@@ -1,0 +1,79 @@
+<project default="test">
+    <property name="version" value="0.1"/>
+    <property name="build.compiler" value="gcj"/>
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <path id="classpath">
+        <pathelement location="lib/jsqlparser.jar"/>
+    </path>
+
+    <target name="compile">
+        <mkdir dir="build/classes"/>
+        <javac srcdir="src" destdir="build/classes" debug="on">
+            <classpath refid="classpath"/>
+        </javac>
+    </target>
+
+    <!-- target name="javadoc">
+        <mkdir dir="build/apidocs"/>
+        <javadoc packagenames="org.tinytemplate"
+            sourcepath="src"
+            windowtitle="Tiny Template version ${version}"
+            version="true"
+            bottom="Tiny Template version ${version}.  For more information see &lt;a href=&quot;http://www.tinytemplate.org/&quot;&gt;tinytemplate.org&lt;a&gt;."
+            destdir="build/apidocs">
+            <classpath refid="classpath"/>
+        </javadoc>
+    </target -->
+
+    <path id="test.classpath">
+        <path refid="classpath"/>
+        <pathelement location="lib/junit.jar"/>
+        <pathelement location="build/classes"/>
+    </path>
+
+    <path id="runtest.classpath">
+        <path refid="test.classpath"/>
+        <pathelement location="build/test-classes"/>
+    </path>
+
+    <target name="compile-tests" depends="compile">
+        <mkdir dir="build/test-classes"/>
+        <javac srcdir="test" destdir="build/test-classes">
+            <classpath refid="test.classpath"/>
+        </javac>
+    </target>
+
+    <target name="test" depends="compile-tests">
+        <java classname="junit.textui.TestRunner"
+            classpathref="runtest.classpath"
+            fork="yes" failonerror="yes">
+            <arg value="net.sourceforge.mayfly.SqlTest"/>
+        </java>
+    </target>
+
+    <!-- target name="jar" depends="compile,test">
+        <jar jarfile="build/tinytemplate.jar" basedir="build/classes"/>
+    </target>
+
+    <target name="dist" depends="jar,javadoc">
+        <zip destfile="tinytemplate-${version}.zip">
+            <fileset dir="build">
+                <include name="tinytemplate.jar"/>
+                <include name="apidocs/**"/>
+            </fileset>
+            <fileset dir="lib">
+                <include name="${jdom}"/>
+                <include name="${xpp3}"/>
+            </fileset>
+            <fileset dir=".">
+                <include name="README.txt"/>
+                <include name="src/**"/>
+                <include name="test/**"/>
+            </fileset>
+        </zip>
+    </target -->
+</project>
