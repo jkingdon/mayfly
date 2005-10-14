@@ -2,11 +2,12 @@
   - create a bunch of tables and a few rows, then close database.
   - joins.  This is where the naive approach to queries might break down.
 
-* Transaction isolation.  Fully isolated (probably by making the database
-data structure immutable) should be doable.  How to best simulate the behavior of
-whatever database you are going to use in production?  Is there a way
-to be especially anal (are there cases we can detect and complain on,
-with respect to applications assuming too much/too little isolation)?
+* Transaction isolation.  Fully isolated (probably by making the
+database data structure immutable) should be doable.  How to best
+simulate the behavior of whatever database you are going to use in
+production?  Is there a way to be especially anal (are there cases we
+can detect and complain on, with respect to applications assuming too
+much/too little isolation)?
 
 Possible features (beyond those in DESCRIPTION.txt):
 

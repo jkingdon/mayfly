@@ -1,16 +1,66 @@
-Although there are a vast number of free and non-free SQL implementations, few of them are really good for unit testing.  A database for unit testing should be very fast on small data sets and should not present performance or other obstacles to setting up databases, adding and removing tables, and destroying databases.  A typical unit test run will want to create thousands of databases.  With most SQL databases, this is not achievable, and one must resort to compromises such as keeping the tables around and only setting up data on each unit test run.  Mayfly aims to make creating an in-memory SQL database as easy as creating any other in-memory data structure.  The leading alternative is hypersonic ( http://hsqldb.org/ ) but it still can be a bit on the slow side (benchmarking it is one of our tasks) and does not allow one to freely create in-memory databases in the same way that one can create Java objects.
+Although there are a vast number of free and non-free SQL
+implementations, few of them are really good for unit testing.  A
+database for unit testing should be very fast on small data sets and
+should not present performance or other obstacles to setting up
+databases, adding and removing tables, and destroying databases.  A
+typical unit test run will want to create thousands of databases.
+With most SQL databases, this is not achievable, and one must resort
+to compromises such as keeping the tables around and only setting up
+data on each unit test run.  Mayfly aims to make creating an in-memory
+SQL database as easy as creating any other in-memory data structure.
+The leading alternative is hypersonic ( http://hsqldb.org/ ) but it
+still can be a bit on the slow side (benchmarking it is one of our
+tasks) and does not allow one to freely create in-memory databases in
+the same way that one can create Java objects.
 
-Mayfly is written in Java (currently works with gcj/libgcj and probably Sun's 1.4, although exact versions of Java may change), and should run on any OS which provides a Java platform.  It relies on the JDBC interfaces from the Java platform (and will implement most of JDBC, although we aren't sure about certain aspects of JDBC which do not fit well with our vision of making a database as easy to manage as a Java object).  The current implementation relies on SQLParser ( http://jsqlparser.sourceforge.net/ ) although this is subject to change.  Our own unit tests are written with JUnit ( http://www.junit.org/ ) although Mayfly should be useful for unit tests written with any unit test framework.  The current implementation does depend on other packages, and in the future we don't expect a huge number to be dragged in (probably some subset of the usual suspects such as Apache Commons - http://jakarta.apache.org/commons/ - as needed).  If we do decide to provide persistence (the ability to save the database to disk), the leading candidate for that would be Prevayler ( http://www.prevayler.org/ ), although persistence is not very high on the list of goals for Mayfly.
+Mayfly is written in Java (currently works with gcj/libgcj and
+probably Sun's 1.4, although exact versions of Java may change), and
+should run on any OS which provides a Java platform.  It relies on the
+JDBC interfaces from the Java platform (and will implement most of
+JDBC, although we aren't sure about certain aspects of JDBC which do
+not fit well with our vision of making a database as easy to manage as
+a Java object).  The current implementation relies on SQLParser (
+http://jsqlparser.sourceforge.net/ ) although this is subject to
+change.  Our own unit tests are written with JUnit (
+http://www.junit.org/ ) although Mayfly should be useful for unit
+tests written with any unit test framework.  The current
+implementation does depend on other packages, and in the future we
+don't expect a huge number to be dragged in (probably some subset of
+the usual suspects such as Apache Commons -
+http://jakarta.apache.org/commons/ - as needed).  If we do decide to
+provide persistence (the ability to save the database to disk), the
+leading candidate for that would be Prevayler (
+http://www.prevayler.org/ ), although persistence is not very high on
+the list of goals for Mayfly.
 
-The big challenge is being able to implement enough of SQL to run real applications.  If Mayfly does not implement enough of SQL as found in Postgres, Oracle, MySQL, etc, developers are unlikely to find it useful.  Other challenges include figuring out whether the simple implementations currently envisaged (for example, table scans rather than indexes) suffice for the kinds of data sets which unit tests end up using.  And of course, Mayfly needs to remain fast.
+The big challenge is being able to implement enough of SQL to run real
+applications.  If Mayfly does not implement enough of SQL as found in
+Postgres, Oracle, MySQL, etc, developers are unlikely to find it
+useful.  Other challenges include figuring out whether the simple
+implementations currently envisaged (for example, table scans rather
+than indexes) suffice for the kinds of data sets which unit tests end
+up using.  And of course, Mayfly needs to remain fast.
 
 A short list of SQL features which we believe are high priority are:
 
 * subselects
-* inner and outer joins (including the machinery, such as SQL aliases, to return data from several tables)
-* data types of numeric, string, CLOB, BLOB, date (probably with syntax as similar as feasible to Oracle, Postgres, etc)
+
+* inner and outer joins (including the machinery, such as SQL aliases,
+  to return data from several tables)
+
+* data types of numeric, string, CLOB, BLOB, date (probably with
+  syntax as similar as feasible to Oracle, Postgres, etc)
+
 * SQL operators such as IN, NOT IN, LIKE, BETWEEN, OR, etc.
 
-We do not envisage providing network protocols or database dump formats, at least not initially.  It should be possible to write such tools on top of Mayfly via JDBC, or such things may become part of Mayfly later on (for a database dump format, one likely choice is an XML serialization of the Mayfly objects, using something such as XStream - http://xstream.codehaus.org/ ).
+We do not envisage providing network protocols or database dump
+formats, at least not initially.  It should be possible to write such
+tools on top of Mayfly via JDBC, or such things may become part of
+Mayfly later on (for a database dump format, one likely choice is an
+XML serialization of the Mayfly objects, using something such as
+XStream - http://xstream.codehaus.org/ ).
 
-As of this writing, Mayfly consists of about 1000 lines of Java code which only is starting to understand the simplest SQL commands like INSERT and SELECT, although we expect it to grow rapidly.  Sourceforge will represent the first public availability of this code, or any documentation/information/etc.
+As of this writing, Mayfly consists of about 1000 lines of Java code
+which only is starting to understand the simplest forms of SQL
+commands like INSERT and SELECT, although we expect it to grow
+rapidly.
