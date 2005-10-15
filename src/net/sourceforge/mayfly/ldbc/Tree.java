@@ -83,8 +83,10 @@ public class Tree implements AST {
         try {
             SQLTokenTypes t = new SQLTokenTypes() {};
 
-            for (Field f : SQLTokenTypes.class.getFields()) {
-                if (f.get(t).equals(code)) {
+            Field[] fields = SQLTokenTypes.class.getFields();
+            for (int i = 0; i < fields.length; ++i) {
+                Field f = fields[i];
+                if (f.get(t).equals(new Integer(code))) {
                     return f.getName();
                 }
             }
@@ -180,7 +182,7 @@ public class Tree implements AST {
     }
 
     public Children children() {
-        Collection<Tree> elements = new ArrayList<Tree>();
+        Collection elements = new ArrayList();
 
         if (getFirstChild()!=null) {
             Tree child = new Tree(getFirstChild());
@@ -196,36 +198,36 @@ public class Tree implements AST {
         return new Children(elements);
     }
 
-    public static class Children extends Enumerable<Children, Tree> {
-        private Collection<Tree> elements;
+    public static class Children extends Enumerable {
+        private Collection elements;
 
-        public Children(Collection<Tree> elements) {
+        public Children(Collection elements) {
             this.elements = elements;
         }
 
-        protected Children createNew(Collection<Tree> items) {
+        protected Object createNew(Collection items) {
             return new Tree.Children(items);
         }
 
-        public Iterator<Tree> iterator() {
+        public Iterator iterator() {
             return elements.iterator();
         }
 
         public Children ofType(int type) {
-            return select(new TypeIs(type));
+            return (Children) select(new TypeIs(type));
         }
 
     }
 
-    public static class TypeIs implements Selector<Tree> {
+    public static class TypeIs implements Selector {
         private int type;
 
         public TypeIs(int type) {
             this.type = type;
         }
 
-        public boolean evaluate(Tree candidate) {
-            return candidate.getType()==type;
+        public boolean evaluate(Object candidate) {
+            return ((Tree)candidate).getType() == type;
         }
     }
 }

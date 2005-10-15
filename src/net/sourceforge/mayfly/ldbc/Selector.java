@@ -1,5 +1,5 @@
 package net.sourceforge.mayfly.ldbc;
 
-public interface Selector<T> {
-    public boolean evaluate(T candidate);
+public interface Selector {
+    public boolean evaluate(Object candidate);
 }

@@ -2,19 +2,25 @@ package net.sourceforge.mayfly.ldbc;
 
 import java.util.*;
 
-abstract public class Enumerable<AggregateT, ElementT> extends ValueObject implements Iterable<ElementT> {
+abstract public class Enumerable extends ValueObject {
     
-    public <To> Collection<To> collect(Transformer<ElementT, To> transformer) {
-        List<To> results = new ArrayList<To>();
-        for (ElementT item : this) {
+    public Collection collect(Transformer transformer) {
+        List results = new ArrayList();
+        Iterator iter = iterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
             results.add(transformer.transform(item));
         }
         return results;
     }
 
-    public AggregateT select(Selector<ElementT> selector) {
-        List<ElementT> selected = new ArrayList<ElementT>();
-        for (ElementT item : this) {
+    abstract protected Iterator iterator();
+
+    public Object select(Selector selector) {
+        List selected = new ArrayList();
+        Iterator iter = iterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
             if (selector.evaluate(item)) {
                 selected.add(item);
             }
@@ -22,14 +28,16 @@ abstract public class Enumerable<AggregateT, ElementT> extends ValueObject imple
         return createNew(selected);
     }
 
-    abstract protected AggregateT createNew(Collection<ElementT> items);
+    abstract protected Object createNew(Collection items);
 
-    public ElementT find(Selector<ElementT> selector) {
+    public Object find(Selector selector) {
         return find(selector, false);
     }
 
-    private ElementT find(Selector<ElementT> selector, boolean shouldReturnNull) {
-        for (ElementT item : this) {
+    private Object find(Selector selector, boolean shouldReturnNull) {
+        Iterator iter = iterator();
+        while (iter.hasNext()) {
+            Object item = iter.next();
             if (selector.evaluate(item)) {
                 return item;
             }
@@ -42,8 +50,8 @@ abstract public class Enumerable<AggregateT, ElementT> extends ValueObject imple
         }
     }
 
-    public boolean exists(Selector<ElementT> selector) {
-        return find(selector, true)!=null;
+    public boolean exists(Selector selector) {
+        return find(selector, true) != null;
     }
 
 }
