@@ -1,10 +1,9 @@
 package net.sourceforge.mayfly;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
+import junit.framework.*;
 
-import junit.framework.TestCase;
+import java.sql.*;
+import java.util.*;
 
 public class SqlTest extends TestCase {
     
