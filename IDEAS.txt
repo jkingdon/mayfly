@@ -16,3 +16,18 @@ Possible features (beyond those in DESCRIPTION.txt):
   function, for example (either as a full implementation, or just
   as a project-specific implementation which only supports a single
   date format).
+
+Things to document somewhere:
+
+* For info on gcj, best site I've found so far is:
+
+http://fedoraproject.org/wiki/JavaFAQ
+
+with one of the most annoying bugs being the lack of line numbers in java stack traces:
+
+http://fedoraproject.org/wiki/JavaStackTraces
+
+and the next most annoying being the random Eclipse crashes and little things which don't work (that's concerning the Eclipse from Fedora Core 4 - other versions of Eclipse are a different matter).
+
+There are some java-related items in:
+http://www.fedoraproject.org/wiki/FC5Future
