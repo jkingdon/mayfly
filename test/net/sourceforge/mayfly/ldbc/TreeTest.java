@@ -44,7 +44,7 @@ public class TreeTest extends TestCase {
     }
 
     public void testChildren() throws Exception {
-        Collection<Tree> expectedElements = new ArrayList<Tree>();
+        Collection expectedElements = new ArrayList();
         expectedElements.add(asterisk);
         expectedElements.add(foo);
         expectedElements.add(comma);
@@ -63,6 +63,17 @@ public class TreeTest extends TestCase {
         assertFalse(typeIs.evaluate(asterisk));
         assertFalse(typeIs.evaluate(comma));
         assertFalse(typeIs.evaluate(where));
+    }
+
+    public void testTypeIsAnyOf() throws Exception {
+        Selector typeIsAnyOf = new Tree.TypeIsAnyOf(new int[] {SQLTokenTypes.SELECTED_TABLE, SQLTokenTypes.COMMA});
+
+        assertTrue(typeIsAnyOf.evaluate(foo));
+        assertTrue(typeIsAnyOf.evaluate(bar));
+        assertTrue(typeIsAnyOf.evaluate(comma));
+
+        assertFalse(typeIsAnyOf.evaluate(asterisk));
+        assertFalse(typeIsAnyOf.evaluate(where));
     }
 
 

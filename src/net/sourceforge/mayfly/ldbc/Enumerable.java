@@ -2,44 +2,55 @@ package net.sourceforge.mayfly.ldbc;
 
 import java.util.*;
 
-abstract public class Enumerable extends ValueObject {
-    
-    public Collection collect(Transformer transformer) {
-        List results = new ArrayList();
-        Iterator iter = iterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            results.add(transformer.transform(item));
-        }
+abstract public class Enumerable extends ValueObject implements Iterable {
+
+    public Collection collect(final Transformer transformer) {
+        final List results = new ArrayList();
+
+        each(new Each() {
+            public void each(Object obj) {
+                results.add(transformer.transform(obj));
+            }
+        });
+
         return results;
     }
 
-    abstract protected Iterator iterator();
-
-    public Object select(Selector selector) {
-        List selected = new ArrayList();
-        Iterator iter = iterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            if (selector.evaluate(item)) {
-                selected.add(item);
-            }
+    public void each(Each e) {
+        for (Iterator iterator = this.iterator(); iterator.hasNext();) {
+            Object o = iterator.next();
+            e.each(o);
         }
-        return createNew(selected);
     }
 
-    abstract protected Object createNew(Collection items);
+    public Object select(final Selector selector) {
+        final List selected = new ArrayList();
+
+        each(
+            new Each() {
+                public void each(Object obj) {
+                    if (selector.evaluate(obj)) {
+                        selected.add(obj);
+                    }
+                }
+            }
+        );
+
+        return createNew(new IterableCollection(selected));
+    }
+
+    abstract protected Object createNew(Iterable items);
 
     public Object find(Selector selector) {
         return find(selector, false);
     }
 
     private Object find(Selector selector, boolean shouldReturnNull) {
-        Iterator iter = iterator();
-        while (iter.hasNext()) {
-            Object item = iter.next();
-            if (selector.evaluate(item)) {
-                return item;
+
+        for (Iterator iterator = this.iterator(); iterator.hasNext();) {
+            Object element = iterator.next();
+            if (selector.evaluate(element)) {
+                return element;
             }
         }
 
@@ -51,7 +62,18 @@ abstract public class Enumerable extends ValueObject {
     }
 
     public boolean exists(Selector selector) {
-        return find(selector, true) != null;
+        return find(selector, true)!=null;
+    }
+
+    public static List asList(Iterable iter) {
+        List l = new ArrayList();
+
+        for (Iterator iterator = iter.iterator(); iterator.hasNext();) {
+            Object o =  iterator.next();
+            l.add(o);
+        }
+
+        return l;
     }
 
 }

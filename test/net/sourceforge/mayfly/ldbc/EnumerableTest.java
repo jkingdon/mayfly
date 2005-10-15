@@ -7,38 +7,40 @@ import java.util.*;
 public class EnumerableTest extends TestCase {
     public void testSelect() throws Exception {
         Strings result =
-            new Strings("a", "b", "c")
+            (Strings)
+                new Strings(new String[]{"a", "b", "c"})
                 .select(
-                    new Selector<String>() {
-                        public boolean evaluate(String candidate) {
+                    new Selector() {
+                        public boolean evaluate(Object candidate) {
                             return candidate.equals("a") || candidate.equals("c");
                         }
                     }
                 );
 
-        assertEquals(new Strings("a", "c"), result);
+        assertEquals(new Strings(new String[]{"a", "c"}), result);
     }
 
     public void testCollect() throws Exception {
-        Collection<String> collected = new Strings("a", "b")
+        Collection collected = new Strings(new String[]{"a", "b"})
             .collect(
-                new Transformer<String, String>() {
-                    public String transform(String from) {
+                new Transformer() {
+                    public Object transform(Object from) {
                         return from + "x";
                     }
                 }
             );
 
-        assertEquals(Arrays.asList("ax", "bx"), collected);
+        assertEquals(Arrays.asList(new Object[]{"ax", "bx"}),
+                     collected);
     }
 
 
     public void testFindAndExists() throws Exception {
         assertEquals("b",
-                     new Strings("a", "b", "c")
+                     new Strings(new String[]{"a", "b", "c"})
                         .find(
-                            new Selector<String>() {
-                                public boolean evaluate(String candidate) {
+                            new Selector() {
+                                public boolean evaluate(Object candidate) {
                                     return candidate.equals("b");
                                 }
                             }
@@ -46,10 +48,10 @@ public class EnumerableTest extends TestCase {
         );
 
         assertTrue(
-            new Strings("a", "b", "c")
+            new Strings(new String[]{"a", "b", "c"})
                         .exists(
-                            new Selector<String>() {
-                                public boolean evaluate(String candidate) {
+                            new Selector() {
+                                public boolean evaluate(Object candidate) {
                                     return candidate.equals("b");
                                 }
                             }
@@ -57,19 +59,20 @@ public class EnumerableTest extends TestCase {
         );
     }
 
-    class Strings extends Enumerable<Strings, String> {
-        private Collection<String> strings;
+    class Strings extends Enumerable {
+        private Collection strings;
 
-        public Strings(String... strings) {
+        public Strings(String[] strings) {
             this.strings = Arrays.asList(strings);
         }
 
-        public Iterator<String> iterator() {
+        public Iterator iterator() {
             return strings.iterator();
         }
 
-        protected Strings createNew(Collection<String> items) {
-            return new Strings(items.toArray(new String[items.size()]));
+        protected Object createNew(Iterable items) {
+            List list = asList(items);
+            return new Strings((String[]) list.toArray(new String[list.size()]));
         }
 
     }

@@ -4,10 +4,12 @@ import org.ldbc.antlr.*;
 import org.ldbc.antlr.collections.*;
 import org.ldbc.core.*;
 import org.ldbc.parser.*;
+import org.apache.commons.lang.*;
 
 import java.io.*;
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.List;
 
 public class Tree implements AST {
 
@@ -58,13 +60,13 @@ public class Tree implements AST {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuffer sb = new StringBuffer();
         treeString("", this, sb);
         return sb.toString();
     }
 
 
-    private void treeString(String prefix, AST ast, StringBuilder sb) {
+    private void treeString(String prefix, AST ast, StringBuffer sb) {
         sb.append(prefix + ast.getText() + " (" + typeName(ast.getType()) + ")" + "\n");
 
         AST child = ast.getFirstChild();
@@ -83,9 +85,8 @@ public class Tree implements AST {
         try {
             SQLTokenTypes t = new SQLTokenTypes() {};
 
-            Field[] fields = SQLTokenTypes.class.getFields();
-            for (int i = 0; i < fields.length; ++i) {
-                Field f = fields[i];
+            for (int i = 0; i < SQLTokenTypes.class.getFields().length; i++) {
+                Field f = SQLTokenTypes.class.getFields()[i];
                 if (f.get(t).equals(new Integer(code))) {
                     return f.getName();
                 }
@@ -205,8 +206,8 @@ public class Tree implements AST {
             this.elements = elements;
         }
 
-        protected Object createNew(Collection items) {
-            return new Tree.Children(items);
+        protected Object createNew(Iterable items) {
+            return new Tree.Children(asList(items));
         }
 
         public Iterator iterator() {
@@ -227,7 +228,19 @@ public class Tree implements AST {
         }
 
         public boolean evaluate(Object candidate) {
-            return ((Tree)candidate).getType() == type;
+            return ((Tree)candidate).getType()==type;
+        }
+    }
+
+    public static class TypeIsAnyOf implements Selector {
+        private List possibleTypes;
+
+        public TypeIsAnyOf(int[] possibleTypes) {
+            this.possibleTypes = Arrays.asList(ArrayUtils.toObject(possibleTypes));
+        }
+
+        public boolean evaluate(Object candidate) {
+            return possibleTypes.contains(new Integer(((Tree)candidate).getType()));
         }
     }
 }

@@ -5,31 +5,32 @@ import org.ldbc.antlr.collections.*;
 import java.util.*;
 import java.util.List;
 
-public class Dimensions extends Enumerable<Dimensions, Dimension> {
+public class Dimensions extends Enumerable {
 
-    private Collection<Dimension> dimensions = new ArrayList<Dimension>();
+    private Collection dimensions = new ArrayList();
 
 
-    public Dimensions(Dimension... dimensions) {
-        this(Arrays.asList(dimensions));
-    }
+    public Dimensions() { }
 
-    private Dimensions(Collection<Dimension> dimensions) {
+    private Dimensions(Collection dimensions) {
         this.dimensions = dimensions;
     }
 
-    protected Dimensions createNew(Collection<Dimension> items) {
-        return new Dimensions(items);
+
+    protected Object createNew(Iterable items) {
+        return new Dimensions(asList(items));
     }
 
-    public Iterator<Dimension> iterator() {
+    public Iterator iterator() {
         return dimensions.iterator();
     }
 
-    public static Dimensions fromTableTrees(Iterable<Tree> tables) {
-        List<Dimension> elements = new ArrayList<Dimension>();
+    public static Dimensions fromTableTrees(Iterable tables) {
+        List elements = new ArrayList();
 
-        for (Tree table : tables) {
+        for (Iterator iterator = tables.iterator(); iterator.hasNext();) {
+            Tree table = (Tree) iterator.next();
+
             AST firstIdentifier = table.getFirstChild();
             String tableName = firstIdentifier.getText();
 
@@ -44,5 +45,10 @@ public class Dimensions extends Enumerable<Dimensions, Dimension> {
         }
 
         return new Dimensions(elements);
+    }
+
+    public Dimensions add(Dimension dimension) {
+        dimensions.add(dimension);
+        return this;
     }
 }
