@@ -6,9 +6,9 @@ public class RowMasksTest extends TestCase {
     //takes a row with a superset of columns and transforms into a row with a subset
 
     public void testFromTree() throws Exception {
-        Tree tree = Tree.parse("select f.*, b.name, b.comment from foo f, bar b");
+        //Tree tree = Tree.parse("select f.*, b.name, b.comment from foo f, bar b");
 
-        System.out.println(tree.toString());
+        //System.out.println(tree.toString());
 
 
         

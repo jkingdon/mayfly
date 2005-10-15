@@ -229,16 +229,25 @@ public class Database {
 
         // really, arguments should be the column names and such for *this table*
         public void addRow(List columns, ItemsList itemsList) throws SQLException {
-            Map row = new HashMap();
+            List columnNames = new ArrayList();
+            List values = new ArrayList();
 
             List items = walkList(itemsList);
             for (int i = 0; i < columns.size(); ++i) {
                 Column column = (Column) columns.get(i);
-                ColumnDefinition definition = findColumn(column.getColumnName());
                 LongValue expression = (LongValue) items.get(i);
-                row.put(definition.getColumnName(), expression);
+                columnNames.add(column.getColumnName());
+                values.add(expression);
             }
             
+            addRow(columnNames, values);
+        }
+
+        public void addRow(List columnNames, List values) {
+            Map row = new HashMap();
+            for (int i = 0; i < columnNames.size(); ++i) {
+                row.put(columnNames.get(i), values.get(i));
+            }
             rows.add(row);
         }
 

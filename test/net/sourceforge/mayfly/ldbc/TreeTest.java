@@ -32,7 +32,7 @@ public class TreeTest extends TestCase {
             //dimensions.
             //constraint.
 
-        System.out.println(t.toString());
+        //System.out.println(t.toString());
     }
 
     public void testEquality() throws Exception {
