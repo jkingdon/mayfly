@@ -211,5 +211,21 @@ public class Tree implements AST {
             return elements.iterator();
         }
 
+        public Children ofType(int type) {
+            return select(new TypeIs(type));
+        }
+
+    }
+
+    public static class TypeIs implements Selector<Tree> {
+        private int type;
+
+        public TypeIs(int type) {
+            this.type = type;
+        }
+
+        public boolean evaluate(Tree candidate) {
+            return candidate.getType()==type;
+        }
     }
 }

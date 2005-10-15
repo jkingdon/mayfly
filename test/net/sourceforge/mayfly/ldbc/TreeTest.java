@@ -1,17 +1,36 @@
 package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
+import org.ldbc.parser.*;
 
 import java.util.*;
 
 public class TreeTest extends TestCase {
+    private Tree asterisk;
+    private Tree foo;
+    private Tree comma;
+    private Tree bar;
+    private Tree where;
+    private Tree t;
+
+    public void setUp() throws Exception {
+        super.setUp();
+
+        t = Tree.parse("select * from foo f, bar b where f.id=b.id and f.name='steve'");
+
+
+        asterisk = new Tree(t.getFirstChild());
+        foo = new Tree(asterisk.getNextSibling());
+        comma = new Tree(foo.getNextSibling());
+        bar = new Tree(comma.getNextSibling());
+        where = new Tree(bar.getNextSibling());
+    }
+
     public void testTree() throws Exception {
         //select consists of :
             //mask.
             //dimensions.
             //constraint.
-
-        Tree t = Tree.parse("select * from foo f, bar b where f.id=b.id and f.name='steve'");
 
         System.out.println(t.toString());
     }
@@ -25,15 +44,6 @@ public class TreeTest extends TestCase {
     }
 
     public void testChildren() throws Exception {
-        Tree t = Tree.parse("select * from foo f, bar b where f.id=b.id and f.name='steve'");
-
-
-        Tree asterisk = new Tree(t.getFirstChild());
-        Tree foo = new Tree(asterisk.getNextSibling());
-        Tree comma = new Tree(foo.getNextSibling());
-        Tree bar = new Tree(comma.getNextSibling());
-        Tree where = new Tree(bar.getNextSibling());
-
         Collection<Tree> expectedElements = new ArrayList<Tree>();
         expectedElements.add(asterisk);
         expectedElements.add(foo);
@@ -42,6 +52,17 @@ public class TreeTest extends TestCase {
         expectedElements.add(where);
 
         assertEquals(new Tree.Children(expectedElements), t.children());
+    }
+
+    public void testTypeIs() throws Exception {
+        Selector typeIs = new Tree.TypeIs(SQLTokenTypes.SELECTED_TABLE);
+
+        assertTrue(typeIs.evaluate(foo));
+        assertTrue(typeIs.evaluate(bar));
+
+        assertFalse(typeIs.evaluate(asterisk));
+        assertFalse(typeIs.evaluate(comma));
+        assertFalse(typeIs.evaluate(where));
     }
 
 
