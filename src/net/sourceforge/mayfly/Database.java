@@ -212,12 +212,12 @@ public class Database {
         }
     }
 
-    private Map tables = new HashMap();
+    DataStore dataStore = new DataStore();
 
     public void execute(String command) throws SQLException {
         Statement statement = parse(command);
         if (statement instanceof Drop) {
-            dropTable(((Drop)statement).getName());
+            dataStore = dataStore.dropTable(((Drop)statement).getName());
         } else if (statement instanceof CreateTable) {
             CreateTable createTable = (CreateTable) statement;
             createTable(createTable.getTable().getName(), 
@@ -243,7 +243,7 @@ public class Database {
     private ResultSet select(SelectBody selectBody) throws SQLException {
         MySelectVisitor visitor = new MySelectVisitor();
         selectBody.accept(visitor);
-        final TableData tableData = lookUpTable(visitor.tableName);
+        final TableData tableData = dataStore.table(visitor.tableName);
 
         List selectItems = visitor.plainSelect.getSelectItems();
         if (selectItems.size() != 1) {
@@ -289,8 +289,7 @@ public class Database {
     }
 
     private void createTable(String table, List columns) {
-        List columnNames = columnNamesFromDefinitions(columns);
-        tables.put(table.toLowerCase(), new TableData(columnNames));
+        dataStore = dataStore.createTable(table, columnNamesFromDefinitions(columns));
     }
 
     private List columnNamesFromDefinitions(List columns) {
@@ -307,34 +306,12 @@ public class Database {
         return columnNames;
     }
 
-    private void dropTable(String table) throws SQLException {
-        if (tables.containsKey(table.toLowerCase())) {
-            tables.remove(table.toLowerCase());
-        } else {
-            throw new SQLException("no such table " + table);
-        }
-    }
-
-    private TableData lookUpTable(String table) throws SQLException {
-        if (tables.containsKey(table.toLowerCase())) {
-            return (TableData) tables.get(table.toLowerCase());
-        } else {
-            throw new SQLException("no such table " + table);
-        }
-    }
-
 
     private void insert(String table, List columns, ItemsList itemsList)
     throws SQLException {
-        TableData tableData = lookUpTable(table);
-        addRow(tableData, columns, itemsList);
-    }
-
-    // really, arguments should be the column names and such for *this table*
-    public void addRow(TableData tableData, List columns, ItemsList itemsList) throws SQLException {
         List columnNames = new ArrayList();
         List values = new ArrayList();
-
+        
         List items = walkList(itemsList);
         for (int i = 0; i < columns.size(); ++i) {
             Column column = (Column) columns.get(i);
@@ -343,7 +320,7 @@ public class Database {
             values.add(new Long(expression.getValue()));
         }
         
-        tableData.addRow(columnNames, values);
+        dataStore = dataStore.addRow(table, columnNames, values);
     }
 
     private List walkList(ItemsList itemsList) {
@@ -360,7 +337,7 @@ public class Database {
      * some kind of convenience method.
      */
     public Set tables() {
-        return Collections.unmodifiableSet(tables.keySet());
+        return dataStore.tables();
     }
 
     /**
@@ -371,7 +348,7 @@ public class Database {
      * some kind of convenience method.
      */
     public List columnNames(String tableName) throws SQLException {
-        TableData tableData = lookUpTable(tableName);
+        TableData tableData = dataStore.table(tableName);
         return tableData.columnNames();
     }
 
@@ -383,7 +360,7 @@ public class Database {
      * what code should be doing (except perhaps some test code?).
      */
     public int rowCount(String tableName) throws SQLException {
-        TableData tableData = lookUpTable(tableName);
+        TableData tableData = dataStore.table(tableName);
         return tableData.rowCount();
     }
 
@@ -392,7 +369,7 @@ public class Database {
      * {@link ResultSet} code is done.
      */
     public int getInt(String tableName, String columnName, int rowIndex) throws SQLException {
-        TableData tableData = lookUpTable(tableName);
+        TableData tableData = dataStore.table(tableName);
         return tableData.getInt(columnName, rowIndex);
     }
 
