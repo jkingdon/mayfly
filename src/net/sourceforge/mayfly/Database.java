@@ -12,6 +12,7 @@ import net.sf.jsqlparser.statement.create.table.*;
 import net.sf.jsqlparser.statement.drop.*;
 import net.sf.jsqlparser.statement.insert.*;
 import net.sf.jsqlparser.statement.select.*;
+import net.sourceforge.mayfly.datastore.*;
 
 import java.io.*;
 import java.sql.*;
@@ -199,74 +200,16 @@ public class Database {
         
     }
 
-    class TableData {
-        class MyItemListVisitor implements ItemsListVisitor {
-            ExpressionList expressions;
+    class MyItemListVisitor implements ItemsListVisitor {
+        ExpressionList expressions;
 
-            public void visit(SubSelect subSelect) {
-                throw new UnimplementedException("no subselects yet");
-            }
-
-            public void visit(ExpressionList expressionList) {
-                expressions = expressionList;
-            }
+        public void visit(SubSelect subSelect) {
+            throw new UnimplementedException("no subselects yet");
         }
 
-        List columnDefinitions;
-        List rows;
-
-        TableData(List columnDefinitions) {
-            super();
-            this.columnDefinitions = columnDefinitions;
-            this.rows = new ArrayList();
+        public void visit(ExpressionList expressionList) {
+            expressions = expressionList;
         }
-
-        public int getInt(String columnName, int rowIndex) throws SQLException {
-            Map row = (Map) rows.get(rowIndex);
-            LongValue value = (LongValue) row.get(findColumn(columnName).getColumnName());
-            return (int) value.getValue();
-        }
-
-        // really, arguments should be the column names and such for *this table*
-        public void addRow(List columns, ItemsList itemsList) throws SQLException {
-            List columnNames = new ArrayList();
-            List values = new ArrayList();
-
-            List items = walkList(itemsList);
-            for (int i = 0; i < columns.size(); ++i) {
-                Column column = (Column) columns.get(i);
-                LongValue expression = (LongValue) items.get(i);
-                columnNames.add(column.getColumnName());
-                values.add(expression);
-            }
-            
-            addRow(columnNames, values);
-        }
-
-        public void addRow(List columnNames, List values) {
-            Map row = new HashMap();
-            for (int i = 0; i < columnNames.size(); ++i) {
-                row.put(columnNames.get(i), values.get(i));
-            }
-            rows.add(row);
-        }
-
-        private ColumnDefinition findColumn(String columnName) throws SQLException {
-            for (int i = 0; i < columnDefinitions.size(); ++i) {
-                ColumnDefinition definition = (ColumnDefinition) columnDefinitions.get(i);
-                if (columnName.equalsIgnoreCase(definition.getColumnName())) {
-                    return definition;
-                }
-            }
-            throw new SQLException("no column " + columnName);
-        }
-
-        private List walkList(ItemsList itemsList) {
-            MyItemListVisitor visitor = new MyItemListVisitor();
-            itemsList.accept(visitor);
-            return visitor.expressions.getExpressions();
-        }
-        
     }
 
     private Map tables = new HashMap();
@@ -315,7 +258,7 @@ public class Database {
         expression.accept(expressionVisitor);
         final Column column = expressionVisitor.column;
         
-        final int rowCount = tableData.rows.size();
+        final int rowCount = tableData.rowCount();
 
         return new ResultSetStub() {
             int pos = -1;
@@ -346,7 +289,22 @@ public class Database {
     }
 
     private void createTable(String table, List columns) {
-        tables.put(table.toLowerCase(), new TableData(columns));
+        List columnNames = columnNamesFromDefinitions(columns);
+        tables.put(table.toLowerCase(), new TableData(columnNames));
+    }
+
+    private List columnNamesFromDefinitions(List columns) {
+        if (columns == null) {
+            // CREATE TABLE FOO without any columns (is it even legal?)
+            return Collections.EMPTY_LIST;
+        }
+
+        List columnNames = new ArrayList();
+        for (Iterator iter = columns.iterator(); iter.hasNext(); ) {
+            ColumnDefinition definition = (ColumnDefinition) iter.next();
+            columnNames.add(definition.getColumnName());
+        }
+        return columnNames;
     }
 
     private void dropTable(String table) throws SQLException {
@@ -369,9 +327,31 @@ public class Database {
     private void insert(String table, List columns, ItemsList itemsList)
     throws SQLException {
         TableData tableData = lookUpTable(table);
-        tableData.addRow(columns, itemsList);
+        addRow(tableData, columns, itemsList);
     }
 
+    // really, arguments should be the column names and such for *this table*
+    public void addRow(TableData tableData, List columns, ItemsList itemsList) throws SQLException {
+        List columnNames = new ArrayList();
+        List values = new ArrayList();
+
+        List items = walkList(itemsList);
+        for (int i = 0; i < columns.size(); ++i) {
+            Column column = (Column) columns.get(i);
+            LongValue expression = (LongValue) items.get(i);
+            columnNames.add(column.getColumnName());
+            values.add(new Long(expression.getValue()));
+        }
+        
+        tableData.addRow(columnNames, values);
+    }
+
+    private List walkList(ItemsList itemsList) {
+        MyItemListVisitor visitor = new MyItemListVisitor();
+        itemsList.accept(visitor);
+        return visitor.expressions.getExpressions();
+    }
+    
     /**
      * Return table names.
      * 
@@ -392,13 +372,7 @@ public class Database {
      */
     public List columnNames(String tableName) throws SQLException {
         TableData tableData = lookUpTable(tableName);
-        List definitions = tableData.columnDefinitions;
-        List names = new ArrayList();
-        for (Iterator iter = definitions.iterator(); iter.hasNext();) {
-            ColumnDefinition definition = (ColumnDefinition) iter.next();
-            names.add(definition.getColumnName());
-        }
-        return names;
+        return tableData.columnNames();
     }
 
     /**
@@ -410,7 +384,7 @@ public class Database {
      */
     public int rowCount(String tableName) throws SQLException {
         TableData tableData = lookUpTable(tableName);
-        return tableData.rows.size();
+        return tableData.rowCount();
     }
 
     /**

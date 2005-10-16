@@ -59,6 +59,17 @@ public class SqlTest extends TestCase {
         assertEquals("X", columns.get(0));
     }
     
+    public void testInsertWithBadColumnName() throws Exception {
+        database.execute("CREATE TABLE FOO (X NUMBER)");
+        try {
+            database.execute("INSERT INTO FOO (y) values (5)");
+            fail();
+        }
+        catch (SQLException e) {
+            assertEquals("no column y", e.getMessage());
+        }
+    }
+    
     public void testInsert() throws Exception {
         database.execute("CREATE TABLE FOO (X NUMBER)");
         assertEquals(0, database.rowCount("foo"));
