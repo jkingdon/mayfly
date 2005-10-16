@@ -5,13 +5,16 @@ import java.util.*;
 
 public class TableData {
 
-    private List columnNames;
-    private List rows;
+    private final ImmutableList columnNames;
+    private final ImmutableList rows;
 
     public TableData(List columnNames) {
-        super();
-        this.columnNames = new ArrayList(columnNames);
-        this.rows = new ArrayList();
+        this(new ImmutableList(columnNames), new ImmutableList());
+    }
+    
+    private TableData(ImmutableList columnNames, ImmutableList rows) {
+        this.columnNames = columnNames;
+        this.rows = rows;
     }
 
     public int getInt(String columnName, int rowIndex) throws SQLException {
@@ -20,12 +23,12 @@ public class TableData {
         return (int) value.longValue();
     }
 
-    public void addRow(List columnNames, List values) throws SQLException {
-        Map row = new HashMap();
+    public TableData addRow(List columnNames, List values) throws SQLException {
+        Map rowBuilder = new HashMap();
         for (int i = 0; i < columnNames.size(); ++i) {
-            row.put(findColumn((String) columnNames.get(i)), values.get(i));
+            rowBuilder.put(findColumn((String) columnNames.get(i)), values.get(i));
         }
-        rows.add(row);
+        return new TableData(this.columnNames, rows.with(new ImmutableMap(rowBuilder)));
     }
 
     private String findColumn(String columnName) throws SQLException {
@@ -39,7 +42,7 @@ public class TableData {
     }
 
     public List columnNames() {
-        return Collections.unmodifiableList(columnNames);
+        return columnNames;
     }
     
     public int rowCount() {

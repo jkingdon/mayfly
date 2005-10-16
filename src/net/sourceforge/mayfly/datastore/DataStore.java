@@ -5,20 +5,26 @@ import java.util.*;
 
 public class DataStore {
 
-    private Map tables = new HashMap();
+    private final ImmutableMap tables;
+    
+    public DataStore() {
+        this(new ImmutableMap());
+    }
+
+    public DataStore(ImmutableMap tables) {
+        this.tables = tables;
+    }
 
     public DataStore createTable(String table, List columnNames) {
-        tables.put(table.toLowerCase(), new TableData(columnNames));
-        return this;
+        return new DataStore(tables.with(table.toLowerCase(), new TableData(columnNames)));
     }
 
     public DataStore dropTable(String table) throws SQLException {
         if (tables.containsKey(table.toLowerCase())) {
-            tables.remove(table.toLowerCase());
+            return new DataStore(tables.without(table.toLowerCase()));
         } else {
             throw new SQLException("no such table " + table);
         }
-        return this;
     }
 
     public TableData table(String table) throws SQLException {
@@ -30,13 +36,11 @@ public class DataStore {
     }
 
     public Set tables() {
-        return Collections.unmodifiableSet(tables.keySet());
+        return tables.keySet();
     }
 
     public DataStore addRow(String table, List columnNames, List values) throws SQLException {
-        TableData tableData = table(table);
-        tableData.addRow(columnNames, values);
-        return this;
+        return new DataStore(tables.with(table.toLowerCase(), table(table).addRow(columnNames, values)));
     }
 
 }

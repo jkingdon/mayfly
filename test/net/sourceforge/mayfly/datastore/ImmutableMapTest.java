@@ -46,5 +46,19 @@ public class ImmutableMapTest extends TestCase {
         assertEquals("A", addToNonEmpty.get("a"));
         assertEquals("B", addToNonEmpty.get("b"));
     }
+    
+    public void testWithout() throws Exception {
+        ImmutableMap twoEntries = new ImmutableMap().with("a", "A").with("b", "B");
+        Map oneEntry = twoEntries.without("b");
+        assertEquals(1, oneEntry.size());
+        assertEquals("A", oneEntry.get("a"));
+        
+        try {
+            twoEntries.without("c");
+            fail();
+        } catch (NoSuchKeyException expected) {
+            
+        }
+    }
 
 }

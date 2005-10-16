@@ -27,6 +27,14 @@ public class ImmutableMap implements Map {
         return new ImmutableMap(copy, true);
     }
 
+    public ImmutableMap without(Object key) {
+        Map copy = new LinkedHashMap(this);
+        if (copy.remove(key) == null) {
+            throw new NoSuchKeyException(key.toString());
+        }
+        return new ImmutableMap(copy, true);
+    }
+
 
     
 
