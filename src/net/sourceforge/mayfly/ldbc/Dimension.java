@@ -12,4 +12,14 @@ public class Dimension extends ValueObject{
         this.tableName = tableName;
         this.alias = alias;
     }
+
+    public String alias() {
+        return alias;
+    }
+
+    public String tableName() {
+        return tableName;
+    }
+    
+    
 }

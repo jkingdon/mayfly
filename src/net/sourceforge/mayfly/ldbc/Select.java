@@ -4,7 +4,6 @@ import org.ldbc.parser.*;
 
 public class Select extends ValueObject {
 
-
     public static Select fromTree(Tree selectTree) {
         return
             new Select(
@@ -18,4 +17,9 @@ public class Select extends ValueObject {
     public Select(Dimensions from) {
         this.from = from;
     }
+
+    public Dimensions from() {
+        return from;
+    }
+    
 }
