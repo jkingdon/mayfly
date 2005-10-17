@@ -259,21 +259,34 @@ public class Database {
         final Column column = expressionVisitor.column;
         
         final int rowCount = tableData.rowCount();
+        final String canonicalizedColumnName = tableData.findColumn(column.getColumnName());
 
         return new ResultSetStub() {
             int pos = -1;
             
             public boolean next() throws SQLException {
-                if (pos + 1 >= rowCount) {
+                ++pos;
+                if (pos >= rowCount) {
                     return false;
                 } else {
-                    ++pos;
                     return true;
                 }
             }
 
             public int getInt(String columnName) throws SQLException {
-                return tableData.getInt(column.getColumnName(), 0);
+                if (!columnName.equalsIgnoreCase(canonicalizedColumnName)) {
+                    throw new SQLException("no column " + columnName);
+                }
+                
+                if (pos < 0) {
+                    throw new SQLException("no current result row");
+                }
+                
+                if (pos >= rowCount) {
+                    throw new SQLException("already read last result row");
+                }
+
+                return tableData.getInt(canonicalizedColumnName, 0);
             }
             
         };

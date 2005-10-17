@@ -31,7 +31,7 @@ public class TableData {
         return new TableData(this.columnNames, rows.with(new ImmutableMap(rowBuilder)));
     }
 
-    private String findColumn(String columnName) throws SQLException {
+    public String findColumn(String columnName) throws SQLException {
         for (int i = 0; i < columnNames.size(); ++i) {
             String name = (String) columnNames.get(i);
             if (columnName.equalsIgnoreCase(name)) {

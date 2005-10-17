@@ -103,13 +103,8 @@ public class SqlTest extends TestCase {
 
     public void testBadColumnName() throws Exception {
         database.execute("CREATE TABLE FOO (X NUMBER)");
-        // TODO: the insert shouldn't be needed
-        database.execute("INSERT INTO FOO (X) values (5)");
         try {
-            ResultSet results = database.query("select y from foo");
-            // TODO: none of this result set stuff should be needed
-            results.next();
-            results.getInt("y");
+            database.query("select y from foo");
             fail();
         } catch (SQLException e) {
             assertEquals("no column y", e.getMessage());
@@ -125,9 +120,46 @@ public class SqlTest extends TestCase {
         assertFalse(results.next());
     }
     
+    public void testAskResultSetForUnqueriedColumn() throws Exception {
+        database.execute("CREATE TABLE FOO (X NUMBER)");
+        database.execute("INSERT INTO FOO (X) values (5)");
+        ResultSet results = database.query("select x from foo");
+        assertTrue(results.next());
+        try {
+            results.getInt("y");
+            fail();
+        } catch (SQLException e) {
+            assertEquals("no column y", e.getMessage());
+        }
+    }
+    
+    public void testTryToGetResultsBeforeCallingNext() throws Exception {
+        database.execute("CREATE TABLE FOO (X NUMBER)");
+        database.execute("INSERT INTO FOO (X) values (5)");
+        ResultSet results = database.query("select x from foo");
+        try {
+            results.getInt("x");
+            fail();
+        } catch (SQLException e) {
+            assertEquals("no current result row", e.getMessage());
+        }
+    }
+    
+    public void testTryToGetResultsAfterNextReturnsFalse() throws Exception {
+        database.execute("CREATE TABLE FOO (X NUMBER)");
+        database.execute("INSERT INTO FOO (X) values (5)");
+        ResultSet results = database.query("select x from foo");
+        assertTrue(results.next());
+        assertFalse(results.next());
+        try {
+            results.getInt("x");
+            fail("foo");
+        } catch (SQLException e) {
+            assertEquals("already read last result row", e.getMessage());
+        }
+    }
+    
     // Various result set cases:
-    // * try to get results before the first next() call
-    // * bad name for column
     // * give column number instead of name
     // * more than one column
 
