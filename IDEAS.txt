@@ -22,6 +22,12 @@ Possible features (beyond those in DESCRIPTION.txt):
    means they can't be garbage collected, which I guess is OK provided that
    a .close() lets them, or at least the data which they point to, be
    garbage collected).
+    * also, keep a stack trace around for each creation...
+      of result sets, statements, connections, etc.,
+      for auditing, debugging, etc.
+      * if something's not closed, print the stack trace of its creation
+      * when do we assert this?  provide an external method?  or,
+        register a shutdown hook (implications?)?
    
  * Enforce "For maximum portability, result set columns within each row should
    be read in left-to-right order, and each column should be read only once."
