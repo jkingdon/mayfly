@@ -246,20 +246,8 @@ public class Database {
         final TableData tableData = dataStore.table(visitor.tableName);
 
         List selectItems = visitor.plainSelect.getSelectItems();
-        if (selectItems.size() != 1) {
-            throw new UnimplementedException("only one select item allowed (SELECT X not SELECT X, Y)");
-        }
-        SelectItem item = (SelectItem) selectItems.get(0);
-        MySelectItemVisitor selectItemVisitor = new MySelectItemVisitor();
-        item.accept(selectItemVisitor);
-        Expression expression = selectItemVisitor.expression;
-        
-        MyExpressionVisitor expressionVisitor = new MyExpressionVisitor();
-        expression.accept(expressionVisitor);
-        final Column column = expressionVisitor.column;
-        
+        final List canonicalizedColumnNames = selectedColumns(tableData, selectItems);
         final int rowCount = tableData.rowCount();
-        final String canonicalizedColumnName = tableData.findColumn(column.getColumnName());
 
         return new ResultSetStub() {
             int pos = -1;
@@ -274,9 +262,7 @@ public class Database {
             }
 
             public int getInt(String columnName) throws SQLException {
-                if (!columnName.equalsIgnoreCase(canonicalizedColumnName)) {
-                    throw new SQLException("no column " + columnName);
-                }
+                String canonicalizedColumnName = lookUpColumn(canonicalizedColumnNames, columnName);
                 
                 if (pos < 0) {
                     throw new SQLException("no current result row");
@@ -288,8 +274,34 @@ public class Database {
 
                 return tableData.getInt(canonicalizedColumnName, pos);
             }
+
+            private String lookUpColumn(List canonicalizedColumnNames, String target) throws SQLException {
+                for (int i = 0; i < canonicalizedColumnNames.size(); ++i) {
+                    String columnName = (String) canonicalizedColumnNames.get(i);
+                    if (target.equalsIgnoreCase(columnName)) {
+                        return columnName;
+                    }
+                }
+                throw new SQLException("no column " + target);
+            }
             
         };
+    }
+
+    private List selectedColumns(TableData tableData, List selectItems) throws SQLException {
+        List result = new ArrayList(selectItems.size());
+        for (int i = 0; i < selectItems.size(); ++i) {
+            SelectItem item = (SelectItem) selectItems.get(i);
+            MySelectItemVisitor selectItemVisitor = new MySelectItemVisitor();
+            item.accept(selectItemVisitor);
+            Expression expression = selectItemVisitor.expression;
+            MyExpressionVisitor expressionVisitor = new MyExpressionVisitor();
+            expression.accept(expressionVisitor);
+            Column column = expressionVisitor.column;
+            String canonicalizedColumnName = tableData.findColumn(column.getColumnName());
+            result.add(canonicalizedColumnName);
+        }
+        return result;
     }
 
     private Statement parse(String command) throws SQLException {

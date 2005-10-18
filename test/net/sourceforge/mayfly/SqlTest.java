@@ -177,8 +177,17 @@ public class SqlTest extends TestCase {
         assertEquals(expected, actual);
     }
     
+    public void testMultipleColumns() throws Exception {
+        database.execute("CREATE TABLE FOO (X NUMBER, Y NUMBER)");
+        database.execute("INSERT INTO FOO (x, y) values (5, 25)");
+        ResultSet results = database.query("select x, y from foo");
+        assertTrue(results.next());
+        assertEquals(5, results.getInt("x"));
+        assertEquals(25, results.getInt("y"));
+        assertFalse(results.next());
+    }
+    
     // Various result set cases:
     // * give column number instead of name
-    // * more than one column
 
 }
