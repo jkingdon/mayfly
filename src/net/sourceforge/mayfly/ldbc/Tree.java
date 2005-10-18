@@ -1,10 +1,11 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.util.*;
+import org.apache.commons.lang.*;
 import org.ldbc.antlr.*;
 import org.ldbc.antlr.collections.*;
 import org.ldbc.core.*;
 import org.ldbc.parser.*;
-import org.apache.commons.lang.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -33,7 +34,7 @@ public class Tree implements AST {
 
     private AST delegate;
 
-    protected Tree(AST delegate) {
+    public Tree(AST delegate) {
         this.delegate = delegate;
     }
 
@@ -57,6 +58,10 @@ public class Tree implements AST {
 
     public int hashCode() {
         return 0;
+    }
+
+    public void print() {
+        System.out.println(toString());
     }
 
     public String toString() {
@@ -215,9 +220,21 @@ public class Tree implements AST {
         }
 
         public Children ofType(int type) {
-            return (Children) select(new TypeIs(type));
+            return ofTypes(new int[] {type});
         }
 
+        public Children ofTypes(int[] types) {
+            return (Children) select(new TypeIsAnyOf(types));
+        }
+
+        public Tree singleSubtreeOfType(int type) {
+            return (Tree)find(new TypeIs(type));
+        }
+
+        public L convertUsing(final TreeConverters converters, int[] typesToIgnore) {
+            Children selected = (Children) select(new AllExceptTypes(typesToIgnore));
+            return selected.collect(new Convert(converters));
+        }
     }
 
     public static class TypeIs implements Selector {
@@ -241,6 +258,32 @@ public class Tree implements AST {
 
         public boolean evaluate(Object candidate) {
             return possibleTypes.contains(new Integer(((Tree)candidate).getType()));
+        }
+    }
+
+    public static class AllExceptTypes implements Selector {
+        private L typesToIgnore;
+
+        public AllExceptTypes(int[] typesToIgnore) {
+            this.typesToIgnore = L.fromArray(typesToIgnore);
+        }
+
+        public boolean evaluate(Object candidate) {
+            Tree t = (Tree) candidate;
+            return !typesToIgnore.contains(t.getType());
+        }
+    }
+
+    public static class Convert implements Transformer {
+        private TreeConverters converters;
+
+        public Convert(TreeConverters converters) {
+            this.converters = converters;
+        }
+
+        public Object transform(Object from) {
+            Tree t = (Tree) from;
+            return converters.transform(t);
         }
     }
 }

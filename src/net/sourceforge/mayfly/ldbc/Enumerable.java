@@ -1,11 +1,13 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.util.*;
+
 import java.util.*;
 
 abstract public class Enumerable extends ValueObject implements Iterable {
 
-    public Collection collect(final Transformer transformer) {
-        final List results = new ArrayList();
+    public L collect(final Transformer transformer) {
+        final L results = new L();
 
         each(new Each() {
             public void each(Object obj) {

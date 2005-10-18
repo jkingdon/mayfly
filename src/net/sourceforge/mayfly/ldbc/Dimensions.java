@@ -1,18 +1,18 @@
 package net.sourceforge.mayfly.ldbc;
 
-import org.ldbc.antlr.collections.*;
+import org.ldbc.parser.*;
 
 import java.util.*;
 import java.util.List;
 
 public class Dimensions extends Enumerable {
 
-    private Collection dimensions = new ArrayList();
+    private List dimensions = new ArrayList();
 
 
     public Dimensions() { }
 
-    private Dimensions(Collection dimensions) {
+    public Dimensions(List dimensions) {
         this.dimensions = dimensions;
     }
 
@@ -25,23 +25,17 @@ public class Dimensions extends Enumerable {
         return dimensions.iterator();
     }
 
-    public static Dimensions fromTableTrees(Iterable tables) {
+    public static Dimensions fromSelectTree(Tree selectTree) {
+        Tree.Children tables = selectTree.children().ofType(SQLTokenTypes.SELECTED_TABLE);
+
         List elements = new ArrayList();
 
         for (Iterator iterator = tables.iterator(); iterator.hasNext();) {
             Tree table = (Tree) iterator.next();
 
-            AST firstIdentifier = table.getFirstChild();
-            String tableName = firstIdentifier.getText();
+            Dimension dimension = Dimension.fromSeletedTableTree(table);
 
-            AST secondIdentifier = firstIdentifier.getNextSibling();
-
-            if (secondIdentifier==null) {
-                elements.add(new Dimension(tableName));
-            } else {
-                String alias = secondIdentifier.getText();
-                elements.add(new Dimension(tableName, alias));
-            }
+            elements.add(dimension);
         }
 
         return new Dimensions(elements);

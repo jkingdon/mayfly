@@ -26,15 +26,6 @@ public class TreeTest extends TestCase {
         where = new Tree(bar.getNextSibling());
     }
 
-    public void testTree() throws Exception {
-        //select consists of :
-            //mask.
-            //dimensions.
-            //constraint.
-
-        //System.out.println(t.toString());
-    }
-
     public void testEquality() throws Exception {
         assertEquals(Tree.parse("select * from foo f, bar b where f.id=b.id and f.name='steve'"),
                      Tree.parse("select * from foo f, bar b where f.id=b.id and f.name='steve'"));
@@ -74,6 +65,44 @@ public class TreeTest extends TestCase {
 
         assertFalse(typeIsAnyOf.evaluate(asterisk));
         assertFalse(typeIsAnyOf.evaluate(where));
+    }
+
+    public void testSingleSubtreeOfType() throws Exception {
+        assertEquals(comma, t.children().singleSubtreeOfType(SQLTokenTypes.COMMA));
+    }
+
+    public void testConvertUsingConverters() throws Exception {
+        Transformer transformer =
+            new Tree.Convert(
+                new TreeConverters()
+                    .register(SQLTokenTypes.ASTERISK,         new TreeConverters.Converter() {
+                                                                public Object convert(Tree from, TreeConverters converters) {
+                                                                    return "asterisk";
+                                                                }
+                                                            })
+                    .register(SQLTokenTypes.COMMA,          new TreeConverters.Converter() {
+                                                        public Object convert(Tree from, TreeConverters converters) {
+                                                            return "comma";
+                                                        }
+                                                    }));
+
+        assertEquals("asterisk", transformer.transform(asterisk));
+        assertEquals("comma", transformer.transform(comma));
+    }
+
+    public void testIgnore() throws Exception {
+        Selector selector =
+            new Tree.AllExceptTypes(new int[]{
+                                        SQLTokenTypes.SELECTED_TABLE,
+                                        SQLTokenTypes.COMMA
+                                    });
+
+        assertTrue(selector.evaluate(asterisk));
+        assertTrue(selector.evaluate(where));
+
+        assertFalse(selector.evaluate(comma));
+        assertFalse(selector.evaluate(foo));
+        assertFalse(selector.evaluate(bar));
     }
 
 
