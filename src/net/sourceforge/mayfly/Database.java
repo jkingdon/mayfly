@@ -286,7 +286,7 @@ public class Database {
                     throw new SQLException("already read last result row");
                 }
 
-                return tableData.getInt(canonicalizedColumnName, 0);
+                return tableData.getInt(canonicalizedColumnName, pos);
             }
             
         };

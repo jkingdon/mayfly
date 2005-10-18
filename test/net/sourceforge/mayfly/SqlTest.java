@@ -159,6 +159,24 @@ public class SqlTest extends TestCase {
         }
     }
     
+    public void testTwoRows() throws Exception {
+        database.execute("CREATE TABLE FOO (X NUMBER)");
+        database.execute("INSERT INTO FOO (X) values (5)");
+        database.execute("INSERT INTO FOO (X) values (7)");
+        ResultSet results = database.query("select x from foo");
+        assertTrue(results.next());
+        int firstResult = results.getInt("x");
+        assertTrue(results.next());
+        int secondResult = results.getInt("x");
+        assertFalse(results.next());
+        
+        Set expected = new HashSet(Arrays.asList(new Integer[] {new Integer(5), new Integer(7)}));
+        Set actual = new HashSet();
+        actual.add(new Integer(firstResult));
+        actual.add(new Integer(secondResult));
+        assertEquals(expected, actual);
+    }
+    
     // Various result set cases:
     // * give column number instead of name
     // * more than one column
