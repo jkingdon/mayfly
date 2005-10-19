@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.ldbc.rowmask;
 
 import net.sourceforge.mayfly.ldbc.*;
-import org.ldbc.parser.*;
 
 import java.util.*;
 

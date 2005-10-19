@@ -32,6 +32,15 @@ Possible features (beyond those in DESCRIPTION.txt):
  * Enforce "For maximum portability, result set columns within each row should
    be read in left-to-right order, and each column should be read only once."
    in a ResultSet.
+   
+
+Open source projects to serve as acceptance tests (criteria: must use SQL
+and have automated tests which can be run against Mayfly):
+
+* Hibernate
+
+* others?
+
 
 Things to document somewhere:
 

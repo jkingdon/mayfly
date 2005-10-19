@@ -13,6 +13,7 @@ import net.sf.jsqlparser.statement.drop.*;
 import net.sf.jsqlparser.statement.insert.*;
 import net.sf.jsqlparser.statement.select.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.jdbc.*;
 
 import java.io.*;
 import java.sql.*;
@@ -212,7 +213,7 @@ public class Database {
         }
     }
 
-    DataStore dataStore = new DataStore();
+    private DataStore dataStore = new DataStore();
 
     public void execute(String command) throws SQLException {
         Statement statement = parse(command);
@@ -264,15 +265,26 @@ public class Database {
             public int getInt(String columnName) throws SQLException {
                 String canonicalizedColumnName = lookUpColumn(canonicalizedColumnNames, columnName);
                 
+                return tableData.getInt(canonicalizedColumnName, checkedRowNumber());
+            }
+            
+            public int getInt(int oneBasedColumn) throws SQLException {
+                int zeroBasedColumn = oneBasedColumn - 1;
+                if (zeroBasedColumn < 0 || zeroBasedColumn >= canonicalizedColumnNames.size()) {
+                    throw new SQLException("no column " + oneBasedColumn);
+                }
+                String columnName = (String) canonicalizedColumnNames.get(zeroBasedColumn);
+                return tableData.getInt(columnName, checkedRowNumber());
+            }
+
+            private int checkedRowNumber() throws SQLException {
                 if (pos < 0) {
                     throw new SQLException("no current result row");
                 }
-                
                 if (pos >= rowCount) {
                     throw new SQLException("already read last result row");
                 }
-
-                return tableData.getInt(canonicalizedColumnName, pos);
+                return pos;
             }
 
             private String lookUpColumn(List canonicalizedColumnNames, String target) throws SQLException {
@@ -396,6 +408,10 @@ public class Database {
     public int getInt(String tableName, String columnName, int rowIndex) throws SQLException {
         TableData tableData = dataStore.table(tableName);
         return tableData.getInt(columnName, rowIndex);
+    }
+
+    public Connection openConnection() throws SQLException {
+        return new JdbcConnection();
     }
 
 }

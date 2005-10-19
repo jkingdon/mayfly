@@ -187,7 +187,29 @@ public class SqlTest extends TestCase {
         assertFalse(results.next());
     }
     
-    // Various result set cases:
-    // * give column number instead of name
+    public void testColumnNumbers() throws Exception {
+        database.execute("CREATE TABLE FOO (X NUMBER)");
+        database.execute("INSERT INTO FOO (X) values (5)");
+        ResultSet results = database.query("select x from foo");
+        assertTrue(results.next());
+
+        try {
+            results.getInt(0);
+            fail();
+        } catch (SQLException e) {
+            assertEquals("no column 0", e.getMessage());
+        }
+
+        assertEquals(5, results.getInt(1));
+
+        try {
+            results.getInt(2);
+            fail();
+        } catch (SQLException e) {
+            assertEquals("no column 2", e.getMessage());
+        }
+
+        assertFalse(results.next());
+    }
 
 }
