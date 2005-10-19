@@ -27,7 +27,10 @@ Possible features (beyond those in DESCRIPTION.txt):
       for auditing, debugging, etc.
       * if something's not closed, print the stack trace of its creation
       * when do we assert this?  provide an external method?  or,
-        register a shutdown hook (implications?)?
+        register a shutdown hook (implications?)? (shutdown hook is wrong
+        unless we can somehow avoid memory growing without bounds).
+        On the finalizer of Database is perhaps one good place but
+        of course we can't assume it would get called.
    
  * Enforce "For maximum portability, result set columns within each row should
    be read in left-to-right order, and each column should be read only once."
