@@ -1,9 +1,5 @@
 package net.sourceforge.mayfly.ldbc;
 
-import org.ldbc.antlr.collections.*;
-
-import java.util.*;
-
 abstract public class Constraint extends ValueObject {
     public static Constraint fromTree(Tree tree) {
         return null;
@@ -12,10 +8,10 @@ abstract public class Constraint extends ValueObject {
 
     public static class Equal extends Constraint {
         public static Constraint fromTree(Tree tree) {
-            Iterator iter = tree.children().iterator();
-
-            AST left = (AST) iter.next();
-            AST right = (AST) iter.next();
+//            Iterator iter = tree.children().iterator();
+//
+//            AST left = (AST) iter.next();
+//            AST right = (AST) iter.next();
             return null;
         }
 

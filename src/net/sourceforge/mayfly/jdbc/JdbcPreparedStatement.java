@@ -11,20 +11,20 @@ import java.util.*;
 public class JdbcPreparedStatement implements PreparedStatement {
 
     private final String command;
+    private Database database;
 
-    public JdbcPreparedStatement(String sql) {
+    JdbcPreparedStatement(String sql, Database database) {
         this.command = sql;
+        this.database = database;
     }
 
     public ResultSet executeQuery() throws SQLException {
-        if (command == null) {
-            throw new NullPointerException();
-        }
-        throw new UnimplementedException();
+        return database.query(command);
     }
 
     public int executeUpdate() throws SQLException {
-        throw new UnimplementedException();
+        database.execute(command);
+        return 0;
     }
 
     public void setNull(int parameterIndex, int sqlType) throws SQLException {
@@ -188,7 +188,6 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public void close() throws SQLException {
-        throw new UnimplementedException();
     }
 
     public int getMaxFieldSize() throws SQLException {

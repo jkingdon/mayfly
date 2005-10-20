@@ -296,6 +296,9 @@ public class Database {
                 }
                 throw new SQLException("no column " + target);
             }
+
+            public void close() throws SQLException {
+            }
             
         };
     }
@@ -411,7 +414,7 @@ public class Database {
     }
 
     public Connection openConnection() throws SQLException {
-        return new JdbcConnection();
+        return new JdbcConnection(this);
     }
 
 }

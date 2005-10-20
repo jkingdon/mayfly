@@ -7,12 +7,22 @@ import java.util.*;
 
 public class JdbcConnection implements Connection {
 
+    private Database database;
+
+    /**
+     * Should only be called diretly from within Mayfly.  External callers should call
+     * {@link Database.openConnection()} or {@link DriverManager.getConnection(String)}.
+     */
+    public JdbcConnection(Database database) {
+        this.database = database;
+    }
+
     public Statement createStatement() throws SQLException {
         throw new UnimplementedException();
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return new JdbcPreparedStatement(sql);
+        return new JdbcPreparedStatement(sql, database);
     }
 
     public CallableStatement prepareCall(String sql) throws SQLException {
@@ -40,7 +50,6 @@ public class JdbcConnection implements Connection {
     }
 
     public void close() throws SQLException {
-        throw new UnimplementedException();
     }
 
     public boolean isClosed() throws SQLException {
