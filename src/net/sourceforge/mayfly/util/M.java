@@ -4,7 +4,7 @@ import net.sourceforge.mayfly.datastore.*;
 
 import java.util.*;
 
-public class M implements Map {
+public class M extends ValueObject implements Map {
 
     private Map delegate;
 
@@ -23,6 +23,13 @@ public class M implements Map {
 
     public ImmutableMap asImmutable() {
         return new ImmutableMap(this);
+    }
+
+    public M plus(Map other) {
+        M together = new M();
+        together.putAll(this);
+        together.putAll(other);
+        return together;
     }
 
 
@@ -83,11 +90,8 @@ public class M implements Map {
         return delegate.put(key, value);
     }
 
-
-    public M plus(Map other) {
-        M together = new M();
-        together.putAll(this);
-        together.putAll(other);
-        return together;
+    public String toString() {
+        return delegate.toString();
     }
+
 }

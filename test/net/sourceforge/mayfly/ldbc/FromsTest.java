@@ -15,20 +15,8 @@ public class FromsTest extends TestCase {
         );
     }
 
-    /**
-     * Ideas.
-     *
-     * dimensions.join(allTables) : Rows (cartesian join result)
-     *
-     * then you'd do
-     *
-     * rows = rows.select(where)
-     *
-     * rows = rows.collect(new ColumnFilter(colsFromSelect))
-     *
-     * rows is a stream only.
-     *
-     *
-     * consequence: change enumerable to ALWAYS stream (createNew(Iterable))
-     */
+    public void testTableNames() throws Exception {
+        assertEquals("foo", new Froms.GetTableName().transform(new From("foo")));
+        assertEquals("foo", new Froms.GetTableName().transform(new From("foo", "f")));
+    }
 }

@@ -128,5 +128,9 @@ public class ImmutableList implements List {
     public Object[] toArray(Object[] a) {
         return delegate.toArray(a);
     }
-    
+
+    public String toString() {
+        return delegate.toString();
+    }
+
 }

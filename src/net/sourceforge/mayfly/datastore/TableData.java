@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.ldbc.*;
+
 import java.sql.*;
 import java.util.*;
 
@@ -47,6 +49,10 @@ public class TableData {
     
     public int rowCount() {
         return rows.size();
+    }
+
+    public Rows rows() {
+        return new Rows(rows);
     }
 
 }

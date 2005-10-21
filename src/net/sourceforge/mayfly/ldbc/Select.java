@@ -2,7 +2,11 @@ package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.datastore.*;
 import org.ldbc.parser.*;
+
+import java.util.*;
+import java.sql.*;
 
 public class Select extends ValueObject {
 
@@ -23,15 +27,35 @@ public class Select extends ValueObject {
 
 
     private What what;
-    private Froms from;
+    private Froms froms;
+    private Where where;
 
-    public Select(What what, Froms from, Where where) {
+    public Select(What what, Froms froms, Where where) {
         this.what = what;
-        this.from = from;
+        this.froms = froms;
+        this.where = where;
     }
 
     public Froms from() {
-        return from;
+        return froms;
     }
 
+    public Rows executeOn(DataStore store) {
+        Rows result = null;
+
+        try {
+            L tableNames = froms.tableNames();
+
+            for (Iterator iterator = tableNames.iterator(); iterator.hasNext();) {
+                String tableName = (String) iterator.next();
+                result = result == null ?
+                             store.table(tableName).rows() :
+                             result.join(store.table(tableName).rows());
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
+    }
 }
