@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.ldbc.rowmask.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
 import org.ldbc.parser.*;
 
@@ -15,17 +15,17 @@ public class Select extends ValueObject {
 
         return
             new Select(
-                new RowMask(converted.selectObjectsThatAre(RowMaskElement.class)),
+                new What(converted.selectObjectsThatAre(WhatElement.class)),
                 new Froms(converted.selectObjectsThatAre(From.class)),
                 (Where) converted.selectObjectThatIs(Where.class)
             );
     }
 
 
-    private RowMask what;
+    private What what;
     private Froms from;
 
-    public Select(RowMask what, Froms from, Where where) {
+    public Select(What what, Froms from, Where where) {
         this.what = what;
         this.from = from;
     }

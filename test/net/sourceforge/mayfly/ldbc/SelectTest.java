@@ -1,13 +1,13 @@
 package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
-import net.sourceforge.mayfly.ldbc.rowmask.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 
 public class SelectTest extends TestCase {
     public void testParse() throws Exception {
         assertEquals(
             new Select(
-                new RowMask()
+                new What()
                     .add(new AllColumnsFromTable("f"))
                     .add(new SingleColumnExpression(new Column("b", "name"))),
                 new Froms()

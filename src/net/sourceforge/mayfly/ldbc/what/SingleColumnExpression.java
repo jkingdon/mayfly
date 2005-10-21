@@ -1,12 +1,12 @@
-package net.sourceforge.mayfly.ldbc.rowmask;
+package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.ldbc.*;
 import org.ldbc.antlr.collections.*;
 
-public class SingleColumnExpression extends RowMaskElement {
+public class SingleColumnExpression extends WhatElement {
     private Column column;
 
-    public static net.sourceforge.mayfly.ldbc.rowmask.SingleColumnExpression fromExpressionTree(Tree t) {
+    public static SingleColumnExpression fromExpressionTree(Tree t) {
         AST expression = t.getFirstChild();
 
         Tree column = new Tree(expression.getFirstChild());

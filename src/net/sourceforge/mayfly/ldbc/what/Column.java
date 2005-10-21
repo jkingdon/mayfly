@@ -1,14 +1,14 @@
-package net.sourceforge.mayfly.ldbc.rowmask;
+package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.ldbc.*;
 import org.ldbc.antlr.collections.*;
 
-public class Column extends RowMaskElement {
-    public static net.sourceforge.mayfly.ldbc.rowmask.Column fromColumnTree(Tree column) {
+public class Column extends WhatElement {
+    public static Column fromColumnTree(Tree column) {
         AST dimensionIdentifier = column.getFirstChild();
         AST columnName = dimensionIdentifier.getNextSibling();
 
-        return new net.sourceforge.mayfly.ldbc.rowmask.Column(dimensionIdentifier.getText(), columnName.getText());
+        return new Column(dimensionIdentifier.getText(), columnName.getText());
     }
 
 

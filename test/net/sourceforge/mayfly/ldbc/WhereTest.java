@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
 import org.ldbc.parser.*;
-import net.sourceforge.mayfly.ldbc.rowmask.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 
 public class WhereTest extends TestCase {
 

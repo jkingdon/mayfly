@@ -1,31 +1,31 @@
-package net.sourceforge.mayfly.ldbc.rowmask;
+package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.ldbc.*;
 
 import java.util.*;
 
-public class RowMask extends Enumerable {
+public class What extends Enumerable {
 
 
     private List masks = new ArrayList();
 
-    public RowMask() {
+    public What() {
     }
 
-    public RowMask(List masks) {
+    public What(List masks) {
         this.masks = masks;
     }
 
 
     protected Object createNew(Iterable items) {
-        return new RowMask(asList(items));
+        return new What(asList(items));
     }
 
     public Iterator iterator() {
         return masks.iterator();
     }
 
-    public RowMask add(RowMaskElement maskElement) {
+    public What add(RowMaskElement maskElement) {
         masks.add(maskElement);
         return this;
     }
