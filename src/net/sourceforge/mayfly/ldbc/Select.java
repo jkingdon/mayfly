@@ -53,20 +53,16 @@ public class Select extends ValueObject {
         return new MyResultSet(canonicalizedColumnNames, tableData);
     }
 
-    public Rows executeOn(DataStore store) {
+    public Rows executeOn(DataStore store) throws SQLException {
         Rows result = null;
 
-        try {
-            L tableNames = froms.tableNames();
+        L tableNames = froms.tableNames();
 
-            for (Iterator iterator = tableNames.iterator(); iterator.hasNext();) {
-                String tableName = (String) iterator.next();
-                result = result == null ?
-                             store.table(tableName).rows() :
-                             result.join(store.table(tableName).rows());
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        for (Iterator iterator = tableNames.iterator(); iterator.hasNext();) {
+            String tableName = (String) iterator.next();
+            result = result == null ?
+                         store.table(tableName).rows() :
+                         result.join(store.table(tableName).rows());
         }
 
         return result;
