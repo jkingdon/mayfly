@@ -1,10 +1,10 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
 
-public class What extends Enumerable {
+public class What extends Aggregate {
 
 
     private List masks = new ArrayList();
@@ -25,7 +25,7 @@ public class What extends Enumerable {
         return masks.iterator();
     }
 
-    public What add(RowMaskElement maskElement) {
+    public What add(WhatElement maskElement) {
         masks.add(maskElement);
         return this;
     }

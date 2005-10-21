@@ -1,10 +1,10 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.util;
 
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.ldbc.*;
 
 import java.util.*;
 
-abstract public class Enumerable extends ValueObject implements Iterable {
+abstract public class Aggregate extends ValueObject implements Iterable {
 
     public L collect(final Transformer transformer) {
         final L results = new L();

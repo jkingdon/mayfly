@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.util.*;
+
 public class Literal extends ValueObject {
 
     public static class QuotedString extends Literal {

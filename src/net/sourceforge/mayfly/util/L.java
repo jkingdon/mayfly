@@ -1,12 +1,12 @@
 package net.sourceforge.mayfly.util;
 
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.datastore.*;
 import org.apache.commons.collections.*;
 import org.apache.commons.lang.*;
 
 import java.util.*;
 
-public class L extends Enumerable implements List {
+public class L extends Aggregate implements List {
     private List delegate;
 
     public L() {
@@ -31,7 +31,7 @@ public class L extends Enumerable implements List {
     }
 
     public Object selectObjectThatIs(final Class type) {
-        return selectObjectsThatAre(type).get(0);    
+        return selectObjectsThatAre(type).get(0);
     }
 
     public L selectObjectsThatAre(final Class type) {
@@ -47,6 +47,10 @@ public class L extends Enumerable implements List {
         return contains(new Integer(candidate));
     }
 
+
+    public ImmutableList asImmutable() {
+        return new ImmutableList(this);
+    }
 
     public int hashCode() {
         return delegate.hashCode();
@@ -156,6 +160,7 @@ public class L extends Enumerable implements List {
     public static L fromArray(int[] objects) {
         return new L(Arrays.asList(ArrayUtils.toObject(objects)));
     }
+
 
 
 }

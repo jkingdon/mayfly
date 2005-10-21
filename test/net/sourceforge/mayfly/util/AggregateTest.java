@@ -1,10 +1,10 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.util;
 
 import junit.framework.*;
 
 import java.util.*;
 
-public class EnumerableTest extends TestCase {
+public class AggregateTest extends TestCase {
     public void testSelect() throws Exception {
         Strings result =
             (Strings)
@@ -59,7 +59,7 @@ public class EnumerableTest extends TestCase {
         );
     }
 
-    class Strings extends Enumerable {
+    class Strings extends Aggregate {
         private Collection strings;
 
         public Strings(String[] strings) {

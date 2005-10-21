@@ -1,8 +1,9 @@
 package net.sourceforge.mayfly.ldbc;
 
 import org.ldbc.antlr.collections.*;
+import net.sourceforge.mayfly.util.*;
 
-public class From extends ValueObject{
+public class From extends ValueObject {
     private String tableName;
     private String alias;
 

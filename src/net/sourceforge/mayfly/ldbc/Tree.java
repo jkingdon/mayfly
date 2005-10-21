@@ -204,7 +204,7 @@ public class Tree implements AST {
         return new Children(elements);
     }
 
-    public static class Children extends Enumerable {
+    public static class Children extends Aggregate {
         private Collection elements;
 
         public Children(Collection elements) {

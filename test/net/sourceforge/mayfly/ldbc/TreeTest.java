@@ -5,6 +5,8 @@ import org.ldbc.parser.*;
 
 import java.util.*;
 
+import net.sourceforge.mayfly.util.*;
+
 public class TreeTest extends TestCase {
     private Tree asterisk;
     private Tree foo;

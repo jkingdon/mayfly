@@ -5,7 +5,9 @@ import org.ldbc.parser.*;
 import java.util.*;
 import java.util.List;
 
-public class Froms extends Enumerable {
+import net.sourceforge.mayfly.util.*;
+
+public class Froms extends Aggregate {
 
     private List dimensions = new ArrayList();
 
