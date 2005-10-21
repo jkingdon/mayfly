@@ -1,5 +1,5 @@
 package net.sourceforge.mayfly.ldbc.rowmask;
 
-public class Everything extends RowMaskElement {
+public class All extends RowMaskElement {
 
 }

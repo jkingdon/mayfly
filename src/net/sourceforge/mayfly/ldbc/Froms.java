@@ -5,27 +5,27 @@ import org.ldbc.parser.*;
 import java.util.*;
 import java.util.List;
 
-public class Dimensions extends Enumerable {
+public class Froms extends Enumerable {
 
     private List dimensions = new ArrayList();
 
 
-    public Dimensions() { }
+    public Froms() { }
 
-    public Dimensions(List dimensions) {
+    public Froms(List dimensions) {
         this.dimensions = dimensions;
     }
 
 
     protected Object createNew(Iterable items) {
-        return new Dimensions(asList(items));
+        return new Froms(asList(items));
     }
 
     public Iterator iterator() {
         return dimensions.iterator();
     }
 
-    public static Dimensions fromSelectTree(Tree selectTree) {
+    public static Froms fromSelectTree(Tree selectTree) {
         Tree.Children tables = selectTree.children().ofType(SQLTokenTypes.SELECTED_TABLE);
 
         List elements = new ArrayList();
@@ -33,16 +33,16 @@ public class Dimensions extends Enumerable {
         for (Iterator iterator = tables.iterator(); iterator.hasNext();) {
             Tree table = (Tree) iterator.next();
 
-            Dimension dimension = Dimension.fromSeletedTableTree(table);
+            From from = From.fromSeletedTableTree(table);
 
-            elements.add(dimension);
+            elements.add(from);
         }
 
-        return new Dimensions(elements);
+        return new Froms(elements);
     }
 
-    public Dimensions add(Dimension dimension) {
-        dimensions.add(dimension);
+    public Froms add(From from) {
+        dimensions.add(from);
         return this;
     }
 }

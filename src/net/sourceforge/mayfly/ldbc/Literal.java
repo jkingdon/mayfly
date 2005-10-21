@@ -8,5 +8,9 @@ public class Literal extends ValueObject {
         public QuotedString(String stringInQuotes) {
             this.stringInQuotes = stringInQuotes;
         }
+
+        public static QuotedString fromTree(Tree tree) {
+            return new QuotedString(tree.getText());
+        }
     }
 }

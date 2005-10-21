@@ -8,13 +8,15 @@ public class SelectTest extends TestCase {
         assertEquals(
             new Select(
                 new RowMask()
-                    .add(new WholeDimension("f"))
+                    .add(new AllColumnsFromTable("f"))
                     .add(new SingleColumnExpression(new Column("b", "name"))),
-                new Dimensions()
-                    .add(new Dimension("foo", "f"))
-                    .add(new Dimension("bar", "b"))
+                new Froms()
+                    .add(new From("foo", "f"))
+                    .add(new From("bar", "b")),
+                new Where()
+                    .add(new Where.Equal(new Column("f", "name"), new Literal.QuotedString("'steve'")))
             ),
-            Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b"))
+            Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b where f.name='steve'"))
         );
     }
 }

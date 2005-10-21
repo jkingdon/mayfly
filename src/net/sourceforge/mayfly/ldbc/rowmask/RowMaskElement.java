@@ -7,7 +7,7 @@ abstract public class RowMaskElement extends ValueObject {
 
     public static RowMaskElement fromTree(Tree t) {
         if (t.getType() == SQLTokenTypes.TABLE_ASTERISK) {
-            return WholeDimension.fromTree(t);
+            return AllColumnsFromTable.fromTree(t);
         }
 
         if (t.getType() == SQLTokenTypes.SELECT_ITEM) {
@@ -15,7 +15,7 @@ abstract public class RowMaskElement extends ValueObject {
         }
 
         if (t.getType() == SQLTokenTypes.ASTERISK) {
-            return new Everything();
+            return new All();
         }
 
         throw new RuntimeException("row match class not found for " + t.getType());

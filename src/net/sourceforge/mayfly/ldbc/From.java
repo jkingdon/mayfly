@@ -2,15 +2,15 @@ package net.sourceforge.mayfly.ldbc;
 
 import org.ldbc.antlr.collections.*;
 
-public class Dimension extends ValueObject{
+public class From extends ValueObject{
     private String tableName;
     private String alias;
 
-    public Dimension(String tableName) {
+    public From(String tableName) {
         this(tableName, null);
     }
 
-    public Dimension(String tableName, String alias) {
+    public From(String tableName, String alias) {
         this.tableName = tableName;
         this.alias = alias;
     }
@@ -24,19 +24,19 @@ public class Dimension extends ValueObject{
     }
 
 
-    public static Dimension fromSeletedTableTree(Tree table) {
+    public static From fromSeletedTableTree(Tree table) {
         AST firstIdentifier = table.getFirstChild();
         String tableName = firstIdentifier.getText();
 
         AST secondIdentifier = firstIdentifier.getNextSibling();
 
-        Dimension dimension;
+        From from;
         if (secondIdentifier==null) {
-            dimension = new Dimension(tableName);
+            from = new From(tableName);
         } else {
             String alias = secondIdentifier.getText();
-            dimension = new Dimension(tableName, alias);
+            from = new From(tableName, alias);
         }
-        return dimension;
+        return from;
     }
 }

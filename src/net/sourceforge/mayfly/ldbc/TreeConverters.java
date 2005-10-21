@@ -16,7 +16,7 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.TABLE_ASTERISK, new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return WholeDimension.fromTree(from);
+                                                              return AllColumnsFromTable.fromTree(from);
                                                           }
                                                       })
             .register(SQLTokenTypes.SELECT_ITEM,    new TreeConverters.Converter() {
@@ -26,7 +26,7 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.ASTERISK,       new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return new Everything();
+                                                              return new All();
                                                           }
                                                       })
             .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
@@ -36,7 +36,12 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.SELECTED_TABLE,new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return Dimension.fromSeletedTableTree(from);
+                                                              return From.fromSeletedTableTree(from);
+                                                          }
+                                                      })
+            .register(SQLTokenTypes.CONDITION,     new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return Where.fromConditionTree(from);
                                                           }
                                                       });
     }
@@ -61,7 +66,7 @@ public class TreeConverters {
         return ((Converter)typeToConverter.get(new Integer(tree.getType()))).convert(tree, this);
     }
 
-    
+
 
     public static interface Converter {
         Object convert(Tree from, TreeConverters converters);

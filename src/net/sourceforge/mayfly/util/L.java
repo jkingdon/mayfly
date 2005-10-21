@@ -30,6 +30,10 @@ public class L extends Enumerable implements List {
         return this;
     }
 
+    public Object selectObjectThatIs(final Class type) {
+        return selectObjectsThatAre(type).get(0);    
+    }
+
     public L selectObjectsThatAre(final Class type) {
         return (L)
             select(new Selector() {

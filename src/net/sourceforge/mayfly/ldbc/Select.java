@@ -16,20 +16,21 @@ public class Select extends ValueObject {
         return
             new Select(
                 new RowMask(converted.selectObjectsThatAre(RowMaskElement.class)),
-                new Dimensions(converted.selectObjectsThatAre(Dimension.class))
+                new Froms(converted.selectObjectsThatAre(From.class)),
+                (Where) converted.selectObjectThatIs(Where.class)
             );
     }
 
 
     private RowMask what;
-    private Dimensions from;
+    private Froms from;
 
-    public Select(RowMask what, Dimensions from) {
+    public Select(RowMask what, Froms from, Where where) {
         this.what = what;
         this.from = from;
     }
 
-    public Dimensions from() {
+    public Froms from() {
         return from;
     }
 
