@@ -16,18 +16,17 @@ the same way that one can create Java objects.
 Mayfly is written in Java (currently works with gcj/libgcj and
 probably Sun's 1.4, although exact versions of Java may change), and
 should run on any OS which provides a Java platform.  It relies on the
-JDBC interfaces from the Java platform (and will implement most of
-JDBC, although we aren't sure about certain aspects of JDBC which do
-not fit well with our vision of making a database as easy to manage as
-a Java object).  The current implementation relies on SQLParser (
-http://jsqlparser.sourceforge.net/ ) although this is subject to
-change.  Our own unit tests are written with JUnit (
+JDBC interfaces from the Java platform (although one has the choice
+of instantiating a Database object directly if one wishes to avoid
+the static nature of DriverManager).  We've been parsing SQL with
+SQLParser ( http://jsqlparser.sourceforge.net/ ) and LDBC, although
+the jury is probably still out on what we'll pick eventually.
+Our own unit tests are written with JUnit (
 http://www.junit.org/ ) although Mayfly should be useful for unit
-tests written with any unit test framework.  The current
-implementation does depend on other packages, and in the future we
-don't expect a huge number to be dragged in (probably some subset of
-the usual suspects such as Apache Commons -
-http://jakarta.apache.org/commons/ - as needed).  If we do decide to
+tests written with any unit test framework.  In terms of other
+dependencies, not a huge list, but some of the usual suspects
+from places like Apache Commons -
+http://jakarta.apache.org/commons/ ).  If we do decide to
 provide persistence (the ability to save the database to disk), the
 leading candidate for that would be Prevayler (
 http://www.prevayler.org/ ), although persistence is not very high on
@@ -60,7 +59,7 @@ Mayfly later on (for a database dump format, one likely choice is an
 XML serialization of the Mayfly objects, using something such as
 XStream - http://xstream.codehaus.org/ ).
 
-As of this writing, Mayfly consists of about 1000 lines of Java code
+As of this writing, Mayfly consists of a modest amount of Java code
 which only is starting to understand the simplest forms of SQL
 commands like INSERT and SELECT, although we expect it to grow
 rapidly.

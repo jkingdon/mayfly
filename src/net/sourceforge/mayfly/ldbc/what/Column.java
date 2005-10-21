@@ -5,10 +5,17 @@ import org.ldbc.antlr.collections.*;
 
 public class Column extends WhatElement {
     public static Column fromColumnTree(Tree column) {
-        AST dimensionIdentifier = column.getFirstChild();
-        AST columnName = dimensionIdentifier.getNextSibling();
-
-        return new Column(dimensionIdentifier.getText(), columnName.getText());
+        AST firstIdentifier = column.getFirstChild();
+        AST secondIdentifier = firstIdentifier.getNextSibling();
+        
+        if (secondIdentifier == null) {
+            String columnName = firstIdentifier.getText();
+            return new Column(columnName);
+        } else {
+            String dimensionIdentifier = firstIdentifier.getText();
+            String columnName = secondIdentifier.getText();
+            return new Column(dimensionIdentifier, columnName);
+        }
     }
 
 
@@ -20,5 +27,12 @@ public class Column extends WhatElement {
         this.column = column;
     }
 
+    public Column(String column) {
+        this(null, column);
+    }
+    
+    public String columnName() {
+        return column;
+    }
 
 }

@@ -27,6 +27,8 @@ public class Tree implements AST {
                 visitor2.visit(parser.getAST());
             }
             return new Tree(parser.getAST());
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -65,13 +67,13 @@ public class Tree implements AST {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         treeString("", this, sb);
         return sb.toString();
     }
 
 
-    private void treeString(String prefix, AST ast, StringBuffer sb) {
+    private void treeString(String prefix, AST ast, StringBuilder sb) {
         sb.append(prefix + ast.getText() + " (" + typeName(ast.getType()) + ")" + "\n");
 
         AST child = ast.getFirstChild();

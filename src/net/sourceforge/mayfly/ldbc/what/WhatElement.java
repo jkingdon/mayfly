@@ -4,5 +4,6 @@ import net.sourceforge.mayfly.util.*;
 
 abstract public class WhatElement extends ValueObject {
 
+    abstract public String columnName();
 
 }

@@ -17,7 +17,7 @@ Possible features (beyond those in DESCRIPTION.txt):
   as a project-specific implementation which only supports a single
   date format).
   
- * Be anal about insisting that close() is called (on result sets, statements,
+* Be anal about insisting that close() is called (on result sets, statements,
    etc).  Does this mean that Database tracks all of those things? (which
    means they can't be garbage collected, which I guess is OK provided that
    a .close() lets them, or at least the data which they point to, be

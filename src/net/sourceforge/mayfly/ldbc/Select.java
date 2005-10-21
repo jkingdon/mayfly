@@ -1,12 +1,13 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
-import net.sourceforge.mayfly.datastore.*;
 import org.ldbc.parser.*;
 
-import java.util.*;
 import java.sql.*;
+import java.util.*;
 
 public class Select extends ValueObject {
 
@@ -17,11 +18,16 @@ public class Select extends ValueObject {
         L converted =
             selectTree.children().convertUsing(TreeConverters.forSelectTree(), typesToIgnore);
 
+        Where where = 
+            converted.selectObjectsThatAre(Where.class).size() > 0 ?
+                    (Where) converted.selectObjectThatIs(Where.class) :
+                    new Where();
+                    
         return
             new Select(
                 new What(converted.selectObjectsThatAre(WhatElement.class)),
                 new Froms(converted.selectObjectsThatAre(From.class)),
-                (Where) converted.selectObjectThatIs(Where.class)
+                where
             );
     }
 
@@ -38,6 +44,13 @@ public class Select extends ValueObject {
 
     public Froms from() {
         return froms;
+    }
+
+    public ResultSet select(DataStore dataStore) throws SQLException {
+        TableData tableData = dataStore.table(froms.singleTableName());
+
+        List canonicalizedColumnNames = what.selectedColumns(tableData);
+        return new MyResultSet(canonicalizedColumnNames, tableData);
     }
 
     public Rows executeOn(DataStore store) {

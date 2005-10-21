@@ -11,11 +11,11 @@ public class JdbcTest extends TestCase {
         // can we distinguish between multiple databases via the url?
         // if no, is there only one legal value?
         Connection connection = DriverManager.getConnection("jdbc:mayfly:");
-        PreparedStatement createTable = connection.prepareStatement("CREATE TABLE FOO (X NUMBER)");
+        PreparedStatement createTable = connection.prepareStatement("CREATE TABLE FOO (a NUMBER)");
         assertEquals(0, createTable.executeUpdate());
         createTable.close();
         
-        PreparedStatement select = connection.prepareStatement("SELECT X FROM FOO");
+        PreparedStatement select = connection.prepareStatement("SELECT A FROM FOO");
         ResultSet results = select.executeQuery();
         assertFalse(results.next());
         results.close();

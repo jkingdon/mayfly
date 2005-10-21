@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.*;
+
 import net.sourceforge.mayfly.util.*;
 import org.ldbc.parser.*;
 
@@ -59,4 +61,13 @@ public class Froms extends Aggregate {
             return f.tableName();
         }
     }
+
+    public String singleTableName() {
+        if (dimensions.size() != 1) {
+            throw new UnimplementedException("expected 1 table, got " + dimensions.size());
+        }
+        From dimension = (From) dimensions.get(0);
+        return dimension.tableName();
+    }
+
 }

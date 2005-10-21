@@ -21,6 +21,29 @@ public class SelectTest extends TestCase {
             Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b where f.name='steve'"))
         );
     }
+    
+    public void testAliasOmitted() throws Exception {
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new SingleColumnExpression(new Column("name"))),
+                new Froms()
+                    .add(new From("foo")),
+                new Where()
+            ),
+            Select.fromTree(Tree.parse("select name from foo"))
+        );
+    }
+
+    // Evidently, X is reserved to ldbc (but not jsqlparser)
+    public void testX() throws Exception {
+        try {
+            Select.fromTree(Tree.parse("select x from foo"));
+            fail();
+        } catch (RuntimeException e) {
+            assertEquals("line 1: unexpected token: x", e.getMessage());
+        }
+    }
 
     public void testSimpleJoin() throws Exception {
         DataStore store =
@@ -40,4 +63,5 @@ public class SelectTest extends TestCase {
         );
 
     }
+
 }

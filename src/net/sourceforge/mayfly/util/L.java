@@ -161,6 +161,9 @@ public class L extends Aggregate implements List {
         return new L(Arrays.asList(ArrayUtils.toObject(objects)));
     }
 
+    public String toString() {
+        return delegate.toString();
+    }
 
 
 }

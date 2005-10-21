@@ -44,4 +44,15 @@ public class LTest extends TestCase {
             list.selectObjectsThatAre(Integer.class)
         );
     }
+    
+    public void testToString() throws Exception {
+        List arrayList = new ArrayList();
+        arrayList.add(new Integer(7));
+        arrayList.add(new Integer(8));
+        assertEquals("[7, 8]", arrayList.toString());
+
+        L list = new L(arrayList);
+        assertEquals("[7, 8]", list.toString());
+    }
+
 }

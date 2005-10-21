@@ -16,4 +16,8 @@ public class SingleColumnExpression extends WhatElement {
     public SingleColumnExpression(Column column) {
         this.column = column;
     }
+
+    public String columnName() {
+        return column.columnName();
+    }
 }

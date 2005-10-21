@@ -14,6 +14,8 @@ import net.sf.jsqlparser.statement.insert.*;
 import net.sf.jsqlparser.statement.select.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.jdbc.*;
+import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.Select;
 
 import java.io.*;
 import java.sql.*;
@@ -21,7 +23,7 @@ import java.util.*;
 
 public class Database {
 
-    class MyExpressionVisitor implements ExpressionVisitor{
+    class MyExpressionVisitor implements ExpressionVisitor {
 
         Column column;
 
@@ -215,6 +217,11 @@ public class Database {
 
     private DataStore dataStore = new DataStore();
 
+    /**
+     * Execute an SQL command which does not return results.
+     * This is similar to the JDBC {@link java.sql.Statement#executeUpdate(java.lang.String)}
+     * but is more convenient if you have a Database instance around.
+     */
     public void execute(String command) throws SQLException {
         Statement statement = parse(command);
         if (statement instanceof Drop) {
@@ -232,91 +239,14 @@ public class Database {
         }
     }
 
+    /**
+     * Execute an SQL command which does returns results.
+     * This is similar to the JDBC {@link java.sql.Statement#executeQuery(java.lang.String)}
+     * but is more convenient if you have a Database instance around.
+     */
     public ResultSet query(String command) throws SQLException {
-        Statement statement = parse(command);
-        if (statement instanceof Select) {
-            Select select = (Select) statement;
-            return select(select.getSelectBody());
-        }
-        throw new SQLException("unrecognized command for query: " + command);
-    }
-
-    private ResultSet select(SelectBody selectBody) throws SQLException {
-        MySelectVisitor visitor = new MySelectVisitor();
-        selectBody.accept(visitor);
-        final TableData tableData = dataStore.table(visitor.tableName);
-
-        List selectItems = visitor.plainSelect.getSelectItems();
-        final List canonicalizedColumnNames = selectedColumns(tableData, selectItems);
-        final int rowCount = tableData.rowCount();
-
-        return new ResultSetStub() {
-            int pos = -1;
-            
-            public boolean next() throws SQLException {
-                ++pos;
-                if (pos >= rowCount) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-
-            public int getInt(String columnName) throws SQLException {
-                String canonicalizedColumnName = lookUpColumn(canonicalizedColumnNames, columnName);
-                
-                return tableData.getInt(canonicalizedColumnName, checkedRowNumber());
-            }
-            
-            public int getInt(int oneBasedColumn) throws SQLException {
-                int zeroBasedColumn = oneBasedColumn - 1;
-                if (zeroBasedColumn < 0 || zeroBasedColumn >= canonicalizedColumnNames.size()) {
-                    throw new SQLException("no column " + oneBasedColumn);
-                }
-                String columnName = (String) canonicalizedColumnNames.get(zeroBasedColumn);
-                return tableData.getInt(columnName, checkedRowNumber());
-            }
-
-            private int checkedRowNumber() throws SQLException {
-                if (pos < 0) {
-                    throw new SQLException("no current result row");
-                }
-                if (pos >= rowCount) {
-                    throw new SQLException("already read last result row");
-                }
-                return pos;
-            }
-
-            private String lookUpColumn(List canonicalizedColumnNames, String target) throws SQLException {
-                for (int i = 0; i < canonicalizedColumnNames.size(); ++i) {
-                    String columnName = (String) canonicalizedColumnNames.get(i);
-                    if (target.equalsIgnoreCase(columnName)) {
-                        return columnName;
-                    }
-                }
-                throw new SQLException("no column " + target);
-            }
-
-            public void close() throws SQLException {
-            }
-            
-        };
-    }
-
-    private List selectedColumns(TableData tableData, List selectItems) throws SQLException {
-        List result = new ArrayList(selectItems.size());
-        for (int i = 0; i < selectItems.size(); ++i) {
-            SelectItem item = (SelectItem) selectItems.get(i);
-            MySelectItemVisitor selectItemVisitor = new MySelectItemVisitor();
-            item.accept(selectItemVisitor);
-            Expression expression = selectItemVisitor.expression;
-            MyExpressionVisitor expressionVisitor = new MyExpressionVisitor();
-            expression.accept(expressionVisitor);
-            Column column = expressionVisitor.column;
-            String canonicalizedColumnName = tableData.findColumn(column.getColumnName());
-            result.add(canonicalizedColumnName);
-        }
-        return result;
+        Select select = Select.fromTree(Tree.parse(command));
+        return select.select(dataStore);
     }
 
     private Statement parse(String command) throws SQLException {
@@ -373,7 +303,7 @@ public class Database {
      * Return table names.
      * 
      * Once this functionality is implemented in
-     * {@link java.sql.DatabaseMetaData}, this method will go away or become
+     * {@link java.sql.DatabaseMetaData}, this method may go away or become
      * some kind of convenience method.
      */
     public Set tables() {
@@ -384,7 +314,7 @@ public class Database {
      * Column names in given table.
      * 
      * Once this functionality is implemented in
-     * {@link java.sql.DatabaseMetaData}, this method will go away or become
+     * {@link java.sql.DatabaseMetaData}, this method may go away or become
      * some kind of convenience method.
      */
     public List columnNames(String tableName) throws SQLException {
@@ -395,9 +325,10 @@ public class Database {
     /**
      * Number of rows in given table.
      * 
-     * Just a temporary method until the 
-     * {@link ResultSet} code is done - counting rows is generally not
-     * what code should be doing (except perhaps some test code?).
+     * This is a convenience method.  Your production code will almost
+     * surely be counting rows (if it needs to at all) via
+     * {@link ResultSet} (or the SQL COUNT, once Mayfly implements it).
+     * But this method may be convenient in tests.
      */
     public int rowCount(String tableName) throws SQLException {
         TableData tableData = dataStore.table(tableName);
@@ -413,6 +344,11 @@ public class Database {
         return tableData.getInt(columnName, rowIndex);
     }
 
+    /**
+     * Open a JDBC connection.
+     * This is similar to the JDBC {@link DriverManager#getConnection(java.lang.String)}
+     * but is more convenient if you have a Database instance around.
+     */
     public Connection openConnection() throws SQLException {
         return new JdbcConnection(this);
     }

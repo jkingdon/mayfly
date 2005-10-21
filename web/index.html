@@ -1,0 +1,40 @@
+<html>
+<head>
+<title>Mayfly: database for unit testing</title>
+<link href="styles.css" />
+</head>
+<body>
+<table>
+<tr>
+<td class="sidebar">
+<ul>
+<!--
+downloads
+javadoc(?)
+manual
+-->
+<li><a href="http://sf.net/projects/mayfly/cvs" >CVS</a></li>
+<li><a href="http://sf.net/projects/mayfly/lists" >lists</a></li>
+</ul>
+</td>
+<td>
+<h1>Mayfly</h1>
+<h2>A Database for Unit Testing</h2>
+<p>Although there are a vast number of free and non-free SQL
+implementations, few of them are really good for unit testing.  A
+database for unit testing should be very fast on small data sets and
+should not present performance or other obstacles to setting up
+databases, adding and removing tables, and destroying databases.  A
+typical unit test run will want to create thousands of databases.
+With most SQL databases, this is not achievable, and one must resort
+to compromises such as keeping the tables around and only setting up
+data on each unit test run.  Mayfly aims to make creating an in-memory
+SQL database as easy as creating any other in-memory data structure.</p>
+
+<p>As of 20 Oct 2005, Mayfly allows any number of tables, columns, and rows, but queries only support one table at a time, only <tt>int</tt> is supported as a data type, and
+any but the simplest SQL does not yet work.  <a href="http://sf.net/projects/mayfly/cvs" >Check back</a>, though, because we are actively developing Mayfly.</p>
+</td>
+</tr>
+</table>
+</body>
+</html>
