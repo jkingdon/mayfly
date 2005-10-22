@@ -23,8 +23,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public int executeUpdate() throws SQLException {
-        database.execute(command);
-        return 0;
+        return database.execute(command);
     }
 
     public void setNull(int parameterIndex, int sqlType) throws SQLException {
