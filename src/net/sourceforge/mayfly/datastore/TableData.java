@@ -55,7 +55,7 @@ public class TableData {
 
         Row newRow = new Row(columnToCell.asImmutable());
 
-        Columns testColumns = (Columns) newRow.columns();
+        Columns testColumns = newRow.columns();
         assertNoUnknownColumns(testColumns);
 
         return new TableData(columns.asNames().asImmutable(), (Rows) rows.with(newRow));

@@ -65,7 +65,7 @@ public class SelectTest extends TestCase {
     }
 
     public void testSimpleWhere() throws Exception {
-        DataStore store =
+        //DataStore store =
             new DataStore()
                 .createTable("foo", new L().append("colA").append("colB"))
                 .addRow("foo", new L().append("colA").append("colB"), new L().append("1a").append("1b"))
