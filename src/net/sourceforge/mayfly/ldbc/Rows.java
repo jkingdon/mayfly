@@ -12,7 +12,11 @@ public class Rows extends Aggregate {
         this.rows = rows;
     }
 
-    protected Object createNew(Iterable items) {
+    public Rows() {
+        this(new ImmutableList());
+    }
+
+    protected Aggregate createNew(Iterable items) {
         return new Rows(new L(items).asImmutable());
     }
 
@@ -20,23 +24,4 @@ public class Rows extends Aggregate {
         return rows.iterator();
     }
 
-    public Rows join(Rows rightSide) {
-        final L joined = new L();
-
-        for (Iterator leftSideIter = rows.iterator(); leftSideIter.hasNext();) {
-            final ImmutableMap leftRow = (ImmutableMap) leftSideIter.next();
-
-            rightSide.each(
-                new Each() {
-                    public void each(Object element) {
-                        Map rightRow = (Map) element;
-                        joined.add(new M(leftRow).plus(rightRow));
-                    }
-                }
-            );
-
-        }
-
-        return new Rows(joined.asImmutable());
-    }
 }

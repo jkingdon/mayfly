@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
 import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -16,7 +17,7 @@ public class SelectTest extends TestCase {
                     .add(new From("foo", "f"))
                     .add(new From("bar", "b")),
                 new Where()
-                    .add(new Where.Equal(new Column("f", "name"), new Literal.QuotedString("'steve'")))
+                    .add(new Equal(new Column("f", "name"), new Literal.QuotedString("'steve'")))
             ),
             Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b where f.name='steve'"))
         );
@@ -58,10 +59,28 @@ public class SelectTest extends TestCase {
 
 
         assertEquals(
-            store.table("foo").rows().join(store.table("bar").rows()),
+            store.table("foo").rows().cartesianJoin(store.table("bar").rows()),
             Select.fromTree(Tree.parse("select * from foo, bar where f.name = 'steve'")).executeOn(store)
         );
-
     }
+
+    public void testSimpleWhere() throws Exception {
+        DataStore store =
+            new DataStore()
+                .createTable("foo", new L().append("colA").append("colB"))
+                .addRow("foo", new L().append("colA").append("colB"), new L().append("1a").append("1b"))
+                .addRow("foo", new L().append("colA").append("colB"), new L().append("2a").append("xx"))
+                .addRow("foo", new L().append("colA").append("colB"), new L().append("3a").append("xx"));
+
+
+        //dont just use equal here.  it's clearer if you just make the rows the expected
+
+        //assertEquals(
+        //    store.table("foo").rows().select(new Equal(new Column("colB"), new Literal.QuotedString("2b"))),
+        //    Select.fromTree(Tree.parse("select * from foo where colB = '2b'")).executeOn(store)
+        //);
+    }
+
+    //TODO: probably need to resolve columns to be fully qualified, i.e. table + string
 
 }

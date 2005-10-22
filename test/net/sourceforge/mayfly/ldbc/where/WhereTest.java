@@ -1,8 +1,9 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.ldbc.where;
 
 import junit.framework.*;
 import org.ldbc.parser.*;
 import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.*;
 
 public class WhereTest extends TestCase {
 
@@ -12,8 +13,8 @@ public class WhereTest extends TestCase {
         Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
 
         assertEquals(
-            new Where.Equal(new Column("f", "name"), new Literal.QuotedString("'steve'")),
-            Where.Equal.fromTree(new Tree(whereClause.getFirstChild()))
+            new Equal(new Column("f", "name"), new Literal.QuotedString("'steve'")),
+            Equal.fromTree(new Tree(whereClause.getFirstChild()))
         );
 
     }
@@ -25,7 +26,7 @@ public class WhereTest extends TestCase {
 
         assertEquals(
             new Where()
-                .add(new Where.Equal(new Column("f", "name"), new Literal.QuotedString("'steve'"))),
+                .add(new Equal(new Column("f", "name"), new Literal.QuotedString("'steve'"))),
             Where.fromConditionTree(whereClause)
         );
     }

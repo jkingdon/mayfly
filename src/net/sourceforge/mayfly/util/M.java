@@ -4,7 +4,19 @@ import net.sourceforge.mayfly.datastore.*;
 
 import java.util.*;
 
-public class M extends ValueObject implements Map {
+public class M extends Aggregate implements Map {
+
+    public static M fromEntries(Iterator entryIter) {
+        M newMap = new M();
+
+        while (entryIter.hasNext()) {
+            Entry entry = (Entry) entryIter.next();
+            newMap.put(entry.getKey(), entry.getValue());
+        }
+
+        return newMap;
+    }
+
 
     private Map delegate;
 
@@ -32,6 +44,18 @@ public class M extends ValueObject implements Map {
         return together;
     }
 
+    protected Aggregate createNew(Iterable items) {
+
+        Iterator iter = items.iterator();
+
+        return fromEntries(iter);
+    }
+
+
+
+    public Iterator iterator() {
+        return entrySet().iterator();
+    }
 
 
     public int hashCode() {

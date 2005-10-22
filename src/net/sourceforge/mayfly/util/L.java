@@ -21,7 +21,7 @@ public class L extends Aggregate implements List {
         delegate = IteratorUtils.toList(items.iterator());
     }
 
-    protected Object createNew(Iterable items) {
+    protected Aggregate createNew(Iterable items) {
         return new L(items);
     }
 
@@ -51,6 +51,16 @@ public class L extends Aggregate implements List {
     public ImmutableList asImmutable() {
         return new ImmutableList(this);
     }
+
+    public L slurp(Iterable iterable) {
+        Iterator iter = iterable.iterator();
+        while (iter.hasNext()) {
+            append(iter.next());
+        }
+
+        return this;
+    }
+
 
     public int hashCode() {
         return delegate.hashCode();

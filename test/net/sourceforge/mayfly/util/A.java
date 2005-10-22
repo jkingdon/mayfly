@@ -15,4 +15,19 @@ public class A {
             }
         }
     }
+
+    public static void assertNotEquals(Object expected, Object actual) {
+        boolean equal;
+
+        try {
+            assertEquals(expected, actual);
+            equal = true;
+        } catch (AssertionFailedError err) {
+            equal = false;
+        }
+
+        if (equal) {
+            throw new AssertionFailedError("expected " + String.valueOf(expected) + " to not be equal to " + String.valueOf(actual));
+        }
+    }
 }

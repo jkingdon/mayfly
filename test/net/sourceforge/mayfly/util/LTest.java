@@ -55,4 +55,18 @@ public class LTest extends TestCase {
         assertEquals("[7, 8]", list.toString());
     }
 
+    public void testSlurp() throws Exception {
+        assertEquals(
+            new L()
+                .append("a")
+                .append("b")
+                .append("c"),
+            new L()
+                .append("a")
+                .slurp(new IterableCollection(new L()
+                                                .append("b")
+                                                .append("c")))
+        );
+    }
+
 }

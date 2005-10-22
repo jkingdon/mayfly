@@ -19,8 +19,8 @@ public class What extends Aggregate {
     }
 
 
-    protected Object createNew(Iterable items) {
-        return new What(asList(items));
+    protected Aggregate createNew(Iterable items) {
+        return new What(new L().slurp(items));
     }
 
     public Iterator iterator() {

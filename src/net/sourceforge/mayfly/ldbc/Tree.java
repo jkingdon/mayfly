@@ -213,8 +213,8 @@ public class Tree implements AST {
             this.elements = elements;
         }
 
-        protected Object createNew(Iterable items) {
-            return new Tree.Children(asList(items));
+        protected Aggregate createNew(Iterable items) {
+            return new Tree.Children(new L().slurp(items));
         }
 
         public Iterator iterator() {

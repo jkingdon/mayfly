@@ -20,11 +20,11 @@ public class Column extends WhatElement {
 
 
     private String dimension;
-    private String column;
+    private String columnName;
 
-    public Column(String dimension, String column) {
+    public Column(String dimension, String columnName) {
         this.dimension = dimension;
-        this.column = column;
+        this.columnName = columnName;
     }
 
     public Column(String column) {
@@ -32,7 +32,15 @@ public class Column extends WhatElement {
     }
     
     public String columnName() {
-        return column;
+        return columnName;
+    }
+
+    public boolean equals(Object other) {
+        return columnName.equalsIgnoreCase(((Column)other).columnName);
+    }
+
+    public int hashCode() {
+        return 0;
     }
 
 }

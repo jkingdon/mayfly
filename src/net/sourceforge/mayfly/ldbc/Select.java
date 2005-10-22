@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.ldbc;
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.util.*;
 import org.ldbc.parser.*;
 
@@ -18,11 +19,11 @@ public class Select extends ValueObject {
         L converted =
             selectTree.children().convertUsing(TreeConverters.forSelectTree(), typesToIgnore);
 
-        Where where = 
+        Where where =
             converted.selectObjectsThatAre(Where.class).size() > 0 ?
                     (Where) converted.selectObjectThatIs(Where.class) :
                     new Where();
-                    
+
         return
             new Select(
                 new What(converted.selectObjectsThatAre(WhatElement.class)),
@@ -62,7 +63,7 @@ public class Select extends ValueObject {
             String tableName = (String) iterator.next();
             result = result == null ?
                          store.table(tableName).rows() :
-                         result.join(store.table(tableName).rows());
+                         (Rows)result.cartesianJoin(store.table(tableName).rows());
         }
 
         return result;

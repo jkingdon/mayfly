@@ -19,8 +19,8 @@ public class Froms extends Aggregate {
     }
 
 
-    protected Object createNew(Iterable items) {
-        return new Froms(asList(items));
+    protected Aggregate createNew(Iterable items) {
+        return new Froms(new L().slurp(items));
     }
 
     public Iterator iterator() {
