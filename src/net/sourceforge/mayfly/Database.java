@@ -221,18 +221,21 @@ public class Database {
      * Execute an SQL command which does not return results.
      * This is similar to the JDBC {@link java.sql.Statement#executeUpdate(java.lang.String)}
      * but is more convenient if you have a Database instance around.
+     * @return Number of rows changed.
      */
-    public void execute(String command) throws SQLException {
+    public int execute(String command) throws SQLException {
         Statement statement = parse(command);
         if (statement instanceof Drop) {
             dataStore = dataStore.dropTable(((Drop)statement).getName());
+            return 0;
         } else if (statement instanceof CreateTable) {
             CreateTable createTable = (CreateTable) statement;
             createTable(createTable.getTable().getName(), 
                     createTable.getColumnDefinitions());
+            return 0;
         } else if (statement instanceof Insert) {
             Insert insert = (Insert) statement;
-            insert(insert.getTable().getName(), 
+            return insert(insert.getTable().getName(), 
                     insert.getColumns(), insert.getItemsList());
         } else {
             throw new SQLException("unrecognized command for execute: " + command);
@@ -277,7 +280,7 @@ public class Database {
     }
 
 
-    private void insert(String table, List columns, ItemsList itemsList)
+    private int insert(String table, List columns, ItemsList itemsList)
     throws SQLException {
         List columnNames = new ArrayList();
         List values = new ArrayList();
@@ -291,6 +294,7 @@ public class Database {
         }
         
         dataStore = dataStore.addRow(table, columnNames, values);
+        return 1;
     }
 
     private List walkList(ItemsList itemsList) {

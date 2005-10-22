@@ -31,6 +31,8 @@ Possible features (beyond those in DESCRIPTION.txt):
         unless we can somehow avoid memory growing without bounds).
         On the finalizer of Database is perhaps one good place but
         of course we can't assume it would get called.
+   (Also check that we don't do anything after calling close() on a statement,
+    result set, etc).
    
  * Enforce "For maximum portability, result set columns within each row should
    be read in left-to-right order, and each column should be read only once."

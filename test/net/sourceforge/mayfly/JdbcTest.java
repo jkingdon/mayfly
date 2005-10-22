@@ -23,5 +23,14 @@ public class JdbcTest extends TestCase {
         
         connection.close();
     }
+    
+    public void testInsert() throws Exception {
+        Connection connection = new Database().openConnection();
+        Statement statement = connection.createStatement();
+        assertEquals(0, statement.executeUpdate("CREATE Table Foo (b number)"));
+        assertEquals(1, statement.executeUpdate("inSERT into foo (b) values (77)"));
+        statement.close();
+        connection.close();
+    }
 
 }

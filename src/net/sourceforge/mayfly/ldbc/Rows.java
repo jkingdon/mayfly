@@ -6,7 +6,7 @@ import net.sourceforge.mayfly.util.*;
 import java.util.*;
 
 public class Rows extends Aggregate {
-    private ImmutableList rows;
+    private final ImmutableList rows;
 
     public Rows(ImmutableList rows) {
         this.rows = rows;

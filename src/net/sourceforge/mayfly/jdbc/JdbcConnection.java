@@ -18,7 +18,7 @@ public class JdbcConnection implements Connection {
     }
 
     public Statement createStatement() throws SQLException {
-        throw new UnimplementedException();
+        return new JdbcStatement(database);
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
