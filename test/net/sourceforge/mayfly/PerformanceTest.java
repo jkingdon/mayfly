@@ -1,26 +1,13 @@
 package net.sourceforge.mayfly;
 
-import junit.framework.*;
-
 import net.sourceforge.mayfly.ldbc.*;
 
-import java.sql.*;
-
-public class PerformanceTest extends TestCase {
+public class PerformanceTest extends SqlTestCase {
     
     private static final int COLUMNS_PER_TABLE = 15;
     private static final int TABLE_COUNT = 30;
     private static final int TABLES_TO_INSERT_INTO = 10;
     private static final int ROWS_TO_INSERT = 3;
-
-    private Database database;
-    private Connection connection;
-
-    public void setUp() throws Exception {
-//        database = new Database();
-//        connection = database.openConnection();
-        connection = MetaDataTest.openConnection();
-    }
 
     // this test is not part of the default build because it is a bit slow,
     // and more importantly because it contains few assertions, so it is
@@ -48,19 +35,7 @@ public class PerformanceTest extends TestCase {
             command.append(")\n");
             execute(command.toString());
         }
-        //assertEquals(TABLE_COUNT, countTables());
-    }
-
-    private int countTables() {
-        return database.tables().size();
-    }
-    
-    private void execute(String sql) throws Exception {
-        Statement statement = connection.createStatement();
-        statement.executeUpdate(sql);
-        statement.close();
-//        CCJSqlParserManager parser = new CCJSqlParserManager();
-//        parser.parse(new StringReader(sql));
+        assertTableCount(TABLE_COUNT);
     }
 
     private void insertSomeData() throws Exception {
@@ -98,7 +73,7 @@ public class PerformanceTest extends TestCase {
         for (int i = 0; i < TABLE_COUNT; ++i) {
             execute("drop table some_table_" + i + "\n");
         }
-        //assertEquals(0, countTables());
+        assertTableCount(0);
     }
     
     public void testStringBuilder() throws Exception {

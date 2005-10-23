@@ -1,17 +1,10 @@
 package net.sourceforge.mayfly;
 
-import junit.framework.*;
 
-import java.sql.*;
-
-public class DataTypeTest extends TestCase {
+public class DataTypeTest extends SqlTestCase {
 
     public void testTypes() throws Exception {
-        Connection connection = MetaDataTest.openConnection();
-        Statement statement = connection.createStatement();
-        statement.executeUpdate("create table foo (a integer)");
-        statement.close();
-        connection.close();
+        execute("create table foo (a integer)");
     }
 
 }

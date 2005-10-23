@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly;
 
-import junit.framework.*;
-
 import java.sql.*;
 
 /**
@@ -10,18 +8,8 @@ import java.sql.*;
  * For now, it is merely limited by what we've gotten around to
  * implementing.  Which, at the time of writing, is nothing.
  */
-public class MetaDataTest extends TestCase {
+public class MetaDataTest extends SqlTestCase {
 
-    private Connection connection;
-
-    public void setUp() throws Exception {
-        connection = openConnection();
-    }
-    
-    public void tearDown() throws Exception {
-        connection.close();
-    }
-    
     public void testNothing() {
     }
 
@@ -44,17 +32,6 @@ public class MetaDataTest extends TestCase {
         assertEquals("foo", tables.getString("TABLE_NAME"));
         assertFalse("no second row", tables.next());
         tables.close();
-    }
-
-    public static Connection openConnection() throws Exception {
-        boolean connectToMayfly = true;
-        if (connectToMayfly) {
-            Database database = new Database();
-            return database.openConnection();
-        } else {
-            Class.forName("org.hsqldb.jdbcDriver");
-            return DriverManager.getConnection("jdbc:hsqldb:.");
-        }
     }
 
 }
