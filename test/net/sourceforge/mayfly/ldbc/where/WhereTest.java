@@ -4,6 +4,8 @@ import junit.framework.*;
 import org.ldbc.parser.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.util.*;
 
 public class WhereTest extends TestCase {
 
@@ -13,7 +15,7 @@ public class WhereTest extends TestCase {
         Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
 
         assertEquals(
-            new Equal(new Column("f", "name"), new Literal.QuotedString("'steve'")),
+            new Equal(new Column("f", "name"), new QuotedString("'steve'")),
             Equal.fromTree(new Tree(whereClause.getFirstChild()))
         );
 
@@ -26,9 +28,30 @@ public class WhereTest extends TestCase {
 
         assertEquals(
             new Where()
-                .add(new Equal(new Column("f", "name"), new Literal.QuotedString("'steve'"))),
+                .add(new Equal(new Column("f", "name"), new QuotedString("'steve'"))),
             Where.fromConditionTree(whereClause)
         );
+    }
+
+    public void testSelect() throws Exception {
+        Tree selectTree = Tree.parse("select * from foo where name='steve'");
+        Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
+        Where where = Where.fromConditionTree(whereClause);
+
+        Row row1 = new Row(
+            new M()
+                .entry(new Column("name"), new Cell("steve"))
+                .asImmutable()
+        );
+
+        Row row2 = new Row(
+            new M()
+                .entry(new Column("name"), new Cell("bob"))
+                .asImmutable()
+        );
+
+        assertTrue(where.evaluate(row1));
+        assertFalse(where.evaluate(row2));
     }
 
 

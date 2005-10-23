@@ -61,6 +61,16 @@ public class L extends Aggregate implements List {
         return this;
     }
 
+    public M asIndexToElementMap() {
+        M result = new M();
+
+        for (int index = 0; index < size(); index++) {
+            result.put(new Integer(index), get(index));
+        }
+
+        return result;
+    }
+
 
     public int hashCode() {
         return delegate.hashCode();
@@ -174,6 +184,7 @@ public class L extends Aggregate implements List {
     public String toString() {
         return delegate.toString();
     }
+
 
 
 }

@@ -55,17 +55,17 @@ public class Select extends ValueObject {
     }
 
     public Rows executeOn(DataStore store) throws SQLException {
-        Rows result = null;
+        Rows joinedRows = null;
 
         L tableNames = froms.tableNames();
 
         for (Iterator iterator = tableNames.iterator(); iterator.hasNext();) {
             String tableName = (String) iterator.next();
-            result = result == null ?
+            joinedRows = joinedRows == null ?
                          store.table(tableName).rows() :
-                         (Rows)result.cartesianJoin(store.table(tableName).rows());
+                         (Rows)joinedRows.cartesianJoin(store.table(tableName).rows());
         }
 
-        return result;
+        return (Rows) joinedRows.select(where);
     }
 }

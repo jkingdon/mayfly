@@ -69,4 +69,16 @@ public class LTest extends TestCase {
         );
     }
 
+    public void testIndexToElementMap() throws Exception {
+        assertEquals(
+            new M()
+                .entry(new Integer(0), "a")
+                .entry(new Integer(1), "b"),
+            new L()
+                .append("a")
+                .append("b")
+                .asIndexToElementMap()
+        );
+    }
+
 }

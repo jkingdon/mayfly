@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.util;
 
 import net.sourceforge.mayfly.ldbc.*;
 import org.apache.commons.collections.*;
+import org.apache.commons.lang.*;
 
 import java.util.*;
 
@@ -161,5 +162,12 @@ abstract public class Aggregate extends ValueObject implements Iterable {
             throw new RuntimeException("this only works when the elements are themselves Aggregates.\n" +
                                        "  Element type was: " + element.getClass().getName());
         }
+    }
+
+    public Aggregate elements(int[] indexes) {
+
+        L keysWanted = new L(Arrays.asList(ArrayUtils.toObject(indexes)));
+
+        return createNew(new IterableCollection(asList().asIndexToElementMap().subMap(keysWanted).values()));
     }
 }

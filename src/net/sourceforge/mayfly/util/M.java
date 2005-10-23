@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.util;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.ldbc.*;
 
 import java.util.*;
 
@@ -35,13 +36,6 @@ public class M extends Aggregate implements Map {
 
     public ImmutableMap asImmutable() {
         return new ImmutableMap(this);
-    }
-
-    public M plus(Map other) {
-        M together = new M();
-        together.putAll(this);
-        together.putAll(other);
-        return together;
     }
 
     protected Aggregate createNew(Iterable items) {
@@ -118,4 +112,15 @@ public class M extends Aggregate implements Map {
         return delegate.toString();
     }
 
+    public M subMap(L keysWanted) {
+        final M result = new M(new TreeMap());
+
+        keysWanted.each(new Each() {
+            public void each(Object element) {
+                result.put(element, get(element));
+            }
+        });
+
+        return result;
+    }
 }

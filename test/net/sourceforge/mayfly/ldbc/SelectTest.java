@@ -17,7 +17,7 @@ public class SelectTest extends TestCase {
                     .add(new From("foo", "f"))
                     .add(new From("bar", "b")),
                 new Where()
-                    .add(new Equal(new Column("f", "name"), new Literal.QuotedString("'steve'")))
+                    .add(new Equal(new Column("f", "name"), new QuotedString("'steve'")))
             ),
             Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b where f.name='steve'"))
         );
@@ -60,12 +60,12 @@ public class SelectTest extends TestCase {
 
         assertEquals(
             store.table("foo").rows().cartesianJoin(store.table("bar").rows()),
-            Select.fromTree(Tree.parse("select * from foo, bar where f.name = 'steve'")).executeOn(store)
+            Select.fromTree(Tree.parse("select * from foo, bar")).executeOn(store)
         );
     }
 
     public void testSimpleWhere() throws Exception {
-        //DataStore store =
+        DataStore store =
             new DataStore()
                 .createTable("foo", new L().append("colA").append("colB"))
                 .addRow("foo", new L().append("colA").append("colB"), new L().append("1a").append("1b"))
@@ -75,10 +75,10 @@ public class SelectTest extends TestCase {
 
         //dont just use equal here.  it's clearer if you just make the rows the expected
 
-        //assertEquals(
-        //    store.table("foo").rows().select(new Equal(new Column("colB"), new Literal.QuotedString("2b"))),
-        //    Select.fromTree(Tree.parse("select * from foo where colB = '2b'")).executeOn(store)
-        //);
+        assertEquals(
+            store.table("foo").rows().elements(new int[]{1, 2}),
+            Select.fromTree(Tree.parse("select * from foo where colB = 'xx'")).executeOn(store)
+        );
     }
 
     //TODO: probably need to resolve columns to be fully qualified, i.e. table + string

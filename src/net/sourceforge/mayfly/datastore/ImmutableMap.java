@@ -1,8 +1,10 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.util.*;
+
 import java.util.*;
 
-public class ImmutableMap implements Map {
+public class ImmutableMap extends ValueObject implements Map {
 
     Map delegate;
 
@@ -93,6 +95,10 @@ public class ImmutableMap implements Map {
 
     public Collection values() {
         return delegate.values();
+    }
+
+    public String toString() {
+        return delegate.toString();
     }
 
 }

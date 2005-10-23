@@ -32,4 +32,14 @@ public class Row extends Aggregate {
     public Columns columns() {
         return new Columns(new ArrayList(columnToCell.keySet()));
     }
+
+    public String toString() {
+        String cols = columnToCell.keySet().toString();
+        String cells = columnToCell.values().toString();
+
+        return "\n" +
+               "Row:\n" +
+               "\tcols:\t" + cols + "\n" +
+               "\tcells:\t" + cells;
+    }
 }

@@ -3,17 +3,25 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.util.*;
 
 public class Cell extends ValueObject {
-    private Object obj;
+    private Object content;
 
-    public Cell(Object obj) {
-        this.obj = obj;
+    public Cell(Object content) {
+        this.content = content;
     }
 
     public int asInt() {
-        return ((Number)obj).intValue();
+        return ((Number)content).intValue();
     }
 
     public long asLong() {
-        return ((Number)obj).longValue();
+        return ((Number)content).longValue();
+    }
+
+    public String asString() {
+        return (String)content;
+    }
+
+    public String toString() {
+        return content.toString();
     }
 }

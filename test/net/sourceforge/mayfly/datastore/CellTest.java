@@ -12,4 +12,10 @@ public class CellTest extends TestCase {
         assertEquals(6L, new Cell(new Long(6)).asLong());
         assertEquals(6L, new Cell(new Integer(6)).asLong());
     }
+
+    public void testAsString() throws Exception {
+        assertEquals("a", new Cell("a").asString());
+    }
+
+
 }

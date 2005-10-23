@@ -157,6 +157,13 @@ public class AggregateTest extends TestCase {
         );
     }
 
+    public void testElementsAt() throws Exception {
+        assertEquals(
+            new Strings("a", "c"),
+            new Strings("a", "b", "c").elements(new int[]{0, 2})
+        );
+    }
+
 
 
     class Strings extends Aggregate {

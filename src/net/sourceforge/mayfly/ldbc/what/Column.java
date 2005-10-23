@@ -43,4 +43,8 @@ public class Column extends WhatElement {
         return 0;
     }
 
+    public String toString() {
+        return columnName;
+    }
+
 }
