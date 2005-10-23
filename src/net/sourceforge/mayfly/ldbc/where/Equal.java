@@ -16,7 +16,7 @@ public class Equal extends ValueObject implements Selector{
         Column column = Column.fromColumnTree(new Tree(left));
 
         AST right = (AST) iter.next();
-        QuotedString quotedString = QuotedString.fromTree(new Tree(right));
+        Literal quotedString = Literal.literalFromTree(new Tree(right));
 
         return new Equal(column, quotedString);
     }
@@ -32,6 +32,6 @@ public class Equal extends ValueObject implements Selector{
     public boolean evaluate(Object candidate) {
         Row r = (Row) candidate;
 
-        return ((QuotedString)rightside).matchesCell(r.cell((Column) leftside));
+        return ((Literal)rightside).matchesCell(r.cell((Column) leftside));
     }
 }

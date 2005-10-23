@@ -212,8 +212,7 @@ public class SqlTest extends TestCase {
         assertFalse(results.next());
     }
     
-    // Need to implement integer comparison, not just string, for this to work.
-    public void xtestWhere() throws Exception {
+    public void testWhere() throws Exception {
         database.execute("create table foo (a integer, b integer)");
         database.execute("insert into foo (a, b) values (4, 16)");
         database.execute("insert into foo (a, b) values (5, 25)");
