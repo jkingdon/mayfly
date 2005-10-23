@@ -51,7 +51,7 @@ public class Select extends ValueObject {
         TableData tableData = dataStore.table(froms.singleTableName());
 
         List canonicalizedColumnNames = what.selectedColumns(tableData);
-        return new MyResultSet(canonicalizedColumnNames, tableData);
+        return new MyResultSet(canonicalizedColumnNames, executeOn(dataStore));
     }
 
     public Rows executeOn(DataStore store) throws SQLException {

@@ -1,6 +1,8 @@
 package net.sourceforge.mayfly;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 
 import java.sql.*;
 import java.util.*;
@@ -10,17 +12,17 @@ public final class MyResultSet extends ResultSetStub {
 
     private final List canonicalizedColumnNames;
 
-    private final TableData tableData;
+    private final Rows rows;
 
-    public MyResultSet(List canonicalizedColumnNames, TableData tableData) {
+    public MyResultSet(List canonicalizedColumnNames, Rows rows) {
         super();
         this.canonicalizedColumnNames = canonicalizedColumnNames;
-        this.tableData = tableData;
+        this.rows = rows;
     }
 
     public boolean next() throws SQLException {
         ++pos;
-        if (pos >= tableData.rowCount()) {
+        if (pos >= rows.size()) {
             return false;
         } else {
             return true;
@@ -28,9 +30,10 @@ public final class MyResultSet extends ResultSetStub {
     }
 
     public int getInt(String columnName) throws SQLException {
-        String canonicalizedColumnName = lookUpColumn(canonicalizedColumnNames, columnName);
-        
-        return tableData.getInt(canonicalizedColumnName, checkedRowNumber());
+        lookUpColumn(columnName);
+        Row row = (Row) rows.element(checkedRowNumber());
+        Cell cell = row.cell(new Column(columnName));
+        return cell.asInt();
     }
 
     public int getInt(int oneBasedColumn) throws SQLException {
@@ -39,20 +42,20 @@ public final class MyResultSet extends ResultSetStub {
             throw new SQLException("no column " + oneBasedColumn);
         }
         String columnName = (String) canonicalizedColumnNames.get(zeroBasedColumn);
-        return tableData.getInt(columnName, checkedRowNumber());
+        return getInt(columnName);
     }
 
     private int checkedRowNumber() throws SQLException {
         if (pos < 0) {
             throw new SQLException("no current result row");
         }
-        if (pos >= tableData.rowCount()) {
+        if (pos >= rows.size()) {
             throw new SQLException("already read last result row");
         }
         return pos;
     }
 
-    private String lookUpColumn(List canonicalizedColumnNames, String target) throws SQLException {
+    private String lookUpColumn(String target) throws SQLException {
         for (int i = 0; i < canonicalizedColumnNames.size(); ++i) {
             String columnName = (String) canonicalizedColumnNames.get(i);
             if (target.equalsIgnoreCase(columnName)) {
