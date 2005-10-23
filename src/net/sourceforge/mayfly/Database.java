@@ -267,7 +267,7 @@ public class Database {
 
     private List columnNamesFromDefinitions(List columns) {
         if (columns == null) {
-            // CREATE TABLE FOO without any columns (is it even legal?)
+            // CREATE TABLE FOO without any columns (is it even legal? Hypersonic says no)
             return Collections.EMPTY_LIST;
         }
 

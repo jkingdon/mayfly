@@ -32,5 +32,9 @@
 		<attributes>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" sourcepath="test/lib-src/hsqldb_1_8_0_2.zip" path="test/lib/hsqldb.jar">
+		<attributes>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

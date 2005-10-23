@@ -2,9 +2,9 @@ package net.sourceforge.mayfly;
 
 import junit.framework.*;
 
-import java.sql.*;
-
 import net.sourceforge.mayfly.ldbc.*;
+
+import java.sql.*;
 
 public class PerformanceTest extends TestCase {
     
@@ -14,9 +14,12 @@ public class PerformanceTest extends TestCase {
     private static final int ROWS_TO_INSERT = 3;
 
     private Database database;
+    private Connection connection;
 
-    public void setUp() {
-        database = new Database();
+    public void setUp() throws Exception {
+//        database = new Database();
+//        connection = database.openConnection();
+        connection = MetaDataTest.openConnection();
     }
 
     // this test is not part of the default build because it is a bit slow,
@@ -31,24 +34,36 @@ public class PerformanceTest extends TestCase {
         System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");
     }
 
-    private void createTables() throws SQLException {
+    private void createTables() throws Exception {
         for (int i = 0; i < TABLE_COUNT; ++i) {
             StringBuilder command = new StringBuilder();
             command.append("create table some_table_" + i + " (\n");
             for (int j = 0; j < COLUMNS_PER_TABLE; ++j) {
-                command.append("  column_" + j + " number");
+                command.append("  column_" + j + " integer");
                 if (j < COLUMNS_PER_TABLE - 1) {
                     command.append(",");
                 }
                 command.append("\n");
             }
             command.append(")\n");
-            database.execute(command.toString());
+            execute(command.toString());
         }
-        assertEquals(TABLE_COUNT, database.tables().size());
+        //assertEquals(TABLE_COUNT, countTables());
+    }
+
+    private int countTables() {
+        return database.tables().size();
     }
     
-    private void insertSomeData() throws SQLException {
+    private void execute(String sql) throws Exception {
+        Statement statement = connection.createStatement();
+        statement.executeUpdate(sql);
+        statement.close();
+//        CCJSqlParserManager parser = new CCJSqlParserManager();
+//        parser.parse(new StringReader(sql));
+    }
+
+    private void insertSomeData() throws Exception {
         for (int i = 0; i < TABLES_TO_INSERT_INTO; ++i) {
             for (int j = 0; j < ROWS_TO_INSERT; ++j) {
                 insertRow("some_table_" + i);
@@ -56,7 +71,7 @@ public class PerformanceTest extends TestCase {
         }
     }
 
-    private void insertRow(String table) throws SQLException {
+    private void insertRow(String table) throws Exception {
         // INSERT INTO table (COLUMN_0, COLUMN_1) VALUES (100, 101)
 
         StringBuilder command = new StringBuilder();
@@ -76,14 +91,14 @@ public class PerformanceTest extends TestCase {
         }
         command.append(")");
 
-        database.execute(command.toString());
+        execute(command.toString());
     }
 
-    private void dropTables() throws SQLException {
+    private void dropTables() throws Exception {
         for (int i = 0; i < TABLE_COUNT; ++i) {
-            database.execute("drop table some_table_" + i + "\n");
+            execute("drop table some_table_" + i + "\n");
         }
-        assertEquals(0, database.tables().size());
+        //assertEquals(0, countTables());
     }
     
     public void testStringBuilder() throws Exception {
