@@ -10,16 +10,16 @@ public class SqlTest extends SqlTestCase {
             execute("PICK NOSE");
             fail();
         } catch (SQLException expected) {
-            assertEquals("cannot parse PICK NOSE", expected.getMessage());
+            assertMessage("cannot parse PICK NOSE", expected);
         }
     }
-    
+
     public void testCommandsAreCaseInsensitive() throws Exception {
         try {
             execute("DrOp tAbLe FOO");
             fail();
         } catch (SQLException expected) {
-            assertEquals("no such table FOO", expected.getMessage());
+            assertMessage("no such table FOO", expected);
         }
     }
 
@@ -28,7 +28,7 @@ public class SqlTest extends SqlTestCase {
             execute("DROP TABLE FOO");
             fail();
         } catch (SQLException expected) {
-            assertEquals("no such table FOO", expected.getMessage());
+            assertMessage("no such table FOO", expected);
         }
     }
     
@@ -37,18 +37,18 @@ public class SqlTest extends SqlTestCase {
     }
 
     public void testInsertWithBadColumnName() throws Exception {
-        execute("CREATE TABLE FOO (A NUMBER)");
+        execute("CREATE TABLE FOO (A integer)");
         try {
             execute("INSERT INTO FOO (b) values (5)");
             fail();
         }
         catch (SQLException e) {
-            assertEquals("no column b", e.getMessage());
+            assertMessage("no column b", e);
         }
     }
     
     public void testSelectEmpty() throws Exception {
-        execute("CREATE TABLE FOO (a NUMBER)");
+        execute("CREATE TABLE FOO (a INTEGER)");
         ResultSet results = query("select a from foo");
         assertFalse(results.next());
     }
@@ -58,22 +58,22 @@ public class SqlTest extends SqlTestCase {
             query("select a from foo");
             fail();
         } catch (SQLException e) {
-            assertEquals("no such table foo", e.getMessage());
+            assertMessage("no such table foo", e);
         }
     }
 
     public void testBadColumnName() throws Exception {
-        execute("CREATE TABLE FOO (A NUMBER)");
+        execute("CREATE TABLE FOO (A INTEGER)");
         try {
             query("select b from foo");
             fail();
         } catch (SQLException e) {
-            assertEquals("no column b", e.getMessage());
+            assertMessage("no column b", e);
         }
     }
 
     public void testSelect() throws Exception {
-        execute("CREATE TABLE FOO (A NUMBER)");
+        execute("CREATE TABLE FOO (A INTEGER)");
         execute("INSERT INTO FOO (A) values (5)");
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
@@ -82,7 +82,7 @@ public class SqlTest extends SqlTestCase {
     }
     
     public void testAskResultSetForUnqueriedColumn() throws Exception {
-        execute("CREATE TABLE FOO (A NUMBER)");
+        execute("CREATE TABLE FOO (A INTEGER)");
         execute("INSERT INTO FOO (A) values (5)");
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
@@ -90,24 +90,24 @@ public class SqlTest extends SqlTestCase {
             results.getInt("b");
             fail();
         } catch (SQLException e) {
-            assertEquals("no column b", e.getMessage());
+            assertMessage("no column b", e);
         }
     }
     
     public void testTryToGetResultsBeforeCallingNext() throws Exception {
-        execute("CREATE TABLE FOO (A NUMBER)");
+        execute("CREATE TABLE FOO (A INTEGER)");
         execute("INSERT INTO FOO (A) values (5)");
         ResultSet results = query("select a from foo");
         try {
             results.getInt("a");
             fail();
         } catch (SQLException e) {
-            assertEquals("no current result row", e.getMessage());
+            assertMessage("no current result row", e);
         }
     }
     
     public void testTryToGetResultsAfterNextReturnsFalse() throws Exception {
-        execute("CREATE TABLE FOO (A NUMBER)");
+        execute("CREATE TABLE FOO (A INTEGER)");
         execute("INSERT INTO FOO (A) values (5)");
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
@@ -116,12 +116,12 @@ public class SqlTest extends SqlTestCase {
             results.getInt("a");
             fail();
         } catch (SQLException e) {
-            assertEquals("already read last result row", e.getMessage());
+            assertMessage("already read last result row", e);
         }
     }
     
     public void testTwoRows() throws Exception {
-        execute("CREATE TABLE FOO (A NUMBER)");
+        execute("CREATE TABLE FOO (A INTEGER)");
         execute("INSERT INTO FOO (A) values (5)");
         execute("INSERT INTO FOO (a) values (7)");
         ResultSet results = query("select a from foo");
@@ -139,7 +139,7 @@ public class SqlTest extends SqlTestCase {
     }
     
     public void testMultipleColumns() throws Exception {
-        execute("CREATE TABLE FOO (A NUMBER, b NUMBER)");
+        execute("CREATE TABLE FOO (A INTEGER, b INTEGER)");
         execute("INSERT INTO FOO (a, B) values (5, 25)");
         ResultSet results = query("select A, b from foo");
         assertTrue(results.next());
@@ -149,7 +149,7 @@ public class SqlTest extends SqlTestCase {
     }
     
     public void testColumnNumbers() throws Exception {
-        execute("CREATE TABLE FOO (A NUMBER)");
+        execute("CREATE TABLE FOO (A INTEGER)");
         execute("INSERT INTO FOO (A) values (5)");
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
@@ -158,7 +158,7 @@ public class SqlTest extends SqlTestCase {
             results.getInt(0);
             fail();
         } catch (SQLException e) {
-            assertEquals("no column 0", e.getMessage());
+            assertMessage("no column 0", e);
         }
 
         assertEquals(5, results.getInt(1));
@@ -167,7 +167,7 @@ public class SqlTest extends SqlTestCase {
             results.getInt(2);
             fail();
         } catch (SQLException e) {
-            assertEquals("no column 2", e.getMessage());
+            assertMessage("no column 2", e);
         }
 
         assertFalse(results.next());

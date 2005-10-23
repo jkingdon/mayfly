@@ -18,11 +18,15 @@ public abstract class SqlTestCase extends TestCase {
             connection = database.openConnection();
         } else {
             Class.forName("org.hsqldb.jdbcDriver");
-            connection =  DriverManager.getConnection("jdbc:hsqldb:.");
+            connection = DriverManager.getConnection("jdbc:hsqldb:mem:SqlTestCase");
         }
     }
 
     public void tearDown() throws Exception {
+        if (!CONNECT_TO_MAYFLY) {
+            execute("SHUTDOWN"); // So next test gets a new database.
+        }
+
         if (statement != null) {
             statement.close();
         }
@@ -50,6 +54,18 @@ public abstract class SqlTestCase extends TestCase {
         } else {
             // Could probably do this with JDBC metadata or database-specific tricks.
             // Not clear we should bother.
+        }
+    }
+
+    protected void assertMessage(String expectedMessage, SQLException exception) {
+        if (CONNECT_TO_MAYFLY) {
+            assertEquals(expectedMessage, exception.getMessage());
+        } else {
+            // To assert on this (having the test pass in the expected wording
+            // for different databases) would be good in terms of seeing that
+            // the test is failing for the expected reason.  But keeping track
+            // of all those wordings for every database we want to try seems
+            // like too much work.
         }
     }
     
