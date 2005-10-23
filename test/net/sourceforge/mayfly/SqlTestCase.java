@@ -10,6 +10,7 @@ public abstract class SqlTestCase extends TestCase {
 
     private Database database;
     protected Connection connection;
+    private Statement statement;
 
     public void setUp() throws Exception {
         if (CONNECT_TO_MAYFLY) {
@@ -22,13 +23,25 @@ public abstract class SqlTestCase extends TestCase {
     }
 
     public void tearDown() throws Exception {
+        if (statement != null) {
+            statement.close();
+        }
         connection.close();
     }
 
-    protected void execute(String sql) throws SQLException {
+    protected int execute(String sql) throws SQLException {
         Statement statement = connection.createStatement();
-        statement.executeUpdate(sql);
+        int rowsAffected = statement.executeUpdate(sql);
         statement.close();
+        return rowsAffected;
+    }
+
+    protected ResultSet query(String sql) throws SQLException {
+        if (statement != null) {
+            statement.close();
+        }
+        statement = connection.createStatement();
+        return statement.executeQuery(sql);
     }
 
     protected void assertTableCount(int expected) {

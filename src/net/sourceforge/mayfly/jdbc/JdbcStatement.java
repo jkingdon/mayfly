@@ -13,7 +13,7 @@ public class JdbcStatement implements Statement {
     }
 
     public ResultSet executeQuery(String sql) throws SQLException {
-        throw new UnimplementedException();
+        return database.query(sql);
     }
 
     public int executeUpdate(String sql) throws SQLException {
