@@ -19,8 +19,8 @@ public class Column extends WhatElement {
     }
 
 
-    private String dimension;
-    private String columnName;
+    private final String dimension;
+    private final String columnName;
 
     public Column(String dimension, String columnName) {
         this.dimension = dimension;

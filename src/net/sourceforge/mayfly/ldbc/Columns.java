@@ -18,13 +18,13 @@ public class Columns extends Aggregate {
                     }
                 );
 
-        return new Columns(columnList);
+        return new Columns(columnList.asImmutable());
     }
 
 
-    private List columns;
+    private final ImmutableList columns;
 
-    public Columns(List columns) {
+    public Columns(ImmutableList columns) {
         this.columns = columns;
     }
 
@@ -64,6 +64,6 @@ public class Columns extends Aggregate {
     }
 
     public ImmutableList asImmutableList() {
-        return new ImmutableList(columns);
+        return columns;
     }
 }

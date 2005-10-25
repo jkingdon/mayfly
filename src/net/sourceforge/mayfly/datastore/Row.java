@@ -30,7 +30,7 @@ public class Row extends Aggregate {
     }
 
     public Columns columns() {
-        return new Columns(new ArrayList(columnToCell.keySet()));
+        return new Columns(new ImmutableList(columnToCell.keySet()));
     }
 
     public String toString() {

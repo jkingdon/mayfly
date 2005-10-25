@@ -10,7 +10,8 @@ public class ColumnsTest extends TestCase {
             new Columns(
                 new L()
                     .append(new Column("a"))
-                    .append(new Column("b"))),
+                    .append(new Column("b"))
+                    .asImmutable()),
             Columns.fromColumnNames(
                 new L()
                     .append("a")

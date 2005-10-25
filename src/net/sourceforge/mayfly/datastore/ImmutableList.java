@@ -10,8 +10,8 @@ public class ImmutableList implements List {
         delegate = Collections.EMPTY_LIST;
     }
 
-    public ImmutableList(List list) {
-        delegate = Collections.unmodifiableList(new ArrayList(list));
+    public ImmutableList(Collection contents) {
+        delegate = Collections.unmodifiableList(new ArrayList(contents));
     }
     
     private ImmutableList(List alreadyCopied, boolean didICopyIt) {
