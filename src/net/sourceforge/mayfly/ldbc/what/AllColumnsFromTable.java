@@ -15,7 +15,7 @@ public class AllColumnsFromTable extends WhatElement {
         this.dimension = dimension;
     }
 
-    public String columnName() {
+    public Columns columns() {
         throw new UnimplementedException("selecting everything from a table (select table.*) not implemeneted");
     }
 

@@ -116,6 +116,10 @@ public class L extends Aggregate implements List {
         return delegate.add(o);
     }
 
+    public void add(int element) {
+        add(new Integer(element));
+    }
+
     public boolean contains(Object o) {
         return delegate.contains(o);
     }
@@ -184,7 +188,5 @@ public class L extends Aggregate implements List {
     public String toString() {
         return delegate.toString();
     }
-
-
 
 }

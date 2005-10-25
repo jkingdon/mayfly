@@ -14,9 +14,12 @@ public final class MyResultSet extends ResultSetStub {
 
     private final Rows rows;
 
-    public MyResultSet(List canonicalizedColumnNames, Rows rows) {
+    private final Columns columns;
+
+    public MyResultSet(Columns columns, Rows rows) {
         super();
-        this.columnNames = canonicalizedColumnNames;
+        this.columns = columns;
+        this.columnNames = columns.asNames();
         this.rows = rows;
     }
 
@@ -38,11 +41,11 @@ public final class MyResultSet extends ResultSetStub {
 
     public int getInt(int oneBasedColumn) throws SQLException {
         int zeroBasedColumn = oneBasedColumn - 1;
-        if (zeroBasedColumn < 0 || zeroBasedColumn >= columnNames.size()) {
+        if (zeroBasedColumn < 0 || zeroBasedColumn >= columns.size()) {
             throw new SQLException("no column " + oneBasedColumn);
         }
-        String columnName = (String) columnNames.get(zeroBasedColumn);
-        return getInt(columnName);
+        Column column = (Column) columns.asImmutableList().get(zeroBasedColumn);
+        return getInt(column.columnName());
     }
 
     private int checkedRowNumber() throws SQLException {

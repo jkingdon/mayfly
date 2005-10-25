@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.ldbc.what;
 import net.sourceforge.mayfly.ldbc.*;
 import org.ldbc.antlr.collections.*;
 
-public class Column extends WhatElement {
+public class Column {
     public static Column fromColumnTree(Tree column) {
         AST firstIdentifier = column.getFirstChild();
         AST secondIdentifier = firstIdentifier.getNextSibling();
@@ -19,11 +19,11 @@ public class Column extends WhatElement {
     }
 
 
-    private final String dimension;
+    private final String table;
     private final String columnName;
 
-    public Column(String dimension, String columnName) {
-        this.dimension = dimension;
+    public Column(String table, String columnName) {
+        this.table = table;
         this.columnName = columnName;
     }
 
@@ -45,6 +45,10 @@ public class Column extends WhatElement {
 
     public String toString() {
         return columnName;
+    }
+
+    public String table() {
+        return table;
     }
 
 }

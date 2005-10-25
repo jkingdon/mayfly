@@ -49,8 +49,9 @@ public class Select extends ValueObject {
     }
 
     public ResultSet select(final DataStore store) throws SQLException {
-        List columns = what.selectedColumns();
-        checkColumns(store, columns);
+        Columns columns = what.selectedColumns();
+        List columnNames = columns.asNames();
+        checkColumns(store, columnNames);
         return new MyResultSet(columns, executeOn(store));
     }
 

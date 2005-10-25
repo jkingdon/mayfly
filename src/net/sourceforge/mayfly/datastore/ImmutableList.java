@@ -14,6 +14,10 @@ public class ImmutableList implements List {
         delegate = Collections.unmodifiableList(new ArrayList(contents));
     }
     
+    public ImmutableList(Object singleElement) {
+        delegate = Collections.singletonList(singleElement);
+    }
+    
     private ImmutableList(List alreadyCopied, boolean didICopyIt) {
         if (!didICopyIt) {
             throw new RuntimeException("Call with() or public constructor instead");

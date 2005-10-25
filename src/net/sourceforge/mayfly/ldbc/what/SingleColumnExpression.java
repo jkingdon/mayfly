@@ -1,6 +1,8 @@
 package net.sourceforge.mayfly.ldbc.what;
 
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
+
 import org.ldbc.antlr.collections.*;
 
 public class SingleColumnExpression extends WhatElement {
@@ -17,7 +19,7 @@ public class SingleColumnExpression extends WhatElement {
         this.column = column;
     }
 
-    public String columnName() {
-        return column.columnName();
+    public Columns columns() {
+        return new Columns(new ImmutableList(column));
     }
 }

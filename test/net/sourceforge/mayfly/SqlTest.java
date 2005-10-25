@@ -188,7 +188,7 @@ public class SqlTest extends SqlTestCase {
         assertFalse(results.next());
     }
     
-    public void testJoin() throws Exception {
+    public void testSimpleJoin() throws Exception {
         execute("create table foo (a integer)");
         execute("create table bar (b integer)");
         execute("insert into foo (a) values (4)");
@@ -197,13 +197,23 @@ public class SqlTest extends SqlTestCase {
         execute("insert into bar (b) values (101)");
         ResultSet results = query("select foo.a, bar.b from foo, bar");
         
-        Set actual = new HashSet();
-        while (results.next()) {
-            int a = results.getInt("a");
-            int b = results.getInt("b");
-            L row = L.fromArray(new int[] {a, b});
-            actual.add(row);
-        }
+        Set expected = new HashSet();
+        expected.add(L.fromArray(new int[] {4, 100}));
+        expected.add(L.fromArray(new int[] {4, 101}));
+        expected.add(L.fromArray(new int[] {5, 100}));
+        expected.add(L.fromArray(new int[] {5, 101}));
+        
+        assertEquals(expected, intResultsAsSet(results, Arrays.asList(new String[] {"a", "b"})));
+    }
+
+    public void xtestJoinSameNameTwice() throws Exception {
+        execute("create table foo (a integer)");
+        execute("create table bar (a integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into bar (a) values (100)");
+        execute("insert into bar (a) values (101)");
+        ResultSet results = query("select foo.a, bar.a from foo, bar");
         
         Set expected = new HashSet();
         expected.add(L.fromArray(new int[] {4, 100}));
@@ -211,7 +221,25 @@ public class SqlTest extends SqlTestCase {
         expected.add(L.fromArray(new int[] {5, 100}));
         expected.add(L.fromArray(new int[] {5, 101}));
         
-        assertEquals(expected, actual);
+        assertEquals(expected, intResultsAsSet(results, L.fromArray(new int[] {1, 2})));
+    }
+
+    private Set intResultsAsSet(ResultSet results, List columns) throws SQLException {
+        Set actual = new HashSet();
+        while (results.next()) {
+            L row = new L();
+            for (int i = 0; i < columns.size(); i++) {
+                Object column = columns.get(i);
+                if (column instanceof String) {
+                    row.add(results.getInt((String) column));
+                } else {
+                    row.add(results.getInt(((Integer) column).intValue()));
+                }
+            }
+            actual.add(row);
+        }
+        results.close();
+        return actual;
     }
 
 }
