@@ -49,11 +49,9 @@ public class Select extends ValueObject {
     }
 
     public ResultSet select(final DataStore store) throws SQLException {
-        Rows selectedRows = executeOn(store);
-
         List columns = what.selectedColumns();
         checkColumns(store, columns);
-        return new MyResultSet(columns, selectedRows);
+        return new MyResultSet(columns, executeOn(store));
     }
 
     private void checkColumns(final DataStore store, List columns) throws SQLException {
@@ -73,15 +71,14 @@ public class Select extends ValueObject {
     }
 
     public Rows executeOn(DataStore store) throws SQLException {
-        Rows joinedRows = null;
-
         L tableNames = froms.tableNames();
 
-        for (Iterator iterator = tableNames.iterator(); iterator.hasNext();) {
+        Iterator iterator = tableNames.iterator();
+        String firstTable = (String) iterator.next();
+        Rows joinedRows = store.table(firstTable).rows();
+        while (iterator.hasNext()) {
             String tableName = (String) iterator.next();
-            joinedRows = joinedRows == null ?
-                         store.table(tableName).rows() :
-                         (Rows)joinedRows.cartesianJoin(store.table(tableName).rows());
+            joinedRows = (Rows)joinedRows.cartesianJoin(store.table(tableName).rows());
         }
 
         return (Rows) joinedRows.select(where);
