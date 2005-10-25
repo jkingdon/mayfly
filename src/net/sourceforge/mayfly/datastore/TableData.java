@@ -82,6 +82,10 @@ public class TableData {
         return columns.asNames();
     }
     
+    public List columns() {
+        return columns.asImmutableList();
+    }
+    
     public int rowCount() {
         return rows.size();
     }

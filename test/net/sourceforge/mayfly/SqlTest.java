@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly;
 
+import net.sourceforge.mayfly.util.*;
+
 import java.sql.*;
 import java.util.*;
 
@@ -184,6 +186,32 @@ public class SqlTest extends SqlTestCase {
         assertEquals(25, results.getInt("b"));
         
         assertFalse(results.next());
+    }
+    
+    public void testJoin() throws Exception {
+        execute("create table foo (a integer)");
+        execute("create table bar (b integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into bar (b) values (100)");
+        execute("insert into bar (b) values (101)");
+        ResultSet results = query("select foo.a, bar.b from foo, bar");
+        
+        Set actual = new HashSet();
+        while (results.next()) {
+            int a = results.getInt("a");
+            int b = results.getInt("b");
+            L row = L.fromArray(new int[] {a, b});
+            actual.add(row);
+        }
+        
+        Set expected = new HashSet();
+        expected.add(L.fromArray(new int[] {4, 100}));
+        expected.add(L.fromArray(new int[] {4, 101}));
+        expected.add(L.fromArray(new int[] {5, 100}));
+        expected.add(L.fromArray(new int[] {5, 101}));
+        
+        assertEquals(expected, actual);
     }
 
 }

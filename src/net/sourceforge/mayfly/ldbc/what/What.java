@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
 import java.sql.*;
@@ -32,12 +31,11 @@ public class What extends Aggregate {
         return this;
     }
 
-    public List selectedColumns(TableData tableData) throws SQLException {
+    public List selectedColumns() throws SQLException {
         List result = new ArrayList();
         for (Iterator iter = masks.iterator(); iter.hasNext();) {
             WhatElement element = (WhatElement) iter.next();
-            String canonicalizedColumnName = tableData.findColumn(element.columnName());
-            result.add(canonicalizedColumnName);
+            result.add(element.columnName());
         }
         return result;
     }

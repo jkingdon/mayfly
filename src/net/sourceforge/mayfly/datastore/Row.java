@@ -10,7 +10,7 @@ public class Row extends Aggregate {
 
     //TODO: will probably need some ordering of cols at some point
 
-    private ImmutableMap columnToCell;
+    private final ImmutableMap columnToCell;
 
     public Row(ImmutableMap columnToCell) {
         this.columnToCell = columnToCell;

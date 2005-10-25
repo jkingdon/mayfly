@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 
 import java.util.*;
@@ -60,5 +61,9 @@ public class Columns extends Aggregate {
         public boolean evaluate(Object candidate) {
             return candidate.equals(new Column(columnNameString));
         }
+    }
+
+    public ImmutableList asImmutableList() {
+        return new ImmutableList(columns);
     }
 }

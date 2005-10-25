@@ -10,13 +10,13 @@ import java.util.*;
 public final class MyResultSet extends ResultSetStub {
     int pos = -1;
 
-    private final List canonicalizedColumnNames;
+    private final List columnNames;
 
     private final Rows rows;
 
     public MyResultSet(List canonicalizedColumnNames, Rows rows) {
         super();
-        this.canonicalizedColumnNames = canonicalizedColumnNames;
+        this.columnNames = canonicalizedColumnNames;
         this.rows = rows;
     }
 
@@ -30,7 +30,7 @@ public final class MyResultSet extends ResultSetStub {
     }
 
     public int getInt(String columnName) throws SQLException {
-        lookUpColumn(columnName);
+        checkColumnName(columnName);
         Row row = (Row) rows.element(checkedRowNumber());
         Cell cell = row.cell(new Column(columnName));
         return cell.asInt();
@@ -38,10 +38,10 @@ public final class MyResultSet extends ResultSetStub {
 
     public int getInt(int oneBasedColumn) throws SQLException {
         int zeroBasedColumn = oneBasedColumn - 1;
-        if (zeroBasedColumn < 0 || zeroBasedColumn >= canonicalizedColumnNames.size()) {
+        if (zeroBasedColumn < 0 || zeroBasedColumn >= columnNames.size()) {
             throw new SQLException("no column " + oneBasedColumn);
         }
-        String columnName = (String) canonicalizedColumnNames.get(zeroBasedColumn);
+        String columnName = (String) columnNames.get(zeroBasedColumn);
         return getInt(columnName);
     }
 
@@ -55,11 +55,11 @@ public final class MyResultSet extends ResultSetStub {
         return pos;
     }
 
-    private String lookUpColumn(String target) throws SQLException {
-        for (int i = 0; i < canonicalizedColumnNames.size(); ++i) {
-            String columnName = (String) canonicalizedColumnNames.get(i);
+    private void checkColumnName(String target) throws SQLException {
+        for (int i = 0; i < columnNames.size(); ++i) {
+            String columnName = (String) columnNames.get(i);
             if (target.equalsIgnoreCase(columnName)) {
-                return columnName;
+                return;
             }
         }
         throw new SQLException("no column " + target);

@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.util.*;
+
 import org.ldbc.parser.*;
 
 import java.sql.*;
@@ -47,11 +48,28 @@ public class Select extends ValueObject {
         return froms;
     }
 
-    public ResultSet select(DataStore dataStore) throws SQLException {
-        TableData tableData = dataStore.table(froms.singleTableName());
+    public ResultSet select(final DataStore store) throws SQLException {
+        Rows selectedRows = executeOn(store);
 
-        List canonicalizedColumnNames = what.selectedColumns(tableData);
-        return new MyResultSet(canonicalizedColumnNames, executeOn(dataStore));
+        List columns = what.selectedColumns();
+        checkColumns(store, columns);
+        return new MyResultSet(columns, selectedRows);
+    }
+
+    private void checkColumns(final DataStore store, List columns) throws SQLException {
+        // This method could use some unit testing.
+        // And also a comparison to make sure its rules correspond to executeOn
+        Set possibleColumnNames = new HashSet();
+        for (Iterator iter = froms.tableNames().iterator(); iter.hasNext();) {
+            String tableName = (String) iter.next();
+            possibleColumnNames.addAll(store.table(tableName).columns());
+        }
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            String columnName = (String) iter.next();
+            if (!possibleColumnNames.contains(new Column(columnName))) {
+                throw new SQLException("no column " + columnName);
+            }
+        }
     }
 
     public Rows executeOn(DataStore store) throws SQLException {

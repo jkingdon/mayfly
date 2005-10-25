@@ -243,7 +243,7 @@ public class Database {
     }
 
     /**
-     * Execute an SQL command which does returns results.
+     * Execute an SQL command which returns results.
      * This is similar to the JDBC {@link java.sql.Statement#executeQuery(java.lang.String)}
      * but is more convenient if you have a Database instance around.
      */
