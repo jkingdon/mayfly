@@ -18,10 +18,21 @@ public class SelectTest extends TestCase {
                     .add(new FromElement("foo", "f"))
                     .add(new FromElement("bar", "b")),
                 new Where(
-                    new Equal(new Column("f", "name"), new QuotedString("'steve'"))
+                    new And(
+                        new And(
+                            new Equal(new Column("f", "name"), new QuotedString("'steve'")),
+                            new Equal(new Column("size"), new MathematicalInt(6))
+                        ),
+                        new Or(
+                            new Equal(new Column("color"), new QuotedString("'red'")),
+                            new Equal(new Column("day"), new MathematicalInt(7))
+                        )
+                    )
+
                 )
             ),
-            Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b where f.name='steve'"))
+            Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b " +
+                                       "where (f.name='steve' and size= 6) and (color='red' or day =7)"))
         );
     }
     

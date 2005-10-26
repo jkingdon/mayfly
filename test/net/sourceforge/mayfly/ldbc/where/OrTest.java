@@ -22,7 +22,7 @@ public class OrTest extends TestCase {
                     ),
                     new Equal(new Column("size"), new MathematicalInt(6))
                 ),
-                Or.fromOrTree(orTree, TreeConverters.forSelectTree())
+                Or.fromOrTree(orTree, TreeConverters.forWhereTree())
         );
     }
 

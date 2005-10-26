@@ -17,7 +17,7 @@ public class WhereTest extends TestCase {
 
         assertEquals(
             new Equal(new Column("f", "name"), new QuotedString("'steve'")),
-            Equal.fromEqualTree(new Tree(whereClause.getFirstChild()), TreeConverters.forSelectTree())
+            Equal.fromEqualTree(new Tree(whereClause.getFirstChild()), TreeConverters.forWhereTree())
         );
 
     }
@@ -31,7 +31,7 @@ public class WhereTest extends TestCase {
             new Where(
                 new Equal(new Column("f", "name"), new QuotedString("'steve'"))
             ),
-            Where.fromConditionTree(whereClause, TreeConverters.forSelectTree())
+            Where.fromConditionTree(whereClause)
         );
     }
 
@@ -40,7 +40,7 @@ public class WhereTest extends TestCase {
     public void testSelect() throws Exception {
         Tree selectTree = Tree.parse("select * from foo where name='steve'");
         Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
-        Where where = Where.fromConditionTree(whereClause, TreeConverters.forSelectTree());
+        Where where = Where.fromConditionTree(whereClause);
 
         Row row1 = new Row(
             new M()

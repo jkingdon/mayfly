@@ -18,7 +18,7 @@ public class EqualTest extends TestCase {
 
         assertEquals(
                 new Equal(new Column("name"), new QuotedString("'steve'")),
-                Equal.fromEqualTree(equalTree, TreeConverters.forSelectTree())
+                Equal.fromEqualTree(equalTree, TreeConverters.forWhereTree())
         );
     }
 

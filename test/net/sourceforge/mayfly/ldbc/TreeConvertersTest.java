@@ -42,7 +42,6 @@ public class TreeConvertersTest extends TestCase {
 
         assertEquals("foo", treeConverters.transform(foo));
         assertEquals("bar", treeConverters.transform(bar));
-
     }
 
 }

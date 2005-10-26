@@ -22,7 +22,26 @@ public class AndTest extends TestCase {
                     ),
                     new Equal(new Column("size"), new MathematicalInt(6))
                 ),
-            And.fromAndTree(andTree, TreeConverters.forSelectTree())
+            And.fromAndTree(andTree, TreeConverters.forWhereTree())
+        );
+    }
+
+    public void testParseWithParens() throws Exception {
+        Tree selectTree = Tree.parse("select * from foo where name='steve' and (species='homo sapiens' and size = 6)");
+
+        Tree andTree = selectTree.children()
+                                .singleSubtreeOfType(SQLTokenTypes.CONDITION).children()
+                                    .singleSubtreeOfType(SQLTokenTypes.LITERAL_and);
+
+        assertEquals(
+                new And(
+                    new Equal(new Column("name"), new QuotedString("'steve'")),
+                    new And(
+                        new Equal(new Column("species"), new QuotedString("'homo sapiens'")),
+                        new Equal(new Column("size"), new MathematicalInt(6))
+                    )
+                ),
+            And.fromAndTree(andTree, TreeConverters.forWhereTree())
         );
     }
 

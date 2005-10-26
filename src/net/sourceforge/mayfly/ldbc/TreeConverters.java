@@ -43,9 +43,13 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.CONDITION,     new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return Where.fromConditionTree(from, converters);
+                                                              return Where.fromConditionTree(from);
                                                           }
-                                                      })
+                                                      });
+    }
+
+    public static TreeConverters forWhereTree() {
+        return new TreeConverters()
             .register(SQLTokenTypes.LITERAL_and,   new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return And.fromAndTree(from, converters);
@@ -61,6 +65,11 @@ public class TreeConverters {
                                                               return Equal.fromEqualTree(from, converters);
                                                           }
                                                       })
+            .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return Column.fromColumnTree(from);
+                                                          }
+                                                      })
             .register(SQLTokenTypes.QUOTED_STRING, new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return QuotedString.fromQuotedStringTree(from);
@@ -70,7 +79,9 @@ public class TreeConverters {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return MathematicalInt.fromDecimalValueTree(from);
                                                           }
-                                                      });
+                                                      })
+            .register(SQLTokenTypes.OPEN_PAREN,    new TreeConverters.SkipLevelAndContinue())
+            .register(SQLTokenTypes.CONDITION,    new TreeConverters.SkipLevelAndContinue());
     }
 
 
@@ -97,5 +108,11 @@ public class TreeConverters {
 
     public static interface Converter {
         Object convert(Tree from, TreeConverters converters);
+    }
+
+    public static class SkipLevelAndContinue implements Converter {
+        public Object convert(Tree from, TreeConverters converters) {
+            return converters.transform(new Tree(from.getFirstChild()));
+        }
     }
 }

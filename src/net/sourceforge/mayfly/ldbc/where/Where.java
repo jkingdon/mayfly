@@ -7,11 +7,8 @@ public class Where extends ValueObject implements Selector {
 
     public static final Where EMPTY = new Where(Selector.ALWAYS_TRUE);
 
-    public static Where fromConditionTree(Tree t, TreeConverters treeConverters) {
-
-        //pretty baked.  that's ok at the moment.
-
-        return new Where(Equal.fromEqualTree(new Tree(t.getFirstChild()), treeConverters));
+    public static Where fromConditionTree(Tree t) {
+        return new Where((Selector) TreeConverters.forWhereTree().transform(new Tree(t.getFirstChild())));
     }
 
 
