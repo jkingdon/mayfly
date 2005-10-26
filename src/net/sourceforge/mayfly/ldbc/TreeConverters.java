@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
+import net.sourceforge.mayfly.ldbc.where.literal.*;
 import org.ldbc.parser.*;
 
 import java.util.*;
@@ -42,9 +43,31 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.CONDITION,     new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return Where.fromConditionTree(from);
+                                                              return Where.fromConditionTree(from, converters);
+                                                          }
+                                                      })
+            .register(SQLTokenTypes.LITERAL_and,   new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return And.fromAndTree(from, converters);
+                                                          }
+                                                      })
+            .register(SQLTokenTypes.EQUAL,         new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return Equal.fromEqualTree(from, converters);
+                                                          }
+                                                      })
+            .register(SQLTokenTypes.QUOTED_STRING, new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return QuotedString.fromQuotedStringTree(from);
+                                                          }
+                                                      })
+            .register(SQLTokenTypes.DECIMAL_VALUE, new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return Int.fromDecimalValueTree(from);
                                                           }
                                                       });
+
+        //TODO: static methods should actually return converter objects insted of inner classes here.
     }
 
 

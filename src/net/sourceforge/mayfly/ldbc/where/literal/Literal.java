@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc.where;
+package net.sourceforge.mayfly.ldbc.where.literal;
 
 import org.ldbc.parser.*;
 
@@ -11,9 +11,9 @@ public abstract class Literal extends ValueObject {
     public static Literal literalFromTree(Tree tree) {
         switch (tree.getType()) {
         case SQLTokenTypes.QUOTED_STRING:
-            return QuotedString.fromTree(tree);
+            return QuotedString.fromQuotedStringTree(tree);
         case SQLTokenTypes.DECIMAL_VALUE:
-            return IntLiteral.fromTree(tree);
+            return Int.fromDecimalValueTree(tree);
         default:
             throw new RuntimeException("unexpected SQL Token type " + tree.getType());
         }

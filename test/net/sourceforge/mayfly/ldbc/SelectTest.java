@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.ldbc;
 import junit.framework.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
+import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -16,8 +17,9 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromElement("foo", "f"))
                     .add(new FromElement("bar", "b")),
-                new Where()
-                    .add(new Equal(new Column("f", "name"), new QuotedString("'steve'")))
+                new Where(
+                    new Equal(new Column("f", "name"), new QuotedString("'steve'"))
+                )
             ),
             Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b where f.name='steve'"))
         );
@@ -30,8 +32,9 @@ public class SelectTest extends TestCase {
                     .add(new All()),
                 new From()
                     .add(new FromElement("foo")),
-                new Where()
-                    .add(new Equal(new Column("a"), new IntLiteral(5)))
+                new Where(
+                    new Equal(new Column("a"), new Int(5))
+                )
             ),
             Select.fromTree(Tree.parse("select * from foo where a = 5"))
         );
@@ -44,7 +47,7 @@ public class SelectTest extends TestCase {
                     .add(new SingleColumnExpression(new Column("name"))),
                 new From()
                     .add(new FromElement("foo")),
-                new Where()
+                Where.EMPTY
             ),
             Select.fromTree(Tree.parse("select name from foo"))
         );
@@ -86,14 +89,12 @@ public class SelectTest extends TestCase {
                 .addRow("foo", new L().append("colA").append("colB"), new L().append("2a").append("xx"))
                 .addRow("foo", new L().append("colA").append("colB"), new L().append("3a").append("xx"));
 
-
-        //dont just use equal here.  it's clearer if you just make the rows the expected
-
         assertEquals(
             store.table("foo").rows().elements(new int[]{1, 2}),
             Select.fromTree(Tree.parse("select * from foo where colB = 'xx'")).executeOn(store)
         );
     }
+
 
     //TODO: probably need to resolve columns to be fully qualified, i.e. table + string
 

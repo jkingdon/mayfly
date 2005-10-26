@@ -1,24 +1,16 @@
 package net.sourceforge.mayfly.ldbc.where;
 
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
-import net.sourceforge.mayfly.datastore.*;
-import org.ldbc.antlr.collections.*;
-
-import java.util.*;
 
 public class Equal extends ValueObject implements Selector{
-    public static Equal fromTree(Tree tree) {
-        Iterator iter = tree.children().iterator();
+    public static Equal fromEqualTree(Tree equalTree, TreeConverters treeConverters) {
+        L both = equalTree.children().convertUsing(treeConverters, new int[0]);
 
-        AST left = (AST) iter.next();
-        Column column = Column.fromColumnTree(new Tree(left));
-
-        AST right = (AST) iter.next();
-        Literal quotedString = Literal.literalFromTree(new Tree(right));
-
-        return new Equal(column, quotedString);
+        return new Equal(both.get(0), both.get(1));
     }
 
     private Object leftside;
@@ -34,4 +26,6 @@ public class Equal extends ValueObject implements Selector{
 
         return ((Literal)rightside).matchesCell(r.cell((Column) leftside));
     }
+
+
 }

@@ -23,7 +23,7 @@ public class Select extends ValueObject {
         Where where =
             converted.selectObjectsThatAre(Where.class).size() > 0 ?
                     (Where) converted.selectObjectThatIs(Where.class) :
-                    new Where();
+                    Where.EMPTY;
 
         return
             new Select(

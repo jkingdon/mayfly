@@ -9,4 +9,11 @@ public interface Selector {
                 return true;
             }
         };
+
+    public static final Selector ALWAYS_FALSE =
+        new Selector() {
+            public boolean evaluate(Object candidate) {
+                return false;
+            }
+        };
 }

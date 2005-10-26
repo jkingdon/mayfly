@@ -4,6 +4,7 @@ import junit.framework.*;
 import org.ldbc.parser.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -16,7 +17,7 @@ public class WhereTest extends TestCase {
 
         assertEquals(
             new Equal(new Column("f", "name"), new QuotedString("'steve'")),
-            Equal.fromTree(new Tree(whereClause.getFirstChild()))
+            Equal.fromEqualTree(new Tree(whereClause.getFirstChild()), TreeConverters.forSelectTree())
         );
 
     }
@@ -27,16 +28,19 @@ public class WhereTest extends TestCase {
         Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
 
         assertEquals(
-            new Where()
-                .add(new Equal(new Column("f", "name"), new QuotedString("'steve'"))),
-            Where.fromConditionTree(whereClause)
+            new Where(
+                new Equal(new Column("f", "name"), new QuotedString("'steve'"))
+            ),
+            Where.fromConditionTree(whereClause, TreeConverters.forSelectTree())
         );
     }
+
+
 
     public void testSelect() throws Exception {
         Tree selectTree = Tree.parse("select * from foo where name='steve'");
         Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
-        Where where = Where.fromConditionTree(whereClause);
+        Where where = Where.fromConditionTree(whereClause, TreeConverters.forSelectTree());
 
         Row row1 = new Row(
             new M()

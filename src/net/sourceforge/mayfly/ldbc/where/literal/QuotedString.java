@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc.where;
+package net.sourceforge.mayfly.ldbc.where.literal;
 
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
@@ -10,8 +10,8 @@ public class QuotedString extends Literal {
         this.stringInQuotes = stringInQuotes;
     }
 
-    public static net.sourceforge.mayfly.ldbc.where.QuotedString fromTree(Tree tree) {
-        return new net.sourceforge.mayfly.ldbc.where.QuotedString(tree.getText());
+    public static net.sourceforge.mayfly.ldbc.where.literal.QuotedString fromQuotedStringTree(Tree tree) {
+        return new net.sourceforge.mayfly.ldbc.where.literal.QuotedString(tree.getText());
     }
 
     public boolean matchesCell(Cell cell) {
