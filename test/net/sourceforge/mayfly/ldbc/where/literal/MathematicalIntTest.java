@@ -4,7 +4,7 @@ import junit.framework.*;
 import net.sourceforge.mayfly.ldbc.*;
 import org.ldbc.parser.*;
 
-public class IntTest extends TestCase {
+public class MathematicalIntTest extends TestCase {
     public void testParse() throws Exception {
         Tree selectTree = Tree.parse("select * from foo where size = 5");
 
@@ -14,6 +14,10 @@ public class IntTest extends TestCase {
                     .singleSubtreeOfType(SQLTokenTypes.EQUAL).children()
                         .singleSubtreeOfType(SQLTokenTypes.DECIMAL_VALUE);
 
-        assertEquals(new Int(5), Int.fromDecimalValueTree(decimalValueTree));
+        assertEquals(new MathematicalInt(5), MathematicalInt.fromDecimalValueTree(decimalValueTree));
+    }
+
+    public void testValue() throws Exception {
+        assertEquals(new Long(5), new MathematicalInt(5).valueForCellContentComparison());
     }
 }

@@ -221,7 +221,7 @@ public class Database {
      * Execute an SQL command which does not return results.
      * This is similar to the JDBC {@link java.sql.Statement#executeUpdate(java.lang.String)}
      * but is more convenient if you have a Database instance around.
-     * @return Number of rows changed.
+     * @return MathematicalInt of rows changed.
      */
     public int execute(String command) throws SQLException {
         Statement statement = parse(command);
@@ -327,7 +327,7 @@ public class Database {
     }
 
     /**
-     * Number of rows in given table.
+     * MathematicalInt of rows in given table.
      * 
      * This is a convenience method.  Your production code will almost
      * surely be counting rows (if it needs to at all) via

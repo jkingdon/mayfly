@@ -21,7 +21,7 @@ public class AndTest extends TestCase {
                         new Equal(new Column("name"), new QuotedString("'steve'")),
                         new Equal(new Column("species"), new QuotedString("'homo sapiens'"))
                     ),
-                    new Equal(new Column("size"), new Int(6))
+                    new Equal(new Column("size"), new MathematicalInt(6))
                 ),
             And.fromAndTree(andTree, TreeConverters.forSelectTree())
         );

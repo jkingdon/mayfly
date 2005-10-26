@@ -21,4 +21,8 @@ public class QuotedString extends Literal {
     private String stringWithoutQuotes() {
         return stringInQuotes.substring(1, stringInQuotes.length()-1);
     }
+
+    public Object valueForCellContentComparison() {
+        return stringWithoutQuotes();
+    }
 }

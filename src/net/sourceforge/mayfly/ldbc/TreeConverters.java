@@ -63,11 +63,9 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.DECIMAL_VALUE, new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return Int.fromDecimalValueTree(from);
+                                                              return MathematicalInt.fromDecimalValueTree(from);
                                                           }
                                                       });
-
-        //TODO: static methods should actually return converter objects insted of inner classes here.
     }
 
 

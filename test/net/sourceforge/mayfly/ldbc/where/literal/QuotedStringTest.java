@@ -22,4 +22,8 @@ public class QuotedStringTest extends TestCase {
         assertTrue(new QuotedString("'a'").matchesCell(new Cell("a")));
         assertFalse(new QuotedString("'b'").matchesCell(new Cell("a")));
     }
+
+    public void testValue() throws Exception {
+        assertEquals("steve", new QuotedString("'steve'").valueForCellContentComparison());
+    }
 }

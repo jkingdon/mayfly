@@ -33,7 +33,7 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromElement("foo")),
                 new Where(
-                    new Equal(new Column("a"), new Int(5))
+                    new Equal(new Column("a"), new MathematicalInt(5))
                 )
             ),
             Select.fromTree(Tree.parse("select * from foo where a = 5"))

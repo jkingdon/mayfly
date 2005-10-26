@@ -1,9 +1,11 @@
 package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.datastore.*;
 import org.ldbc.antlr.collections.*;
 
-public class Column {
+public class Column implements Transformer {
     public static Column fromColumnTree(Tree column) {
         AST firstIdentifier = column.getFirstChild();
         AST secondIdentifier = firstIdentifier.getNextSibling();
@@ -49,6 +51,11 @@ public class Column {
 
     public String table() {
         return table;
+    }
+
+    public Object transform(Object from) {
+        Row row = (Row) from;
+        return row.cell(this);
     }
 
 }
