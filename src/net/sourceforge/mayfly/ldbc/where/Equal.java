@@ -6,7 +6,7 @@ import net.sourceforge.mayfly.util.*;
 
 public class Equal extends ValueObject implements Selector{
     public static Equal fromEqualTree(Tree equalTree, TreeConverters treeConverters) {
-        L both = equalTree.children().convertUsing(treeConverters, new int[0]);
+        L both = equalTree.children().convertUsing(treeConverters);
 
         return new Equal((Transformer)both.get(0), (Transformer) both.get(1));
     }

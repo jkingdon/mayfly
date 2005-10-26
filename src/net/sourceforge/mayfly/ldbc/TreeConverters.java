@@ -51,6 +51,11 @@ public class TreeConverters {
                                                               return And.fromAndTree(from, converters);
                                                           }
                                                       })
+            .register(SQLTokenTypes.LITERAL_or,   new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return Or.fromOrTree(from, converters);
+                                                          }
+                                                      })
             .register(SQLTokenTypes.EQUAL,         new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return Equal.fromEqualTree(from, converters);

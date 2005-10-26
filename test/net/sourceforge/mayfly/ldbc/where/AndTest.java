@@ -4,7 +4,6 @@ import junit.framework.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.util.*;
 import org.ldbc.parser.*;
 
 public class AndTest extends TestCase {
@@ -31,17 +30,7 @@ public class AndTest extends TestCase {
         assertTrue(new And(new StringStartsWith("f"), new StringStartsWith("fo")).evaluate("foo"));
         assertFalse(new And(new StringStartsWith("f"), new StringStartsWith("XX")).evaluate("foo"));
         assertFalse(new And(new StringStartsWith("XX"), new StringStartsWith("fo")).evaluate("foo"));
+        assertFalse(new And(new StringStartsWith("XX"), new StringStartsWith("XX")).evaluate("foo"));
     }
 
-    class StringStartsWith implements Selector {
-        private String prefix;
-
-        public StringStartsWith(String prefix) {
-            this.prefix = prefix;
-        }
-
-        public boolean evaluate(Object candidate) {
-            return candidate.toString().startsWith(prefix);
-        }
-    }
 }

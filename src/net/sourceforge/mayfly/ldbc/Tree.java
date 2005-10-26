@@ -233,6 +233,10 @@ public class Tree implements AST {
             return (Tree)find(new TypeIs(type));
         }
 
+        public L convertUsing(final TreeConverters converters) {
+            return convertUsing(converters, new int[0]);
+        }
+
         public L convertUsing(final TreeConverters converters, int[] typesToIgnore) {
             Children selected = (Children) select(new AllExceptTypes(typesToIgnore));
             return selected.collect(new Convert(converters));

@@ -9,7 +9,7 @@ public class And extends ValueObject implements Selector {
 
 
     public static And fromAndTree(Tree andTree, TreeConverters treeConverters) {
-        L both = andTree.children().convertUsing(treeConverters, new int[0]);
+        L both = andTree.children().convertUsing(treeConverters);
         return new And((Selector)both.get(0), (Selector)both.get(1));
     }
 
