@@ -5,12 +5,9 @@ import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 
 import java.sql.*;
-import java.util.*;
 
 public final class MyResultSet extends ResultSetStub {
     int pos = -1;
-
-    private final List columnNames;
 
     private final Rows rows;
 
@@ -19,7 +16,6 @@ public final class MyResultSet extends ResultSetStub {
     public MyResultSet(Columns columns, Rows rows) {
         super();
         this.columns = columns;
-        this.columnNames = columns.asNames();
         this.rows = rows;
     }
 
@@ -33,19 +29,45 @@ public final class MyResultSet extends ResultSetStub {
     }
 
     public int getInt(String columnName) throws SQLException {
-        checkColumnName(columnName);
-        Row row = (Row) rows.element(checkedRowNumber());
-        Cell cell = row.cell(new Column(columnName));
-        return cell.asInt();
+        return cellFromName(columnName).asInt();
     }
 
     public int getInt(int oneBasedColumn) throws SQLException {
+        return cellFromIndex(oneBasedColumn).asInt();
+    }
+
+    public String getString(String columnName) throws SQLException {
+        return cellFromName(columnName).asString();
+    }
+
+    public String getString(int oneBasedColumn) throws SQLException {
+        return cellFromIndex(oneBasedColumn).asString();
+    }
+
+    private Cell cellFromName(String columnName) throws SQLException {
+        return cell(columnFromName(columnName));
+    }
+
+    private Column columnFromName(String columnName) throws SQLException {
+        checkColumnName(columnName);
+        return new Column(columnName);
+    }
+
+    private Cell cellFromIndex(int oneBasedColumn) throws SQLException {
+        return cell(columnFromIndex(oneBasedColumn));
+    }
+
+    private Column columnFromIndex(int oneBasedColumn) throws SQLException {
         int zeroBasedColumn = oneBasedColumn - 1;
         if (zeroBasedColumn < 0 || zeroBasedColumn >= columns.size()) {
             throw new SQLException("no column " + oneBasedColumn);
         }
-        Column column = (Column) columns.asImmutableList().get(zeroBasedColumn);
-        return getInt(column.columnName());
+        return columns.get(zeroBasedColumn);
+    }
+
+    private Cell cell(Column column) throws SQLException {
+        Row row = (Row) rows.element(checkedRowNumber());
+        return row.cell(column);
     }
 
     private int checkedRowNumber() throws SQLException {
@@ -59,9 +81,9 @@ public final class MyResultSet extends ResultSetStub {
     }
 
     private void checkColumnName(String target) throws SQLException {
-        for (int i = 0; i < columnNames.size(); ++i) {
-            String columnName = (String) columnNames.get(i);
-            if (target.equalsIgnoreCase(columnName)) {
+        for (int i = 0; i < columns.size(); ++i) {
+            Column column = columns.get(i);
+            if (column.matchesName(target)) {
                 return;
             }
         }

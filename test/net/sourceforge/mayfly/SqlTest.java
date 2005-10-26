@@ -242,4 +242,16 @@ public class SqlTest extends SqlTestCase {
         return actual;
     }
 
+    public void testAlias() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into foo (a) values (10)");
+        ResultSet results = query("select f.a from foo f where f.a = 4");
+        assertTrue(results.next());
+        
+        assertEquals(4, results.getInt("a"));
+        
+        assertFalse(results.next());
+    }
+    
 }

@@ -19,7 +19,8 @@ public class QuotedString extends Literal {
     }
 
     private String stringWithoutQuotes() {
-        return stringInQuotes.substring(1, stringInQuotes.length()-1);
+        String withoutQuotes = stringInQuotes.substring(1, stringInQuotes.length()-1);
+        return withoutQuotes.replaceAll("''", "'");
     }
 
     public Object valueForCellContentComparison() {

@@ -37,8 +37,15 @@ public class Column implements Transformer {
         return columnName;
     }
 
+    public boolean matchesName(String otherName) {
+        return columnName.equalsIgnoreCase(otherName);
+    }
+
     public boolean equals(Object other) {
-        return columnName.equalsIgnoreCase(((Column)other).columnName);
+        // TODO: This is broken.  If other isn't a column, should be a
+        // false return, not ClassCastException
+        String otherName = ((Column)other).columnName;
+        return matchesName(otherName);
     }
 
     public int hashCode() {

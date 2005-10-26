@@ -221,7 +221,7 @@ public class Database {
      * Execute an SQL command which does not return results.
      * This is similar to the JDBC {@link java.sql.Statement#executeUpdate(java.lang.String)}
      * but is more convenient if you have a Database instance around.
-     * @return MathematicalInt of rows changed.
+     * @return Number of rows changed.
      */
     public int execute(String command) throws SQLException {
         Statement statement = parse(command);
@@ -288,13 +288,26 @@ public class Database {
         List items = walkList(itemsList);
         for (int i = 0; i < columns.size(); ++i) {
             Column column = (Column) columns.get(i);
-            LongValue expression = (LongValue) items.get(i);
+
+            Object value = makeCellValue((Expression) items.get(i));
+
             columnNames.add(column.getColumnName());
-            values.add(new Long(expression.getValue()));
+            values.add(value);
         }
         
         dataStore = dataStore.addRow(table, columnNames, values);
         return 1;
+    }
+
+    private Object makeCellValue(Expression itemValue) {
+        if (itemValue instanceof LongValue) {
+            return new Long(((LongValue) itemValue).getValue());
+        } else if (itemValue instanceof StringValue) {
+            return ((StringValue) itemValue).getNotExcapedValue();
+        } else {
+            throw new UnimplementedException("Don't know how to deal with expression type " 
+                    + itemValue.getClass().getName());
+        }
     }
 
     private List walkList(ItemsList itemsList) {
@@ -306,7 +319,7 @@ public class Database {
     /**
      * Return table names.
      * 
-     * Once this functionality is implemented in
+     * If this functionality is implemented in
      * {@link java.sql.DatabaseMetaData}, this method may go away or become
      * some kind of convenience method.
      */
@@ -317,7 +330,7 @@ public class Database {
     /**
      * Column names in given table.
      * 
-     * Once this functionality is implemented in
+     * If this functionality is implemented in
      * {@link java.sql.DatabaseMetaData}, this method may go away or become
      * some kind of convenience method.
      */
@@ -327,7 +340,7 @@ public class Database {
     }
 
     /**
-     * MathematicalInt of rows in given table.
+     * Number of rows in given table.
      * 
      * This is a convenience method.  Your production code will almost
      * surely be counting rows (if it needs to at all) via
@@ -340,12 +353,12 @@ public class Database {
     }
 
     /**
-     * Get some data out. Probably just a temporary method until the
-     * {@link ResultSet} code is done.
+     * Get some data out. This is now redundant with {@link ResultSet}.  Do we
+     * want a non-JDBC API for convenience?  Should it look like this or more
+     * like java collections?
      */
     public int getInt(String tableName, String columnName, int rowIndex) throws SQLException {
-        TableData tableData = dataStore.table(tableName);
-        return tableData.getInt(columnName, rowIndex);
+        return dataStore.table(tableName).getInt(columnName, rowIndex);
     }
 
     /**

@@ -41,6 +41,14 @@ public class DatabaseTest extends TestCase {
         catch (SQLException e) {
             assertEquals("no column b", e.getMessage());
         }
+
+        try {
+            database.getInt("bar", "a", 0);
+            fail();
+        }
+        catch (SQLException e) {
+            assertEquals("no such table bar", e.getMessage());
+        }
     }
     
 }

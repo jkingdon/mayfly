@@ -66,4 +66,8 @@ public class Columns extends Aggregate {
     public ImmutableList asImmutableList() {
         return columns;
     }
+
+    public Column get(int index) {
+        return (Column) columns.get(index);
+    }
 }
