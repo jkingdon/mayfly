@@ -75,6 +75,11 @@ public class TreeConverters {
                                                               return NotEq.fromNotEqualTree(from, converters);
                                                           }
                                                       })
+            .register(SQLTokenTypes.BIGGER,   new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return Gt.fromBiggerTree(from, converters);
+                                                          }
+                                                      })
             .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return Column.fromColumnTree(from);

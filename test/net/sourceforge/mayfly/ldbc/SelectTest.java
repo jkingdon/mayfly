@@ -21,13 +21,17 @@ public class SelectTest extends TestCase {
                     new And(
                         new And(
                             new Eq(new Column("f", "name"), new QuotedString("'steve'")),
-                            new Eq(new Column("size"), new MathematicalInt(6))
+                            new Or(
+                                new Eq(new Column("size"), new MathematicalInt(4)),
+                                new Gt(new MathematicalInt(6), new Column("size"))    
+                            )
+
                         ),
                         new Or(
                             new Eq(new Column("color"), new QuotedString("'red'")),
                             new And(
                                 new NotEq(new Column("day"), new MathematicalInt(7)),
-                                new NotEq(new Column("day"), new MathematicalInt(6))    
+                                new NotEq(new Column("day"), new MathematicalInt(6))
                             )
 
                         )
@@ -36,9 +40,11 @@ public class SelectTest extends TestCase {
                 )
             ),
             Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b " +
-                                       "where (f.name='steve' and size= 6) and " +
-                                             "(color='red' or " +
-                                                        " (day <>7 and day != 6) )"))
+                                       "where (f.name='steve' and " +
+                                                " (size = 4 or 6 >size ) ) " +
+                                             " and " +
+                                                 "(color='red' or " +
+                                                            " (day <>7 and day != 6) )"))
         );
     }
     
