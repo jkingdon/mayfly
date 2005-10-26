@@ -8,7 +8,7 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
 public class SelectTest extends TestCase {
-    public void testParse() throws Exception {
+    public void testGrandParseIntegration() throws Exception {
         assertEquals(
             new Select(
                 new What()
@@ -20,19 +20,25 @@ public class SelectTest extends TestCase {
                 new Where(
                     new And(
                         new And(
-                            new Equal(new Column("f", "name"), new QuotedString("'steve'")),
-                            new Equal(new Column("size"), new MathematicalInt(6))
+                            new Eq(new Column("f", "name"), new QuotedString("'steve'")),
+                            new Eq(new Column("size"), new MathematicalInt(6))
                         ),
                         new Or(
-                            new Equal(new Column("color"), new QuotedString("'red'")),
-                            new Equal(new Column("day"), new MathematicalInt(7))
+                            new Eq(new Column("color"), new QuotedString("'red'")),
+                            new And(
+                                new NotEq(new Column("day"), new MathematicalInt(7)),
+                                new NotEq(new Column("day"), new MathematicalInt(6))    
+                            )
+
                         )
                     )
 
                 )
             ),
             Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b " +
-                                       "where (f.name='steve' and size= 6) and (color='red' or day =7)"))
+                                       "where (f.name='steve' and size= 6) and " +
+                                             "(color='red' or " +
+                                                        " (day <>7 and day != 6) )"))
         );
     }
     
@@ -44,7 +50,7 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromElement("foo")),
                 new Where(
-                    new Equal(new Column("a"), new MathematicalInt(5))
+                    new Eq(new Column("a"), new MathematicalInt(5))
                 )
             ),
             Select.fromTree(Tree.parse("select * from foo where a = 5"))

@@ -17,10 +17,10 @@ public class OrTest extends TestCase {
         assertEquals(
                 new Or(
                     new Or(
-                        new Equal(new Column("name"), new QuotedString("'steve'")),
-                        new Equal(new Column("species"), new QuotedString("'homo sapiens'"))
+                        new Eq(new Column("name"), new QuotedString("'steve'")),
+                        new Eq(new Column("species"), new QuotedString("'homo sapiens'"))
                     ),
-                    new Equal(new Column("size"), new MathematicalInt(6))
+                    new Eq(new Column("size"), new MathematicalInt(6))
                 ),
                 Or.fromOrTree(orTree, TreeConverters.forWhereTree())
         );

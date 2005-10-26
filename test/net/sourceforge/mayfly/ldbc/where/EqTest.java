@@ -8,7 +8,7 @@ import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.util.*;
 import org.ldbc.parser.*;
 
-public class EqualTest extends TestCase {
+public class EqTest extends TestCase {
 
     public void testParse() throws Exception {
         Tree selectTree = Tree.parse("select * from foo where name='steve'");
@@ -17,8 +17,8 @@ public class EqualTest extends TestCase {
         Tree equalTree = new Tree(whereClause.getFirstChild());
 
         assertEquals(
-                new Equal(new Column("name"), new QuotedString("'steve'")),
-                Equal.fromEqualTree(equalTree, TreeConverters.forWhereTree())
+                new Eq(new Column("name"), new QuotedString("'steve'")),
+                Eq.fromEqualTree(equalTree, TreeConverters.forWhereTree())
         );
     }
 
@@ -26,11 +26,10 @@ public class EqualTest extends TestCase {
         Row row = new Row(
             new M()
                 .entry(new Column("colA"), new Cell("1"))
-                .entry(new Column("colB"), new Cell("2"))
                 .asImmutable()
         );
 
-        assertTrue(new Equal(new Column("colA"), new QuotedString("'1'")).evaluate(row));
-        assertFalse(new Equal(new Column("colA"), new QuotedString("'2'")).evaluate(row));
+        assertTrue(new Eq(new Column("colA"), new QuotedString("'1'")).evaluate(row));
+        assertFalse(new Eq(new Column("colA"), new QuotedString("'2'")).evaluate(row));
     }
 }

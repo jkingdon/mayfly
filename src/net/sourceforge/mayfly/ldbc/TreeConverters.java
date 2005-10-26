@@ -62,7 +62,17 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.EQUAL,         new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return Equal.fromEqualTree(from, converters);
+                                                              return Eq.fromEqualTree(from, converters);
+                                                          }
+                                                      })
+            .register(SQLTokenTypes.NOT_EQUAL,     new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return NotEq.fromNotEqualTree(from, converters);
+                                                          }
+                                                      })
+            .register(SQLTokenTypes.NOT_EQUAL_2,   new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return NotEq.fromNotEqualTree(from, converters);
                                                           }
                                                       })
             .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
