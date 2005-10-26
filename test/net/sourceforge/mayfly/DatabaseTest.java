@@ -15,6 +15,7 @@ public class DatabaseTest extends TestCase {
 
     public void testCreateAndDrop() throws Exception {
         database.execute("CREATE TABLE FOO (A NUMBER)");
+        // TODO: This should come back as FOO.  Case preserving is more friendly.
         assertEquals(Collections.singleton("foo"), database.tables());
 
         database.execute("DROP TABLE Foo");
