@@ -3,17 +3,20 @@ package net.sourceforge.mayfly.ldbc;
 import junit.framework.*;
 
 public class FromTest extends TestCase {
-    public void testFromTree() throws Exception {
-        //Tree tree = Tree.parse("select * from foo f, zzz");
-        //
-        //Tree.Children tables = tree.children().ofType(SQLTokenTypes.SELECTED_TABLE);
-        //
-        //assertEquals(new From("foo", "f"), tables.);
+    public void testSimple() throws Exception {
+        Tree tree = Tree.parse("select * from foo f, bar b, zzz");
 
-        //tree.children().find(
-        //    new Selector() {
-        //
-        //    }
-        //)
+        assertEquals(
+            new From()
+                .add(new FromElement("foo", "f"))
+                .add(new FromElement("bar", "b"))
+                .add(new FromElement("zzz")),
+            From.fromSelectTree(tree)
+        );
+    }
+
+    public void testTableNames() throws Exception {
+        assertEquals("foo", new From.GetTableName().transform(new FromElement("foo")));
+        assertEquals("foo", new From.GetTableName().transform(new FromElement("foo", "f")));
     }
 }

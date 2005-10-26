@@ -13,9 +13,9 @@ public class SelectTest extends TestCase {
                 new What()
                     .add(new AllColumnsFromTable("f"))
                     .add(new SingleColumnExpression(new Column("b", "name"))),
-                new Froms()
-                    .add(new From("foo", "f"))
-                    .add(new From("bar", "b")),
+                new From()
+                    .add(new FromElement("foo", "f"))
+                    .add(new FromElement("bar", "b")),
                 new Where()
                     .add(new Equal(new Column("f", "name"), new QuotedString("'steve'")))
             ),
@@ -28,22 +28,22 @@ public class SelectTest extends TestCase {
             new Select(
                 new What()
                     .add(new All()),
-                new Froms()
-                    .add(new From("foo")),
+                new From()
+                    .add(new FromElement("foo")),
                 new Where()
                     .add(new Equal(new Column("a"), new IntLiteral(5)))
             ),
             Select.fromTree(Tree.parse("select * from foo where a = 5"))
         );
     }
-    
+
     public void testAliasOmitted() throws Exception {
         assertEquals(
             new Select(
                 new What()
                     .add(new SingleColumnExpression(new Column("name"))),
-                new Froms()
-                    .add(new From("foo")),
+                new From()
+                    .add(new FromElement("foo")),
                 new Where()
             ),
             Select.fromTree(Tree.parse("select name from foo"))

@@ -146,7 +146,9 @@ abstract public class Aggregate extends ValueObject implements Iterable {
 
                             Aggregate rightElement = (Aggregate) element;
 
-                            joinResult.append(leftElement.plus(rightElement));
+                            Aggregate combined = leftElement.plus(rightElement);
+
+                            joinResult.append(combined);
                         }
                     });
 
@@ -165,7 +167,6 @@ abstract public class Aggregate extends ValueObject implements Iterable {
     }
 
     public Aggregate elements(int[] indexes) {
-
         L keysWanted = new L(Arrays.asList(ArrayUtils.toObject(indexes)));
 
         return createNew(new IterableCollection(asList().asIndexToElementMap().subMap(keysWanted).values()));

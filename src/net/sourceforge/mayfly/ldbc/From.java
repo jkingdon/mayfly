@@ -1,43 +1,73 @@
 package net.sourceforge.mayfly.ldbc;
 
-import org.ldbc.antlr.collections.*;
+import net.sourceforge.mayfly.*;
+
 import net.sourceforge.mayfly.util.*;
+import org.ldbc.parser.*;
 
-public class From extends ValueObject {
-    private String tableName;
-    private String alias;
+import java.util.*;
 
-    public From(String tableName) {
-        this(tableName, null);
-    }
+public class From extends Aggregate {
 
-    public From(String tableName, String alias) {
-        this.tableName = tableName;
-        this.alias = alias;
-    }
+    private List dimensions = new ArrayList();
 
-    public String alias() {
-        return alias;
-    }
 
-    public String tableName() {
-        return tableName;
+    public From() { }
+
+    public From(List dimensions) {
+        this.dimensions = dimensions;
     }
 
 
-    public static From fromSeletedTableTree(Tree table) {
-        AST firstIdentifier = table.getFirstChild();
-        String tableName = firstIdentifier.getText();
+    protected Aggregate createNew(Iterable items) {
+        return new From(new L().slurp(items));
+    }
 
-        AST secondIdentifier = firstIdentifier.getNextSibling();
+    public Iterator iterator() {
+        return dimensions.iterator();
+    }
 
-        From from;
-        if (secondIdentifier==null) {
-            from = new From(tableName);
-        } else {
-            String alias = secondIdentifier.getText();
-            from = new From(tableName, alias);
+    public From add(FromElement fromElement) {
+        dimensions.add(fromElement);
+        return this;
+    }
+
+    public L tableNames() {
+        return collect(new GetTableName());
+    }
+
+
+    public static From fromSelectTree(Tree selectTree) {
+        Tree.Children tables = selectTree.children().ofType(SQLTokenTypes.SELECTED_TABLE);
+
+        List elements = new ArrayList();
+
+        for (Iterator iterator = tables.iterator(); iterator.hasNext();) {
+            Tree table = (Tree) iterator.next();
+
+            FromElement fromElement = FromElement.fromSeletedTableTree(table);
+
+            elements.add(fromElement);
         }
-        return from;
+
+        return new From(elements);
     }
+
+
+
+    public static class GetTableName implements Transformer {
+        public Object transform(Object obj) {
+            FromElement f = (FromElement) obj;
+            return f.tableName();
+        }
+    }
+
+    public String singleTableName() {
+        if (dimensions.size() != 1) {
+            throw new UnimplementedException("expected 1 table, got " + dimensions.size());
+        }
+        FromElement dimension = (FromElement) dimensions.get(0);
+        return dimension.tableName();
+    }
+
 }

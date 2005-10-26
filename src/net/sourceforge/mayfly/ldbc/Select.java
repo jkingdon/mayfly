@@ -28,24 +28,24 @@ public class Select extends ValueObject {
         return
             new Select(
                 new What(converted.selectObjectsThatAre(WhatElement.class)),
-                new Froms(converted.selectObjectsThatAre(From.class)),
+                new From(converted.selectObjectsThatAre(FromElement.class)),
                 where
             );
     }
 
 
     private What what;
-    private Froms froms;
+    private From from;
     private Where where;
 
-    public Select(What what, Froms froms, Where where) {
+    public Select(What what, From from, Where where) {
         this.what = what;
-        this.froms = froms;
+        this.from = from;
         this.where = where;
     }
 
-    public Froms from() {
-        return froms;
+    public From from() {
+        return from;
     }
 
     public ResultSet select(final DataStore store) throws SQLException {
@@ -59,7 +59,7 @@ public class Select extends ValueObject {
         // This method could use some unit testing.
         // And also a comparison to make sure its rules correspond to executeOn
         Set possibleColumnNames = new HashSet();
-        for (Iterator iter = froms.tableNames().iterator(); iter.hasNext();) {
+        for (Iterator iter = from.tableNames().iterator(); iter.hasNext();) {
             String tableName = (String) iter.next();
             possibleColumnNames.addAll(store.table(tableName).columns());
         }
@@ -72,7 +72,7 @@ public class Select extends ValueObject {
     }
 
     public Rows executeOn(DataStore store) throws SQLException {
-        L tableNames = froms.tableNames();
+        L tableNames = from.tableNames();
 
         Iterator iterator = tableNames.iterator();
         String firstTable = (String) iterator.next();
