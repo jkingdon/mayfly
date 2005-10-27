@@ -195,15 +195,115 @@ public class SqlTest extends SqlTestCase {
         execute("insert into foo (a) values (5)");
         execute("insert into bar (b) values (100)");
         execute("insert into bar (b) values (101)");
-        ResultSet results = query("select foo.a, bar.b from foo, bar");
-        
-        Set expected = new HashSet();
-        expected.add(L.fromArray(new int[] {4, 100}));
-        expected.add(L.fromArray(new int[] {4, 101}));
-        expected.add(L.fromArray(new int[] {5, 100}));
-        expected.add(L.fromArray(new int[] {5, 101}));
-        
-        assertEquals(expected, intResultsAsSet(results, Arrays.asList(new String[] {"a", "b"})));
+
+        assertResultSet(
+            new String[] {
+                "   4,  100 ",
+                "   4,  101 ",
+                "   5,  100 ",
+                "   5,  101 ",
+            },
+            query("select foo.a, bar.b from foo, bar")
+        );
+    }
+
+
+
+    public void testWhereAnd() throws Exception {
+        execute("create table foo (a integer, b integer, c integer)");
+        execute("insert into foo (a, b, c) values (1, 1, 1)");
+        execute("insert into foo (a, b, c) values (1, 1, 2)");
+        execute("insert into foo (a, b, c) values (1, 2, 1)");
+        execute("insert into foo (a, b, c) values (1, 2, 2)");
+        execute("insert into foo (a, b, c) values (2, 2, 2)");
+
+        assertResultSet(
+            new String[] {
+                "   1,  1,  1 ",
+                "   1,  2,  1 "
+            },
+            query("select a, b, c from foo where a=1 and c=1")
+        );
+    }
+
+    public void testWhatOr() throws Exception {
+        execute("create table foo (a integer, b integer, c integer)");
+        execute("insert into foo (a, b, c) values (1, 1, 1)");
+        execute("insert into foo (a, b, c) values (1, 1, 2)");
+        execute("insert into foo (a, b, c) values (1, 2, 1)");
+        execute("insert into foo (a, b, c) values (1, 2, 2)");
+        execute("insert into foo (a, b, c) values (2, 2, 2)");
+
+        assertResultSet(
+            new String[] {
+                "   1,  1,  1 ",
+                "   1,  1,  2 ",
+                "   2,  2,  2 ",
+            },
+            query("select a, b, c from foo where a=2 or b=1")
+        );
+    }
+
+    public void testNotEqual() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into foo (a) values (6)");
+
+        assertResultSet(
+            new String[] {
+                "   4 ",
+                "   6 ",
+            },
+            query("select a from foo where a != 5")
+        );
+
+        assertResultSet(
+            new String[] {
+                "   4 ",
+                "   6 ",
+            },
+            query("select a from foo where 5 != a")
+        );
+
+        assertResultSet(
+            new String[] {
+                "   4 ",
+                "   6 ",
+            },
+            query("select a from foo where a <> 5")
+        );
+
+        assertResultSet(
+            new String[] {
+                "   4 ",
+                "   6 ",
+            },
+            query("select a from foo where 5 <> a")
+        );
+    }
+
+    public void testGreaterThan() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into foo (a) values (6)");
+
+        assertResultSet(
+            new String[] {
+                "   5 ",
+                "   6 ",
+            },
+            query("select a from foo where a > 4")
+        );
+
+        assertResultSet(
+            new String[] {
+                "   4 ",
+                "   5 ",
+            },
+            query("select a from foo where 6 > a ")
+        );
     }
 
     public void xtestJoinSameNameTwice() throws Exception {
@@ -248,10 +348,55 @@ public class SqlTest extends SqlTestCase {
         execute("insert into foo (a) values (10)");
         ResultSet results = query("select f.a from foo f where f.a = 4");
         assertTrue(results.next());
-        
+
         assertEquals(4, results.getInt("a"));
-        
+
         assertFalse(results.next());
     }
-    
+
+    private Set objectResultsAsSet(ResultSet rs) throws SQLException {
+        Set actual = new HashSet();
+        while (rs.next()) {
+            L row = new L();
+            boolean rowDone = false;
+            int col = 1;
+
+            while (!rowDone) {
+                try {
+                    int i = rs.getInt(col);
+                    row.append(new Integer(i));
+                } catch (SQLException ex) {
+                    rowDone = true;
+                }
+                col++;
+            }
+
+            actual.add(row);
+        }
+        rs.close();
+        return actual;
+    }
+
+    private void assertResultSet(String[] rowsAsStrings, ResultSet rs) throws SQLException {
+        Set expected = new HashSet();
+        for (int i = 0; i < rowsAsStrings.length; i++) {
+            String rowString = rowsAsStrings[i];
+            String[] cells = rowString.split(",");
+            L row = new L();
+
+            for (int j = 0; j < cells.length; j++) {
+                String cell = cells[j].trim();
+                if (cell.startsWith("'")) {
+                    row.append(cell.substring(1, cell.length()-1));
+                } else {
+                    row.append(new Integer(Integer.parseInt(cell)));
+                }
+            }
+            expected.add(row);
+        }
+
+        assertEquals(expected, objectResultsAsSet(rs));
+
+    }
+
 }
