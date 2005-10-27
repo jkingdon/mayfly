@@ -261,14 +261,14 @@ public class Database {
         }
     }
 
-    private void createTable(String table, List columns) {
+    private void createTable(String table, List columns) throws SQLException {
         dataStore = dataStore.createTable(table, columnNamesFromDefinitions(columns));
     }
 
-    private List columnNamesFromDefinitions(List columns) {
+    private List columnNamesFromDefinitions(List columns) throws SQLException {
         if (columns == null) {
-            // CREATE TABLE FOO without any columns (is it even legal? Hypersonic says no)
-            return Collections.EMPTY_LIST;
+            // CREATE TABLE FOO without any columns
+            throw new SQLException("must specify columns on create");
         }
 
         List columnNames = new ArrayList();

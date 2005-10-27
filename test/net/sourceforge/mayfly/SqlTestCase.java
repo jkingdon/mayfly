@@ -61,11 +61,15 @@ public abstract class SqlTestCase extends TestCase {
         if (CONNECT_TO_MAYFLY) {
             assertEquals(expectedMessage, exception.getMessage());
         } else {
-            // To assert on this (having the test pass in the expected wording
-            // for different databases) would be good in terms of seeing that
-            // the test is failing for the expected reason.  But keeping track
-            // of all those wordings for every database we want to try seems
-            // like too much work.
+            // To assert on this we'd need to keep lists of messages for many
+            // databases in many versions.  That seems hard.
+            // But we would like to see that databases fail for the same
+            // reasons.  So we provide the ability to manually inspect
+            // the messages side by side.
+            if (false) {
+                System.out.print("Mayfly message would be " + expectedMessage + "\n");
+                System.out.print("Actual message was " + exception.getMessage() + "\n\n");
+            }
         }
     }
     

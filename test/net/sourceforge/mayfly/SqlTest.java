@@ -7,24 +7,6 @@ import java.util.*;
 
 public class SqlTest extends SqlTestCase {
     
-    public void testBadCommand() throws Exception {
-        try {
-            execute("PICK NOSE");
-            fail();
-        } catch (SQLException expected) {
-            assertMessage("cannot parse PICK NOSE", expected);
-        }
-    }
-
-    public void testCommandsAreCaseInsensitive() throws Exception {
-        try {
-            execute("DrOp tAbLe FOO");
-            fail();
-        } catch (SQLException expected) {
-            assertMessage("no such table FOO", expected);
-        }
-    }
-
     public void testDropNonexisting() throws Exception {
         try {
             execute("DROP TABLE FOO");
@@ -34,10 +16,6 @@ public class SqlTest extends SqlTestCase {
         }
     }
     
-    public void testTablesMissingOnCreate() throws Exception {
-        // CREATE TABLE FOO => should be SQLException
-    }
-
     public void testInsertWithBadColumnName() throws Exception {
         execute("CREATE TABLE FOO (A integer)");
         try {
@@ -46,6 +24,16 @@ public class SqlTest extends SqlTestCase {
         }
         catch (SQLException e) {
             assertMessage("no column b", e);
+        }
+    }
+    
+    public void testInsertIntoNonexistentTable() throws Exception {
+        try {
+            execute("INSERT INTO FOO (b) values (5)");
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage("no such table FOO", e);
         }
     }
     
@@ -186,6 +174,18 @@ public class SqlTest extends SqlTestCase {
         assertEquals(25, results.getInt("b"));
         
         assertFalse(results.next());
+    }
+    
+    public void testWhereIsCaseSensitive() throws Exception {
+        execute("create table foo (a varchar)");
+        execute("insert into foo (a) values ('Foo')");
+        ResultSet wrongCase = query("select a from foo where a = 'FOO'");
+        assertFalse(wrongCase.next());
+
+        ResultSet correctCase = query("select a from foo where a = 'Foo'");
+        assertTrue(correctCase.next());
+        assertEquals("Foo", correctCase.getString("a"));
+        assertFalse(correctCase.next());
     }
     
     public void testSimpleJoin() throws Exception {
@@ -352,6 +352,25 @@ public class SqlTest extends SqlTestCase {
         assertEquals(4, results.getInt("a"));
 
         assertFalse(results.next());
+    }
+
+    // Apparently ldbc can't even parse the select here.
+    public void xtestIn() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo (a, b) values (1, 1)");
+        execute("insert into foo (a, b) values (2, 4)");
+        execute("insert into foo (a, b) values (3, 9)");
+
+        execute("create table bar (c integer)");
+        execute("insert into bar (c) values (2)");
+        execute("insert into bar (c) values (3)");
+        ResultSet results = query("select b from foo where foo.a in (select c from bar)");
+
+        Set expected = new HashSet();
+        expected.add(L.fromArray(new int[] {4}));
+        expected.add(L.fromArray(new int[] {9}));
+        
+        assertEquals(expected, intResultsAsSet(results, Collections.singletonList("b")));
     }
 
     private Set objectResultsAsSet(ResultSet rs) throws SQLException {

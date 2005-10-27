@@ -16,23 +16,28 @@ public class DataStore {
     }
 
     public DataStore createTable(String table, List columnNames) {
-        return new DataStore(tables.with(table.toLowerCase(), new TableData(columnNames)));
+        return new DataStore(tables.with(table, new TableData(columnNames)));
     }
 
     public DataStore dropTable(String table) throws SQLException {
-        if (tables.containsKey(table.toLowerCase())) {
-            return new DataStore(tables.without(table.toLowerCase()));
-        } else {
-            throw new SQLException("no such table " + table);
-        }
+        String canonicalTableName = lookUpTable(table);
+        return new DataStore(tables.without(canonicalTableName));
     }
 
     public TableData table(String table) throws SQLException {
-        if (tables.containsKey(table.toLowerCase())) {
-            return (TableData) tables.get(table.toLowerCase());
-        } else {
-            throw new SQLException("no such table " + table);
+        String canonicalTableName = lookUpTable(table);
+        
+        return (TableData) tables.get(canonicalTableName);
+    }
+
+    private String lookUpTable(String target) throws SQLException {
+        for (Iterator iter = tables.keySet().iterator(); iter.hasNext(); ) {
+            String canonicalTable = (String) iter.next();
+            if (canonicalTable.equalsIgnoreCase(target)) {
+                return canonicalTable;
+            }
         }
+        throw new SQLException("no such table " + target);
     }
 
     public Set tables() {
@@ -40,7 +45,7 @@ public class DataStore {
     }
 
     public DataStore addRow(String table, List columnNames, List values) throws SQLException {
-        return new DataStore(tables.with(table.toLowerCase(), table(table).addRow(columnNames, values)));
+        return new DataStore(tables.with(lookUpTable(table), table(table).addRow(columnNames, values)));
     }
 
 }
