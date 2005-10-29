@@ -214,7 +214,7 @@ public class Tree implements AST {
         }
 
         protected Aggregate createNew(Iterable items) {
-            return new Tree.Children(new L().slurp(items));
+            return new Tree.Children(new L().addAll(items));
         }
 
         public Iterator iterator() {

@@ -196,7 +196,7 @@ public class AggregateTest extends TestCase {
         }
 
         protected Aggregate createNew(Iterable items) {
-            L list = new L().slurp(items);
+            L list = new L().addAll(items);
             return new Strings((String[]) list.toArray(new String[list.size()]));
         }
 

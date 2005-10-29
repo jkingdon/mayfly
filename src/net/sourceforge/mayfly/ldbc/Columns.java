@@ -29,7 +29,7 @@ public class Columns extends Aggregate {
     }
 
     protected Aggregate createNew(Iterable items) {
-        return new Columns(new L().slurp(items).asImmutable());
+        return new Columns(new L().addAll(items).asImmutable());
     }
 
     public Iterator iterator() {

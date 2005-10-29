@@ -72,14 +72,14 @@ abstract public class Aggregate extends ValueObject implements Iterable {
     public Aggregate plus(Aggregate other) {
         L list =
             new L()
-                .slurp(this)
-                .slurp(other);
+                .addAll(this)
+                .addAll(other);
 
         return createNew(list);
     }
 
     public L asList() {
-        return new L().slurp(this);
+        return new L().addAll(this);
     }
 
 

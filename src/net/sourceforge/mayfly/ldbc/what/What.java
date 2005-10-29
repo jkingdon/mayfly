@@ -20,7 +20,7 @@ public class What extends Aggregate {
 
 
     protected Aggregate createNew(Iterable items) {
-        return new What(new L().slurp(items));
+        return new What(new L().addAll(items));
     }
 
     public Iterator iterator() {

@@ -55,7 +55,7 @@ public class LTest extends TestCase {
         assertEquals("[7, 8]", list.toString());
     }
 
-    public void testSlurp() throws Exception {
+    public void testAddIterable() throws Exception {
         assertEquals(
             new L()
                 .append("a")
@@ -63,7 +63,7 @@ public class LTest extends TestCase {
                 .append("c"),
             new L()
                 .append("a")
-                .slurp(new IterableCollection(new L()
+                .addAll(new IterableCollection(new L()
                                                 .append("b")
                                                 .append("c")))
         );

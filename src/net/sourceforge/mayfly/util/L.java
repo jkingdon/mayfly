@@ -52,15 +52,6 @@ public class L extends Aggregate implements List {
         return new ImmutableList(this);
     }
 
-    public L slurp(Iterable iterable) {
-        Iterator iter = iterable.iterator();
-        while (iter.hasNext()) {
-            append(iter.next());
-        }
-
-        return this;
-    }
-
     public M asIndexToElementMap() {
         M result = new M();
 
@@ -138,6 +129,16 @@ public class L extends Aggregate implements List {
 
     public boolean addAll(Collection c) {
         return delegate.addAll(c);
+    }
+
+    /** Iterate through iterable, slurping each element into this list. */
+    public L addAll(Iterable iterable) {
+        Iterator iter = iterable.iterator();
+        while (iter.hasNext()) {
+            append(iter.next());
+        }
+
+        return this;
     }
 
     public boolean containsAll(Collection c) {
