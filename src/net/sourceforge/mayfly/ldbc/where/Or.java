@@ -5,10 +5,8 @@ import net.sourceforge.mayfly.util.*;
 
 public class Or extends ValueObject implements Selector {
 
-
-
-    public static Or fromOrTree(Tree orTree, TreeConverters treeConverters) {
-        L both = orTree.children().convertUsing(treeConverters);
+    public static Or fromOrTree(Tree orTree, TreeConverters converters) {
+        L both = orTree.children().convertUsing(converters);
         return new Or((Selector)both.get(0), (Selector)both.get(1));
     }
 
@@ -23,4 +21,5 @@ public class Or extends ValueObject implements Selector {
     public boolean evaluate(Object candidate) {
         return leftSide.evaluate(candidate) || rightSide.evaluate(candidate);
     }
+
 }

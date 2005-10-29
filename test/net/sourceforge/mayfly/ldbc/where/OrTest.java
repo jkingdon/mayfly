@@ -26,7 +26,7 @@ public class OrTest extends TestCase {
         );
     }
 
-    public void testEval() throws Exception {
+    public void testEvaluate() throws Exception {
         assertTrue(new Or(new StringStartsWith("f"), new StringStartsWith("fo")).evaluate("foo"));
         assertTrue(new Or(new StringStartsWith("f"), new StringStartsWith("XX")).evaluate("foo"));
         assertTrue(new Or(new StringStartsWith("XX"), new StringStartsWith("fo")).evaluate("foo"));

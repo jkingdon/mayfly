@@ -60,6 +60,11 @@ public class TreeConverters {
                                                               return Or.fromOrTree(from, converters);
                                                           }
                                                       })
+            .register(SQLTokenTypes.NOT,   new TreeConverters.Converter() {
+                public Object convert(Tree from, TreeConverters converters) {
+                    return Not.fromNotTree(from, converters);
+                }
+            })
             .register(SQLTokenTypes.LITERAL_in,   new TreeConverters.Converter() {
                 public Object convert(Tree from, TreeConverters converters) {
                     return In.fromInTree(from, converters);

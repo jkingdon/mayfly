@@ -360,17 +360,39 @@ public class SqlTest extends SqlTestCase {
         execute("insert into foo (a, b) values (2, 4)");
         execute("insert into foo (a, b) values (3, 9)");
 
-        ResultSet results = query("select b from foo where foo.a in (1, 3)");
+        assertResultSet(
+            new String[] {
+                "   1 ",
+                "   9 ",
+            },
+            query("select b from foo where foo.a in (1, 3)")
+        );
 
-        Set expected = new HashSet();
-        expected.add(L.fromArray(new int[] {1}));
-        expected.add(L.fromArray(new int[] {9}));
-        
-        assertEquals(expected, intResultsAsSet(results, Collections.singletonList("b")));
+        assertResultSet(
+            new String[] {
+                "   4 ",
+            },
+            query("select b from foo where not foo.a in (1, 3)")
+        );
+
+        if (!CONNECT_TO_MAYFLY) {
+            // Needs fixing in LDBC grammar.
+            assertResultSet(
+                new String[] {
+                    "   4 ",
+                },
+                query("select b from foo where foo.a not in (1, 3)")
+            );
+        }
+
     }
 
-    // Apparently ldbc can't even parse the select here.
-    public void xtestInWithSubselect() throws Exception {
+    public void testInWithSubselect() throws Exception {
+        if (CONNECT_TO_MAYFLY) {
+            // Needs fixing in LDBC grammar.
+            return;
+        }
+
         execute("create table foo (a integer, b integer)");
         execute("insert into foo (a, b) values (1, 1)");
         execute("insert into foo (a, b) values (2, 4)");
@@ -379,13 +401,15 @@ public class SqlTest extends SqlTestCase {
         execute("create table bar (c integer)");
         execute("insert into bar (c) values (2)");
         execute("insert into bar (c) values (3)");
-        ResultSet results = query("select b from foo where foo.a in (select c from bar)");
 
-        Set expected = new HashSet();
-        expected.add(L.fromArray(new int[] {4}));
-        expected.add(L.fromArray(new int[] {9}));
-        
-        assertEquals(expected, intResultsAsSet(results, Collections.singletonList("b")));
+        assertResultSet(
+            new String[] {
+                "   4 ",
+                "   9 ",
+            },
+            query("select b from foo where foo.a in (select c from bar)")
+        );
+
     }
 
     private Set objectResultsAsSet(ResultSet rs) throws SQLException {

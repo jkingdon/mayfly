@@ -6,7 +6,7 @@ import java.sql.*;
 
 public abstract class SqlTestCase extends TestCase {
 
-    private static final boolean CONNECT_TO_MAYFLY = true;
+    protected static final boolean CONNECT_TO_MAYFLY = true;
 
     private Database database;
     protected Connection connection;
