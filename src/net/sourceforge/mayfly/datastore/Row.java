@@ -17,7 +17,7 @@ public class Row extends Aggregate {
     }
 
     protected Aggregate createNew(Iterable items) {
-        return new Row(M.fromEntries(items.iterator()).asImmutable());
+        return new Row(M.fromEntries(items).asImmutable());
     }
 
     public Iterator iterator() {

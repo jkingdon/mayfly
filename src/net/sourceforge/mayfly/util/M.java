@@ -7,11 +7,12 @@ import java.util.*;
 
 public class M extends Aggregate implements Map {
 
-    public static M fromEntries(Iterator entryIter) {
+    public static M fromEntries(Iterable entries) {
         M newMap = new M();
 
+        Iterator entryIter = entries.iterator();
         while (entryIter.hasNext()) {
-            Entry entry = (Entry) entryIter.next();
+            Map.Entry entry = (Map.Entry) entryIter.next();
             newMap.put(entry.getKey(), entry.getValue());
         }
 
@@ -39,10 +40,7 @@ public class M extends Aggregate implements Map {
     }
 
     protected Aggregate createNew(Iterable items) {
-
-        Iterator iter = items.iterator();
-
-        return fromEntries(iter);
+        return fromEntries(items);
     }
 
 

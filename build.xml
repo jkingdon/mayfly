@@ -1,13 +1,17 @@
 <project default="test">
     <property name="version" value="0.1"/>
+    <!--
     <property name="build.compiler" value="gcj"/>
+    -->
 
     <target name="clean">
         <delete dir="build"/>
     </target>
 
     <path id="classpath">
-        <pathelement location="lib/jsqlparser.jar"/>
+        <fileset dir="src/lib">
+            <include name="**/*.jar"/>
+        </fileset>
     </path>
 
     <target name="compile">
@@ -31,7 +35,9 @@
 
     <path id="test.classpath">
         <path refid="classpath"/>
-        <pathelement location="lib/junit.jar"/>
+        <fileset dir="test/lib">
+            <include name="**/*.jar"/>
+        </fileset>
         <pathelement location="build/classes"/>
     </path>
 
@@ -48,11 +54,23 @@
     </target>
 
     <target name="test" depends="compile-tests">
+    	<!-- Don't see an easy way to find the tests in this case
         <java classname="junit.textui.TestRunner"
             classpathref="runtest.classpath"
             fork="yes" failonerror="yes">
             <arg value="net.sourceforge.mayfly.SqlTest"/>
         </java>
+        -->
+        <junit fork="yes" haltonfailure="true" haltonerror="true">
+	        <classpath refid="runtest.classpath"/>
+            <formatter usefile="false" type="brief"/>
+            <batchtest>
+                <fileset dir="test">
+        	        <include name="**/*Test.java"/>
+        	    </fileset>
+        	</batchtest>
+        </junit>
+
     </target>
 
     <!-- target name="jar" depends="compile,test">
