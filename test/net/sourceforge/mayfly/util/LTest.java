@@ -80,5 +80,13 @@ public class LTest extends TestCase {
                 .asIndexToElementMap()
         );
     }
+    
+    public void testSubListToEnd() throws Exception {
+        L abc = new L(Arrays.asList(new String[] {"a", "b", "c"}));
+        assertEquals(
+            new L(Arrays.asList(new String[] {"b", "c"})),
+            abc.subList(1)
+        );
+    }
 
 }

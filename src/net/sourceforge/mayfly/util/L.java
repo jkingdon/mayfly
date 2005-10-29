@@ -160,6 +160,10 @@ public class L extends Aggregate implements List {
         return delegate.subList(fromIndex, toIndex);
     }
 
+	public List subList(int fromIndex) {
+		return subList(fromIndex, size());
+	}
+
     public ListIterator listIterator() {
         return delegate.listIterator();
     }

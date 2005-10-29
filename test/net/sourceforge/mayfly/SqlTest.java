@@ -354,7 +354,7 @@ public class SqlTest extends SqlTestCase {
         assertFalse(results.next());
     }
 
-    public void xtestSimpleIn() throws Exception {
+    public void testSimpleIn() throws Exception {
         execute("create table foo (a integer, b integer)");
         execute("insert into foo (a, b) values (1, 1)");
         execute("insert into foo (a, b) values (2, 4)");
