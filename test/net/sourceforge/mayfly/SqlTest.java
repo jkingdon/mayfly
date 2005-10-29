@@ -354,8 +354,23 @@ public class SqlTest extends SqlTestCase {
         assertFalse(results.next());
     }
 
+    public void xtestSimpleIn() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo (a, b) values (1, 1)");
+        execute("insert into foo (a, b) values (2, 4)");
+        execute("insert into foo (a, b) values (3, 9)");
+
+        ResultSet results = query("select b from foo where foo.a in (1, 3)");
+
+        Set expected = new HashSet();
+        expected.add(L.fromArray(new int[] {1}));
+        expected.add(L.fromArray(new int[] {9}));
+        
+        assertEquals(expected, intResultsAsSet(results, Collections.singletonList("b")));
+    }
+
     // Apparently ldbc can't even parse the select here.
-    public void xtestIn() throws Exception {
+    public void xtestInWithSubselect() throws Exception {
         execute("create table foo (a integer, b integer)");
         execute("insert into foo (a, b) values (1, 1)");
         execute("insert into foo (a, b) values (2, 4)");
