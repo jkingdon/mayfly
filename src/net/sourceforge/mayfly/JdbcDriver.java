@@ -5,6 +5,8 @@ import java.util.*;
 
 public class JdbcDriver implements Driver {
 
+    private static final String JDBC_URL = "jdbc:mayfly:";
+
     static {
         try {
             DriverManager.registerDriver(new JdbcDriver());
@@ -23,11 +25,16 @@ public class JdbcDriver implements Driver {
     Database database = new Database();
 
     public Connection connect(String url, Properties info) throws SQLException {
+        if (!JDBC_URL.equals(url)) {
+            // Being strict about this will lessen future confusion in case we start to
+            // have multiple URLs which mean different things.
+            throw new SQLException("Mayfly only allows " + JDBC_URL + " for the JDBC URL");
+        }
         return database.openConnection();
     }
 
     public boolean acceptsURL(String url) throws SQLException {
-        return url.startsWith("jdbc:mayfly");
+        return url.startsWith(JDBC_URL);
     }
 
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties properties) throws SQLException {

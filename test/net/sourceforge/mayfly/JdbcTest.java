@@ -7,9 +7,7 @@ import java.sql.*;
 public class JdbcTest extends TestCase {
 
     public void testPrepareNoParameters() throws Exception {
-        Class.forName("net.sourceforge.mayfly.JdbcDriver"); // how are these usually named?
-        // can we distinguish between multiple databases via the url?
-        // if no, is there only one legal value?
+        Class.forName("net.sourceforge.mayfly.JdbcDriver");
         Connection connection = DriverManager.getConnection("jdbc:mayfly:");
         PreparedStatement createTable = connection.prepareStatement("CREATE TABLE FOO (a NUMBER)");
         assertEquals(0, createTable.executeUpdate());
@@ -24,7 +22,17 @@ public class JdbcTest extends TestCase {
         connection.close();
     }
     
-    public void testInsert() throws Exception {
+    public void testBadJdbcUrl() throws Exception {
+        Class.forName("net.sourceforge.mayfly.JdbcDriver");
+        try {
+            DriverManager.getConnection("jdbc:mayfly:x");
+            fail();
+        } catch (SQLException expected) {
+            assertEquals("Mayfly only allows jdbc:mayfly: for the JDBC URL", expected.getMessage());
+        }
+    }
+    
+    public void testReturnValueFromExecuteUpdate() throws Exception {
         Connection connection = new Database().openConnection();
         Statement statement = connection.createStatement();
         assertEquals(0, statement.executeUpdate("CREATE Table Foo (b number)"));
