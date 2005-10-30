@@ -32,18 +32,4 @@ public class JdbcTest extends TestCase {
         }
     }
     
-    public void testReturnValueFromExecuteUpdate() throws Exception {
-        Connection connection = new Database().openConnection();
-        Statement statement = connection.createStatement();
-        assertEquals(0, statement.executeUpdate("CREATE Table Foo (b number)"));
-        assertEquals(1, statement.executeUpdate("inSERT into foo (b) values (77)"));
-        statement.close();
-        
-        PreparedStatement prepared = connection.prepareStatement("insert into foo (b) values (88)");
-        assertEquals(1, prepared.executeUpdate());
-        prepared.close();
-
-        connection.close();
-    }
-
 }

@@ -12,10 +12,12 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     private final String command;
     private Database database;
+    private Vector parameters;
 
     JdbcPreparedStatement(String sql, Database database) {
         this.command = sql;
         this.database = database;
+        this.parameters = new Vector();
     }
 
     public ResultSet executeQuery() throws SQLException {
@@ -23,78 +25,86 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public int executeUpdate() throws SQLException {
-        return database.execute(command);
+        return database.execute(command, parameters);
     }
 
     public void setNull(int parameterIndex, int sqlType) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setBoolean(int parameterIndex, boolean x) throws SQLException {
+    public void setBoolean(int parameterIndex, boolean value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setByte(int parameterIndex, byte x) throws SQLException {
+    public void setByte(int parameterIndex, byte value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setShort(int parameterIndex, short x) throws SQLException {
+    public void setShort(int parameterIndex, short value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setInt(int parameterIndex, int x) throws SQLException {
+    public void setInt(int oneBased, int value) throws SQLException {
+        setParameter(oneBased, new Long(value));
+    }
+
+    private void setParameter(int oneBasedParameterIndex, Object value) {
+        int zeroBased = oneBasedParameterIndex - 1;
+        if (zeroBased >= parameters.size()) {
+            parameters.setSize(zeroBased + 1);
+        }
+        parameters.set(zeroBased, value);
+    }
+
+    public void setLong(int parameterIndex, long value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setLong(int parameterIndex, long x) throws SQLException {
+    public void setFloat(int parameterIndex, float value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setFloat(int parameterIndex, float x) throws SQLException {
+    public void setDouble(int parameterIndex, double value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setDouble(int parameterIndex, double x) throws SQLException {
-        throw new UnimplementedException();
-    }
-
-    public void setBigDecimal(int parameterIndex, BigDecimal x)
+    public void setBigDecimal(int parameterIndex, BigDecimal value)
             throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setString(int parameterIndex, String x) throws SQLException {
+    public void setString(int parameterIndex, String value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setBytes(int parameterIndex, byte[] x) throws SQLException {
+    public void setBytes(int parameterIndex, byte[] value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setDate(int parameterIndex, java.sql.Date x) throws SQLException {
+    public void setDate(int parameterIndex, java.sql.Date value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setTime(int parameterIndex, Time x) throws SQLException {
+    public void setTime(int parameterIndex, Time value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setTimestamp(int parameterIndex, Timestamp x)
+    public void setTimestamp(int parameterIndex, Timestamp value)
             throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setAsciiStream(int parameterIndex, InputStream x, int length)
+    public void setAsciiStream(int parameterIndex, InputStream value, int length)
             throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setUnicodeStream(int parameterIndex, InputStream x, int length)
+    public void setUnicodeStream(int parameterIndex, InputStream value, int length)
             throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setBinaryStream(int parameterIndex, InputStream x, int length)
+    public void setBinaryStream(int parameterIndex, InputStream value, int length)
             throws SQLException {
         throw new UnimplementedException();
     }
@@ -103,17 +113,17 @@ public class JdbcPreparedStatement implements PreparedStatement {
         throw new UnimplementedException();
     }
 
-    public void setObject(int parameterIndex, Object x, int targetSqlType,
+    public void setObject(int parameterIndex, Object value, int targetSqlType,
             int scale) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setObject(int parameterIndex, Object x, int targetSqlType)
+    public void setObject(int parameterIndex, Object value, int targetSqlType)
             throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setObject(int parameterIndex, Object x) throws SQLException {
+    public void setObject(int parameterIndex, Object value) throws SQLException {
         throw new UnimplementedException();
     }
 
@@ -130,19 +140,19 @@ public class JdbcPreparedStatement implements PreparedStatement {
         throw new UnimplementedException();
     }
 
-    public void setRef(int i, Ref x) throws SQLException {
+    public void setRef(int i, Ref value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setBlob(int i, Blob x) throws SQLException {
+    public void setBlob(int i, Blob value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setClob(int i, Clob x) throws SQLException {
+    public void setClob(int i, Clob value) throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setArray(int i, Array x) throws SQLException {
+    public void setArray(int i, Array value) throws SQLException {
         throw new UnimplementedException();
     }
 
@@ -150,17 +160,17 @@ public class JdbcPreparedStatement implements PreparedStatement {
         throw new UnimplementedException();
     }
 
-    public void setDate(int parameterIndex, java.sql.Date x, Calendar cal)
+    public void setDate(int parameterIndex, java.sql.Date value, Calendar cal)
             throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setTime(int parameterIndex, Time x, Calendar cal)
+    public void setTime(int parameterIndex, Time value, Calendar cal)
             throws SQLException {
         throw new UnimplementedException();
     }
 
-    public void setTimestamp(int parameterIndex, Timestamp x, Calendar cal)
+    public void setTimestamp(int parameterIndex, Timestamp value, Calendar cal)
             throws SQLException {
         throw new UnimplementedException();
     }
@@ -170,7 +180,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
         throw new UnimplementedException();
     }
 
-    public void setURL(int parameterIndex, URL x) throws SQLException {
+    public void setURL(int parameterIndex, URL value) throws SQLException {
         throw new UnimplementedException();
     }
 

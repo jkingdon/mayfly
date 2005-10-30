@@ -412,49 +412,4 @@ public class SqlTest extends SqlTestCase {
 
     }
 
-    private Set objectResultsAsSet(ResultSet rs) throws SQLException {
-        Set actual = new HashSet();
-        while (rs.next()) {
-            L row = new L();
-            boolean rowDone = false;
-            int col = 1;
-
-            while (!rowDone) {
-                try {
-                    int i = rs.getInt(col);
-                    row.append(new Integer(i));
-                } catch (SQLException ex) {
-                    rowDone = true;
-                }
-                col++;
-            }
-
-            actual.add(row);
-        }
-        rs.close();
-        return actual;
-    }
-
-    private void assertResultSet(String[] rowsAsStrings, ResultSet rs) throws SQLException {
-        Set expected = new HashSet();
-        for (int i = 0; i < rowsAsStrings.length; i++) {
-            String rowString = rowsAsStrings[i];
-            String[] cells = rowString.split(",");
-            L row = new L();
-
-            for (int j = 0; j < cells.length; j++) {
-                String cell = cells[j].trim();
-                if (cell.startsWith("'")) {
-                    row.append(cell.substring(1, cell.length()-1));
-                } else {
-                    row.append(new Integer(Integer.parseInt(cell)));
-                }
-            }
-            expected.add(row);
-        }
-
-        assertEquals(expected, objectResultsAsSet(rs));
-
-    }
-
 }

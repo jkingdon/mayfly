@@ -16,6 +16,7 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.jdbc.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.Select;
+import net.sourceforge.mayfly.util.*;
 
 import java.io.*;
 import java.sql.*;
@@ -224,6 +225,10 @@ public class Database {
      * @return Number of rows changed.
      */
     public int execute(String command) throws SQLException {
+        return execute(command, Collections.EMPTY_LIST);
+    }
+
+    public int execute(String command, List jdbcParameters) throws SQLException {
         Statement statement = parse(command);
         if (statement instanceof Drop) {
             dataStore = dataStore.dropTable(((Drop)statement).getName());
@@ -236,7 +241,7 @@ public class Database {
         } else if (statement instanceof Insert) {
             Insert insert = (Insert) statement;
             return insert(insert.getTable().getName(), 
-                    insert.getColumns(), insert.getItemsList());
+                    insert.getColumns(), insert.getItemsList(), jdbcParameters);
         } else {
             throw new SQLException("unrecognized command for execute: " + command);
         }
@@ -280,8 +285,9 @@ public class Database {
     }
 
 
-    private int insert(String table, List columns, ItemsList itemsList)
+    private int insert(String table, List columns, ItemsList itemsList, List jdbcParameters)
     throws SQLException {
+        Iterator parameterIterator = jdbcParameters.iterator();
         List columnNames = new ArrayList();
         List values = new ArrayList();
         
@@ -289,7 +295,7 @@ public class Database {
         for (int i = 0; i < columns.size(); ++i) {
             Column column = (Column) columns.get(i);
 
-            Object value = makeCellValue((Expression) items.get(i));
+            Object value = makeCellValue((Expression) items.get(i), parameterIterator);
 
             columnNames.add(column.getColumnName());
             values.add(value);
@@ -299,11 +305,13 @@ public class Database {
         return 1;
     }
 
-    private Object makeCellValue(Expression itemValue) {
+    private Object makeCellValue(Expression itemValue, Iterator parameterIterator) {
         if (itemValue instanceof LongValue) {
             return new Long(((LongValue) itemValue).getValue());
         } else if (itemValue instanceof StringValue) {
             return ((StringValue) itemValue).getNotExcapedValue();
+        } else if (itemValue instanceof JdbcParameter) {
+            return parameterIterator.next();
         } else {
             throw new UnimplementedException("Don't know how to deal with expression type " 
                     + itemValue.getClass().getName());
