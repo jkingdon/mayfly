@@ -24,58 +24,31 @@ public class TableData {
     public int getInt(String columnName, int rowIndex) throws SQLException {
         Row row = (Row) rows.element(rowIndex);
 
-        assertColumnKnown(columnName);
-
-        Cell cell = row.cell(new Column(columnName));
+        Cell cell = row.cell(findColumn(columnName));
         return cell.asInt();
     }
 
     public TableData addRow(List columnNames, List values) throws SQLException {
-        L cols =
-            new L(columnNames)
-                .collect(
-                    new Transformer() {
-                        public Object transform(Object from) {
-                            String columnName = (String) from;
-                            return new Column(columnName);
-                        }
-                    }
-                );
-        L cells =
-            new L(values)
-                .collect(
-                    new Transformer() {
-                        public Object transform(Object from) {
-                            return new Cell(from);
-                        }
-                    }
-                );
+        if (columnNames.size() != values.size()) {
+            throw new IllegalArgumentException("Column names has " + columnNames.size() + 
+                " elements but values has " + values.size());
+        }
 
-        M columnToCell = cols.zipper(cells);
+        M columnToCell = new M();
+        for (int i = 0; i < columnNames.size(); ++i) {
+            columnToCell.put(
+                findColumn((String) columnNames.get(i)),
+                new Cell(values.get(i))
+            );
+        }
 
         Row newRow = new Row(columnToCell.asImmutable());
-
-        Columns testColumns = newRow.columns();
-        assertNoUnknownColumns(testColumns);
 
         return new TableData(columns.asNames().asImmutable(), (Rows) rows.with(newRow));
     }
 
-    public String findColumn(String columnName) throws SQLException {
-        assertColumnKnown(columnName);
-
-        return columns.findColumnWithName(columnName).columnName();
-    }
-
-    private void assertColumnKnown(String columnName) throws SQLException {
-        assertNoUnknownColumns(Columns.fromColumnNames(new L().append(columnName)));
-    }
-
-    private void assertNoUnknownColumns(Columns testColumns) throws SQLException {
-        Columns extraColumns = (Columns) testColumns.subtract(columns);
-        if (extraColumns.hasContents()) {
-            throw new SQLException("no column " + extraColumns.asNames().element(0));
-        }
+    public Column findColumn(String columnName) throws SQLException {
+        return columns.columnFromName(columnName);
     }
 
     public List columnNames() {

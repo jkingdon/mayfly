@@ -16,7 +16,6 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.jdbc.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.Select;
-import net.sourceforge.mayfly.util.*;
 
 import java.io.*;
 import java.sql.*;
@@ -228,6 +227,15 @@ public class Database {
         return execute(command, Collections.EMPTY_LIST);
     }
 
+    /**
+     * Execute an SQL command which does not return results.
+     * This is similar to the JDBC {@link PreparedStatement#executeUpdate()}
+     * but might be more convenient if you have a Database instance around.
+     * @param command SQL command, with ? in place of values to be substituted.
+     * @param jdbcParameters Values to substitute for the parameters.  Currently
+     * each element must be a {@link Long}.
+     * @return Number of rows changed.
+     */
     public int execute(String command, List jdbcParameters) throws SQLException {
         Statement statement = parse(command);
         if (statement instanceof Drop) {

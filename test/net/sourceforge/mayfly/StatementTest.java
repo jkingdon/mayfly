@@ -31,5 +31,6 @@ public class StatementTest extends SqlTestCase {
     // order of ?'s (depth first, breadth first, what? Does short circuiting affect anything?)
     // one of the setInt calls is missing
     // setInt call with index <= 0 or index > size
+    // ? works in select statements too
 
 }

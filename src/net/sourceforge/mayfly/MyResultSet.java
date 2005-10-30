@@ -49,8 +49,7 @@ public final class MyResultSet extends ResultSetStub {
     }
 
     private Column columnFromName(String columnName) throws SQLException {
-        checkColumnName(columnName);
-        return new Column(columnName);
+        return columns.columnFromName(columnName);
     }
 
     private Cell cellFromIndex(int oneBasedColumn) throws SQLException {
@@ -78,16 +77,6 @@ public final class MyResultSet extends ResultSetStub {
             throw new SQLException("already read last result row");
         }
         return pos;
-    }
-
-    private void checkColumnName(String target) throws SQLException {
-        for (int i = 0; i < columns.size(); ++i) {
-            Column column = columns.get(i);
-            if (column.matchesName(target)) {
-                return;
-            }
-        }
-        throw new SQLException("no column " + target);
     }
 
     public void close() throws SQLException {

@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.util.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 
+import java.sql.*;
 import java.util.*;
 
 public class Columns extends Aggregate {
@@ -40,6 +41,11 @@ public class Columns extends Aggregate {
         return collect(new ToName());
     }
 
+    /**
+     * Only suitable for the case in which we know the column to exist.
+     * If the column might not exist, {@link Columns#columnFromName(String)
+     * throws a better-worded exception.
+     */
     public Column findColumnWithName(String columnNameString) {
         return (Column) find(new HasEquivalentName(columnNameString));
     }
@@ -69,5 +75,15 @@ public class Columns extends Aggregate {
 
     public Column get(int index) {
         return (Column) columns.get(index);
+    }
+
+    public Column columnFromName(String columnName) throws SQLException {
+        for (int i = 0; i < size(); ++i) {
+            Column column = get(i);
+            if (column.matchesName(columnName)) {
+                return column;
+            }
+        }
+        throw new SQLException("no column " + columnName);
     }
 }
