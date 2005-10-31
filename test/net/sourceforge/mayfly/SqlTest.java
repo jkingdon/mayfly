@@ -304,7 +304,15 @@ public class SqlTest extends SqlTestCase {
             },
             query("select a from foo where 6 > a ")
         );
-    }
+
+        assertResultSet(
+                new String[] {
+                    "   4 ",
+                    "   5 ",
+                },
+                query("select a from foo where a < 6 ")
+            );
+}
 
     public void xtestJoinSameNameTwice() throws Exception {
         execute("create table foo (a integer)");

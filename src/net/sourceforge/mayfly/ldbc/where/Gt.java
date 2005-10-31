@@ -13,6 +13,12 @@ public class Gt extends RowExpression {
         return new Gt((Transformer)both.get(0), (Transformer) both.get(1));
     }
 
+    public static Gt fromSmallerTree(Tree ltTree, TreeConverters treeConverters) {
+        L both = ltTree.children().convertUsing(treeConverters);
+
+        return new Gt((Transformer)both.get(1), (Transformer) both.get(0));
+    }
+
 
     public Gt(Transformer leftSide, Transformer rightSide) {
         super(leftSide, rightSide);
