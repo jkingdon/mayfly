@@ -26,6 +26,8 @@ public class ColumnsTest extends TestCase {
 
     public void testHasEquivalentName() throws Exception {
         assertTrue(new Columns.HasEquivalentName("a").evaluate(new Column("a")));
+        assertTrue(new Columns.HasEquivalentName("a").evaluate(new Column("A")));
+        assertTrue(new Columns.HasEquivalentName("a").evaluate(new Column("foo", "a")));
         assertFalse(new Columns.HasEquivalentName("a").evaluate(new Column("b")));
     }
 }

@@ -65,7 +65,8 @@ public class Columns extends Aggregate {
         }
 
         public boolean evaluate(Object candidate) {
-            return candidate.equals(new Column(columnNameString));
+            Column column = (Column) candidate;
+            return column.matchesName(columnNameString);
         }
     }
 

@@ -13,11 +13,11 @@ public class TableData {
     private final Rows rows;
 
     public TableData(List columnNames) {
-        this(new ImmutableList(columnNames), new Rows());
+        this(Columns.fromColumnNames(columnNames), new Rows());
     }
     
-    private TableData(ImmutableList columnNames, Rows rows) {
-        this.columns = Columns.fromColumnNames(columnNames);
+    private TableData(Columns columns, Rows rows) {
+        this.columns = columns;
         this.rows = rows;
     }
 
@@ -44,7 +44,7 @@ public class TableData {
 
         Row newRow = new Row(columnToCell.asImmutable());
 
-        return new TableData(columns.asNames().asImmutable(), (Rows) rows.with(newRow));
+        return new TableData(columns, (Rows) rows.with(newRow));
     }
 
     public Column findColumn(String columnName) throws SQLException {
