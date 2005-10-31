@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.ldbc.what.*;
 import java.sql.*;
 
 public final class MyResultSet extends ResultSetStub {
-    int pos = -1;
+    private int pos = -1;
 
     private final Rows rows;
 

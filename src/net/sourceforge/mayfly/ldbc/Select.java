@@ -50,12 +50,11 @@ public class Select extends ValueObject {
 
     public ResultSet select(final DataStore store) throws SQLException {
         Columns columns = what.selectedColumns();
-        List columnNames = columns.asNames();
-        checkColumns(store, columnNames);
+        checkColumns(store, columns);
         return new MyResultSet(columns, executeOn(store));
     }
 
-    private void checkColumns(final DataStore store, List columns) throws SQLException {
+    private void checkColumns(final DataStore store, Columns columns) throws SQLException {
         // This method could use some unit testing.
         // And also a comparison to make sure its rules correspond to executeOn
         Set possibleColumnNames = new HashSet();
@@ -64,9 +63,9 @@ public class Select extends ValueObject {
             possibleColumnNames.addAll(store.table(tableName).columns());
         }
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            String columnName = (String) iter.next();
-            if (!possibleColumnNames.contains(new Column(columnName))) {
-                throw new SQLException("no column " + columnName);
+            Column column = (Column) iter.next();
+            if (!possibleColumnNames.contains(column)) {
+                throw new SQLException("no column " + column.columnName());
             }
         }
     }

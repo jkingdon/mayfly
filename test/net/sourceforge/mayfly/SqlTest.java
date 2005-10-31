@@ -312,9 +312,14 @@ public class SqlTest extends SqlTestCase {
                 },
                 query("select a from foo where a < 6 ")
             );
-}
+    }
 
-    public void xtestJoinSameNameTwice() throws Exception {
+    public void testJoinSameNameTwice() throws Exception {
+        if (CONNECT_TO_MAYFLY) {
+            // Code around aliases, column names, and tables names is pretty far from right.
+            return;
+        }
+
         execute("create table foo (a integer)");
         execute("create table bar (a integer)");
         execute("insert into foo (a) values (4)");
