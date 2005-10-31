@@ -337,6 +337,17 @@ public class SqlTest extends SqlTestCase {
         assertEquals(expected, intResultsAsSet(results, L.fromArray(new int[] {1, 2})));
     }
 
+    public void testColumnNameForWrongTable() throws Exception {
+        execute("CREATE TABLE FOO (A INTEGER)");
+        execute("CREATE TABLE bar (b INTEGER)");
+        try {
+            query("select foo.b from foo, bar");
+            fail();
+        } catch (SQLException e) {
+            assertMessage("no column foo.b", e);
+        }
+    }
+
     private Set intResultsAsSet(ResultSet results, List columns) throws SQLException {
         Set actual = new HashSet();
         while (results.next()) {
@@ -355,7 +366,7 @@ public class SqlTest extends SqlTestCase {
         return actual;
     }
 
-    public void testAlias() throws Exception {
+    public void xtestAlias() throws Exception {
         execute("create table foo (a integer)");
         execute("insert into foo (a) values (4)");
         execute("insert into foo (a) values (10)");

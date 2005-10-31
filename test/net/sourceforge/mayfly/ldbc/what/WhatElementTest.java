@@ -11,7 +11,7 @@ public class WhatElementTest extends TestCase {
         Columns columns = element.columns();
         assertEquals(1, columns.size());
         Column column = columns.get(0);
-        assertEquals("table", column.table());
+        assertEquals("table", column.tableOrAlias());
         assertEquals("col", column.columnName());
     }
 

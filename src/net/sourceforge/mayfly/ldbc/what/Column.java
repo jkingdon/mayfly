@@ -21,11 +21,11 @@ public class Column implements Transformer {
     }
 
 
-    private final String table;
+    private final String tableOrAlias;
     private final String columnName;
 
     public Column(String table, String columnName) {
-        this.table = table;
+        this.tableOrAlias = table;
         this.columnName = columnName;
     }
 
@@ -56,8 +56,8 @@ public class Column implements Transformer {
         return columnName;
     }
 
-    public String table() {
-        return table;
+    public String tableOrAlias() {
+        return tableOrAlias;
     }
 
     public Object transform(Object from) {

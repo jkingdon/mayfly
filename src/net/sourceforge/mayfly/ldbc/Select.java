@@ -64,8 +64,15 @@ public class Select extends ValueObject {
         }
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
             Column column = (Column) iter.next();
-            if (!possibleColumnNames.contains(column)) {
-                throw new SQLException("no column " + column.columnName());
+            String table = column.tableOrAlias(); // we don't do aliases yet
+            if (table != null) {
+                if (!store.table(table).columns().contains(column)) {
+                    throw new SQLException("no column " + table + "." + column.columnName());
+                }
+            } else {
+                if (!possibleColumnNames.contains(column)) {
+                    throw new SQLException("no column " + column.columnName());
+                }
             }
         }
     }
