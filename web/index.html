@@ -42,8 +42,22 @@ to compromises such as keeping the tables around and only setting up
 data on each unit test run.  Mayfly aims to make creating an in-memory
 SQL database as easy as creating any other in-memory data structure.</p>
 
-<p>As of 20 Oct 2005, Mayfly allows any number of tables, columns, and rows, but queries only support one table at a time, only <tt>int</tt> is supported as a data type, and
-any but the simplest SQL does not yet work.  <a href="http://sf.net/projects/mayfly/cvs" >Check back</a>, though, because we are actively developing Mayfly.</p>
+<p>Some of what has been implemented so far:</p>
+
+<ul>
+<li>Any number of tables, columns, and rows (limited by available memory and
+to a certain extent by query speed).</li>
+
+<li>Some join capability.</li>
+
+<li>WHERE clauses with =, !=, <, >, AND, OR, NOT</li>
+
+<li>Integer and string data types.</li>
+</ul>
+
+<p>The best up to date information can be found on the
+<a href="http://sf.net/projects/mayfly/lists" >mailing lists</a>.</p>
+
 </td>
 </tr>
 </table>

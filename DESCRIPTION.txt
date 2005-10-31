@@ -14,7 +14,7 @@ tasks) and does not allow one to freely create in-memory databases in
 the same way that one can create Java objects.
 
 Mayfly is written in Java (currently works with gcj/libgcj and
-probably Sun's 1.4, although exact versions of Java may change), and
+Sun Java from 1.4, although exact versions may change), and
 should run on any OS which provides a Java platform.  It relies on the
 JDBC interfaces from the Java platform (although one has the choice
 of instantiating a Database object directly if one wishes to avoid
@@ -38,7 +38,7 @@ Postgres, Oracle, MySQL, etc, developers are unlikely to find it
 useful.  Other challenges include figuring out whether the simple
 implementations currently envisaged (for example, table scans rather
 than indexes) suffice for the kinds of data sets which unit tests end
-up using.  And of course, Mayfly needs to remain fast.
+up using.  And of course, Mayfly needs to be fast.
 
 A short list of SQL features which we believe are high priority are:
 
@@ -59,7 +59,9 @@ Mayfly later on (for a database dump format, one likely choice is an
 XML serialization of the Mayfly objects, using something such as
 XStream - http://xstream.codehaus.org/ ).
 
-As of this writing, Mayfly consists of a modest amount of Java code
-which only is starting to understand the simplest forms of SQL
-commands like INSERT and SELECT, although we expect it to grow
-rapidly.
+Some of what has been implemented so far:
+
+    * Any number of tables, columns, and rows (limited by available memory and to a certain extent by query speed).
+    * Some join capability.
+    * WHERE clauses with =, !=, <, >, AND, OR, NOT
+    * Integer and string data types.
