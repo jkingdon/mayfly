@@ -55,8 +55,8 @@ public class TableData {
         return columns.asNames();
     }
     
-    public List columns() {
-        return columns.asImmutableList();
+    public Columns columns() {
+        return columns;
     }
     
     public int rowCount() {
@@ -67,5 +67,14 @@ public class TableData {
         return rows;
     }
 
+    public boolean hasColumn(String target) {
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            Column column = (Column) iter.next();
+            if (column.matchesName(target)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }

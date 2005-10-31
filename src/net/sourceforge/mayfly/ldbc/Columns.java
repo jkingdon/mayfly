@@ -41,6 +41,10 @@ public class Columns extends Aggregate {
         return collect(new ToName());
     }
 
+    public List asLowercaseNames() {
+        return collect(new ToLowercaseName());
+    }
+
     /**
      * Only suitable for the case in which we know the column to exist.
      * If the column might not exist, {@link Columns#columnFromName(String)
@@ -54,6 +58,12 @@ public class Columns extends Aggregate {
     static class ToName implements Transformer {
         public Object transform(Object from) {
             return ((Column)from).columnName();
+        }
+    }
+
+    static class ToLowercaseName implements Transformer {
+        public Object transform(Object from) {
+            return ((Column)from).columnName().toLowerCase();
         }
     }
 
@@ -87,4 +97,5 @@ public class Columns extends Aggregate {
         }
         throw new SQLException("no column " + columnName);
     }
+
 }

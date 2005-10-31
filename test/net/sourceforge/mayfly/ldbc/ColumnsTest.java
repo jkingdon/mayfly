@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
+
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -22,6 +23,12 @@ public class ColumnsTest extends TestCase {
 
     public void testAsNames() throws Exception {
         assertEquals("a", new Columns.ToName().transform(new Column("a")));
+        assertEquals("Id", new Columns.ToName().transform(new Column("Id")));
+    }
+
+    public void testAsLowercaseNames() throws Exception {
+        assertEquals("a", new Columns.ToLowercaseName().transform(new Column("a")));
+        assertEquals("id", new Columns.ToLowercaseName().transform(new Column("Id")));
     }
 
     public void testHasEquivalentName() throws Exception {

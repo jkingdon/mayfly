@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.util.*;
 
+import org.apache.commons.collections.*;
 import org.ldbc.parser.*;
 
 import java.sql.*;
@@ -58,20 +59,30 @@ public class Select extends ValueObject {
         // This method could use some unit testing.
         // And also a comparison to make sure its rules correspond to executeOn
         Set possibleColumnNames = new HashSet();
+        Set ambiguousColumnNames = new HashSet();
         for (Iterator iter = from.tableNames().iterator(); iter.hasNext();) {
             String tableName = (String) iter.next();
-            possibleColumnNames.addAll(store.table(tableName).columns());
+            List columnsForThisTable = store.table(tableName).columns().asLowercaseNames();
+
+            Collection alreadySeenColumns = CollectionUtils.intersection(columnsForThisTable, possibleColumnNames);
+            ambiguousColumnNames.addAll(alreadySeenColumns);
+
+            possibleColumnNames.addAll(columnsForThisTable);
         }
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
             Column column = (Column) iter.next();
             String table = column.tableOrAlias(); // we don't do aliases yet
+            String columnName = column.columnName();
             if (table != null) {
-                if (!store.table(table).columns().contains(column)) {
-                    throw new SQLException("no column " + table + "." + column.columnName());
+                if (!store.table(table).hasColumn(columnName)) {
+                    throw new SQLException("no column " + table + "." + columnName);
                 }
             } else {
-                if (!possibleColumnNames.contains(column)) {
-                    throw new SQLException("no column " + column.columnName());
+                if (!possibleColumnNames.contains(columnName.toLowerCase())) {
+                    throw new SQLException("no column " + columnName);
+                }
+                if (ambiguousColumnNames.contains(columnName.toLowerCase())) {
+                    throw new SQLException("ambiguous column " + columnName);
                 }
             }
         }

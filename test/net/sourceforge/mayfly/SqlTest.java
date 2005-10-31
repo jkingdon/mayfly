@@ -346,8 +346,38 @@ public class SqlTest extends SqlTestCase {
         } catch (SQLException e) {
             assertMessage("no column foo.b", e);
         }
+
+        if (!CONNECT_TO_MAYFLY) {
+            // Haven't implemented this yet.
+            expectQueryFailure("select a from foo, bar where bar.A = 5", "no column bar.A");
+        }
     }
 
+    public void testAmbiguousColumnName() throws Exception {
+        execute("CREATE TABLE FOO (A INTEGER)");
+        execute("CREATE TABLE bar (a INTEGER)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into bar (a) values (9)");
+        
+        if (CONNECT_TO_MAYFLY) {
+            expectQueryFailure("select A from foo, bar", "ambiguous column A");
+        } else {
+            // This is the hypersonic behavior.  It seems too "guess what I meant"-ish
+            // for mayfly.
+            assertResultSet(new String[] {"5"}, query("select A from foo, bar"));
+            assertResultSet(new String[] {"9"}, query("select A from bar, foo"));
+        }
+    }
+
+    private void expectQueryFailure(String sql, String expectedMessage) {
+        try {
+            query(sql);
+            fail();
+        } catch (SQLException e) {
+            assertMessage(expectedMessage, e);
+        }
+    }
+    
     private Set intResultsAsSet(ResultSet results, List columns) throws SQLException {
         Set actual = new HashSet();
         while (results.next()) {
