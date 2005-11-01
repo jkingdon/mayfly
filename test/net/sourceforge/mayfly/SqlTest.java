@@ -340,17 +340,16 @@ public class SqlTest extends SqlTestCase {
     public void testColumnNameForWrongTable() throws Exception {
         execute("CREATE TABLE FOO (A INTEGER)");
         execute("CREATE TABLE bar (b INTEGER)");
-        try {
-            query("select foo.b from foo, bar");
-            fail();
-        } catch (SQLException e) {
-            assertMessage("no column foo.b", e);
-        }
+        expectQueryFailure("select foo.b from foo, bar", "no column foo.b");
 
         if (!CONNECT_TO_MAYFLY) {
-            // Haven't implemented this yet.
+            // Mayfly's current checking for this case only kicks in once we have a row.
             expectQueryFailure("select a from foo, bar where bar.A = 5", "no column bar.A");
         }
+
+        execute("insert into foo (a) values (7)");
+        execute("insert into bar (b) values (8)");
+        expectQueryFailure("select a from foo, bar where bar.A = 5", "no column bar.A");
     }
 
     public void testAmbiguousColumnName() throws Exception {
@@ -372,7 +371,10 @@ public class SqlTest extends SqlTestCase {
     private void expectQueryFailure(String sql, String expectedMessage) {
         try {
             query(sql);
-            fail();
+            fail("Did not find expected exception.\n" +
+                "expected message: " + expectedMessage + "\n" +
+                "command: " + sql + "\n"
+            );
         } catch (SQLException e) {
             assertMessage(expectedMessage, e);
         }

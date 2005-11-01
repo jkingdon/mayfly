@@ -16,6 +16,10 @@ public class Rows extends Aggregate {
         this(new ImmutableList());
     }
 
+    public Rows(Row row) {
+        this(new ImmutableList(row));
+    }
+
     protected Aggregate createNew(Iterable items) {
         return new Rows(new L(items).asImmutable());
     }

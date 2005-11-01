@@ -50,42 +50,38 @@ public class Select extends ValueObject {
     }
 
     public ResultSet select(final DataStore store) throws SQLException {
-        Columns columns = what.selectedColumns();
-        checkColumns(store, columns);
-        return new MyResultSet(columns, executeOn(store));
+        try {
+            Columns columns = what.selectedColumns();
+            checkColumns(store, columns);
+            return new MyResultSet(columns, executeOn(store));
+        } catch (MayflyException e) {
+            // This wrapping isn't really desirable.  It can be avoided by
+            // having a MayflyException create an SQLException inside it.
+            throw (SQLException)new SQLException(e.getMessage()).initCause(e);
+        }
     }
 
     private void checkColumns(final DataStore store, Columns columns) throws SQLException {
-        // This method could use some unit testing.
-        // And also a comparison to make sure its rules correspond to executeOn
-        Set possibleColumnNames = new HashSet();
-        Set ambiguousColumnNames = new HashSet();
-        for (Iterator iter = from.tableNames().iterator(); iter.hasNext();) {
-            String tableName = (String) iter.next();
-            List columnsForThisTable = store.table(tableName).columns().asLowercaseNames();
+        L tableNames = from.tableNames();
 
-            Collection alreadySeenColumns = CollectionUtils.intersection(columnsForThisTable, possibleColumnNames);
-            ambiguousColumnNames.addAll(alreadySeenColumns);
-
-            possibleColumnNames.addAll(columnsForThisTable);
+        Iterator iterator = tableNames.iterator();
+        String firstTable = (String) iterator.next();
+        Rows joinedRows = new Rows(store.table(firstTable).dummyRow());
+        while (iterator.hasNext()) {
+            String tableName = (String) iterator.next();
+            joinedRows = (Rows)joinedRows.cartesianJoin(new Rows(store.table(tableName).dummyRow()));
         }
+
+        if (joinedRows.size() != 1) {
+            throw new RuntimeException("internal error: got " + joinedRows.size());
+        }
+        Row row = (Row) joinedRows.element(0);
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
             Column column = (Column) iter.next();
-            String table = column.tableOrAlias(); // we don't do aliases yet
-            String columnName = column.columnName();
-            if (table != null) {
-                if (!store.table(table).hasColumn(columnName)) {
-                    throw new SQLException("no column " + table + "." + columnName);
-                }
-            } else {
-                if (!possibleColumnNames.contains(columnName.toLowerCase())) {
-                    throw new SQLException("no column " + columnName);
-                }
-                if (ambiguousColumnNames.contains(columnName.toLowerCase())) {
-                    throw new SQLException("ambiguous column " + columnName);
-                }
-            }
+            row.cell(column);
         }
+
+        //new Rows(row).select(where);
     }
 
     public Rows executeOn(DataStore store) throws SQLException {

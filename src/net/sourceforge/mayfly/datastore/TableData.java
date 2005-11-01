@@ -46,6 +46,18 @@ public class TableData {
 
         return new TableData(columns, (Rows) rows.with(newRow));
     }
+    
+    public Row dummyRow() {
+        M columnToCell = new M();
+        for (int i = 0; i < columns.size(); ++i) {
+            columnToCell.put(
+                columns.get(i),
+                new Cell(new Long(0))
+            );
+        }
+
+        return new Row(columnToCell.asImmutable());
+    }
 
     public Column findColumn(String columnName) throws SQLException {
         return columns.columnFromName(columnName);
