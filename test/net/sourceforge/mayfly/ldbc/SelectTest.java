@@ -20,18 +20,18 @@ public class SelectTest extends TestCase {
                 new Where(
                     new And(
                         new And(
-                            new Eq(new Column("f", "name"), new QuotedString("'steve'")),
+                            new Eq(new SingleColumnExpression("f", "name"), new QuotedString("'steve'")),
                             new Or(
-                                new Eq(new Column("size"), new MathematicalInt(4)),
-                                new Gt(new MathematicalInt(6), new Column("size"))    
+                                new Eq(new SingleColumnExpression("size"), new MathematicalInt(4)),
+                                new Gt(new MathematicalInt(6), new SingleColumnExpression("size"))    
                             )
 
                         ),
                         new Or(
-                            new Eq(new Column("color"), new QuotedString("'red'")),
+                            new Eq(new SingleColumnExpression("color"), new QuotedString("'red'")),
                             new And(
-                                new NotEq(new Column("day"), new MathematicalInt(7)),
-                                new NotEq(new Column("day"), new MathematicalInt(6))
+                                new NotEq(new SingleColumnExpression("day"), new MathematicalInt(7)),
+                                new NotEq(new SingleColumnExpression("day"), new MathematicalInt(6))
                             )
 
                         )
@@ -56,7 +56,7 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromElement("foo")),
                 new Where(
-                    new Eq(new Column("a"), new MathematicalInt(5))
+                    new Eq(new SingleColumnExpression("a"), new MathematicalInt(5))
                 )
             ),
             Select.fromTree(Tree.parse("select * from foo where a = 5"))

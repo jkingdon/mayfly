@@ -31,11 +31,6 @@ public class TreeConverters {
                                                               return new All();
                                                           }
                                                       })
-            .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
-                                                          public Object convert(Tree from, TreeConverters converters) {
-                                                              return Column.fromColumnTree(from);
-                                                          }
-                                                      })
             .register(SQLTokenTypes.SELECTED_TABLE,new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return FromElement.fromSeletedTableTree(from);
@@ -97,7 +92,7 @@ public class TreeConverters {
             })
             .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return Column.fromColumnTree(from);
+                                                              return SingleColumnExpression.fromColumnTree(from);
                                                           }
                                                       })
             .register(SQLTokenTypes.QUOTED_STRING, new TreeConverters.Converter() {

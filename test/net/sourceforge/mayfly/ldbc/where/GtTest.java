@@ -15,7 +15,7 @@ public class GtTest extends TestCase {
                                 .children().singleSubtreeOfType(SQLTokenTypes.BIGGER);
 
         assertEquals(
-                new Gt(new Column("size"), new MathematicalInt(6)),
+                new Gt(new SingleColumnExpression("size"), new MathematicalInt(6)),
                 Gt.fromBiggerTree(gtTree, TreeConverters.forWhereTree())
         );
     }
@@ -28,9 +28,9 @@ public class GtTest extends TestCase {
                 .asImmutable()
         );
 
-        assertFalse(new Gt(new MathematicalInt(5), new Column("colA")).evaluate(row));
-        assertFalse(new Gt(new MathematicalInt(6), new Column("colA")).evaluate(row));
-        assertTrue(new Gt(new MathematicalInt(7), new Column("colA")).evaluate(row));
-        assertTrue(new Gt(new Column("colB"), new Column("colA")).evaluate(row));
+        assertFalse(new Gt(new MathematicalInt(5), new SingleColumnExpression("colA")).evaluate(row));
+        assertFalse(new Gt(new MathematicalInt(6), new SingleColumnExpression("colA")).evaluate(row));
+        assertTrue(new Gt(new MathematicalInt(7), new SingleColumnExpression("colA")).evaluate(row));
+        assertTrue(new Gt(new SingleColumnExpression("colB"), new SingleColumnExpression("colA")).evaluate(row));
     }
 }

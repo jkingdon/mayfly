@@ -16,7 +16,7 @@ public class NotTest extends TestCase {
             .singleSubtreeOfType(SQLTokenTypes.CONDITION).children()
                 .singleSubtreeOfType(SQLTokenTypes.NOT);
         assertEquals(
-            new Not(new Eq(new Column("name"), new QuotedString("'jim'"))),
+            new Not(new Eq(new SingleColumnExpression("name"), new QuotedString("'jim'"))),
             Not.fromNotTree(notTree, TreeConverters.forWhereTree())
         );
     }

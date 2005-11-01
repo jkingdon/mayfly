@@ -17,10 +17,10 @@ public class AndTest extends TestCase {
         assertEquals(
                 new And(
                     new And(
-                        new Eq(new Column("name"), new QuotedString("'steve'")),
-                        new Eq(new Column("species"), new QuotedString("'homo sapiens'"))
+                        new Eq(new SingleColumnExpression("name"), new QuotedString("'steve'")),
+                        new Eq(new SingleColumnExpression("species"), new QuotedString("'homo sapiens'"))
                     ),
-                    new Eq(new Column("size"), new MathematicalInt(6))
+                    new Eq(new SingleColumnExpression("size"), new MathematicalInt(6))
                 ),
             And.fromAndTree(andTree, TreeConverters.forWhereTree())
         );
@@ -35,10 +35,10 @@ public class AndTest extends TestCase {
 
         assertEquals(
                 new And(
-                    new Eq(new Column("name"), new QuotedString("'steve'")),
+                    new Eq(new SingleColumnExpression("name"), new QuotedString("'steve'")),
                     new And(
-                        new Eq(new Column("species"), new QuotedString("'homo sapiens'")),
-                        new Eq(new Column("size"), new MathematicalInt(6))
+                        new Eq(new SingleColumnExpression("species"), new QuotedString("'homo sapiens'")),
+                        new Eq(new SingleColumnExpression("size"), new MathematicalInt(6))
                     )
                 ),
             And.fromAndTree(andTree, TreeConverters.forWhereTree())
