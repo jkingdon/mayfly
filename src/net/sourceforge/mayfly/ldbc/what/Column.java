@@ -1,7 +1,9 @@
 package net.sourceforge.mayfly.ldbc.what;
 
+import net.sourceforge.mayfly.util.*;
 
-public class Column {
+
+public class Column extends ValueObject {
     private final String tableOrAlias;
     private final String columnName;
 
@@ -22,23 +24,27 @@ public class Column {
         return columnName.equalsIgnoreCase(otherName);
     }
 
-    public boolean equals(Object other) {
-        // TODO: This is broken.  If other isn't a column, should be a
-        // false return, not ClassCastException
-        String otherName = ((Column)other).columnName;
-        return matchesName(otherName);
-    }
-
-    public int hashCode() {
-        return 0;
-    }
-
-    public String toString() {
-        return columnName;
+    public boolean matches(String tableOrAlias, String target) {
+        if (tableOrAlias != null && !tableOrAlias.equalsIgnoreCase(this.tableOrAlias)) {
+            return false;
+        }
+        return matchesName(target);
     }
 
     public String tableOrAlias() {
         return tableOrAlias;
     }
 
+    public String toString() {
+        return displayName(tableOrAlias, columnName);
+    }
+
+    public static String displayName(String tableOrAlias, String column) {
+        if (tableOrAlias == null) {
+            return column;
+        } else {
+            return tableOrAlias + "." + column;
+        }
+    }
+    
 }

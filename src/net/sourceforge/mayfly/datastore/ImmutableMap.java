@@ -16,7 +16,11 @@ public class ImmutableMap extends ValueObject implements Map {
         delegate = Collections.unmodifiableMap(new LinkedHashMap(map));
     }
 
-    public ImmutableMap(Map alreadyCopied, boolean didICopyIt) {
+    public ImmutableMap(Object key, Object value) {
+        delegate = Collections.singletonMap(key, value);
+    }
+
+    private ImmutableMap(Map alreadyCopied, boolean didICopyIt) {
         if (!didICopyIt) {
             throw new RuntimeException("Call with() or public constructor instead");
         }

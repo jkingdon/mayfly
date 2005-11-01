@@ -8,13 +8,17 @@ import java.sql.*;
 import java.util.*;
 
 public class Columns extends Aggregate {
-    public static Columns fromColumnNames(List columnNameStrings) {
+    public static Columns fromColumnNames(final String tableName, List columnNameStrings) {
+        if (tableName == null) {
+            throw new NullPointerException("must pass table to fromColumnNames");
+        }
+
         L columnList =
             new L(columnNameStrings)
                 .collect(
                     new Transformer() {
                         public Object transform(Object from) {
-                            return new Column((String) from);
+                            return new Column(tableName, (String) from);
                         }
                     }
                 );

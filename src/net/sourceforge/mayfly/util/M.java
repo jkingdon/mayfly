@@ -23,7 +23,7 @@ public class M extends Aggregate implements Map {
     private Map delegate;
 
     public M() {
-        this(new HashMap());
+        this(new LinkedHashMap());
     }
 
     public M(Map map) {

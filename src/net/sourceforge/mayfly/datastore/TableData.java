@@ -12,8 +12,8 @@ public class TableData {
     private final Columns columns;
     private final Rows rows;
 
-    public TableData(List columnNames) {
-        this(Columns.fromColumnNames(columnNames), new Rows());
+    public TableData(Columns columns) {
+        this(columns, new Rows());
     }
     
     private TableData(Columns columns, Rows rows) {

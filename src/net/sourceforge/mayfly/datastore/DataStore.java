@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.ldbc.*;
+
 import java.sql.*;
 import java.util.*;
 
@@ -16,7 +18,7 @@ public class DataStore {
     }
 
     public DataStore createTable(String table, List columnNames) {
-        return new DataStore(tables.with(table, new TableData(columnNames)));
+        return new DataStore(tables.with(table, new TableData(Columns.fromColumnNames(table, columnNames))));
     }
 
     public DataStore dropTable(String table) throws SQLException {

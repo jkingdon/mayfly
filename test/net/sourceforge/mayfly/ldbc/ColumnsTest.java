@@ -10,10 +10,11 @@ public class ColumnsTest extends TestCase {
         assertEquals(
             new Columns(
                 new L()
-                    .append(new Column("a"))
-                    .append(new Column("b"))
+                    .append(new Column("foo", "a"))
+                    .append(new Column("foo", "b"))
                     .asImmutable()),
             Columns.fromColumnNames(
+                "foo",
                 new L()
                     .append("a")
                     .append("b")

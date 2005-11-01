@@ -13,7 +13,7 @@ public class SelectTest extends TestCase {
             new Select(
                 new What()
                     .add(new AllColumnsFromTable("f"))
-                    .add(new SingleColumnExpression(new Column("b", "name"))),
+                    .add(new SingleColumnExpression("b", "name")),
                 new From()
                     .add(new FromElement("foo", "f"))
                     .add(new FromElement("bar", "b")),
@@ -67,7 +67,7 @@ public class SelectTest extends TestCase {
         assertEquals(
             new Select(
                 new What()
-                    .add(new SingleColumnExpression(new Column("name"))),
+                    .add(new SingleColumnExpression("name")),
                 new From()
                     .add(new FromElement("foo")),
                 Where.EMPTY
@@ -100,6 +100,29 @@ public class SelectTest extends TestCase {
 
         assertEquals(
             store.table("foo").rows().cartesianJoin(store.table("bar").rows()),
+            Select.fromTree(Tree.parse("select * from foo, bar")).executeOn(store)
+        );
+    }
+
+    public void testSmallerJoin() throws Exception {
+        DataStore store =
+            new DataStore()
+                .createTable("foo", new L().append("colA"))
+                .addRow("foo", new L().append("colA"), new L().append("1a"))
+                .createTable("bar", new L().append("colX"))
+                .addRow("bar", new L().append("colX"), new L().append("barXValue"))
+                ;
+
+
+        assertEquals(
+            new Rows(
+                new L()
+                    .append(new Row(new M()
+                            .entry(new Column("bar", "colX"), new Cell("barXValue"))
+                            .entry(new Column("foo", "colA"), new Cell("1a"))
+                            .asImmutable())
+                ).asImmutable()
+            ),
             Select.fromTree(Tree.parse("select * from foo, bar")).executeOn(store)
         );
     }

@@ -30,12 +30,12 @@ public class SingleColumnExpression extends WhatElement implements Transformer {
         }
     }
 
-    public SingleColumnExpression(Column column) {
+    private SingleColumnExpression(Column column) {
         this.column = column;
     }
 
     public SingleColumnExpression(String columnName) {
-        this(new Column(columnName));
+        this(null, columnName);
     }
 
     public SingleColumnExpression(String tableOrAlias, String columnName) {

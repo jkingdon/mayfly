@@ -3,10 +3,6 @@ package net.sourceforge.mayfly.util;
 import org.apache.commons.lang.builder.*;
 
 public class ValueObject {
-    static {
-        ReflectionToStringBuilder.setDefaultStyle(ToStringStyle.MULTI_LINE_STYLE);
-    }
-
     public boolean equals(Object other) {
         return EqualsBuilder.reflectionEquals(this, other);
     }
@@ -16,6 +12,6 @@ public class ValueObject {
     }
 
     public String toString() {
-        return ReflectionToStringBuilder.toString(this);
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
 }
