@@ -24,4 +24,8 @@ public class Cell extends ValueObject {
     public String toString() {
         return content.toString();
     }
+
+    public Object asObject() {
+        return content;
+    }
 }

@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly;
 
-import net.sourceforge.mayfly.util.*;
-
 import java.sql.*;
 import java.util.*;
 
@@ -188,25 +186,6 @@ public class SqlTest extends SqlTestCase {
         assertFalse(correctCase.next());
     }
     
-    public void testSimpleJoin() throws Exception {
-        execute("create table foo (a integer)");
-        execute("create table bar (b integer)");
-        execute("insert into foo (a) values (4)");
-        execute("insert into foo (a) values (5)");
-        execute("insert into bar (b) values (100)");
-        execute("insert into bar (b) values (101)");
-
-        assertResultSet(
-            new String[] {
-                "   4,  100 ",
-                "   4,  101 ",
-                "   5,  100 ",
-                "   5,  101 ",
-            },
-            query("select foo.a, bar.b from foo, bar")
-        );
-    }
-
 
 
     public void testWhereAnd() throws Exception {
@@ -314,27 +293,55 @@ public class SqlTest extends SqlTestCase {
             );
     }
 
-    public void testJoinSameNameTwice() throws Exception {
-        if (CONNECT_TO_MAYFLY) {
-            // Code around aliases, column names, and tables names is pretty far from right.
-            return;
-        }
 
+    public void testSimpleJoin() throws Exception {
+        execute("create table foo (a integer)");
+        execute("create table bar (b integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into bar (b) values (100)");
+        execute("insert into bar (b) values (101)");
+
+        assertResultSet(
+            new String[] {
+                "   4,  100 ",
+                "   4,  101 ",
+                "   5,  100 ",
+                "   5,  101 ",
+            },
+            query("select foo.a, bar.b from foo, bar")
+        );
+    }
+
+    public void testJoinSameNameTwice() throws Exception {
         execute("create table foo (a integer)");
         execute("create table bar (a integer)");
         execute("insert into foo (a) values (4)");
         execute("insert into foo (a) values (5)");
         execute("insert into bar (a) values (100)");
         execute("insert into bar (a) values (101)");
-        ResultSet results = query("select foo.a, bar.a from foo, bar");
-        
-        Set expected = new HashSet();
-        expected.add(L.fromArray(new int[] {4, 100}));
-        expected.add(L.fromArray(new int[] {4, 101}));
-        expected.add(L.fromArray(new int[] {5, 100}));
-        expected.add(L.fromArray(new int[] {5, 101}));
-        
-        assertEquals(expected, intResultsAsSet(results, L.fromArray(new int[] {1, 2})));
+        assertResultSet(
+            new String[] {
+                "   4,  100 ",
+                "   4,  101 ",
+                "   5,  100 ",
+                "   5,  101 ",
+            },
+            query("select foo.a, bar.a from foo, bar")
+        );
+    }
+
+    public void testWhereNeedsTableName() throws Exception {
+        execute("create table foo (a integer)");
+        execute("create table bar (a integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into bar (a) values (100)");
+        execute("insert into bar (a) values (101)");
+
+        assertResultSet(
+            new String[] { "4, 100" },
+            query("select foo.a, bar.a from foo, bar where bar.a = 100")
+        );
     }
 
     public void testColumnNameForWrongTable() throws Exception {
@@ -342,10 +349,7 @@ public class SqlTest extends SqlTestCase {
         execute("CREATE TABLE bar (b INTEGER)");
         expectQueryFailure("select foo.b from foo, bar", "no column foo.b");
 
-        if (!CONNECT_TO_MAYFLY) {
-            // Mayfly's current checking for this case only kicks in once we have a row.
-            expectQueryFailure("select a from foo, bar where bar.A = 5", "no column bar.A");
-        }
+        expectQueryFailure("select a from foo, bar where bar.A = 5", "no column bar.A");
 
         execute("insert into foo (a) values (7)");
         execute("insert into bar (b) values (8)");
@@ -368,37 +372,7 @@ public class SqlTest extends SqlTestCase {
         }
     }
 
-    private void expectQueryFailure(String sql, String expectedMessage) {
-        try {
-            query(sql);
-            fail("Did not find expected exception.\n" +
-                "expected message: " + expectedMessage + "\n" +
-                "command: " + sql + "\n"
-            );
-        } catch (SQLException e) {
-            assertMessage(expectedMessage, e);
-        }
-    }
-    
-    private Set intResultsAsSet(ResultSet results, List columns) throws SQLException {
-        Set actual = new HashSet();
-        while (results.next()) {
-            L row = new L();
-            for (int i = 0; i < columns.size(); i++) {
-                Object column = columns.get(i);
-                if (column instanceof String) {
-                    row.add(results.getInt((String) column));
-                } else {
-                    row.add(results.getInt(((Integer) column).intValue()));
-                }
-            }
-            actual.add(row);
-        }
-        results.close();
-        return actual;
-    }
-
-    public void xtestAlias() throws Exception {
+    public void testAlias() throws Exception {
         execute("create table foo (a integer)");
         execute("insert into foo (a) values (4)");
         execute("insert into foo (a) values (10)");
@@ -410,6 +384,36 @@ public class SqlTest extends SqlTestCase {
         assertFalse(results.next());
     }
 
+    public void testAliasResolvesToCorrectTable() throws Exception {
+        execute("create table foo (a integer)");
+        execute("create table bar (a integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into bar (a) values (100)");
+        execute("insert into bar (a) values (101)");
+
+        assertResultSet(
+            new String[] { "4, 100" },
+            query("select f.a, b.a from foo f, bar b where b.a = 100")
+        );
+    }
+    
+    public void testSelfJoin() throws Exception {
+        execute("create table place (id integer, parent integer, name varchar)");
+        execute("insert into place (id, parent, name) values (1, 0, 'India')");
+        execute("insert into place (id, parent, name) values (10, 1, 'Karnataka')");
+        execute("insert into place (id, parent, name) values (100, 10, 'Bangalore')");
+        assertResultSet(
+            new String[] {
+                "'India', 'Karnataka'",
+                "'Karnataka', 'Bangalore'",
+            },
+            query("select parent.name, child.name from place parent, place child " +
+                "where parent.id = child.parent")
+        );
+    }
+
+
+    
     public void testSimpleIn() throws Exception {
         execute("create table foo (a integer, b integer)");
         execute("insert into foo (a, b) values (1, 1)");
@@ -466,6 +470,18 @@ public class SqlTest extends SqlTestCase {
             query("select b from foo where foo.a in (select c from bar)")
         );
 
+    }
+
+    private void expectQueryFailure(String sql, String expectedMessage) {
+        try {
+            query(sql);
+            fail("Did not find expected exception.\n" +
+                "expected message: " + expectedMessage + "\n" +
+                "command: " + sql + "\n"
+            );
+        } catch (SQLException e) {
+            assertMessage(expectedMessage, e);
+        }
     }
 
 }

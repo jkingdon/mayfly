@@ -44,6 +44,14 @@ public final class MyResultSet extends ResultSetStub {
         return cellFromIndex(oneBasedColumn).asString();
     }
 
+    public Object getObject(String columnName) throws SQLException {
+        return cellFromName(columnName).asObject();
+    }
+
+    public Object getObject(int oneBasedColumn) throws SQLException {
+        return cellFromIndex(oneBasedColumn).asObject();
+    }
+
     private Cell cellFromName(String columnName) throws SQLException {
         return cell(columnFromName(columnName));
     }

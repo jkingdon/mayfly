@@ -76,7 +76,7 @@ public abstract class SqlTestCase extends TestCase {
         }
     }
 
-    private Set objectResultsAsSet(ResultSet rs) throws SQLException {
+    private Set objectResultsAsSet(ResultSet rs, boolean strings) throws SQLException {
         Set actual = new HashSet();
         while (rs.next()) {
             L row = new L();
@@ -85,8 +85,11 @@ public abstract class SqlTestCase extends TestCase {
     
             while (!rowDone) {
                 try {
-                    int i = rs.getInt(col);
-                    row.append(new Integer(i));
+                    if (strings) {
+                        row.append(rs.getString(col));
+                    } else {
+                        row.append(new Integer(rs.getInt(col)));
+                    }
                 } catch (SQLException ex) {
                     rowDone = true;
                 }
@@ -100,6 +103,8 @@ public abstract class SqlTestCase extends TestCase {
     }
 
     protected void assertResultSet(String[] rowsAsStrings, ResultSet rs) throws SQLException {
+        boolean strings = false;
+
         Set expected = new HashSet();
         for (int i = 0; i < rowsAsStrings.length; i++) {
             String rowString = rowsAsStrings[i];
@@ -109,15 +114,17 @@ public abstract class SqlTestCase extends TestCase {
             for (int j = 0; j < cells.length; j++) {
                 String cell = cells[j].trim();
                 if (cell.startsWith("'")) {
-                    row.append(cell.substring(1, cell.length()-1));
+                    strings = true;
+                    row.append(cell.substring(1, cell.length() - 1));
                 } else {
+                    strings = false;
                     row.append(new Integer(Integer.parseInt(cell)));
                 }
             }
             expected.add(row);
         }
     
-        assertEquals(expected, objectResultsAsSet(rs));
+        assertEquals(expected, objectResultsAsSet(rs, strings));
     
     }
     

@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.util.*;
 import org.apache.commons.lang.*;
 import org.ldbc.antlr.*;
@@ -30,7 +31,7 @@ public class Tree implements AST {
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new MayflyException(e);
         }
     }
 

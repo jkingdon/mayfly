@@ -9,7 +9,7 @@ public class AllColumnsFromTable extends WhatElement {
         return new AllColumnsFromTable(dimensionIdentifier);
     }
 
-    private String dimension;
+    /*private*/ String dimension;
 
     public AllColumnsFromTable(String dimension) {
         this.dimension = dimension;

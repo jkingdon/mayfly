@@ -33,6 +33,9 @@ Possible features (beyond those in DESCRIPTION.txt):
         of course we can't assume it would get called.
    (Also check that we don't do anything after calling close() on a statement,
     result set, etc).
+    
+   * Have a limit (typically one if this feature is in use) on the number of result
+     sets per statement, the number of statements per connection, and anything else.
    
  * Enforce "For maximum portability, result set columns within each row should
    be read in left-to-right order, and each column should be read only once."

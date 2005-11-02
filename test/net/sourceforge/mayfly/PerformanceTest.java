@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly;
 
+import java.sql.*;
+
 import net.sourceforge.mayfly.ldbc.*;
 
 public class PerformanceTest extends SqlTestCase {
@@ -19,6 +21,31 @@ public class PerformanceTest extends SqlTestCase {
         dropTables();
         long end = System.currentTimeMillis();
         System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");
+    }
+    
+    public void xtestQueries() throws Exception {
+        // Goal here is to test parsing, per-command overhead, etc, not the time evaluating
+        // complicated joins and wheres.
+        execute("create table foo (a integer, b integer, c integer, d integer, e integer)");
+        execute("insert into foo (a, b, c, d, e) values (1, 2, 3, 4, 5)");
+        execute("insert into foo (a, b, c, d, e) values (10, 20, 30, 40, 50)");
+        execute("insert into foo (a, b, c, d, e) values (100, 200, 300, 400, 500)");
+        long start = System.currentTimeMillis();
+        int rows = 0;
+        int sum = 0;
+        for (int i = 0; i < 1000; ++i) {
+            ResultSet results = query("select a, c, e from foo where e > " + i);
+            while (results.next()) {
+                rows += 1;
+                sum += results.getInt(1);
+            }
+            results.close();
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");
+
+        assertEquals(5 * 3 + 45 * 2 + 450 * 1 + 500 * 0, rows);
+        assertEquals(5 * 111 + 45 * 110 + 450 * 100 + 500 * 0, sum);
     }
 
     private void createTables() throws Exception {

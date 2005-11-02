@@ -47,7 +47,7 @@ public class TableData {
         return new TableData(columns, (Rows) rows.with(newRow));
     }
     
-    public Row dummyRow() {
+    public Rows dummyRows() {
         M columnToCell = new M();
         for (int i = 0; i < columns.size(); ++i) {
             columnToCell.put(
@@ -56,7 +56,7 @@ public class TableData {
             );
         }
 
-        return new Row(columnToCell.asImmutable());
+        return new Rows(new Row(columnToCell.asImmutable()));
     }
 
     public Column findColumn(String columnName) throws SQLException {
