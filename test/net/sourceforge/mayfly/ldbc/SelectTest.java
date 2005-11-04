@@ -85,6 +85,24 @@ public class SelectTest extends TestCase {
             assertEquals("line 1: unexpected token: x", e.getMessage());
         }
     }
+    
+    public void xtestParseExplicitJoin() throws Exception {
+//        System.out.println(Tree.parse(
+//                "select * from places inner join types on type = id"
+//            ).toString());
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new All()),
+                new From()
+                    /*.add(new Join("places" mumble mumble mumble))*/,
+                Where.EMPTY
+            ),
+            Select.fromTree(Tree.parse(
+                "select * from places inner join types on type = id"
+            ))
+        );
+    }
 
     public void testSimpleJoin() throws Exception {
         DataStore store =

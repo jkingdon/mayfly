@@ -73,10 +73,10 @@ public class Select extends ValueObject {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();
-        Rows joinedRows = dummyRows(store, firstTable);
+        Rows joinedRows = firstTable.dummyRows(store);
         while (iterator.hasNext()) {
             FromElement table = (FromElement) iterator.next();
-            joinedRows = (Rows)joinedRows.cartesianJoin(dummyRows(store, table));
+            joinedRows = (Rows)joinedRows.cartesianJoin(table.dummyRows(store));
         }
         if (joinedRows.size() != 1) {
             throw new RuntimeException("internal error: got " + joinedRows.size());
@@ -88,51 +88,13 @@ public class Select extends ValueObject {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();
-        Rows joinedRows = tableContents(store, firstTable);
+        Rows joinedRows = firstTable.tableContents(store);
         while (iterator.hasNext()) {
             FromElement table = (FromElement) iterator.next();
-            joinedRows = (Rows)joinedRows.cartesianJoin(tableContents(store, table));
+            joinedRows = (Rows)joinedRows.cartesianJoin(table.tableContents(store));
         }
 
         return (Rows) joinedRows.select(where);
-    }
-
-    private Rows tableContents(DataStore store, FromElement table) throws SQLException {
-        return applyAlias(table, store.table(table.tableName()).rows());
-    }
-
-    private Rows dummyRows(DataStore store, FromElement table) throws SQLException {
-        return applyAlias(table, store.table(table.tableName()).dummyRows());
-    }
-
-    private Rows applyAlias(FromElement table, Rows storedRows) {
-        if (table.alias() == null) {
-            return storedRows;
-        } else {
-            return applyAlias(table.alias(), storedRows);
-        }
-    }
-
-    private Rows applyAlias(String alias, Rows storedRows) {
-        L rows = new L();
-        for (Iterator iter = storedRows.iterator(); iter.hasNext();) {
-            Row row = (Row) iter.next();
-            rows.add(applyAlias(alias, row));
-        }
-        return new Rows(rows.asImmutable());
-    }
-
-    private Row applyAlias(String alias, Row row) {
-        M columnToCell = new M();
-        for (Iterator iter = row.iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry) iter.next();
-            Column column = (Column) entry.getKey();
-            Cell cell = (Cell) entry.getValue();
-
-            Column newColumn = new Column(alias, column.columnName());
-            columnToCell.put(newColumn, cell);
-        }
-        return new Row(columnToCell.asImmutable());
     }
 
 }

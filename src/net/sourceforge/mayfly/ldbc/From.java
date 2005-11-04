@@ -1,8 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.*;
-
 import net.sourceforge.mayfly.util.*;
+
 import org.ldbc.parser.*;
 
 import java.util.*;
@@ -32,10 +31,6 @@ public class From extends Aggregate {
         return this;
     }
 
-    public L tableNames() {
-        return collect(new GetTableName());
-    }
-
 
     public static From fromSelectTree(Tree selectTree) {
         Tree.Children tables = selectTree.children().ofType(SQLTokenTypes.SELECTED_TABLE);
@@ -54,20 +49,5 @@ public class From extends Aggregate {
     }
 
 
-
-    public static class GetTableName implements Transformer {
-        public Object transform(Object obj) {
-            FromElement f = (FromElement) obj;
-            return f.tableName();
-        }
-    }
-
-    public String singleTableName() {
-        if (dimensions.size() != 1) {
-            throw new UnimplementedException("expected 1 table, got " + dimensions.size());
-        }
-        FromElement dimension = (FromElement) dimensions.get(0);
-        return dimension.tableName();
-    }
 
 }

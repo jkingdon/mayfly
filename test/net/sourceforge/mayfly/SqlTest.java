@@ -412,6 +412,27 @@ public class SqlTest extends SqlTestCase {
         );
     }
 
+    public void xtestExplicitJoin() throws Exception {
+        execute("create table places (name varchar, type integer)");
+        execute("create table types (type integer, name varchar)");
+        execute("insert into places (name, type) values ('London', 1)");
+        execute("insert into places (name, type) values ('France', 2)");
+        execute("insert into places (name, type) values ('Erewhon', 0)");
+        execute("insert into types (name, type) values ('City', 1)");
+        execute("insert into types (name, type) values ('Country', 2)");
+
+        // Are the column names in the ON expression resolved relative only to those two tables?
+        // what other cases?
+
+        assertResultSet(
+            new String[] {
+                " 'London',   'City'    ",
+                " 'France',   'Country' ",
+            },
+            query("select places.name, types.name from places inner join types on places.type = types.type")
+        );
+    }
+
 
     
     public void testSimpleIn() throws Exception {

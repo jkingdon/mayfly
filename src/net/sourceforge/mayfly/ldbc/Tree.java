@@ -2,10 +2,10 @@ package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.util.*;
+
 import org.apache.commons.lang.*;
 import org.ldbc.antlr.*;
 import org.ldbc.antlr.collections.*;
-import org.ldbc.core.*;
 import org.ldbc.parser.*;
 
 import java.io.*;
@@ -23,7 +23,7 @@ public class Tree implements AST {
             SQLParser parser = new SQLParser(lexer);
             parser.statement();
 
-            if (Trace.isDetailed()) {
+            if (false) {
                 DumpASTVisitor visitor2 = new DumpASTVisitor();
                 visitor2.visit(parser.getAST());
             }

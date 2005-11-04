@@ -15,8 +15,4 @@ public class FromTest extends TestCase {
         );
     }
 
-    public void testTableNames() throws Exception {
-        assertEquals("foo", new From.GetTableName().transform(new FromElement("foo")));
-        assertEquals("foo", new From.GetTableName().transform(new FromElement("foo", "f")));
-    }
 }
