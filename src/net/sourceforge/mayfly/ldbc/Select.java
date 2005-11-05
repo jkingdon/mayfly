@@ -91,7 +91,7 @@ public class Select extends ValueObject {
         Rows joinedRows = firstTable.tableContents(store);
         while (iterator.hasNext()) {
             FromElement table = (FromElement) iterator.next();
-            joinedRows = (Rows)joinedRows.cartesianJoin(table.tableContents(store));
+            joinedRows = (Rows) joinedRows.cartesianJoin(table.tableContents(store));
         }
 
         return (Rows) joinedRows.select(where);

@@ -402,7 +402,7 @@ public class SqlTest extends SqlTestCase {
         );
     }
 
-    public void xtestExplicitJoin() throws Exception {
+    public void testExplicitJoin() throws Exception {
         execute("create table places (name varchar, type integer)");
         execute("create table types (type integer, name varchar)");
         execute("insert into places (name, type) values ('London', 1)");
@@ -416,6 +416,7 @@ public class SqlTest extends SqlTestCase {
         // 2b. Nested: from foo inner join bar on x = y inner join baz on y = z
         // 3. Followed by table: from foo inner join bar on x = y, baz
         // 4. from foo, bar outer join baz  => the "left" is bar, not the result of foo cross bar
+        // 5. error down in the ON condition
         // n. what other cases?
 
         assertResultSet(
