@@ -24,7 +24,9 @@ public class Join extends ValueObject implements FromElement {
     }
 
     public Rows dummyRows(DataStore store) throws SQLException {
-        return (Rows) left.dummyRows(store).cartesianJoin(right.dummyRows(store));
+        Rows dummyRows = (Rows) left.dummyRows(store).cartesianJoin(right.dummyRows(store));
+        dummyRows.select(condition);
+        return dummyRows;
     }
 
 }
