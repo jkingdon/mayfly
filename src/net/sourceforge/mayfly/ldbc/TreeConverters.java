@@ -33,7 +33,7 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.SELECTED_TABLE,new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return FromElement.fromSeletedTableTree(from);
+                                                              return FromTable.fromSeletedTableTree(from);
                                                           }
                                                       })
             .register(SQLTokenTypes.CONDITION,     new TreeConverters.Converter() {

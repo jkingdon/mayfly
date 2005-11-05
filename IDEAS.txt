@@ -49,6 +49,9 @@ and have automated tests which can be run against Mayfly):
 
 * others?
 
+* Or on a lighter note, we could always target the SQL implementation of the
+  "99 bottles of beer" song at http://www.99-bottles-of-beer.net/language-sql-865.html
+
 
 Things to document somewhere:
 

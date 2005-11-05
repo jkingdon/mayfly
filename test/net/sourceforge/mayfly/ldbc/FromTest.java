@@ -8,9 +8,9 @@ public class FromTest extends TestCase {
 
         assertEquals(
             new From()
-                .add(new FromElement("foo", "f"))
-                .add(new FromElement("bar", "b"))
-                .add(new FromElement("zzz")),
+                .add(new FromTable("foo", "f"))
+                .add(new FromTable("bar", "b"))
+                .add(new FromTable("zzz")),
             From.fromSelectTree(tree)
         );
     }

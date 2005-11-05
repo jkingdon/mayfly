@@ -40,7 +40,7 @@ public class From extends Aggregate {
         for (Iterator iterator = tables.iterator(); iterator.hasNext();) {
             Tree table = (Tree) iterator.next();
 
-            FromElement fromElement = FromElement.fromSeletedTableTree(table);
+            FromElement fromElement = FromTable.fromSeletedTableTree(table);
 
             elements.add(fromElement);
         }

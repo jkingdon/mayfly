@@ -421,8 +421,12 @@ public class SqlTest extends SqlTestCase {
         execute("insert into types (name, type) values ('City', 1)");
         execute("insert into types (name, type) values ('Country', 2)");
 
-        // Are the column names in the ON expression resolved relative only to those two tables?
-        // what other cases?
+        // 1. Are the column names in the ON expression resolved relative only to those two tables?
+        // 2. Nested: from foo inner join bar inner join baz on x = y on y = z (dangling ON?)
+        // 2b. Nested: from foo inner join bar on x = y inner join baz on y = z
+        // 3. Followed by table: from foo inner join bar on x = y, baz
+        // 4. from foo, bar outer join baz  => the "left" is bar, not the result of foo cross bar
+        // n. what other cases?
 
         assertResultSet(
             new String[] {

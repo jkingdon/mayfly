@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.util.*;
 
 import org.apache.commons.lang.*;
@@ -240,7 +241,31 @@ public class Tree implements AST {
 
         public L convertUsing(final TreeConverters converters, int[] typesToIgnore) {
             Children selected = (Children) select(new AllExceptTypes(typesToIgnore));
-            return selected.collect(new Convert(converters));
+
+            final L results = new L();
+            
+            for (int i = 0; i < selected.size(); i++) {
+                int lookaheadIndex = i + 1;
+                Tree tree = (Tree) selected.element(i);
+
+                if (lookaheadIndex < selected.size()) {
+                    Tree lookahead = (Tree) selected.element(lookaheadIndex);
+                    if (lookahead.getType() == SQLTokenTypes.LITERAL_inner) {
+                        FromElement left = (FromElement) new Convert(converters).transform(tree);
+                        Tree rightTree = (Tree) selected.element(i + 2);
+                        FromElement right = (FromElement) new Convert(converters).transform(rightTree);
+                        Tree conditionTree = (Tree) selected.element(i + 3);
+                        Where condition = (Where) new Convert(converters).transform(conditionTree);
+                        results.add(new Join(left, right, condition));
+                        i += 3;
+                        continue;
+                    }
+                }
+                
+                results.add(new Convert(converters).transform(tree));
+            }
+            
+            return results;
         }
     }
 

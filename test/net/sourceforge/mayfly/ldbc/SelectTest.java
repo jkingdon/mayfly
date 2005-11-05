@@ -15,8 +15,8 @@ public class SelectTest extends TestCase {
                     .add(new AllColumnsFromTable("f"))
                     .add(new SingleColumnExpression("b", "name")),
                 new From()
-                    .add(new FromElement("foo", "f"))
-                    .add(new FromElement("bar", "b")),
+                    .add(new FromTable("foo", "f"))
+                    .add(new FromTable("bar", "b")),
                 new Where(
                     new And(
                         new And(
@@ -54,7 +54,7 @@ public class SelectTest extends TestCase {
                 new What()
                     .add(new All()),
                 new From()
-                    .add(new FromElement("foo")),
+                    .add(new FromTable("foo")),
                 new Where(
                     new Eq(new SingleColumnExpression("a"), new MathematicalInt(5))
                 )
@@ -69,7 +69,7 @@ public class SelectTest extends TestCase {
                 new What()
                     .add(new SingleColumnExpression("name")),
                 new From()
-                    .add(new FromElement("foo")),
+                    .add(new FromTable("foo")),
                 Where.EMPTY
             ),
             Select.fromTree(Tree.parse("select name from foo"))
@@ -86,16 +86,19 @@ public class SelectTest extends TestCase {
         }
     }
     
-    public void xtestParseExplicitJoin() throws Exception {
-//        System.out.println(Tree.parse(
-//                "select * from places inner join types on type = id"
-//            ).toString());
+    public void testParseExplicitJoin() throws Exception {
         assertEquals(
             new Select(
                 new What()
                     .add(new All()),
                 new From()
-                    /*.add(new Join("places" mumble mumble mumble))*/,
+                    .add(new Join(
+                        new FromTable("places"),
+                        new FromTable("types"),
+                        new Where(
+                            new Eq(new SingleColumnExpression("type"), new SingleColumnExpression("id"))
+                        )
+                    )),
                 Where.EMPTY
             ),
             Select.fromTree(Tree.parse(
