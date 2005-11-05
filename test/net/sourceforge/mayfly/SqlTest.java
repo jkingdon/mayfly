@@ -42,22 +42,12 @@ public class SqlTest extends SqlTestCase {
     }
 
     public void testSelectFromBadTable() throws Exception {
-        try {
-            query("select a from foo");
-            fail();
-        } catch (SQLException e) {
-            assertMessage("no such table foo", e);
-        }
+        expectQueryFailure("select a from foo", "no such table foo");
     }
 
     public void testBadColumnName() throws Exception {
         execute("CREATE TABLE FOO (A INTEGER)");
-        try {
-            query("select b from foo");
-            fail();
-        } catch (SQLException e) {
-            assertMessage("no column b", e);
-        }
+        expectQueryFailure("select b from foo", "no column b");
     }
 
     public void testSelect() throws Exception {
