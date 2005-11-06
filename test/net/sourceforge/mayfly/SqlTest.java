@@ -433,7 +433,10 @@ public class SqlTest extends SqlTestCase {
             "ambiguous column type");
     }
 
-    public void testOnNamesResolved() throws Exception {
+    public void testCombineExplicitAndImplicitJoins() throws Exception {
+        // It is useful/common to have a query with both an explicit and
+        // implicit join in it?
+
         execute("create table foo (a integer)");
         execute("create table bar (a integer)");
         execute("create table types (type integer, name varchar)");
@@ -458,6 +461,19 @@ public class SqlTest extends SqlTestCase {
 //                },
 //                query("select foo.a, bar.a from foo, bar inner join types on a = type")
 //            );
+
+        // Which raises the question of whether the ON is really any different from the WHERE.
+        // Hypersonic seems to say no, at least in the following case:
+        // (I would think mayfly should reject this kind of usage, but what does SQL92 and/or
+        // common practice say?)
+        if (!CONNECT_TO_MAYFLY) {
+          assertResultSet(
+              new String[] {
+                  " 5, 9 ",
+              },
+              query("select foo.a, bar.a from bar, foo inner join types on bar.a = type")
+          );
+        }
 
         // LDBC won't parse this
         if (!CONNECT_TO_MAYFLY) {
