@@ -55,15 +55,15 @@ public class DataTypeTest extends SqlTestCase {
             results.close();
         }
 
-//        {
-//            ResultSet results = query("select waist, inseam from foo");
-//            assertTrue(results.next());
-//            // Are these supposed to be Integer? Long? Hypersonic says Integer
-//            assertEquals(new Integer(30), results.getObject(1));
-//            assertEquals(new Integer(32), results.getObject("inseam"));
-//            assertFalse(results.next());
-//            results.close();
-//        }
+        {
+            ResultSet results = query("select waist, inseam from foo");
+            assertTrue(results.next());
+            // Are these supposed to be Integer? Long? Hypersonic says Integer
+            assertEquals(30, ((Number) results.getObject(1)).intValue());
+            assertEquals(32, ((Number) results.getObject("inseam")).intValue());
+            assertFalse(results.next());
+            results.close();
+        }
     }
 
 }
