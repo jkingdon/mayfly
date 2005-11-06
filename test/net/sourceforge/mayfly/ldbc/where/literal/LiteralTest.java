@@ -5,14 +5,13 @@ import net.sourceforge.mayfly.datastore.*;
 
 public class LiteralTest extends TestCase {
     public void testTransform() throws Exception {
-        assertEquals(new Cell("foo"), new MyLiteral().transform("IRL this is a row object but it actually doesnt matter"));
+        assertEquals(
+            new Cell("foo"),
+            new MyLiteral().transform("would be a row object but doesn't matter here")
+        );
     }
 
     class MyLiteral extends Literal {
-        public boolean matchesCell(Cell cell) {
-            return false;
-        }
-
         public Object valueForCellContentComparison() {
             return "foo";
         }

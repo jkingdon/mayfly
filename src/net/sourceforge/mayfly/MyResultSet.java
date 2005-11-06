@@ -10,7 +10,6 @@ public final class MyResultSet extends ResultSetStub {
     private int pos = -1;
 
     private final Rows rows;
-
     private final Columns columns;
 
     public MyResultSet(Columns columns, Rows rows) {
@@ -74,7 +73,8 @@ public final class MyResultSet extends ResultSetStub {
 
     private Cell cell(Column column) throws SQLException {
         Row row = (Row) rows.element(checkedRowNumber());
-        return row.cell(column);
+        Cell cell = row.cell(column);
+        return cell;
     }
 
     private int checkedRowNumber() throws SQLException {
@@ -89,4 +89,5 @@ public final class MyResultSet extends ResultSetStub {
 
     public void close() throws SQLException {
     }
+
 }

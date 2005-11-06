@@ -5,7 +5,9 @@ import net.sourceforge.mayfly.util.*;
 
 public abstract class Literal extends ValueObject implements Transformer {
 
-    public abstract boolean matchesCell(Cell cell);
+    public boolean matchesCell(Cell cell) {
+        return cell.equals(new Cell(valueForCellContentComparison()));
+    }
 
     public Object transform(Object from) {
         return new Cell(valueForCellContentComparison());

@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
-import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 
 public class MathematicalInt extends Literal {
@@ -13,10 +12,6 @@ public class MathematicalInt extends Literal {
 
     public static Literal fromDecimalValueTree(Tree tree) {
         return new MathematicalInt(Integer.parseInt(tree.getFirstChild().getText()));
-    }
-
-    public boolean matchesCell(Cell cell) {
-        return value == cell.asInt();
     }
 
     public Object valueForCellContentComparison() {
