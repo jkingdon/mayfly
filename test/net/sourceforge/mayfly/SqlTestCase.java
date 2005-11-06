@@ -127,5 +127,17 @@ public abstract class SqlTestCase extends TestCase {
         assertEquals(expected, objectResultsAsSet(rs, strings));
     
     }
+
+    protected void expectQueryFailure(String sql, String expectedMessage) {
+        try {
+            query(sql);
+            fail("Did not find expected exception.\n" +
+                "expected message: " + expectedMessage + "\n" +
+                "command: " + sql + "\n"
+            );
+        } catch (SQLException e) {
+            assertMessage(expectedMessage, e);
+        }
+    }
     
 }
