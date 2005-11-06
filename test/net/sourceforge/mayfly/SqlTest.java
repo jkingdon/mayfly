@@ -411,10 +411,8 @@ public class SqlTest extends SqlTestCase {
         execute("insert into types (name, type) values ('City', 1)");
         execute("insert into types (name, type) values ('Country', 2)");
 
-        // 1. Are the column names in the ON expression resolved relative only to those two tables?
-        // 2. Nested: from foo inner join bar inner join baz on x = y on y = z (dangling ON?)
+        // 2. Nested: from foo inner join bar inner join quux on b = q on b = f (dangling ON?)
         // 2b. Nested: from foo inner join bar on x = y inner join baz on y = z
-        // 3. Followed by table: from foo inner join bar on x = y, baz
         // 4. from foo, bar outer join baz  => the "left" is bar, not the result of foo cross bar
         // n. what other cases?
 
@@ -435,6 +433,42 @@ public class SqlTest extends SqlTestCase {
             "ambiguous column type");
     }
 
+    public void testOnNamesResolved() throws Exception {
+        execute("create table foo (a integer)");
+        execute("create table bar (a integer)");
+        execute("create table types (type integer, name varchar)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into bar (a) values (9)");
+        execute("insert into bar (a) values (10)");
+        execute("insert into types (name, type) values ('City', 9)");
+        
+        // Illustrates setup but isn't the point of this test
+        assertResultSet(
+            new String[] {
+                " 9 ",
+            },
+            query("select bar.a from bar inner join types on a = type")
+        );
+
+        // LDBC won't parse this
+        // Hypersonic says column A is ambiguous
+//        assertResultSet(
+//                new String[] {
+//                    " 5, 9 ",
+//                },
+//                query("select foo.a, bar.a from foo, bar inner join types on a = type")
+//            );
+
+        // LDBC won't parse this
+        if (!CONNECT_TO_MAYFLY) {
+            assertResultSet(
+                new String[] {
+                    " 5, 9 ",
+                },
+                query("select foo.a, bar.a from bar inner join types on a = type, foo")
+            );
+        }
+    }
 
     
     public void testSimpleIn() throws Exception {
