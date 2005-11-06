@@ -277,7 +277,7 @@ public class Tree implements AST {
         }
 
         public boolean evaluate(Object candidate) {
-            return ((Tree)candidate).getType()==type;
+            return ((Tree)candidate).getType() == type;
         }
     }
 

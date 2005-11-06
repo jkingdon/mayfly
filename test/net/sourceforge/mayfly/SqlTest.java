@@ -411,8 +411,6 @@ public class SqlTest extends SqlTestCase {
         execute("insert into types (name, type) values ('City', 1)");
         execute("insert into types (name, type) values ('Country', 2)");
 
-        // 2. Nested: from foo inner join bar inner join quux on b = q on b = f (dangling ON?)
-        // 2b. Nested: from foo inner join bar on x = y inner join baz on y = z
         // 4. from foo, bar outer join baz  => the "left" is bar, not the result of foo cross bar
         // n. what other cases?
 
@@ -485,6 +483,34 @@ public class SqlTest extends SqlTestCase {
             );
         }
     }
+    
+    public void testNestedJoins() throws Exception {
+        execute("create table foo (f integer, name varchar)");
+        execute("create table bar (b1 integer, b2 integer)");
+        execute("create table quux (q integer, name varchar)");
+        execute("insert into foo (f, name) values (5, 'FooVal')");
+        execute("insert into foo (f, name) values (7, 'FooDecoy')");
+        execute("insert into bar (b1, b2) values (5, 9)");
+        execute("insert into bar (b1, b2) values (5, 10)");
+        execute("insert into bar (b1, b2) values (4, 9)");
+        execute("insert into quux (q, name) values (9, 'QuuxVal')");
+        execute("insert into quux (q, name) values (8, 'QuuxDecoy')");
+        
+        // Neither LDBC nor Hypersonic parse this.  But the SQL92 grammar seems to allow it (I think)
+//        assertResultSet(
+//            new String[] {" 'FooVal', 'QuuxVal' " },
+//            query("select foo.name, quux.name from foo inner join bar inner join quux on b2 = q on f = b1")
+//        );
+
+        /** We can't currently transform this 
+         * {@link net.sourceforge.mayfly.ldbc.SelectTest#xtestNestedJoins()} */
+        if (!CONNECT_TO_MAYFLY) {
+            assertResultSet(
+                new String[] {" 'FooVal', 'QuuxVal' " },
+                query("select foo.name, quux.name from foo inner join bar on f = b1 inner join quux on b2 = q")
+            );
+        }
+}
 
     
     public void testSimpleIn() throws Exception {

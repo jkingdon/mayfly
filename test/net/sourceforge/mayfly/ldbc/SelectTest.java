@@ -106,8 +106,40 @@ public class SelectTest extends TestCase {
             ))
         );
     }
+    
+    public void xtestNestedJoins() throws Exception {
+        // There's just no sane way to do this currently.  I think the grammar probably has
+        // to be smarter about what groups with what (?)
+        System.out.println(Tree.parse(
+                "select * from foo inner join bar on f = b1 inner join quux on b2 = q"
+            ).toString());
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new All()),
+                new From()
+                    .add(new Join(
+                        new Join(
+                            new FromTable("foo"),
+                            new FromTable("bar"),
+                            new Where(
+                                new Eq(new SingleColumnExpression("f"), new SingleColumnExpression("b1"))
+                            )
+                        ),
+                        new FromTable("types"),
+                        new Where(
+                            new Eq(new SingleColumnExpression("b2"), new SingleColumnExpression("q"))
+                        )
+                    )),
+                Where.EMPTY
+            ),
+            Select.fromTree(Tree.parse(
+                "select * from foo inner join bar on f = b1 inner join quux on b2 = q"
+            ))
+        );
+    }
 
-    public void testSimpleJoin() throws Exception {
+    public void testExecuteSimpleJoin() throws Exception {
         DataStore store =
             new DataStore()
                 .createTable("foo", new L().append("colA").append("colB"))
