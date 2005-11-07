@@ -10,7 +10,7 @@ import net.sf.jsqlparser.schema.*;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.*;
 import net.sf.jsqlparser.statement.drop.*;
-import net.sf.jsqlparser.statement.insert.*;
+import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.jdbc.*;
@@ -151,56 +151,6 @@ public class Database {
             throw new UnimplementedException();
         }
     
-    }
-
-    class MySelectItemVisitor implements SelectItemVisitor {
-        
-        Expression expression;
-
-        public void visit(AllColumns allColumns) {
-            throw new UnimplementedException("no support for SELECT *");
-        }
-
-        public void visit(AllTableColumns allTableColumns) {
-            throw new UnimplementedException("no support for SELECT Table.*");
-        }
-
-        public void visit(SelectExpressionItem selectExpressionItem) {
-            expression = selectExpressionItem.getExpression();
-        }
-
-    }
-
-    class MySelectVisitor implements SelectVisitor {
-        String tableName;
-        PlainSelect plainSelect;
-
-        class MyFromVisitor implements FromItemVisitor {
-            public void visit(Table table) {
-                tableName = table.getName();
-            }
-
-            public void visit(SubSelect subSelect) {
-                throw new UnimplementedException("Subselects not implemented");
-            }
-        }
-
-        public void visit(PlainSelect plainSelect) {
-            List fromItems = plainSelect.getFromItems();
-            if (fromItems.size() != 1) {
-                throw new UnimplementedException("only a single from currently supported in select");
-            }
-            FromItem fromItem = (FromItem) fromItems.get(0);
-            MyFromVisitor fromVisitor = new MyFromVisitor();
-            fromItem.accept(fromVisitor);
-            
-            this.plainSelect = plainSelect;
-        }
-
-        public void visit(Union union) {
-            throw new UnimplementedException("Union selects not implemented");
-        }
-        
     }
 
     class MyItemListVisitor implements ItemsListVisitor {
