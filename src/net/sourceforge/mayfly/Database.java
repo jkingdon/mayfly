@@ -1,21 +1,13 @@
 package net.sourceforge.mayfly;
 
 import net.sf.jsqlparser.*;
-import net.sf.jsqlparser.expression.*;
-import net.sf.jsqlparser.expression.operators.arithmetic.*;
-import net.sf.jsqlparser.expression.operators.conditional.*;
-import net.sf.jsqlparser.expression.operators.relational.*;
 import net.sf.jsqlparser.parser.*;
-import net.sf.jsqlparser.schema.*;
 import net.sf.jsqlparser.statement.Statement;
 import net.sf.jsqlparser.statement.create.table.*;
 import net.sf.jsqlparser.statement.drop.*;
-import net.sf.jsqlparser.statement.insert.Insert;
-import net.sf.jsqlparser.statement.select.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.jdbc.*;
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.Select;
 
 import java.io.*;
 import java.sql.*;
@@ -23,149 +15,15 @@ import java.util.*;
 
 public class Database {
 
-    class MyExpressionVisitor implements ExpressionVisitor {
+    private DataStore dataStore;
 
-        Column column;
-
-        public void visit(NullValue nullValue) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(Function function) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(InverseExpression inverseExpression) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(JdbcParameter jdbcParameter) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(DoubleValue doubleValue) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(LongValue longValue) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(DateValue dateValue) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(TimeValue timeValue) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(TimestampValue timestampValue) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(Parenthesis parenthesis) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(StringValue stringValue) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(Addition addition) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(Division division) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(Multiplication multiplication) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(Subtraction subtraction) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(AndExpression andExpression) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(OrExpression orExpression) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(Between between) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(EqualsTo equalsTo) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(GreaterThan greaterThan) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(GreaterThanEquals greaterThanEquals) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(InExpression inExpression) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(IsNullExpression isNullExpression) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(LikeExpression likeExpression) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(MinorThan minorThan) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(MinorThanEquals minorThanEquals) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(NotEqualsTo notEqualsTo) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(Column tableColumn) {
-            column = tableColumn;   
-        }
-
-        public void visit(SubSelect subSelect) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(CaseExpression caseExpression) {
-            throw new UnimplementedException();
-        }
-
-        public void visit(WhenClause whenClause) {
-            throw new UnimplementedException();
-        }
-    
+    public Database(DataStore store) {
+        dataStore = store;
     }
 
-    class MyItemListVisitor implements ItemsListVisitor {
-        ExpressionList expressions;
-
-        public void visit(SubSelect subSelect) {
-            throw new UnimplementedException("no subselects yet");
-        }
-
-        public void visit(ExpressionList expressionList) {
-            expressions = expressionList;
-        }
+    public Database() {
+        this(new DataStore());
     }
-
-    private DataStore dataStore = new DataStore();
 
     /**
      * Execute an SQL command which does not return results.
@@ -196,10 +54,8 @@ public class Database {
             createTable(createTable.getTable().getName(), 
                     createTable.getColumnDefinitions());
             return 0;
-        } else if (statement instanceof Insert) {
-            Insert insert = (Insert) statement;
-            return insert(insert.getTable().getName(), 
-                    insert.getColumns(), insert.getItemsList(), jdbcParameters);
+        } else if (statement instanceof net.sf.jsqlparser.statement.insert.Insert) {
+            return insert(command, jdbcParameters);
         } else {
             throw new SQLException("unrecognized command for execute: " + command);
         }
@@ -243,45 +99,13 @@ public class Database {
     }
 
 
-    private int insert(String table, List columns, ItemsList itemsList, List jdbcParameters)
-    throws SQLException {
-        Iterator parameterIterator = jdbcParameters.iterator();
-        List columnNames = new ArrayList();
-        List values = new ArrayList();
-        
-        List items = walkList(itemsList);
-        for (int i = 0; i < columns.size(); ++i) {
-            Column column = (Column) columns.get(i);
-
-            Object value = makeCellValue((Expression) items.get(i), parameterIterator);
-
-            columnNames.add(column.getColumnName());
-            values.add(value);
-        }
-        
-        dataStore = dataStore.addRow(table, columnNames, values);
+    private int insert(String command, List jdbcParameters) throws SQLException {
+        Insert insert = Insert.fromTree(Tree.parse(command));
+        insert.substitute(jdbcParameters);
+        dataStore = dataStore.addRow(insert.table(), insert.columns(), insert.values());
         return 1;
     }
 
-    private Object makeCellValue(Expression itemValue, Iterator parameterIterator) {
-        if (itemValue instanceof LongValue) {
-            return new Long(((LongValue) itemValue).getValue());
-        } else if (itemValue instanceof StringValue) {
-            return ((StringValue) itemValue).getNotExcapedValue();
-        } else if (itemValue instanceof JdbcParameter) {
-            return parameterIterator.next();
-        } else {
-            throw new UnimplementedException("Don't know how to deal with expression type " 
-                    + itemValue.getClass().getName());
-        }
-    }
-
-    private List walkList(ItemsList itemsList) {
-        MyItemListVisitor visitor = new MyItemListVisitor();
-        itemsList.accept(visitor);
-        return visitor.expressions.getExpressions();
-    }
-    
     /**
      * Return table names.
      * 

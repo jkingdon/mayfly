@@ -11,9 +11,9 @@ import java.util.*;
 
 public class Insert extends ValueObject {
 
-    /*private*/ final InsertTable table;
-    /*private*/ final List columns;
-    /*private*/ final List values;
+    private final InsertTable table;
+    private final List columns;
+    private final List values;
 
     public Insert(InsertTable table, List columns, List values) {
         this.table = table;
@@ -45,9 +45,17 @@ public class Insert extends ValueObject {
     }
 
     private static Object convertValue(Tree value) {
-        if (value.getType() == SQLTokenTypes.DECIMAL_VALUE) {
+        switch (value.getType()) {
+        case SQLTokenTypes.DECIMAL_VALUE:
             return MathematicalInt.fromDecimalValueTree(value).valueForCellContentComparison();
-        } else {
+
+        case SQLTokenTypes.PARAMETER:
+            return JdbcParameter.INSTANCE;
+
+        case SQLTokenTypes.QUOTED_STRING:
+            return QuotedString.fromQuotedStringTree(value).valueForCellContentComparison();
+
+        default:
             throw new UnimplementedException("Don't know how to convert " + value);
         }
     }
@@ -60,6 +68,30 @@ public class Insert extends ValueObject {
             result.add(column.getText());
         }
         return result;
+    }
+
+    public List columns() {
+        return columns;
+    }
+
+    public String table() {
+        return table.tableName();
+    }
+
+    public List values() {
+        return values;
+    }
+
+    public void substitute(Collection jdbcParameters) {
+        substitute(jdbcParameters.iterator());
+    }
+
+    private void substitute(Iterator jdbcParameters) {
+        for (int i = 0; i < values.size(); ++i) {
+            if (values.get(i) instanceof JdbcParameter) {
+                values.set(i, jdbcParameters.next());
+            }
+        }
     }
 
 }
