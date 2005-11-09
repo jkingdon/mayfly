@@ -15,7 +15,7 @@ public class InsertTest extends TestCase {
                 Arrays.asList(new String[] {"a", "b"}),
                 Arrays.asList(new Object[] {new Long(5), "Value"})
             ),
-            Insert.fromTree(Tree.parse("insert into foo (a, b) values (5, 'Value')"))
+            Insert.insertFromTree(Tree.parse("insert into foo (a, b) values (5, 'Value')"))
         );
     }
     
@@ -26,7 +26,7 @@ public class InsertTest extends TestCase {
                 Collections.singletonList("a"),
                 Collections.singletonList(JdbcParameter.INSTANCE)
             ),
-            Insert.fromTree(Tree.parse("insert into foo (a) values (?)"))
+            Insert.insertFromTree(Tree.parse("insert into foo (a) values (?)"))
         );
     }
     

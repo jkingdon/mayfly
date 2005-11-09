@@ -9,7 +9,7 @@ import org.ldbc.parser.*;
 
 import java.util.*;
 
-public class Insert extends ValueObject {
+public class Insert extends Command {
 
     private final InsertTable table;
     private final List columns;
@@ -21,7 +21,7 @@ public class Insert extends ValueObject {
         this.values = values;
     }
 
-    public static Insert fromTree(Tree tree) {
+    public static Insert insertFromTree(Tree tree) {
         Children children = tree.children();
         Tree tableIdentifier = (Tree) children.element(0);
         Tree columnList = (Tree) children.element(1);

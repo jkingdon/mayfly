@@ -37,9 +37,11 @@ Possible features (beyond those in DESCRIPTION.txt):
    * Have a limit (typically one if this feature is in use) on the number of result
      sets per statement, the number of statements per connection, and anything else.
    
- * Enforce "For maximum portability, result set columns within each row should
-   be read in left-to-right order, and each column should be read only once."
-   in a ResultSet.
+* Enforce "For maximum portability, result set columns within each row should
+  be read in left-to-right order, and each column should be read only once."
+  in a ResultSet.
+
+* VARCHAR(7) -> enforce the length (exception on attempt to store anything longer)
    
 
 Open source projects to serve as acceptance tests (criteria: must use SQL

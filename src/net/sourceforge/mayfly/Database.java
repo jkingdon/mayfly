@@ -47,10 +47,12 @@ public class Database {
     public int execute(String command, List jdbcParameters) throws SQLException {
         Statement statement = parse(command);
         if (statement instanceof Drop) {
-            dataStore = dataStore.dropTable(((Drop)statement).getName());
+            DropTable drop = DropTable.dropTableFromTree(Tree.parse(command));
+            dataStore = dataStore.dropTable(drop.table());
             return 0;
-        } else if (statement instanceof CreateTable) {
-            CreateTable createTable = (CreateTable) statement;
+        } else if (statement instanceof net.sf.jsqlparser.statement.create.table.CreateTable) {
+            net.sf.jsqlparser.statement.create.table.CreateTable createTable =
+                (net.sf.jsqlparser.statement.create.table.CreateTable) statement;
             createTable(createTable.getTable().getName(), 
                     createTable.getColumnDefinitions());
             return 0;
@@ -100,7 +102,7 @@ public class Database {
 
 
     private int insert(String command, List jdbcParameters) throws SQLException {
-        Insert insert = Insert.fromTree(Tree.parse(command));
+        Insert insert = Insert.insertFromTree(Tree.parse(command));
         insert.substitute(jdbcParameters);
         dataStore = dataStore.addRow(insert.table(), insert.columns(), insert.values());
         return 1;
