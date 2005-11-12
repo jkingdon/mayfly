@@ -108,7 +108,7 @@ public class JoinTest extends SqlTestCase {
     }
     
     public void testSelfJoin() throws Exception {
-        execute("create table place (id integer, parent integer, name varchar)");
+        execute("create table place (id integer, parent integer, name varchar(80))");
         execute("insert into place (id, parent, name) values (1, 0, 'India')");
         execute("insert into place (id, parent, name) values (10, 1, 'Karnataka')");
         execute("insert into place (id, parent, name) values (100, 10, 'Bangalore')");
@@ -123,8 +123,8 @@ public class JoinTest extends SqlTestCase {
     }
 
     public void testExplicitJoin() throws Exception {
-        execute("create table places (name varchar, type integer)");
-        execute("create table types (type integer, name varchar)");
+        execute("create table places (name varchar(80), type integer)");
+        execute("create table types (type integer, name varchar(80))");
         execute("insert into places (name, type) values ('London', 1)");
         execute("insert into places (name, type) values ('France', 2)");
         execute("insert into places (name, type) values ('Erewhon', 0)");
@@ -141,8 +141,8 @@ public class JoinTest extends SqlTestCase {
     }
     
     public void testErrorInOnCondition() throws Exception {
-        execute("create table places (name varchar, type integer)");
-        execute("create table types (type integer, name varchar)");
+        execute("create table places (name varchar(80), type integer)");
+        execute("create table types (type integer, name varchar(80))");
         expectQueryFailure(
             "select places.name from places inner join types on type = types.type",
             "ambiguous column type");
@@ -157,7 +157,7 @@ public class JoinTest extends SqlTestCase {
 
         execute("create table foo (a integer)");
         execute("create table bar (a integer)");
-        execute("create table types (type integer, name varchar)");
+        execute("create table types (type integer, name varchar(80))");
         execute("insert into foo (a) values (5)");
         execute("insert into bar (a) values (9)");
         execute("insert into bar (a) values (10)");
@@ -205,9 +205,9 @@ public class JoinTest extends SqlTestCase {
     }
     
     public void testNestedJoins() throws Exception {
-        execute("create table foo (f integer, name varchar)");
+        execute("create table foo (f integer, name varchar(80))");
         execute("create table bar (b1 integer, b2 integer)");
-        execute("create table quux (q integer, name varchar)");
+        execute("create table quux (q integer, name varchar(80))");
         execute("insert into foo (f, name) values (5, 'FooVal')");
         execute("insert into foo (f, name) values (7, 'FooDecoy')");
         execute("insert into bar (b1, b2) values (5, 9)");

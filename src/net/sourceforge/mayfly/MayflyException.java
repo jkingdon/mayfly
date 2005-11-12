@@ -29,8 +29,6 @@ public class MayflyException extends RuntimeException {
     }
 
     public SQLException asSqlException() {
-        // This wrapping isn't really desirable.  It can be avoided by
-        // having a MayflyException create an SQLException inside it.
         return sqlException;
     }
 

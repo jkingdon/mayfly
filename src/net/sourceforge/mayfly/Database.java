@@ -3,7 +3,6 @@ package net.sourceforge.mayfly;
 import net.sf.jsqlparser.*;
 import net.sf.jsqlparser.parser.*;
 import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.create.table.*;
 import net.sf.jsqlparser.statement.drop.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.jdbc.*;
@@ -45,21 +44,23 @@ public class Database {
      * @return Number of rows changed.
      */
     public int execute(String command, List jdbcParameters) throws SQLException {
-        Statement statement = parse(command);
-        if (statement instanceof Drop) {
-            DropTable drop = DropTable.dropTableFromTree(Tree.parse(command));
-            dataStore = dataStore.dropTable(drop.table());
-            return 0;
-        } else if (statement instanceof net.sf.jsqlparser.statement.create.table.CreateTable) {
-            net.sf.jsqlparser.statement.create.table.CreateTable createTable =
-                (net.sf.jsqlparser.statement.create.table.CreateTable) statement;
-            createTable(createTable.getTable().getName(), 
-                    createTable.getColumnDefinitions());
-            return 0;
-        } else if (statement instanceof net.sf.jsqlparser.statement.insert.Insert) {
-            return insert(command, jdbcParameters);
-        } else {
-            throw new SQLException("unrecognized command for execute: " + command);
+        try {
+            Statement statement = parse(command);
+            if (statement instanceof Drop) {
+                DropTable drop = DropTable.dropTableFromTree(Tree.parse(command));
+                dataStore = dataStore.dropTable(drop.table());
+                return 0;
+            } else if (statement instanceof net.sf.jsqlparser.statement.create.table.CreateTable) {
+                CreateTable create = CreateTable.createTableFromTree(Tree.parse(command));
+                dataStore = dataStore.createTable(create.table(), create.columnNames());
+                return 0;
+            } else if (statement instanceof net.sf.jsqlparser.statement.insert.Insert) {
+                return insert(command, jdbcParameters);
+            } else {
+                throw new SQLException("unrecognized command for execute: " + command);
+            }
+        } catch (MayflyException e) {
+            throw e.asSqlException();
         }
     }
 
@@ -81,25 +82,6 @@ public class Database {
             throw (SQLException) new SQLException("cannot parse " + command).initCause(e);
         }
     }
-
-    private void createTable(String table, List columns) throws SQLException {
-        dataStore = dataStore.createTable(table, columnNamesFromDefinitions(columns));
-    }
-
-    private List columnNamesFromDefinitions(List columns) throws SQLException {
-        if (columns == null) {
-            // CREATE TABLE FOO without any columns
-            throw new SQLException("must specify columns on create");
-        }
-
-        List columnNames = new ArrayList();
-        for (Iterator iter = columns.iterator(); iter.hasNext(); ) {
-            ColumnDefinition definition = (ColumnDefinition) iter.next();
-            columnNames.add(definition.getColumnName());
-        }
-        return columnNames;
-    }
-
 
     private int insert(String command, List jdbcParameters) throws SQLException {
         Insert insert = Insert.insertFromTree(Tree.parse(command));

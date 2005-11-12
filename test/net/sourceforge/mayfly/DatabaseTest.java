@@ -14,7 +14,7 @@ public class DatabaseTest extends TestCase {
     }
 
     public void testCreateAndDrop() throws Exception {
-        database.execute("CREATE TABLE FOO (A NUMBER)");
+        database.execute("CREATE TABLE FOO (A integer)");
         assertEquals(Collections.singleton("FOO"), database.tables());
 
         database.execute("DROP TABLE Foo");
@@ -22,13 +22,13 @@ public class DatabaseTest extends TestCase {
     }
     
     public void testCreateWithOneColumn() throws Exception {
-        database.execute("CREATE TABLE Foo (A NUMBER)");
+        database.execute("CREATE TABLE Foo (A integer)");
         assertEquals(Collections.singleton("Foo"), database.tables());
         assertEquals(Collections.singletonList("A"), database.columnNames("fOo"));
     }
     
     public void testInsert() throws Exception {
-        database.execute("CREATE TABLE FOO (A NUMBER)");
+        database.execute("CREATE TABLE FOO (A integer)");
         assertEquals(0, database.rowCount("foo"));
         database.execute("INSERT INTO FOO (A) values (5)");
         assertEquals(1, database.rowCount("foo"));

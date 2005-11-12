@@ -9,7 +9,7 @@ public class JdbcTest extends TestCase {
     public void testPrepareNoParameters() throws Exception {
         Class.forName("net.sourceforge.mayfly.JdbcDriver");
         Connection connection = DriverManager.getConnection("jdbc:mayfly:");
-        PreparedStatement createTable = connection.prepareStatement("CREATE TABLE FOO (a NUMBER)");
+        PreparedStatement createTable = connection.prepareStatement("CREATE TABLE FOO (a integer)");
         assertEquals(0, createTable.executeUpdate());
         createTable.close();
         

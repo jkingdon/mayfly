@@ -18,7 +18,7 @@ public class WhereTest extends SqlTestCase {
     }
     
     public void testWhereIsCaseSensitive() throws Exception {
-        execute("create table foo (a varchar)");
+        execute("create table foo (a varchar(80))");
         execute("insert into foo (a) values ('Foo')");
         ResultSet wrongCase = query("select a from foo where a = 'FOO'");
         assertFalse(wrongCase.next());

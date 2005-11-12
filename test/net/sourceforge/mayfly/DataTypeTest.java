@@ -6,11 +6,11 @@ import java.sql.*;
 public class DataTypeTest extends SqlTestCase {
 
     public void testTypes() throws Exception {
-        execute("create table foo (a integer)");
+        execute("create table foo (a integer, b varchar(5))");
     }
     
     public void testStrings() throws Exception {
-        execute("create table foo (color varchar, size varchar)");
+        execute("create table foo (color varchar(80), size varchar(80))");
         execute("insert into foo (color, size) values ('red', 'medium')");
 
         {
@@ -33,7 +33,7 @@ public class DataTypeTest extends SqlTestCase {
     }
 
     public void testAsciiPunctuation() throws Exception {
-        execute("create table foo (value varchar)");
+        execute("create table foo (value varchar(255))");
         execute("insert into foo (value) values (' !\"#$%&''()*+,-./:;<=>?@[\\]^_`{|}~')");
 
         ResultSet results = query("select value from foo where value = ' !\"#$%&''()*+,-./:;<=>?@[\\]^_`{|}~'");
