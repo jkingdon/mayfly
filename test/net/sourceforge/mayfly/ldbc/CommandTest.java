@@ -17,4 +17,5 @@ public class CommandTest extends TestCase {
             ), 
             Command.fromTree(Tree.parse("insert into foo (a) values (5)")));
     }
+    
 }

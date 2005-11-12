@@ -1,12 +1,14 @@
 package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.Tree.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.util.*;
 
 import org.ldbc.parser.*;
 
+import java.sql.*;
 import java.util.*;
 
 public class Insert extends Command {
@@ -92,6 +94,14 @@ public class Insert extends Command {
                 values.set(i, jdbcParameters.next());
             }
         }
+    }
+
+    public DataStore executeOn(DataStore store) throws SQLException {
+        return store.addRow(table(), columns(), values());
+    }
+
+    public int rowsAffected() {
+        return 1;
     }
 
 }

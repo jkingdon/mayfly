@@ -1,40 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="test">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="src" path="src">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="src/lib/commons-collections-3.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="src/lib/commons-lang-2.1.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" sourcepath="src/lib-src/jsqlparser-0.3.14.jar" path="src/lib/jsqlparser.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" sourcepath="src/lib-src/ldbc.zip" path="src/lib/ldbc.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" path="test/lib/junit.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
-	<classpathentry kind="lib" sourcepath="test/lib-src/hsqldb_1_8_0_2.zip" path="test/lib/hsqldb.jar">
-		<attributes>
-		</attributes>
-	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="src/lib/commons-collections-3.1.jar"/>
+	<classpathentry kind="lib" path="src/lib/commons-lang-2.1.jar"/>
+	<classpathentry kind="lib" sourcepath="src/lib-src/ldbc.zip" path="src/lib/ldbc.jar"/>
+	<classpathentry kind="lib" path="test/lib/junit.jar"/>
+	<classpathentry kind="lib" sourcepath="test/lib-src/hsqldb_1_8_0_2.zip" path="test/lib/hsqldb.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

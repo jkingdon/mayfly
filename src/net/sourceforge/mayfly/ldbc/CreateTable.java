@@ -1,9 +1,11 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
 import org.ldbc.parser.*;
 
+import java.sql.*;
 import java.util.*;
 
 public class CreateTable extends Command {
@@ -38,6 +40,17 @@ public class CreateTable extends Command {
 
     public List columnNames() {
         return columnNames;
+    }
+
+    public void substitute(Collection jdbcParameters) throws SQLException {
+    }
+
+    public DataStore executeOn(DataStore store) throws SQLException {
+        return store.createTable(table(), columnNames());
+    }
+
+    public int rowsAffected() {
+        return 0;
     }
 
 }

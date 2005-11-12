@@ -2,12 +2,11 @@ package net.sourceforge.mayfly;
 import java.sql.*;
 
 /**
- * This is suitable for errors which we don't think will
- * make it out of mayfly itself.
+ * For errors which we don't think will
+ * make it out of mayfly itself, we can use this exception, or
+ * RuntimeException, or IllegalArgumentException (etc).
  * 
- * We also might want to replace SQLException with MayflyException
- * internally, and only unwrap them at the JDBC level (keeping
- * MayflyException at the Database level).  To be determined...
+ * Otherwise, MayflyException turns into SQLException.
  */
 public class MayflyException extends RuntimeException {
     
@@ -25,7 +24,7 @@ public class MayflyException extends RuntimeException {
 
     public MayflyException(Throwable cause) {
         super(cause);
-        sqlException = (SQLException) new SQLException().initCause(cause);
+        sqlException = (SQLException) new SQLException(cause.getMessage()).initCause(cause);
     }
 
     public SQLException asSqlException() {

@@ -9,7 +9,7 @@ public class SyntaxTest extends SqlTestCase {
             execute("PICK NOSE");
             fail();
         } catch (SQLException expected) {
-            assertMessage("cannot parse PICK NOSE", expected);
+            assertMessage("unexpected token: PICK", expected);
         }
     }
 
