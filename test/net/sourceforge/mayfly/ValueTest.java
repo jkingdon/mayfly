@@ -130,4 +130,20 @@ public class ValueTest extends SqlTestCase {
 
     }
     
+    public void testSelectExpression() throws Exception {
+        if (CONNECT_TO_MAYFLY) {
+            /** This turns out to be hard.  The fact that the {@link MyResultSet} takes
+             * a {@link net.sourceforge.mayfly.ldbc.Columns}, which is a collection of
+             * {@link net.sourceforge.mayfly.ldbc.what.Column} (rather than
+             * {@link net.sourceforge.mayfly.ldbc.what.WhatElement} or some such), would
+             * need to be changed to make this work.
+             */ 
+            return;
+        }
+
+        execute("create table foo (dummy integer)");
+        execute("insert into foo(dummy) values(5)");
+        assertResultSet(new String[] {"5"}, query("select 5 from foo"));
+    }
+
 }

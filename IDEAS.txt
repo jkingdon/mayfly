@@ -52,7 +52,13 @@ and have automated tests which can be run against Mayfly):
 * others?
 
 * Or on a lighter note, we could always target the SQL implementation of the
-  "99 bottles of beer" song at http://www.99-bottles-of-beer.net/language-sql-865.html
+  "99 bottles of beer" song at 
+  http://www.99-bottles-of-beer.net/language-sql-865.html
+
+* An example schema is at
+  http://cvs.open-bio.org/cgi-bin/viewcvs/viewcvs.cgi/biosql-schema/sql/?cvsroot=biosql
+  but they just seem to have libraries which use it, not tests or 
+  even a full fledged application
 
 
 Things to document somewhere:

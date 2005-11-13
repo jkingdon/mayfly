@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.ldbc.where;
 
+import java.util.*;
+
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -22,6 +24,10 @@ public class Not extends BooleanExpression {
 
     public int parameterCount() {
         return operand.parameterCount();
+    }
+
+    public void substitute(Iterator jdbcParameters) {
+        operand.substitute(jdbcParameters);
     }
 
 }

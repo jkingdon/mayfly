@@ -100,6 +100,9 @@ public class Select extends Command {
     }
 
     public void substitute(Collection jdbcParameters) throws SQLException {
+        Iterator iter = jdbcParameters.iterator();
+        what.substitute(iter);
+        where.substitute(iter);
     }
 
     public int parameterCount() {

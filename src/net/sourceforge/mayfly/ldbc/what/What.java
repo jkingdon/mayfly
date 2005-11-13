@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.util.*;
 
 import java.sql.*;
@@ -49,6 +50,14 @@ public class What extends Aggregate {
             }
         }
         return count;
+    }
+
+    public void substitute(Iterator jdbcParameters) {
+        for (int i = 0; i < elements.size(); ++i) {
+            if (elements.get(i) instanceof JdbcParameter) {
+                elements.set(i, Literal.fromValue(jdbcParameters.next()));
+            }
+        }
     }
 
 }

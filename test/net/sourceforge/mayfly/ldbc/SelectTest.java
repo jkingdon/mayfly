@@ -2,13 +2,13 @@ package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
 
-import java.sql.*;
-
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
+
+import java.sql.*;
 
 public class SelectTest extends TestCase {
     public void testGrandParseIntegration() throws Exception {
@@ -79,6 +79,19 @@ public class SelectTest extends TestCase {
         );
     }
 
+    public void testParseSelectExpression() throws Exception {
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new MathematicalInt(5)),
+                new From()
+                    .add(new FromTable("foo")),
+                Where.EMPTY
+            ),
+            Select.selectFromTree(Tree.parse("select 5 from foo"))
+        );
+    }
+
     public void testParseJdbcParameter() throws Exception {
         assertEquals(
             new Select(
@@ -92,7 +105,6 @@ public class SelectTest extends TestCase {
             ),
             Select.selectFromTree(Tree.parse("select ? from foo where a = ?"))
         );
-        
     }
 
     public void testParameterCount() throws Exception {
@@ -103,6 +115,66 @@ public class SelectTest extends TestCase {
 
     private void checkParameterCount(int expected, String sql) throws SQLException {
         assertEquals(expected, Select.selectFromTree(Tree.parse(sql)).parameterCount());
+    }
+    
+    public void testSubstituteMultipleValues() throws Exception {
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new MathematicalInt(5)),
+                new From()
+                    .add(new FromTable("foo")),
+                new Where(
+                    new And(
+                        new Or(
+                            new Eq(
+                                new SingleColumnExpression("a"),
+                                new MathematicalInt(6)
+                            ),
+                            new Not(
+                                new Eq(
+                                    new MathematicalInt(7),
+                                    new SingleColumnExpression("b")
+                                )
+                            )
+                        ),
+                        new Gt(
+                            new MathematicalInt(8),
+                            new SingleColumnExpression("c")
+                        )
+                    )
+                )
+            ),
+            substitute("select ? from foo where (a = ? or ? != b) and c < ?")
+        );
+    }
+
+    public void testSubstituteIn() throws Exception {
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new SingleColumnExpression("a")),
+                new From()
+                    .add(new FromTable("foo")),
+                new Where(
+                    new In(
+                        new MathematicalInt(5),
+                        L.fromArray(new Object[] {
+                            new MathematicalInt(6),
+                            new MathematicalInt(3),
+                            new MathematicalInt(7)
+                        })
+                    )
+                )
+            ),
+            substitute("select a from foo where ? in (?, 3, ?)")
+        );
+    }
+
+    private Command substitute(String sql) throws SQLException {
+        Command command = Command.fromTree(Tree.parse(sql));
+        command.substitute(L.fromArray(new int[] { 5, 6, 7, 8 }));
+        return command;
     }
 
     // Evidently, X is reserved to ldbc (but not jsqlparser)

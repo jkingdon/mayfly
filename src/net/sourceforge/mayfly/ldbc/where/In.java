@@ -9,8 +9,8 @@ import java.util.*;
 
 public class In extends BooleanExpression {
 
-    private final Transformer leftSide;
-	private final List list;
+    private Transformer leftSide;
+	private List list;
 
 	public static In fromInTree(Tree inTree, TreeConverters converters) {
         L converted = inTree.children().convertUsing(converters);
@@ -44,6 +44,13 @@ public class In extends BooleanExpression {
             listCount += parameterCount((Transformer) list.get(i));
         }
         return parameterCount(leftSide) + listCount;
+    }
+
+    public void substitute(Iterator jdbcParameters) {
+        leftSide = substitute(leftSide, jdbcParameters);
+        for (int i = 0; i < list.size(); ++i) {
+            list.set(i, substitute((Transformer) list.get(i), jdbcParameters));
+        }
     }
 
 }

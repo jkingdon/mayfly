@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.Tree.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -24,7 +23,7 @@ public class Insert extends Command {
     }
 
     public static Insert insertFromTree(Tree tree) {
-        Children children = tree.children();
+        Tree.Children children = tree.children();
         Tree tableIdentifier = (Tree) children.element(0);
         Tree columnList = (Tree) children.element(1);
         Tree values = (Tree) children.element(2);

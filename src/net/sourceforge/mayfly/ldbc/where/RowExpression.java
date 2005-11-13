@@ -3,6 +3,8 @@ package net.sourceforge.mayfly.ldbc.where;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
+import java.util.*;
+
 abstract public class RowExpression extends BooleanExpression {
 
     private Transformer leftSide;
@@ -23,6 +25,11 @@ abstract public class RowExpression extends BooleanExpression {
 
     public int parameterCount() {
         return parameterCount(leftSide) + parameterCount(rightSide);
+    }
+
+    public void substitute(Iterator jdbcParameters) {
+        leftSide = substitute(leftSide, jdbcParameters);
+        rightSide = substitute(rightSide, jdbcParameters);
     }
 
 }

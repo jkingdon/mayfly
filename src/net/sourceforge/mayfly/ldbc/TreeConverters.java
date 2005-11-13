@@ -23,7 +23,7 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.SELECT_ITEM,    new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return WhatElement.fromExpressionTree(from);
+                                                              return WhatElement.fromSelectItemTree(from);
                                                           }
                                                       })
             .register(SQLTokenTypes.ASTERISK,       new TreeConverters.Converter() {
@@ -92,7 +92,7 @@ public class TreeConverters {
             })
             .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return WhatElement.fromColumnTree(from);
+                                                              return WhatElement.fromExpressionTree(from);
                                                           }
                                                       })
             .register(SQLTokenTypes.PARAMETER,       new TreeConverters.Converter() {

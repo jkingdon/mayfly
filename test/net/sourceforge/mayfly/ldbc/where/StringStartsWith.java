@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.ldbc.where;
 
+import java.util.*;
+
 import net.sourceforge.mayfly.*;
 
 public class StringStartsWith extends BooleanExpression {
@@ -14,6 +16,10 @@ public class StringStartsWith extends BooleanExpression {
     }
 
     public int parameterCount() {
+        throw new UnimplementedException();
+    }
+
+    public void substitute(Iterator jdbcParameters) {
         throw new UnimplementedException();
     }
 

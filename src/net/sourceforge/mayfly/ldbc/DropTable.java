@@ -4,12 +4,11 @@ import java.sql.*;
 import java.util.*;
 
 import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.Tree.*;
 
 public class DropTable extends Command {
 
     public static DropTable dropTableFromTree(Tree tree) {
-        Children children = tree.children();
+        Tree.Children children = tree.children();
         Tree tableIdentifier = (Tree) children.element(0);
         return new DropTable(tableIdentifier.getText());
     }
