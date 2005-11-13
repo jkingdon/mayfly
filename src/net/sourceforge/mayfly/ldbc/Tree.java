@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -11,13 +10,14 @@ import org.ldbc.parser.*;
 
 import java.io.*;
 import java.lang.reflect.*;
+import java.sql.*;
 import java.util.*;
 import java.util.List;
 
 public class Tree implements AST {
 
 
-    public static Tree parse(String sql) {
+    public static Tree parse(String sql) throws SQLException {
         try {
             StringReader in = new StringReader(sql);
             SQLLexer lexer = new SQLLexer(in);
@@ -29,10 +29,10 @@ public class Tree implements AST {
                 visitor2.visit(parser.getAST());
             }
             return new Tree(parser.getAST());
-        } catch (RuntimeException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new MayflyException(e);
+        } catch (ANTLRException e) {
+            // Do we want to report the text we were parsing, or line/column numbers?
+            // Is there anything interesting about e other than its message (like its class?)
+            throw new SQLException(e.getMessage());
         }
     }
 

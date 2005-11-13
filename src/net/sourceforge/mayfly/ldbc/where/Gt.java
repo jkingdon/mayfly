@@ -1,11 +1,10 @@
 package net.sourceforge.mayfly.ldbc.where;
 
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
-import net.sourceforge.mayfly.datastore.*;
 
 public class Gt extends RowExpression {
-
 
     public static Gt fromBiggerTree(Tree gtTree, TreeConverters treeConverters) {
         L both = gtTree.children().convertUsing(treeConverters);
@@ -27,4 +26,5 @@ public class Gt extends RowExpression {
     protected boolean compare(Cell leftSide, Cell rightSide) {
         return leftSide.asLong() > rightSide.asLong();
     }
+
 }

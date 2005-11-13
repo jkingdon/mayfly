@@ -45,11 +45,15 @@ public class CreateTable extends Command {
     public void substitute(Collection jdbcParameters) throws SQLException {
     }
 
-    public DataStore executeOn(DataStore store) throws SQLException {
+    public DataStore update(DataStore store) throws SQLException {
         return store.createTable(table(), columnNames());
     }
 
     public int rowsAffected() {
+        return 0;
+    }
+
+    public int parameterCount() {
         return 0;
     }
 

@@ -96,12 +96,22 @@ public class Insert extends Command {
         }
     }
 
-    public DataStore executeOn(DataStore store) throws SQLException {
+    public DataStore update(DataStore store) throws SQLException {
         return store.addRow(table(), columns(), values());
     }
 
     public int rowsAffected() {
         return 1;
+    }
+    
+    public int parameterCount() {
+        int count = 0;
+        for (int i = 0; i < values().size(); ++i) {
+            if (values.get(i) instanceof JdbcParameter) {
+                ++count;
+            }
+        }
+        return count;
     }
 
 }

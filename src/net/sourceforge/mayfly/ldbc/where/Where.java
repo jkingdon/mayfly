@@ -1,26 +1,28 @@
 package net.sourceforge.mayfly.ldbc.where;
 
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.util.*;
 
-public class Where extends ValueObject implements Selector {
+public class Where extends BooleanExpression {
 
-    public static final Where EMPTY = new Where(Selector.ALWAYS_TRUE);
+    public static final Where EMPTY = new Where(BooleanExpression.TRUE);
 
     public static Where fromConditionTree(Tree t) {
-        return new Where((Selector) TreeConverters.forWhereTree().transform(new Tree(t.getFirstChild())));
+        return new Where((BooleanExpression) TreeConverters.forWhereTree().transform(new Tree(t.getFirstChild())));
     }
 
 
-    private Selector expression = Selector.ALWAYS_TRUE;
+    private BooleanExpression expression = BooleanExpression.TRUE;
 
-
-    public Where(Selector expression) {
+    public Where(BooleanExpression expression) {
         this.expression = expression;
     }
 
     public boolean evaluate(Object candidate) {
         return expression.evaluate(candidate);
+    }
+
+    public int parameterCount() {
+        return expression.parameterCount();
     }
 
 

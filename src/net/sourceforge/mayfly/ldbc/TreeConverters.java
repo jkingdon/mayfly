@@ -13,7 +13,7 @@ public class TreeConverters {
         return new TreeConverters()
             .register(SQLTokenTypes.SELECT,         new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return Select.fromTree(from);
+                                                              return Select.selectFromTree(from);
                                                           }
                                                       })
             .register(SQLTokenTypes.TABLE_ASTERISK, new TreeConverters.Converter() {
@@ -23,7 +23,7 @@ public class TreeConverters {
                                                       })
             .register(SQLTokenTypes.SELECT_ITEM,    new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return SingleColumnExpression.fromExpressionTree(from);
+                                                              return WhatElement.fromExpressionTree(from);
                                                           }
                                                       })
             .register(SQLTokenTypes.ASTERISK,       new TreeConverters.Converter() {
@@ -92,7 +92,12 @@ public class TreeConverters {
             })
             .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return SingleColumnExpression.fromColumnTree(from);
+                                                              return WhatElement.fromColumnTree(from);
+                                                          }
+                                                      })
+            .register(SQLTokenTypes.PARAMETER,       new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return JdbcParameter.INSTANCE;
                                                           }
                                                       })
             .register(SQLTokenTypes.QUOTED_STRING, new TreeConverters.Converter() {

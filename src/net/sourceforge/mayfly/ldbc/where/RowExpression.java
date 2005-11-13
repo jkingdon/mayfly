@@ -1,9 +1,9 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import net.sourceforge.mayfly.util.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.util.*;
 
-abstract public class RowExpression extends ValueObject implements Selector {
+abstract public class RowExpression extends BooleanExpression {
 
     private Transformer leftSide;
     private Transformer rightSide;
@@ -16,8 +16,13 @@ abstract public class RowExpression extends ValueObject implements Selector {
     public boolean evaluate(Object candidate) {
         Row row = (Row) candidate;
 
-        return compare((Cell)leftSide.transform(row), (Cell) rightSide.transform(row));
+        return compare((Cell) leftSide.transform(row), (Cell) rightSide.transform(row));
     }
 
     abstract protected boolean compare(Cell leftSide, Cell rightSide);
+
+    public int parameterCount() {
+        return parameterCount(leftSide) + parameterCount(rightSide);
+    }
+
 }

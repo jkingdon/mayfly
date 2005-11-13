@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
 
-public class In extends ValueObject implements Selector {
+public class In extends BooleanExpression {
 
     private final Transformer leftSide;
 	private final List list;
@@ -37,5 +37,13 @@ public class In extends ValueObject implements Selector {
 		}
 		return false;
 	}
+
+    public int parameterCount() {
+        int listCount = 0;
+        for (int i = 0; i < list.size(); ++i) {
+            listCount += parameterCount((Transformer) list.get(i));
+        }
+        return parameterCount(leftSide) + listCount;
+    }
 
 }

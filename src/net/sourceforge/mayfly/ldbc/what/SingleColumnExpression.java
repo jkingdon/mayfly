@@ -4,31 +4,8 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
-import org.ldbc.antlr.collections.*;
-
 public class SingleColumnExpression extends WhatElement implements Transformer {
     private Column column;
-
-    public static SingleColumnExpression fromExpressionTree(Tree t) {
-        AST expression = t.getFirstChild();
-
-        Tree column = new Tree(expression.getFirstChild());
-        return fromColumnTree(column);
-    }
-
-    public static SingleColumnExpression fromColumnTree(Tree column) {
-        AST firstIdentifier = column.getFirstChild();
-        AST secondIdentifier = firstIdentifier.getNextSibling();
-        
-        if (secondIdentifier == null) {
-            String columnName = firstIdentifier.getText();
-            return new SingleColumnExpression(columnName);
-        } else {
-            String tableOrAlias = firstIdentifier.getText();
-            String columnName = secondIdentifier.getText();
-            return new SingleColumnExpression(tableOrAlias, columnName);
-        }
-    }
 
     private SingleColumnExpression(Column column) {
         this.column = column;

@@ -19,6 +19,8 @@ public abstract class Command extends ValueObject {
             return CreateTable.createTableFromTree(tree);
         case SQLTokenTypes.INSERT:
             return Insert.insertFromTree(tree);
+        case SQLTokenTypes.SELECT:
+            return Select.selectFromTree(tree);
         default:
             throw new UnimplementedException("Unrecognized command " + tree);
         }
@@ -26,8 +28,10 @@ public abstract class Command extends ValueObject {
     
     abstract public void substitute(Collection jdbcParameters) throws SQLException;
 
-    abstract public DataStore executeOn(DataStore store) throws SQLException;
+    abstract public int parameterCount();
+    
+    abstract public DataStore update(DataStore store) throws SQLException;
 
     abstract public int rowsAffected();
-    
+
 }

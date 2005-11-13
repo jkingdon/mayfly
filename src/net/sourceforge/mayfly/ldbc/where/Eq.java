@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
 public class Eq extends RowExpression {
+
     public static Eq fromEqualTree(Tree equalTree, TreeConverters treeConverters) {
         L both = equalTree.children().convertUsing(treeConverters);
 
@@ -18,6 +19,5 @@ public class Eq extends RowExpression {
     protected boolean compare(Cell leftSide, Cell rightSide) {
         return leftSide.equals(rightSide);
     }
-
 
 }

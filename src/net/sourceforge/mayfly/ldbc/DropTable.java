@@ -27,11 +27,15 @@ public class DropTable extends Command {
     public void substitute(Collection jdbcParameters) {
     }
 
-    public DataStore executeOn(DataStore store) throws SQLException {
+    public DataStore update(DataStore store) throws SQLException {
         return store.dropTable(table());
     }
 
     public int rowsAffected() {
+        return 0;
+    }
+
+    public int parameterCount() {
         return 0;
     }
 

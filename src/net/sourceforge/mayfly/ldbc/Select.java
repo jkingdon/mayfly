@@ -11,9 +11,11 @@ import org.ldbc.parser.*;
 import java.sql.*;
 import java.util.*;
 
-public class Select extends ValueObject {
+public class Select extends Command {
 
-    public static Select fromTree(Tree selectTree) {
+    private static final String UPDATE_MESSAGE = "SELECT is only available with query, not update";
+
+    public static Select selectFromTree(Tree selectTree) {
 
         int[] typesToIgnore = new int[]{SQLTokenTypes.COMMA};
 
@@ -52,7 +54,7 @@ public class Select extends ValueObject {
         try {
             Columns columns = what.selectedColumns();
             checkColumns(store, columns);
-            return new MyResultSet(columns, executeOn(store));
+            return new MyResultSet(columns, query(store));
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
@@ -84,7 +86,7 @@ public class Select extends ValueObject {
         return (Row) joinedRows.element(0);
     }
 
-    public Rows executeOn(DataStore store) throws SQLException {
+    public Rows query(DataStore store) throws SQLException {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();
@@ -95,6 +97,21 @@ public class Select extends ValueObject {
         }
 
         return (Rows) joinedRows.select(where);
+    }
+
+    public void substitute(Collection jdbcParameters) throws SQLException {
+    }
+
+    public int parameterCount() {
+        return what.parameterCount() + where.parameterCount();
+    }
+
+    public DataStore update(DataStore store) throws SQLException {
+        throw new UnimplementedException(UPDATE_MESSAGE);
+    }
+
+    public int rowsAffected() {
+        throw new UnimplementedException(UPDATE_MESSAGE);
     }
 
 }

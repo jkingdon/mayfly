@@ -1,6 +1,9 @@
 package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
+
+import java.sql.*;
+
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
@@ -30,8 +33,8 @@ public class SelectTest extends TestCase {
                         new Or(
                             new Eq(new SingleColumnExpression("color"), new QuotedString("'red'")),
                             new And(
-                                new NotEq(new SingleColumnExpression("day"), new MathematicalInt(7)),
-                                new NotEq(new SingleColumnExpression("day"), new MathematicalInt(6))
+                                new Not(new Eq(new SingleColumnExpression("day"), new MathematicalInt(7))),
+                                new Not(new Eq(new SingleColumnExpression("day"), new MathematicalInt(6)))
                             )
 
                         )
@@ -39,7 +42,7 @@ public class SelectTest extends TestCase {
 
                 )
             ),
-            Select.fromTree(Tree.parse("select f.*, b.name from foo f, bar b " +
+            Select.selectFromTree(Tree.parse("select f.*, b.name from foo f, bar b " +
                                        "where (f.name='steve' and " +
                                                 " (size = 4 or 6 >size ) ) " +
                                              " and " +
@@ -59,7 +62,7 @@ public class SelectTest extends TestCase {
                     new Eq(new SingleColumnExpression("a"), new MathematicalInt(5))
                 )
             ),
-            Select.fromTree(Tree.parse("select * from foo where a = 5"))
+            Select.selectFromTree(Tree.parse("select * from foo where a = 5"))
         );
     }
 
@@ -72,17 +75,43 @@ public class SelectTest extends TestCase {
                     .add(new FromTable("foo")),
                 Where.EMPTY
             ),
-            Select.fromTree(Tree.parse("select name from foo"))
+            Select.selectFromTree(Tree.parse("select name from foo"))
         );
+    }
+
+    public void testParseJdbcParameter() throws Exception {
+        assertEquals(
+            new Select(
+                new What()
+                    .add(JdbcParameter.INSTANCE),
+                new From()
+                    .add(new FromTable("foo")),
+                new Where(
+                    new Eq(new SingleColumnExpression("a"), JdbcParameter.INSTANCE)
+                )
+            ),
+            Select.selectFromTree(Tree.parse("select ? from foo where a = ?"))
+        );
+        
+    }
+
+    public void testParameterCount() throws Exception {
+        checkParameterCount(2, "select ? from foo where a = ?");
+        checkParameterCount(3, "select a from foo where (? = b or ? != c) and a > ?");
+        checkParameterCount(2, "select a from foo where ? IN (1, ?, 5)");
+    }
+
+    private void checkParameterCount(int expected, String sql) throws SQLException {
+        assertEquals(expected, Select.selectFromTree(Tree.parse(sql)).parameterCount());
     }
 
     // Evidently, X is reserved to ldbc (but not jsqlparser)
     public void testX() throws Exception {
         try {
-            Select.fromTree(Tree.parse("select x from foo"));
+            Select.selectFromTree(Tree.parse("select x from foo"));
             fail();
-        } catch (RuntimeException e) {
-            assertEquals("line 1: unexpected token: x", e.getMessage());
+        } catch (SQLException e) {
+            assertEquals("unexpected token: x", e.getMessage());
         }
     }
     
@@ -101,7 +130,7 @@ public class SelectTest extends TestCase {
                     )),
                 Where.EMPTY
             ),
-            Select.fromTree(Tree.parse(
+            Select.selectFromTree(Tree.parse(
                 "select * from places inner join types on type = id"
             ))
         );
@@ -133,7 +162,7 @@ public class SelectTest extends TestCase {
                     )),
                 Where.EMPTY
             ),
-            Select.fromTree(Tree.parse(
+            Select.selectFromTree(Tree.parse(
                 "select * from foo inner join bar on f = b1 inner join quux on b2 = q"
             ))
         );
@@ -153,7 +182,7 @@ public class SelectTest extends TestCase {
 
         assertEquals(
             store.table("foo").rows().cartesianJoin(store.table("bar").rows()),
-            Select.fromTree(Tree.parse("select * from foo, bar")).executeOn(store)
+            Select.selectFromTree(Tree.parse("select * from foo, bar")).query(store)
         );
     }
 
@@ -176,7 +205,7 @@ public class SelectTest extends TestCase {
                             .asImmutable())
                 ).asImmutable()
             ),
-            Select.fromTree(Tree.parse("select * from foo, bar")).executeOn(store)
+            Select.selectFromTree(Tree.parse("select * from foo, bar")).query(store)
         );
     }
 
@@ -190,7 +219,7 @@ public class SelectTest extends TestCase {
 
         assertEquals(
             store.table("foo").rows().elements(new int[]{1, 2}),
-            Select.fromTree(Tree.parse("select * from foo where colB = 'xx'")).executeOn(store)
+            Select.selectFromTree(Tree.parse("select * from foo where colB = 'xx'")).query(store)
         );
     }
 

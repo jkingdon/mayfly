@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.jdbc;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.ldbc.*;
 
 import java.io.*;
 import java.math.*;
@@ -13,15 +14,19 @@ public class JdbcPreparedStatement implements PreparedStatement {
     private final String command;
     private Database database;
     private Vector parameters;
+    private int parameterCount;
 
-    JdbcPreparedStatement(String sql, Database database) {
+    JdbcPreparedStatement(String sql, Database database) throws SQLException {
         this.command = sql;
         this.database = database;
         this.parameters = new Vector();
+        parameterCount = Command.fromTree(Tree.parse(sql)).parameterCount();;
     }
 
     public ResultSet executeQuery() throws SQLException {
-        return database.query(command);
+        Select select = Select.selectFromTree(Tree.parse(command));
+        select.substitute(parameters);
+        return database.query(select);
     }
 
     public int executeUpdate() throws SQLException {
@@ -48,8 +53,17 @@ public class JdbcPreparedStatement implements PreparedStatement {
         setParameter(oneBased, new Long(value));
     }
 
-    private void setParameter(int oneBasedParameterIndex, Object value) {
+    private void setParameter(int oneBasedParameterIndex, Object value) throws SQLException {
         int zeroBased = oneBasedParameterIndex - 1;
+
+        if (zeroBased < 0) {
+            throw new SQLException("Parameter index " + oneBasedParameterIndex + " is out of bounds");
+        }
+
+        if (zeroBased >= parameterCount) {
+            throw new SQLException("Parameter index " + oneBasedParameterIndex + " is out of bounds");
+        }
+
         if (zeroBased >= parameters.size()) {
             parameters.setSize(zeroBased + 1);
         }
@@ -74,7 +88,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public void setString(int parameterIndex, String value) throws SQLException {
-        throw new UnimplementedException();
+        setParameter(parameterIndex, value);
     }
 
     public void setBytes(int parameterIndex, byte[] value) throws SQLException {

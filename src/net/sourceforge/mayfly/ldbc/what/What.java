@@ -41,4 +41,14 @@ public class What extends Aggregate {
         return new Columns(new ImmutableList(result));
     }
 
+    public int parameterCount() {
+        int count = 0;
+        for (int i = 0; i < elements.size(); ++i) {
+            if (elements.get(i) instanceof JdbcParameter) {
+                ++count;
+            }
+        }
+        return count;
+    }
+
 }
