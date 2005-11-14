@@ -1,8 +1,6 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.util.*;
 
 public class MathematicalInt extends Literal {
 
@@ -18,10 +16,6 @@ public class MathematicalInt extends Literal {
 
     public Object valueForCellContentComparison() {
         return new Long(value);
-    }
-
-    public Tuples process(Tuples originalTuples, M aliasToTableName) {
-        throw new RuntimeException();
     }
 
 }

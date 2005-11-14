@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
@@ -29,5 +30,9 @@ public abstract class Literal extends WhatElement implements Transformer {
     }
 
     abstract public Object valueForCellContentComparison();
+
+    public Tuples process(Tuples originalTuples, M aliasToTableName) {
+        throw new UnimplementedException();
+    }
 
 }

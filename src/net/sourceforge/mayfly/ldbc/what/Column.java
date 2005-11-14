@@ -7,9 +7,10 @@ import net.sourceforge.mayfly.datastore.*;
 public class Column extends ValueObject implements CellHeader {
     private final String tableOrAlias;
     private final String columnName;
-    private TableIdentifier tableIdentifier;
+    private final TableIdentifier tableIdentifier;
 
     public Column(String table, String columnName) {
+        this.tableIdentifier = null;
         this.tableOrAlias = table;
         this.columnName = columnName;
     }

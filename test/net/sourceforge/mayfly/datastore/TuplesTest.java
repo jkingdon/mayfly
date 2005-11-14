@@ -17,7 +17,8 @@ public class TuplesTest extends TestCase {
 
         try {
             b.append(new Tuple(new Column("colB"), new Cell("2")));
-        } catch ( Exception ex ) { }
+            fail();
+        } catch ( UnsupportedOperationException expected ) { }
 
         assertEquals(a, b);
     }

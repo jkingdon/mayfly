@@ -45,14 +45,6 @@ public class ColumnsTest extends TestCase {
         Column b = new Column(new TableIdentifier("foo"), "b");
         Column c = new Column(new TableIdentifier("bar"), "c");
 
-        Columns columns = new Columns(
-            new L()
-                .append(a)
-                .append(b)
-                .append(c)
-                .asImmutable()
-        );
-
         assertTrue(new Columns.ColumnMatching("foo", "a").evaluate(a));
         assertFalse(new Columns.ColumnMatching("foo", "a").evaluate(b));
 

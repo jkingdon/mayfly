@@ -35,6 +35,7 @@ public class A {
     public static void assertMayflyException(String expectedExceptionMessage, ExceptionBlock block) {
         try {
             block.execute();
+            Assert.fail();
         } catch (MayflyException ex) {
             assertEquals(expectedExceptionMessage, ex.getMessage());
         }

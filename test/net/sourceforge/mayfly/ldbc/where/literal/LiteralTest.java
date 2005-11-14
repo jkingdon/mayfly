@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
-import junit.framework.TestCase;
+import junit.framework.*;
+
 import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.util.*;
 
 public class LiteralTest extends TestCase {
     public void testTransform() throws Exception {
@@ -13,12 +13,11 @@ public class LiteralTest extends TestCase {
     }
 
     class MyLiteral extends Literal {
+
         public Object valueForCellContentComparison() {
             return "foo";
         }
 
-        public Tuples process(Tuples originalTuples, M aliasToTableName) {
-            throw new RuntimeException();
-        }
     }
+
 }

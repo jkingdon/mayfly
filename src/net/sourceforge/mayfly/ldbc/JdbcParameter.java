@@ -21,6 +21,6 @@ public class JdbcParameter extends WhatElement implements Transformer {
     }
 
     public Tuples process(Tuples originalTuples, M aliasToTableName) {
-        throw new RuntimeException();
+        throw new UnimplementedException();
     }
 }

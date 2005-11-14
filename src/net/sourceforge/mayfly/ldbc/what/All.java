@@ -12,6 +12,6 @@ public class All extends WhatElement {
     }
 
     public Tuples process(Tuples originalTuples, M aliasToTableName) {
-        throw new RuntimeException();
+        throw new UnimplementedException();
     }
 }
