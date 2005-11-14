@@ -139,7 +139,7 @@ public class M extends Aggregate implements Map {
         }
 
         public boolean evaluate(Object candidate) {
-            Entry entry = (Entry) candidate;
+            Map.Entry entry = (Map.Entry) candidate;
             return keyIsLike.equalsIgnoreCase((String) entry.getKey());
         }
     }
