@@ -29,6 +29,24 @@ public class SingleColumnExpressionTest extends TestCase {
         );
     }
 
+    //public void testProcess_TableAlias() throws Exception {
+    //    M tableAliases =
+    //        new M()
+    //            .entry("f", "foo")
+    //            .entry("b", "bar");
+    //
+    //    Tuples original = new Tuples()
+    //        .append(new Tuple(new Column(new TableIdentifier("foo"), "colA"), new Cell("a")))
+    //        .append(new Tuple(new Column("colB"), new Cell("b")));
+    //
+    //    assertEquals(
+    //        new Tuples()
+    //            .append(new Tuple(new Column("colA"), new Cell("a"))),
+    //        new SingleColumnExpression("f", "colA")
+    //            .process(original, tableAliases)
+    //    );
+    //}
+
 
 
 }
