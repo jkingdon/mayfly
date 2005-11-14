@@ -55,7 +55,7 @@ public class What extends Aggregate {
     public Row applyTo(Row original) {
         final Tuples originalTuples = original.tuples();
 
-        final Tuples newTuples = new Tuples();
+        final TupleBuilder newTuples = new TupleBuilder();
 
         each(new Each() {
             public void each(Object element) {

@@ -22,7 +22,7 @@ public class SingleColumn extends WhatElement implements Transformer {
 
     public Columns columns() {
         //throw new RuntimeException("kill me");
-        return new Columns(new ImmutableList(new Column(tableOrAlias, columnName)));
+        return new Columns(ImmutableList.singleton(new Column(tableOrAlias, columnName)));
     }
 
     public Object transform(Object from) {

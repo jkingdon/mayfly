@@ -9,18 +9,22 @@ import java.util.*;
 
 public class Row extends Aggregate {
 
-    private Tuples tuples;
+    private final Tuples tuples;
 
     public Row(Tuple tuple) {
-        this(new Tuples().append(tuple));
+        this(new Tuples(tuple));
     }
 
     public Row(Tuples tuples) {
-        this.tuples = new Tuples(new L(tuples));
+        this.tuples = tuples;
+    }
+
+    public Row(TupleBuilder tuples) {
+        this.tuples = tuples.asTuple();
     }
 
     protected Aggregate createNew(Iterable items) {
-        return new Row(new Tuples(new L(items)));
+        return new Row(new Tuples(ImmutableList.fromIterable(items)));
     }
 
     public Iterator iterator() {
@@ -56,7 +60,7 @@ public class Row extends Aggregate {
     }
 
     public Columns columns() {
-        return new Columns(new ImmutableList(tuples.headers()));
+        return new Columns(ImmutableList.fromIterable(tuples.headers()));
     }
 
     public String toString() {

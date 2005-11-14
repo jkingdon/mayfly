@@ -64,7 +64,7 @@ public class FromTable extends ValueObject implements FromElement {
     }
 
     private Row applyAlias(String alias, Row row) {
-        Tuples newTuples = new Tuples();
+        TupleBuilder newTuples = new TupleBuilder();
         for (Iterator iter = row.iterator(); iter.hasNext(); ) {
             Tuple entry = (Tuple) iter.next();
             Column column = (Column) entry.header();

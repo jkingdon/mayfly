@@ -17,7 +17,7 @@ public class Rows extends Aggregate {
     }
 
     public Rows(Row row) {
-        this(new ImmutableList(row));
+        this(ImmutableList.singleton(row));
     }
 
     protected Aggregate createNew(Iterable items) {

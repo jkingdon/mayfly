@@ -21,7 +21,7 @@ public class GtTest extends TestCase {
 
     public void testEval() throws Exception {
         Row row = new Row(
-            new Tuples()
+            new TupleBuilder()
                 .appendColumnCellTuple("colA", new Long(6))
                 .appendColumnCellTuple("colB", new Long(7))
         );

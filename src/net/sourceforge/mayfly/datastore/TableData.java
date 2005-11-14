@@ -33,7 +33,7 @@ public class TableData {
                 " elements but values has " + values.size());
         }
 
-        Tuples tuples = new Tuples();
+        TupleBuilder tuples = new TupleBuilder();
 
         for (int i = 0; i < columnNames.size(); ++i) {
             tuples.append(
@@ -51,7 +51,7 @@ public class TableData {
     
     public Rows dummyRows() {
 
-        Tuples tuples = new Tuples();
+        TupleBuilder tuples = new TupleBuilder();
         for (int i = 0; i < columns.size(); ++i) {
             tuples.append(
                 new Tuple(

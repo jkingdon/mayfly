@@ -271,7 +271,7 @@ public class SelectTest extends TestCase {
             new Rows(
                 new L()
                     .append(new Row(
-                                new Tuples()
+                                new TupleBuilder()
                                     .appendColumnCellTuple("foo", "colA", "1a")
                                     .appendColumnCellTuple("bar", "colX", "barXValue"))
                 ).asImmutable()

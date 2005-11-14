@@ -1,45 +1,30 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.util.*;
-import net.sourceforge.mayfly.ldbc.what.*;
 
 import java.util.*;
 
 public class Tuples extends Aggregate {
-    private L tuples;
+    private final ImmutableList tuples;
 
     public Tuples() {
-        this(new L());
+        this(new ImmutableList());
     }
 
     public Tuples(Tuple tuple) {
-        this(new L().append(tuple));
+        this(ImmutableList.singleton(tuple));
     }
 
-    public Tuples(L tuples) {
+    public Tuples(ImmutableList tuples) {
         this.tuples = tuples;
     }
 
     protected Aggregate createNew(Iterable items) {
-        return new Tuples(new L(items));
+        return new Tuples(ImmutableList.fromIterable(items));
     }
 
     public Iterator iterator() {
         return tuples.iterator();
-    }
-
-    public Tuples append(Tuple tuple) {
-        tuples.append(tuple);
-        return this;
-    }
-
-    public Tuples appendAll(Tuples tuplesToAdd) {
-        tuples.addAll(tuplesToAdd);
-        return this;
-    }
-
-    public Tuples asImmutable() {
-        return new Tuples(tuples.asUnmodifiable());
     }
 
     public Cell cellFor(CellHeader header) {
@@ -57,16 +42,6 @@ public class Tuples extends Aggregate {
     public Cells cells() {
         return new Cells(collect(new GetCell()));
     }
-
-    public Tuples appendColumnCellTuple(String tableName, String columnName, Object cellValue) {
-        return append(new Tuple(new Column(tableName, columnName), new Cell(cellValue)));
-    }
-
-    public Tuples appendColumnCellTuple(String columnName, Object cellValue) {
-        return append(new Tuple(new Column(columnName), new Cell(cellValue)));
-    }
-
-
 
 
     public static class HeaderIs implements Selector {

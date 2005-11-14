@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.util.*;
 
 public class Cell extends ValueObject {
-    private Object content;
+    private final Object content; // Needs to be immutable (currently Number, String)
 
     public Cell(Object content) {
         this.content = content;

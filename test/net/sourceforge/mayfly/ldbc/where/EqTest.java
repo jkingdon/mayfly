@@ -23,7 +23,7 @@ public class EqTest extends TestCase {
 
     public void testColumnAndQuotedString() throws Exception {
         Row row = new Row(
-            new Tuples()
+            new TupleBuilder()
                 .appendColumnCellTuple("colA", "1")
         );
 

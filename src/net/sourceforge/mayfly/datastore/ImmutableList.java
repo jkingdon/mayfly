@@ -1,9 +1,19 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.util.*;
+
 import java.util.*;
 
 public class ImmutableList implements List {
+
+    public static ImmutableList singleton(Object singleElement) {
+        return new ImmutableList(Collections.singletonList(singleElement), true);
+    }
     
+    public static ImmutableList fromIterable(Iterable contents) {
+        return new ImmutableList(new L(contents));
+    }
+
     List delegate;
 
     public ImmutableList() {
@@ -12,10 +22,6 @@ public class ImmutableList implements List {
 
     public ImmutableList(Collection contents) {
         delegate = Collections.unmodifiableList(new ArrayList(contents));
-    }
-    
-    public ImmutableList(Object singleElement) {
-        delegate = Collections.singletonList(singleElement);
     }
     
     private ImmutableList(List alreadyCopied, boolean didICopyIt) {
