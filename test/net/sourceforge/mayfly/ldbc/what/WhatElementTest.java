@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.ldbc.*;
 public class WhatElementTest extends TestCase {
 
     public void testSingleColumn() {
-        WhatElement element = new SingleColumnExpression("table", "col");
+        WhatElement element = new SingleColumn("table", "col");
         Columns columns = element.columns();
         assertEquals(1, columns.size());
         Column column = columns.get(0);

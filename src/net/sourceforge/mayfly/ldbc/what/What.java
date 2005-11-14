@@ -60,7 +60,7 @@ public class What extends Aggregate {
         each(new Each() {
             public void each(Object element) {
                 WhatElement whatElement = (WhatElement) element;
-                newTuples.appendAll(whatElement.process(originalTuples));
+                newTuples.appendAll(whatElement.process(originalTuples, new M()));
             }
         });
 

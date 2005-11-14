@@ -33,4 +33,36 @@ public class MTest extends TestCase {
         );
     }
 
+    public void testCaseInsensitive() throws Exception {
+        assertTrue(new M.CaseInsensitiveKeyIs("aAa").evaluate(new MyEntry("aAa")));
+        assertTrue(new M.CaseInsensitiveKeyIs("aAa").evaluate(new MyEntry("AAA")));
+        assertTrue(new M.CaseInsensitiveKeyIs("aAa").evaluate(new MyEntry("aaa")));
+        assertFalse(new M.CaseInsensitiveKeyIs("aAa").evaluate(new MyEntry("zzz")));
+        
+    }
+
+    class MyEntry implements Map.Entry {
+        private Object key;
+
+        public MyEntry(Object key) {
+            this.key = key;
+        }
+
+        public Object getKey() {
+            return key;
+        }
+
+        public void setKey(Object key) {
+            this.key = key;
+        }
+
+        public Object getValue() {
+            return null;
+        }
+
+        public Object setValue(Object value) {
+            return null;
+        }
+    }
+
 }

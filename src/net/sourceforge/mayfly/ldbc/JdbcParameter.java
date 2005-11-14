@@ -20,7 +20,7 @@ public class JdbcParameter extends WhatElement implements Transformer {
         throw new MayflyException("internal error: should have substituted jdbc parameters by now");
     }
 
-    public Tuples process(Tuples originalTuples) {
+    public Tuples process(Tuples originalTuples, M aliasToTableName) {
         throw new RuntimeException();
     }
 }

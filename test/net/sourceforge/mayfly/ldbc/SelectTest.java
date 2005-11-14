@@ -15,25 +15,25 @@ public class SelectTest extends TestCase {
             new Select(
                 new What()
                     .add(new AllColumnsFromTable("f"))
-                    .add(new SingleColumnExpression("b", "name")),
+                    .add(new SingleColumn("b", "name")),
                 new From()
                     .add(new FromTable("foo", "f"))
                     .add(new FromTable("bar", "b")),
                 new Where(
                     new And(
                         new And(
-                            new Eq(new SingleColumnExpression("f", "name"), new QuotedString("'steve'")),
+                            new Eq(new SingleColumn("f", "name"), new QuotedString("'steve'")),
                             new Or(
-                                new Eq(new SingleColumnExpression("size"), new MathematicalInt(4)),
-                                new Gt(new MathematicalInt(6), new SingleColumnExpression("size"))
+                                new Eq(new SingleColumn("size"), new MathematicalInt(4)),
+                                new Gt(new MathematicalInt(6), new SingleColumn("size"))
                             )
 
                         ),
                         new Or(
-                            new Eq(new SingleColumnExpression("color"), new QuotedString("'red'")),
+                            new Eq(new SingleColumn("color"), new QuotedString("'red'")),
                             new And(
-                                new Not(new Eq(new SingleColumnExpression("day"), new MathematicalInt(7))),
-                                new Not(new Eq(new SingleColumnExpression("day"), new MathematicalInt(6)))
+                                new Not(new Eq(new SingleColumn("day"), new MathematicalInt(7))),
+                                new Not(new Eq(new SingleColumn("day"), new MathematicalInt(6)))
                             )
 
                         )
@@ -58,7 +58,7 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromTable("foo")),
                 new Where(
-                    new Eq(new SingleColumnExpression("a"), new MathematicalInt(5))
+                    new Eq(new SingleColumn("a"), new MathematicalInt(5))
                 )
             ),
             Select.selectFromTree(Tree.parse("select * from foo where a = 5"))
@@ -69,7 +69,7 @@ public class SelectTest extends TestCase {
         assertEquals(
             new Select(
                 new What()
-                    .add(new SingleColumnExpression("name")),
+                    .add(new SingleColumn("name")),
                 new From()
                     .add(new FromTable("foo")),
                 Where.EMPTY
@@ -99,7 +99,7 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromTable("foo")),
                 new Where(
-                    new Eq(new SingleColumnExpression("a"), JdbcParameter.INSTANCE)
+                    new Eq(new SingleColumn("a"), JdbcParameter.INSTANCE)
                 )
             ),
             Select.selectFromTree(Tree.parse("select ? from foo where a = ?"))
@@ -127,19 +127,19 @@ public class SelectTest extends TestCase {
                     new And(
                         new Or(
                             new Eq(
-                                new SingleColumnExpression("a"),
+                                new SingleColumn("a"),
                                 new MathematicalInt(6)
                             ),
                             new Not(
                                 new Eq(
                                     new MathematicalInt(7),
-                                    new SingleColumnExpression("b")
+                                    new SingleColumn("b")
                                 )
                             )
                         ),
                         new Gt(
                             new MathematicalInt(8),
-                            new SingleColumnExpression("c")
+                            new SingleColumn("c")
                         )
                     )
                 )
@@ -152,7 +152,7 @@ public class SelectTest extends TestCase {
         assertEquals(
             new Select(
                 new What()
-                    .add(new SingleColumnExpression("a")),
+                    .add(new SingleColumn("a")),
                 new From()
                     .add(new FromTable("foo")),
                 new Where(
@@ -196,7 +196,7 @@ public class SelectTest extends TestCase {
                         new FromTable("places"),
                         new FromTable("types"),
                         new Where(
-                            new Eq(new SingleColumnExpression("type"), new SingleColumnExpression("id"))
+                            new Eq(new SingleColumn("type"), new SingleColumn("id"))
                         )
                     )),
                 Where.EMPTY
@@ -223,12 +223,12 @@ public class SelectTest extends TestCase {
                             new FromTable("foo"),
                             new FromTable("bar"),
                             new Where(
-                                new Eq(new SingleColumnExpression("f"), new SingleColumnExpression("b1"))
+                                new Eq(new SingleColumn("f"), new SingleColumn("b1"))
                             )
                         ),
                         new FromTable("types"),
                         new Where(
-                            new Eq(new SingleColumnExpression("b2"), new SingleColumnExpression("q"))
+                            new Eq(new SingleColumn("b2"), new SingleColumn("q"))
                         )
                     )),
                 Where.EMPTY

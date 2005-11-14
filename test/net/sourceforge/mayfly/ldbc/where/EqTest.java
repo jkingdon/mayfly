@@ -16,7 +16,7 @@ public class EqTest extends TestCase {
         Tree equalTree = new Tree(whereClause.getFirstChild());
 
         assertEquals(
-                new Eq(new SingleColumnExpression("name"), new QuotedString("'steve'")),
+                new Eq(new SingleColumn("name"), new QuotedString("'steve'")),
                 Eq.fromEqualTree(equalTree, TreeConverters.forWhereTree())
         );
     }
@@ -27,7 +27,7 @@ public class EqTest extends TestCase {
                 .appendColumnCellTuple("colA", "1")
         );
 
-        assertTrue(new Eq(new SingleColumnExpression("colA"), new QuotedString("'1'")).evaluate(row));
-        assertFalse(new Eq(new SingleColumnExpression("colA"), new QuotedString("'2'")).evaluate(row));
+        assertTrue(new Eq(new SingleColumn("colA"), new QuotedString("'1'")).evaluate(row));
+        assertFalse(new Eq(new SingleColumn("colA"), new QuotedString("'2'")).evaluate(row));
     }
 }

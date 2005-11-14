@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.util;
 
 import junit.framework.*;
+import net.sourceforge.mayfly.*;
 
 public class A {
     public static void assertEquals(Object expected, Object actual) {
@@ -28,6 +29,14 @@ public class A {
 
         if (equal) {
             throw new AssertionFailedError("expected " + String.valueOf(expected) + " to not be equal to " + String.valueOf(actual));
+        }
+    }
+
+    public static void assertMayflyException(String expectedExceptionMessage, ExceptionBlock block) {
+        try {
+            block.execute();
+        } catch (MayflyException ex) {
+            assertEquals(expectedExceptionMessage, ex.getMessage());
         }
     }
 }

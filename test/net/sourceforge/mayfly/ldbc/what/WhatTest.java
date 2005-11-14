@@ -18,7 +18,7 @@ public class WhatTest extends TestCase {
 
         assertEquals(expected,
                      new What()
-                        .add(new SingleColumnExpression("colB"))
+                        .add(new SingleColumn("colB"))
                         .applyTo(original)
         );
     }

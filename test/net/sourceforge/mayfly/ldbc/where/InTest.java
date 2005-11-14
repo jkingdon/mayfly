@@ -19,7 +19,7 @@ public class InTest extends TestCase {
                 .singleSubtreeOfType(SQLTokenTypes.LITERAL_in);
         assertEquals(
             new In(
-                new SingleColumnExpression("a"),
+                new SingleColumn("a"),
                 new L()
 	                .append(new MathematicalInt(1))
 	                .append(new MathematicalInt(2))
@@ -30,7 +30,7 @@ public class InTest extends TestCase {
     
     public void testEvaluate() throws Exception {
         In in = new In(
-            new SingleColumnExpression("a"),
+            new SingleColumn("a"),
             new L()
 	            .append(new MathematicalInt(1))
 				.append(new MathematicalInt(3)));

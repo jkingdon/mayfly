@@ -79,6 +79,10 @@ public class Tuples extends Aggregate {
         public boolean evaluate(Object candidate) {
             return ((Tuple)candidate).header().equals(header);
         }
+
+        public String toString() {
+            return header.toString();
+        }
     }
 
     public static class GetHeader implements Transformer {

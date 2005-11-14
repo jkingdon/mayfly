@@ -9,7 +9,7 @@ import java.util.*;
 import java.text.*;
 
 abstract public class Aggregate extends ValueObject implements Iterable {
-    private String messageIfNotFound = "[{0}] not found";
+    private String messageIfNotFound = "{0} not found";
 
     public L collect(final Transformer transformer) {
         final L results = new L();

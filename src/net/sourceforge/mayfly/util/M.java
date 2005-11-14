@@ -121,4 +121,26 @@ public class M extends Aggregate implements Map {
 
         return result;
     }
+
+    public boolean containsKeyCaseInsensitive(String key) {
+        return exists(new CaseInsensitiveKeyIs(key));
+    }
+
+    public Object getCaseInsensitive(String key) {
+        return ((Map.Entry)find(new CaseInsensitiveKeyIs(key))).getValue();
+    }
+
+
+    public static class CaseInsensitiveKeyIs implements Selector {
+        private String keyIsLike;
+
+        public CaseInsensitiveKeyIs(String keyIsLike) {
+            this.keyIsLike = keyIsLike;
+        }
+
+        public boolean evaluate(Object candidate) {
+            Entry entry = (Entry) candidate;
+            return keyIsLike.equalsIgnoreCase((String) entry.getKey());
+        }
+    }
 }

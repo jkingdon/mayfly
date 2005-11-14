@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.util.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 
@@ -20,7 +21,7 @@ public class AllColumnsFromTable extends WhatElement {
         throw new UnimplementedException("selecting everything from a table (select table.*) not implemeneted");
     }
 
-    public Tuples process(Tuples originalTuples) {
+    public Tuples process(Tuples originalTuples, M aliasToTableName) {
         throw new RuntimeException();
     }
 }

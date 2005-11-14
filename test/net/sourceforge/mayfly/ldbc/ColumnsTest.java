@@ -4,6 +4,7 @@ import junit.framework.*;
 
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.datastore.*;
 
 public class ColumnsTest extends TestCase {
     public void testFromColumnNames() throws Exception {
@@ -38,4 +39,30 @@ public class ColumnsTest extends TestCase {
         assertTrue(new Columns.HasEquivalentName("a").evaluate(new Column("foo", "a")));
         assertFalse(new Columns.HasEquivalentName("a").evaluate(new Column("b")));
     }
+
+    public void testColumnMatching() throws Exception {
+        Column a = new Column(new TableIdentifier("foo"), "a");
+        Column b = new Column(new TableIdentifier("foo"), "b");
+        Column c = new Column(new TableIdentifier("bar"), "c");
+
+        Columns columns = new Columns(
+            new L()
+                .append(a)
+                .append(b)
+                .append(c)
+                .asImmutable()
+        );
+
+        assertTrue(new Columns.ColumnMatching("foo", "a").evaluate(a));
+        assertFalse(new Columns.ColumnMatching("foo", "a").evaluate(b));
+
+        assertTrue(new Columns.ColumnMatching("FoO", "A").evaluate(a));
+
+        assertTrue(new Columns.ColumnMatching("FoO", "b").evaluate(b));
+        assertTrue(new Columns.ColumnMatching("bar", "C").evaluate(c));
+
+        assertFalse(new Columns.ColumnMatching("bar", "C").evaluate(a));
+    }
+
+
 }

@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.*;
 public class Column extends ValueObject implements CellHeader {
     private final String tableOrAlias;
     private final String columnName;
+    private TableIdentifier tableIdentifier;
 
     public Column(String table, String columnName) {
         this.tableOrAlias = table;
@@ -14,7 +15,13 @@ public class Column extends ValueObject implements CellHeader {
     }
 
     public Column(String column) {
-        this(null, column);
+        this((String)null, column);
+    }
+
+    public Column(TableIdentifier tableIdentifier, String columnName) {
+        this.tableIdentifier = tableIdentifier;
+        this.columnName = columnName.toLowerCase();
+        this.tableOrAlias = null;
     }
 
     public String columnName() {
@@ -48,4 +55,7 @@ public class Column extends ValueObject implements CellHeader {
         }
     }
 
+    public boolean matches2(String tableName, String columnName) {
+        return tableIdentifier.equals(new TableIdentifier(tableName)) && columnName.toLowerCase().equals(this.columnName);
+    }
 }

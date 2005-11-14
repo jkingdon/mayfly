@@ -16,7 +16,7 @@ public class NotEqTest extends TestCase {
         Tree notEqualTree = new Tree(whereClause.getFirstChild());
 
         assertEquals(
-                new Not(new Eq(new SingleColumnExpression("name"), new QuotedString("'steve'"))),
+                new Not(new Eq(new SingleColumn("name"), new QuotedString("'steve'"))),
                 NotEq.fromNotEqualTree(notEqualTree, TreeConverters.forWhereTree())
         );
     }
@@ -28,7 +28,7 @@ public class NotEqTest extends TestCase {
         Tree notEqualTree = new Tree(whereClause.getFirstChild());
 
         assertEquals(
-                new Not(new Eq(new SingleColumnExpression("name"), new QuotedString("'steve'"))),
+                new Not(new Eq(new SingleColumn("name"), new QuotedString("'steve'"))),
                 NotEq.fromNotEqualTree(notEqualTree, TreeConverters.forWhereTree())
         );
     }

@@ -15,7 +15,7 @@ public class WhereTest extends TestCase {
         Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
 
         assertEquals(
-            new Eq(new SingleColumnExpression("f", "name"), new QuotedString("'steve'")),
+            new Eq(new SingleColumn("f", "name"), new QuotedString("'steve'")),
             Eq.fromEqualTree(new Tree(whereClause.getFirstChild()), TreeConverters.forWhereTree())
         );
 
@@ -28,7 +28,7 @@ public class WhereTest extends TestCase {
 
         assertEquals(
             new Where(
-                new Eq(new SingleColumnExpression("f", "name"), new QuotedString("'steve'"))
+                new Eq(new SingleColumn("f", "name"), new QuotedString("'steve'"))
             ),
             Where.fromConditionTree(whereClause)
         );
