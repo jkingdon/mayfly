@@ -97,9 +97,15 @@ public class LTest extends TestCase {
 
         try {
             unmodifiable.append("b");
-        } catch (UnsupportedOperationException ex) {}
+            fail();
+        } catch (UnsupportedOperationException expected) {}
 
         assertEquals(new L().append("a"), unmodifiable);
+        
+        original.append("c");
+
+        // Here's why this is less safe than making an ImmutableList.
+        assertEquals(new L().append("a").append("c"), unmodifiable);
     }
 
 }
