@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
-
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
@@ -26,7 +25,7 @@ public class SelectTest extends TestCase {
                             new Eq(new SingleColumnExpression("f", "name"), new QuotedString("'steve'")),
                             new Or(
                                 new Eq(new SingleColumnExpression("size"), new MathematicalInt(4)),
-                                new Gt(new MathematicalInt(6), new SingleColumnExpression("size"))    
+                                new Gt(new MathematicalInt(6), new SingleColumnExpression("size"))
                             )
 
                         ),
@@ -50,7 +49,7 @@ public class SelectTest extends TestCase {
                                                             " (day <>7 and day != 6) )"))
         );
     }
-    
+
     public void testParseIntegerLiteral() throws Exception {
         assertEquals(
             new Select(
@@ -116,7 +115,7 @@ public class SelectTest extends TestCase {
     private void checkParameterCount(int expected, String sql) throws SQLException {
         assertEquals(expected, Select.selectFromTree(Tree.parse(sql)).parameterCount());
     }
-    
+
     public void testSubstituteMultipleValues() throws Exception {
         assertEquals(
             new Select(
@@ -271,10 +270,10 @@ public class SelectTest extends TestCase {
         assertEquals(
             new Rows(
                 new L()
-                    .append(new Row(new M()
-                            .entry(new Column("bar", "colX"), new Cell("barXValue"))
-                            .entry(new Column("foo", "colA"), new Cell("1a"))
-                            .asImmutable())
+                    .append(new Row(
+                                new Tuples()
+                                    .appendColumnCellTuple("foo", "colA", "1a")
+                                    .appendColumnCellTuple("bar", "colX", "barXValue"))
                 ).asImmutable()
             ),
             Select.selectFromTree(Tree.parse("select * from foo, bar")).query(store)

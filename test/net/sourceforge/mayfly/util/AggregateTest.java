@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.util;
 
 import junit.framework.*;
+import net.sourceforge.mayfly.*;
 
 import java.util.*;
 
@@ -163,6 +164,26 @@ public class AggregateTest extends TestCase {
             new Strings("a", "b", "c").elements(new int[]{0, 2})
         );
     }
+
+    public void testNotFoundException() throws Exception {
+        try {
+            new Strings("a", "b", "c")
+                .messageIfNotFound("couldn''t find {0}, try again")
+                .find(new Selector() {
+                    public boolean evaluate(Object candidate) {
+                        return candidate.equals("d");
+                    }
+
+                    public String toString() {
+                        return "d";
+                    }
+                });
+        } catch (MayflyException ex) {
+            assertEquals("couldn't find d, try again", ex.getMessage());
+        }
+    }
+
+    
 
 
 

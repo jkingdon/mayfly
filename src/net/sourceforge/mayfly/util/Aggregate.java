@@ -1,12 +1,15 @@
 package net.sourceforge.mayfly.util;
 
 import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.*;
 import org.apache.commons.collections.*;
 import org.apache.commons.lang.*;
 
 import java.util.*;
+import java.text.*;
 
 abstract public class Aggregate extends ValueObject implements Iterable {
+    private String messageIfNotFound = "[{0}] not found";
 
     public L collect(final Transformer transformer) {
         final L results = new L();
@@ -27,7 +30,7 @@ abstract public class Aggregate extends ValueObject implements Iterable {
         }
     }
 
-    public Object select(final Selector selector) {
+    public Aggregate select(final Selector selector) {
         final List selected = new ArrayList();
 
         each(
@@ -59,7 +62,7 @@ abstract public class Aggregate extends ValueObject implements Iterable {
         }
 
         if (!shouldReturnNull) {
-            throw new RuntimeException("not found");
+            throw new MayflyException(MessageFormat.format(messageIfNotFound, new Object[] {selector.toString()}));
         } else {
             return null;
         }
@@ -170,5 +173,10 @@ abstract public class Aggregate extends ValueObject implements Iterable {
         L keysWanted = new L(Arrays.asList(ArrayUtils.toObject(indexes)));
 
         return createNew(new IterableCollection(asList().asIndexToElementMap().subMap(keysWanted).values()));
+    }
+
+    public Aggregate messageIfNotFound(String message) {
+        this.messageIfNotFound = message;
+        return this;
     }
 }

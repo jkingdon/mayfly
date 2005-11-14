@@ -1,9 +1,10 @@
 package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.datastore.*;
 
 
-public class Column extends ValueObject {
+public class Column extends ValueObject implements CellHeader {
     private final String tableOrAlias;
     private final String columnName;
 
@@ -15,7 +16,7 @@ public class Column extends ValueObject {
     public Column(String column) {
         this(null, column);
     }
-    
+
     public String columnName() {
         return columnName;
     }
@@ -46,5 +47,5 @@ public class Column extends ValueObject {
             return tableOrAlias + "." + column;
         }
     }
-    
+
 }

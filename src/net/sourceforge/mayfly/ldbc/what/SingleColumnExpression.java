@@ -3,6 +3,9 @@ package net.sourceforge.mayfly.ldbc.what;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.*;
+
+import java.sql.*;
 
 public class SingleColumnExpression extends WhatElement implements Transformer {
     private Column column;
@@ -26,6 +29,20 @@ public class SingleColumnExpression extends WhatElement implements Transformer {
     public Object transform(Object from) {
         Row row = (Row) from;
         return row.cell(column);
+    }
+
+    public Tuples process(Tuples originalTuples) {
+        try {
+            Column column =
+                originalTuples
+                    .headers()
+                        .thatAreColumns()
+                            .columnFromName(this.column.columnName());
+
+            return new Tuples(originalTuples.withHeader(column));
+        } catch (SQLException e) {
+            throw new MayflyException(e);
+        }
     }
 
 }

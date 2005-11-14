@@ -194,4 +194,7 @@ public class L extends Aggregate implements List {
         return delegate.toString();
     }
 
+    public L asUnmodifiable() {
+        return new L(Collections.unmodifiableList(this));
+    }
 }

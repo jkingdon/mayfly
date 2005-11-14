@@ -1,10 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
 import junit.framework.*;
-
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.util.*;
 
 public class RowTest extends TestCase {
 
@@ -13,11 +11,10 @@ public class RowTest extends TestCase {
 
     public void testCell() throws Exception {
         Row row = new Row(
-            new M()
-                .entry(new Column("colA"), new Cell("1"))
-                .entry(new Column("colB"), new Cell("2"))
-                .entry(new Column("colC"), new Cell("3"))
-                .asImmutable()
+            new Tuples()
+                .appendColumnCellTuple("colA", "1")
+                .appendColumnCellTuple("colB", "2")
+                .appendColumnCellTuple("colC", "3")
         );
 
         assertEquals(new Cell("2"), row.cell(new Column("colB")));
@@ -26,11 +23,10 @@ public class RowTest extends TestCase {
 
     public void testCellByAliasAndColumn() throws Exception {
         Row row = new Row(
-            new M()
-                .entry(new Column("Foo", "colA"), new Cell("1"))
-                .entry(new Column("Foo", "colB"), new Cell("2"))
-                .entry(new Column("Bar", "colA"), new Cell("3"))
-                .asImmutable()
+            new Tuples()
+                .appendColumnCellTuple("Foo", "colA", "1")
+                .appendColumnCellTuple("Foo", "colB", "2")
+                .appendColumnCellTuple("Bar", "colA", "3")
         );
 
         assertEquals(new Cell("2"), row.cell(null, "colB"));
@@ -64,27 +60,25 @@ public class RowTest extends TestCase {
 
     public void testPlus() throws Exception {
         Row row1 = new Row(
-            new M()
-                .entry(new Column("colA"), new Cell("1"))
-                .entry(new Column("colB"), new Cell("2"))
-                .asImmutable()
+            new Tuples()
+                .appendColumnCellTuple("colA", "1")
+                .appendColumnCellTuple("colB", "2")
         );
 
         Row row2 = new Row(
-            new M()
-                .entry(new Column("colC"), new Cell("3"))
-                .asImmutable()
+            new Tuples()
+                .appendColumnCellTuple("colC", "3")
         );
 
         Row expected = new Row(
-            new M()
-                .entry(new Column("colA"), new Cell("1"))
-                .entry(new Column("colB"), new Cell("2"))
-                .entry(new Column("colC"), new Cell("3"))
-                .asImmutable()
+            new Tuples()
+                .appendColumnCellTuple("colA", "1")
+                .appendColumnCellTuple("colB", "2")
+                .appendColumnCellTuple("colC", "3")
         );
 
 
         assertEquals(expected, row1.plus(row2));
     }
+
 }

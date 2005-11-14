@@ -1,11 +1,10 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import junit.framework.TestCase;
+import junit.framework.*;
 import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.util.*;
 import org.ldbc.parser.*;
 
 public class EqTest extends TestCase {
@@ -24,9 +23,8 @@ public class EqTest extends TestCase {
 
     public void testColumnAndQuotedString() throws Exception {
         Row row = new Row(
-            new M()
-                .entry(new Column("colA"), new Cell("1"))
-                .asImmutable()
+            new Tuples()
+                .appendColumnCellTuple("colA", "1")
         );
 
         assertTrue(new Eq(new SingleColumnExpression("colA"), new QuotedString("'1'")).evaluate(row));

@@ -1,12 +1,12 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import org.ldbc.antlr.collections.*;
-import org.ldbc.parser.*;
-
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.util.*;
+import org.ldbc.antlr.collections.*;
+import org.ldbc.parser.*;
 
 abstract public class WhatElement extends ValueObject {
 
@@ -45,4 +45,6 @@ abstract public class WhatElement extends ValueObject {
         return WhatElement.fromExpressionTree(column);
     }
 
+    //TODO: name sucks
+    abstract public Tuples process(Tuples originalTuples);
 }

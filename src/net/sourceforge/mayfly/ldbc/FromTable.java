@@ -1,13 +1,12 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.util.*;
 import org.ldbc.antlr.collections.*;
 
 import java.sql.*;
 import java.util.*;
-
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.util.*;
 
 public class FromTable extends ValueObject implements FromElement {
     private String tableName;
@@ -65,16 +64,16 @@ public class FromTable extends ValueObject implements FromElement {
     }
 
     private Row applyAlias(String alias, Row row) {
-        M columnToCell = new M();
+        Tuples newTuples = new Tuples();
         for (Iterator iter = row.iterator(); iter.hasNext(); ) {
-            Map.Entry entry = (Map.Entry) iter.next();
-            Column column = (Column) entry.getKey();
-            Cell cell = (Cell) entry.getValue();
+            Tuple entry = (Tuple) iter.next();
+            Column column = (Column) entry.header();
+            Cell cell = entry.cell();
 
             Column newColumn = new Column(alias, column.columnName());
-            columnToCell.put(newColumn, cell);
+            newTuples.append(new Tuple(newColumn, cell));
         }
-        return new Row(columnToCell.asImmutable());
+        return new Row(newTuples);
     }
 
 }

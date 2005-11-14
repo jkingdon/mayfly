@@ -9,20 +9,22 @@ import java.util.*;
 
 public class Row extends Aggregate {
 
-    //TODO: will probably need some ordering of columns at some point
+    private Tuples tuples;
 
-    private final ImmutableMap columnToCell;
+    public Row(Tuple tuple) {
+        this(new Tuples().append(tuple));
+    }
 
-    public Row(ImmutableMap columnToCell) {
-        this.columnToCell = columnToCell;
+    public Row(Tuples tuples) {
+        this.tuples = new Tuples(new L(tuples));
     }
 
     protected Aggregate createNew(Iterable items) {
-        return new Row(M.fromEntries(items).asImmutable());
+        return new Row(new Tuples(new L(items)));
     }
 
     public Iterator iterator() {
-        return columnToCell.entrySet().iterator();
+        return tuples.iterator();
     }
 
 
@@ -31,12 +33,12 @@ public class Row extends Aggregate {
     }
 
     public Cell cell(String tableOrAlias, String column) {
-        return (Cell) columnToCell.get(findColumn(tableOrAlias, column));
+        return tuples.cellFor(findColumn(tableOrAlias, column));
     }
 
     private Column findColumn(String tableOrAlias, String target) {
         Column found = null;
-        for (Iterator iter = columnToCell.keySet().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = tuples.headers().iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
             if (column.matches(tableOrAlias, target)) {
                 if (found != null) {
@@ -54,12 +56,12 @@ public class Row extends Aggregate {
     }
 
     public Columns columns() {
-        return new Columns(new ImmutableList(columnToCell.keySet()));
+        return new Columns(new ImmutableList(tuples.headers()));
     }
 
     public String toString() {
-        String columns = columnToCell.keySet().toString();
-        String cells = columnToCell.values().toString();
+        String columns = tuples.headers().toString();
+        String cells = tuples.cells().toString();
 
         return "\n" +
                "Row:\n" +
@@ -67,4 +69,7 @@ public class Row extends Aggregate {
                "\tcells:\t" + cells;
     }
 
+    public Tuples tuples() {
+        return tuples;
+    }
 }

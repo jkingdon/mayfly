@@ -39,7 +39,7 @@ public class InTest extends TestCase {
 	}
 
     private Row row(long aValue) {
-        return new Row(new M().entry(new Column("a"), new Cell(new Long(aValue))).asImmutable());
+        return new Row(new Tuple(new Column("a"), new Cell(new Long(aValue))));
     }
 
 }

@@ -15,5 +15,9 @@ public class LiteralTest extends TestCase {
         public Object valueForCellContentComparison() {
             return "foo";
         }
+
+        public Tuples process(Tuples originalTuples) {
+            throw new RuntimeException();
+        }
     }
 }

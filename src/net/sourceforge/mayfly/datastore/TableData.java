@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.util.*;
 
 import java.sql.*;
 import java.util.*;
@@ -34,29 +33,35 @@ public class TableData {
                 " elements but values has " + values.size());
         }
 
-        M columnToCell = new M();
+        Tuples tuples = new Tuples();
+
         for (int i = 0; i < columnNames.size(); ++i) {
-            columnToCell.put(
-                findColumn((String) columnNames.get(i)),
-                new Cell(values.get(i))
+            tuples.append(
+                new Tuple(
+                    findColumn((String) columnNames.get(i)),
+                    new Cell(values.get(i))
+                )
             );
         }
 
-        Row newRow = new Row(columnToCell.asImmutable());
+        Row newRow = new Row(tuples);
 
         return new TableData(columns, (Rows) rows.with(newRow));
     }
     
     public Rows dummyRows() {
-        M columnToCell = new M();
+
+        Tuples tuples = new Tuples();
         for (int i = 0; i < columns.size(); ++i) {
-            columnToCell.put(
-                columns.get(i),
-                new Cell(new Long(0))
+            tuples.append(
+                new Tuple(
+                    columns.get(i),
+                    new Cell(new Long(0))
+                )
             );
         }
 
-        return new Rows(new Row(columnToCell.asImmutable()));
+        return new Rows(new Row(tuples));
     }
 
     public Column findColumn(String columnName) throws SQLException {

@@ -1,11 +1,10 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import junit.framework.TestCase;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import junit.framework.*;
 import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.where.literal.*;
 import org.ldbc.parser.*;
 
 public class GtTest extends TestCase {
@@ -22,10 +21,9 @@ public class GtTest extends TestCase {
 
     public void testEval() throws Exception {
         Row row = new Row(
-            new M()
-                .entry(new Column("colA"), new Cell(new Long(6)))
-                .entry(new Column("colB"), new Cell(new Long(7)))
-                .asImmutable()
+            new Tuples()
+                .appendColumnCellTuple("colA", new Long(6))
+                .appendColumnCellTuple("colB", new Long(7))
         );
 
         assertFalse(new Gt(new MathematicalInt(5), new SingleColumnExpression("colA")).evaluate(row));

@@ -89,4 +89,17 @@ public class LTest extends TestCase {
         );
     }
 
+    public void testAsUnmodifiable() throws Exception {
+
+        L original = new L().append("a");
+
+        L unmodifiable = original.asUnmodifiable();
+
+        try {
+            unmodifiable.append("b");
+        } catch (UnsupportedOperationException ex) {}
+
+        assertEquals(new L().append("a"), unmodifiable);
+    }
+
 }
