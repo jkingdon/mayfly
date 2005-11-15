@@ -1,10 +1,10 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.util.*;
 
-import java.sql.*;
 import java.util.*;
 
 public class Columns extends Aggregate {
@@ -96,14 +96,14 @@ public class Columns extends Aggregate {
         return (Column) columns.get(index);
     }
 
-    public Column columnFromName(String columnName) throws SQLException {
+    public Column columnFromName(String columnName) {
         for (int i = 0; i < size(); ++i) {
             Column column = get(i);
             if (column.matchesName(columnName)) {
                 return column;
             }
         }
-        throw new SQLException("no column " + columnName);
+        throw new MayflyException("no column " + columnName);
     }
 
     public static class ColumnMatching implements Selector{

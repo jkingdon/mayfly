@@ -3,9 +3,6 @@ package net.sourceforge.mayfly.ldbc.what;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
-import net.sourceforge.mayfly.*;
-
-import java.sql.*;
 
 public class SingleColumn extends WhatElement implements Transformer {
     private String tableOrAlias;
@@ -32,26 +29,20 @@ public class SingleColumn extends WhatElement implements Transformer {
     }
 
     public Tuple process(Tuple originalTuple, M aliasToTableName) {
-        try {
+        String tableName =
+            aliasToTableName.containsKeyCaseInsensitive(tableOrAlias) ?
+                (String)aliasToTableName.getCaseInsensitive(tableOrAlias) :
+                tableOrAlias;
 
-            String tableName =
-                aliasToTableName.containsKeyCaseInsensitive(tableOrAlias) ?
-                    (String)aliasToTableName.getCaseInsensitive(tableOrAlias) :
-                    tableOrAlias;
+        Columns possibleColumns = originalTuple
+                                        .headers()
+                                            .thatAreColumns();
+        Column column =
+            tableName == null ?
+                 possibleColumns.columnFromName(columnName) :
+                 possibleColumns.columnMatching(tableName, columnName);
 
-            Columns possibleColumns = originalTuple
-                                            .headers()
-                                                .thatAreColumns();
-            Column column =
-                tableName == null ?
-                     possibleColumns.columnFromName(columnName) :
-                     possibleColumns.columnMatching(tableName, columnName);
-
-            return new Tuple(originalTuple.withHeader(column));
-        } catch (SQLException e) {
-            throw new MayflyException(e);
-        }
-
+        return new Tuple(originalTuple.withHeader(column));
     }
 
 }

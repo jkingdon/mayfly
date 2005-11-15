@@ -102,15 +102,6 @@ public class Database {
     }
 
     /**
-     * Get some data out. This is now redundant with {@link ResultSet}.  Do we
-     * want a non-JDBC API for convenience?  Should it look like this or more
-     * like java collections?
-     */
-    public int getInt(String tableName, String columnName, int rowIndex) throws SQLException {
-        return dataStore.table(tableName).getInt(columnName, rowIndex);
-    }
-
-    /**
      * Open a JDBC connection.
      * This is similar to the JDBC {@link DriverManager#getConnection(java.lang.String)}
      * but is more convenient if you have a Database instance around.

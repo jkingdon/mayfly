@@ -2,7 +2,6 @@ package net.sourceforge.mayfly;
 
 import junit.framework.*;
 
-import java.sql.*;
 import java.util.*;
 
 public class DatabaseTest extends TestCase {
@@ -32,23 +31,6 @@ public class DatabaseTest extends TestCase {
         assertEquals(0, database.rowCount("foo"));
         database.execute("INSERT INTO FOO (A) values (5)");
         assertEquals(1, database.rowCount("foo"));
-        assertEquals(5, database.getInt("foo", "a", 0));
-
-        try {
-            database.getInt("foo", "b", 0);
-            fail();
-        }
-        catch (SQLException e) {
-            assertEquals("no column b", e.getMessage());
-        }
-
-        try {
-            database.getInt("bar", "a", 0);
-            fail();
-        }
-        catch (SQLException e) {
-            assertEquals("no such table bar", e.getMessage());
-        }
     }
     
 }

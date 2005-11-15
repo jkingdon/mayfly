@@ -56,7 +56,11 @@ public final class MyResultSet extends ResultSetStub {
     }
 
     private Column columnFromName(String columnName) throws SQLException {
-        return columns.columnFromName(columnName);
+        try {
+            return columns.columnFromName(columnName);
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
 
     private Cell cellFromIndex(int oneBasedColumn) throws SQLException {

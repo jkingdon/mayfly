@@ -20,13 +20,6 @@ public class TableData {
         this.rows = rows;
     }
 
-    public int getInt(String columnName, int rowIndex) throws SQLException {
-        Row row = (Row) rows.element(rowIndex);
-
-        Cell cell = row.cell(findColumn(columnName));
-        return cell.asInt();
-    }
-
     public TableData addRow(List columnNames, List values) throws SQLException {
         if (columnNames.size() != values.size()) {
             throw new IllegalArgumentException("Column names has " + columnNames.size() + 
