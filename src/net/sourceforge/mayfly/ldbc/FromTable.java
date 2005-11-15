@@ -66,12 +66,12 @@ public class FromTable extends ValueObject implements FromElement {
     private Row applyAlias(String alias, Row row) {
         TupleBuilder newTuples = new TupleBuilder();
         for (Iterator iter = row.iterator(); iter.hasNext(); ) {
-            Tuple entry = (Tuple) iter.next();
+            TupleElement entry = (TupleElement) iter.next();
             Column column = (Column) entry.header();
             Cell cell = entry.cell();
 
             Column newColumn = new Column(alias, column.columnName());
-            newTuples.append(new Tuple(newColumn, cell));
+            newTuples.append(new TupleElement(newColumn, cell));
         }
         return new Row(newTuples);
     }

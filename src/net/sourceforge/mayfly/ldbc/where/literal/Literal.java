@@ -31,7 +31,7 @@ public abstract class Literal extends WhatElement implements Transformer {
 
     abstract public Object valueForCellContentComparison();
 
-    public Tuples process(Tuples originalTuples, M aliasToTableName) {
+    public Tuple process(Tuple originalTuple, M aliasToTableName) {
         throw new UnimplementedException();
     }
 

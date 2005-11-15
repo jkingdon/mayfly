@@ -7,13 +7,13 @@ public class WhatTest extends TestCase {
     public void testApplyWhat_Simple() throws Exception {
         Row original = new Row(
             new TupleBuilder()
-                .append(new Tuple(new Column("colA"), new Cell("1")))
-                .append(new Tuple(new Column("colB"), new Cell("2")))
+                .append(new TupleElement(new Column("colA"), new Cell("1")))
+                .append(new TupleElement(new Column("colB"), new Cell("2")))
         );
 
         Row expected = new Row(
             new TupleBuilder()
-                .append(new Tuple(new Column("colB"), new Cell("2")))
+                .append(new TupleElement(new Column("colB"), new Cell("2")))
         );
 
         assertEquals(expected,

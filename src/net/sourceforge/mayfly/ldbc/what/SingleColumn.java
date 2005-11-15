@@ -31,7 +31,7 @@ public class SingleColumn extends WhatElement implements Transformer {
         return row.cell(new Column(tableOrAlias, columnName));
     }
 
-    public Tuples process(Tuples originalTuples, M aliasToTableName) {
+    public Tuple process(Tuple originalTuple, M aliasToTableName) {
         try {
 
             String tableName =
@@ -39,7 +39,7 @@ public class SingleColumn extends WhatElement implements Transformer {
                     (String)aliasToTableName.getCaseInsensitive(tableOrAlias) :
                     tableOrAlias;
 
-            Columns possibleColumns = originalTuples
+            Columns possibleColumns = originalTuple
                                             .headers()
                                                 .thatAreColumns();
             Column column =
@@ -47,7 +47,7 @@ public class SingleColumn extends WhatElement implements Transformer {
                      possibleColumns.columnFromName(columnName) :
                      possibleColumns.columnMatching(tableName, columnName);
 
-            return new Tuples(originalTuples.withHeader(column));
+            return new Tuple(originalTuple.withHeader(column));
         } catch (SQLException e) {
             throw new MayflyException(e);
         }

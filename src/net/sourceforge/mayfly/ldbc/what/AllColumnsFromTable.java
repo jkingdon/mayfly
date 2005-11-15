@@ -21,7 +21,7 @@ public class AllColumnsFromTable extends WhatElement {
         throw new UnimplementedException("selecting everything from a table (select table.*) not implemeneted");
     }
 
-    public Tuples process(Tuples originalTuples, M aliasToTableName) {
+    public Tuple process(Tuple originalTuple, M aliasToTableName) {
         throw new UnimplementedException();
     }
 }

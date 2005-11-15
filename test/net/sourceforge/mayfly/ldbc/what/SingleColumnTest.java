@@ -18,13 +18,13 @@ public class SingleColumnTest extends TestCase {
     }
 
     public void testProcess_Simple() throws Exception {
-        Tuples original = new TupleBuilder()
-            .append(new Tuple(new Column(new TableIdentifier("foo"), "colA"), new Cell("a")))
-            .append(new Tuple(new Column(new TableIdentifier("bar"), "colB"), new Cell("b")))
+        Tuple original = new TupleBuilder()
+            .append(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new Cell("a")))
+            .append(new TupleElement(new Column(new TableIdentifier("bar"), "colB"), new Cell("b")))
             .asTuple();
 
         assertEquals(
-            new Tuples(new Tuple(new Column(new TableIdentifier("foo"), "colA"), new Cell("a"))),
+            new Tuple(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new Cell("a"))),
             new SingleColumn("colA").process(original, new M())
         );
     }
@@ -36,19 +36,19 @@ public class SingleColumnTest extends TestCase {
                 .entry("f", "fOO")
                 .entry("B", "bar");
 
-        Tuples original = new TupleBuilder()
-            .append(new Tuple(new Column(new TableIdentifier("foo"), "colA"), new Cell("a")))
-            .append(new Tuple(new Column(new TableIdentifier("bar"), "colB"), new Cell("b")))
+        Tuple original = new TupleBuilder()
+            .append(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new Cell("a")))
+            .append(new TupleElement(new Column(new TableIdentifier("bar"), "colB"), new Cell("b")))
             .asTuple();
 
         assertEquals(
-            new Tuples(new Tuple(new Column(new TableIdentifier("foo"), "colA"), new Cell("a"))),
+            new Tuple(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new Cell("a"))),
             new SingleColumn("F", "cola")
                 .process(original, tableAliases)
         );
 
         assertEquals(
-            new Tuples(new Tuple(new Column(new TableIdentifier("bar"), "colB"), new Cell("b"))),
+            new Tuple(new TupleElement(new Column(new TableIdentifier("bar"), "colB"), new Cell("b"))),
             new SingleColumn("b", "COLB")
                 .process(original, tableAliases)
         );

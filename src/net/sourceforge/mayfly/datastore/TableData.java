@@ -33,35 +33,35 @@ public class TableData {
                 " elements but values has " + values.size());
         }
 
-        TupleBuilder tuples = new TupleBuilder();
+        TupleBuilder tuple = new TupleBuilder();
 
         for (int i = 0; i < columnNames.size(); ++i) {
-            tuples.append(
-                new Tuple(
+            tuple.append(
+                new TupleElement(
                     findColumn((String) columnNames.get(i)),
                     new Cell(values.get(i))
                 )
             );
         }
 
-        Row newRow = new Row(tuples);
+        Row newRow = new Row(tuple);
 
         return new TableData(columns, (Rows) rows.with(newRow));
     }
     
     public Rows dummyRows() {
 
-        TupleBuilder tuples = new TupleBuilder();
+        TupleBuilder tuple = new TupleBuilder();
         for (int i = 0; i < columns.size(); ++i) {
-            tuples.append(
-                new Tuple(
+            tuple.append(
+                new TupleElement(
                     columns.get(i),
                     new Cell(new Long(0))
                 )
             );
         }
 
-        return new Rows(new Row(tuples));
+        return new Rows(new Row(tuple));
     }
 
     public Column findColumn(String columnName) throws SQLException {

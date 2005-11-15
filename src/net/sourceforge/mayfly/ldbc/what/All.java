@@ -11,7 +11,7 @@ public class All extends WhatElement {
         throw new UnimplementedException("selecting everything (select *) not implemented");
     }
 
-    public Tuples process(Tuples originalTuples, M aliasToTableName) {
+    public Tuple process(Tuple originalTuple, M aliasToTableName) {
         throw new UnimplementedException();
     }
 }

@@ -46,5 +46,5 @@ abstract public class WhatElement extends ValueObject {
     }
 
     //TODO: name sucks
-    abstract public Tuples process(Tuples originalTuples, M aliasToTableName);
+    abstract public Tuple process(Tuple originalTuple, M aliasToTableName);
 }

@@ -5,28 +5,28 @@ import net.sourceforge.mayfly.util.*;
 
 public class TupleBuilder {
     
-    private L tuples = new L();
+    private L elements = new L();
 
-    public TupleBuilder append(Tuple tuple) {
-        tuples.append(tuple);
+    public TupleBuilder append(TupleElement tuple) {
+        elements.append(tuple);
         return this;
     }
 
-    public TupleBuilder appendAll(Tuples tuplesToAdd) {
-        tuples.addAll(tuplesToAdd);
+    public TupleBuilder appendAll(Tuple elementsToAdd) {
+        elements.addAll(elementsToAdd);
         return this;
     }
 
     public TupleBuilder appendColumnCellTuple(String tableName, String columnName, Object cellValue) {
-        return append(new Tuple(new Column(tableName, columnName), new Cell(cellValue)));
+        return append(new TupleElement(new Column(tableName, columnName), new Cell(cellValue)));
     }
 
     public TupleBuilder appendColumnCellTuple(String columnName, Object cellValue) {
-        return append(new Tuple(new Column(columnName), new Cell(cellValue)));
+        return append(new TupleElement(new Column(columnName), new Cell(cellValue)));
     }
     
-    public Tuples asTuple() {
-        return new Tuples(tuples.asImmutable());
+    public Tuple asTuple() {
+        return new Tuple(elements.asImmutable());
     }
 
 }

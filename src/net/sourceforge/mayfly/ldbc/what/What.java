@@ -53,18 +53,18 @@ public class What extends Aggregate {
     }
 
     public Row applyTo(Row original) {
-        final Tuples originalTuples = original.tuples();
+        final Tuple originalTuple = original.tuple();
 
-        final TupleBuilder newTuples = new TupleBuilder();
+        final TupleBuilder newTuple = new TupleBuilder();
 
         each(new Each() {
             public void each(Object element) {
                 WhatElement whatElement = (WhatElement) element;
-                newTuples.appendAll(whatElement.process(originalTuples, new M()));
+                newTuple.appendAll(whatElement.process(originalTuple, new M()));
             }
         });
 
-        return new Row(newTuples);
+        return new Row(newTuple);
     }
 
     public void substitute(Iterator jdbcParameters) {

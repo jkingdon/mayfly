@@ -41,8 +41,8 @@ public class WhereTest extends TestCase {
         Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
         Where where = Where.fromConditionTree(whereClause);
 
-        Row row1 = new Row(new Tuple(new Column("name"), new Cell("steve")));
-        Row row2 = new Row(new Tuple(new Column("name"), new Cell("bob")));
+        Row row1 = new Row(new TupleElement(new Column("name"), new Cell("steve")));
+        Row row2 = new Row(new TupleElement(new Column("name"), new Cell("bob")));
 
         assertTrue(where.evaluate(row1));
         assertFalse(where.evaluate(row2));

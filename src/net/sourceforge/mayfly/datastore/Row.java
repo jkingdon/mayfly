@@ -9,26 +9,26 @@ import java.util.*;
 
 public class Row extends Aggregate {
 
-    private final Tuples tuples;
+    private final Tuple tuple;
+
+    public Row(TupleElement element) {
+        this(new Tuple(element));
+    }
 
     public Row(Tuple tuple) {
-        this(new Tuples(tuple));
+        this.tuple = tuple;
     }
 
-    public Row(Tuples tuples) {
-        this.tuples = tuples;
-    }
-
-    public Row(TupleBuilder tuples) {
-        this.tuples = tuples.asTuple();
+    public Row(TupleBuilder tuple) {
+        this.tuple = tuple.asTuple();
     }
 
     protected Aggregate createNew(Iterable items) {
-        return new Row(new Tuples(ImmutableList.fromIterable(items)));
+        return new Row(new Tuple(ImmutableList.fromIterable(items)));
     }
 
     public Iterator iterator() {
-        return tuples.iterator();
+        return tuple.iterator();
     }
 
 
@@ -37,12 +37,12 @@ public class Row extends Aggregate {
     }
 
     public Cell cell(String tableOrAlias, String column) {
-        return tuples.cellFor(findColumn(tableOrAlias, column));
+        return tuple.cellFor(findColumn(tableOrAlias, column));
     }
 
     private Column findColumn(String tableOrAlias, String target) {
         Column found = null;
-        for (Iterator iter = tuples.headers().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = tuple.headers().iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
             if (column.matches(tableOrAlias, target)) {
                 if (found != null) {
@@ -60,12 +60,12 @@ public class Row extends Aggregate {
     }
 
     public Columns columns() {
-        return new Columns(ImmutableList.fromIterable(tuples.headers()));
+        return new Columns(ImmutableList.fromIterable(tuple.headers()));
     }
 
     public String toString() {
-        String columns = tuples.headers().toString();
-        String cells = tuples.cells().toString();
+        String columns = tuple.headers().toString();
+        String cells = tuple.cells().toString();
 
         return "\n" +
                "Row:\n" +
@@ -73,7 +73,7 @@ public class Row extends Aggregate {
                "\tcells:\t" + cells;
     }
 
-    public Tuples tuples() {
-        return tuples;
+    public Tuple tuple() {
+        return tuple;
     }
 }

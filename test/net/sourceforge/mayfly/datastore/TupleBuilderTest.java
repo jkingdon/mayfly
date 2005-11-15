@@ -8,7 +8,7 @@ public class TupleBuilderTest extends TestCase {
     
     public void testBasics() throws Exception {
         assertEquals(
-            new Tuples(new Tuple(new Column("a"), new Cell("val"))),
+            new Tuple(new TupleElement(new Column("a"), new Cell("val"))),
             new TupleBuilder()
                 .appendColumnCellTuple("a", "val")
                 .asTuple()
