@@ -110,4 +110,34 @@ public class Database {
         return new JdbcConnection(this);
     }
 
+    /**
+     * Take a snapshot of this database.  Specifically, return the data store, which is
+     * an immutable object containing all the data, and table definitions, for this
+     * database.  Because the data store is immutable, one might store it in a constant
+     * and use it from multiple tests.  Here's an example:
+     * 
+     * <pre>
+    static final DataStore standardSetup = makeData();
+
+    private static DataStore makeData() {
+        try {
+            Database original = new Database();
+            original.execute("create table foo (a integer)");
+            original.execute("insert into foo(a) values(6)");
+            return original.dataStore();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    Database database;
+    public void setUp() {
+        database = new Database(standardSetup);
+    }
+    </pre>
+     */
+    public DataStore dataStore() {
+        return dataStore;
+    }
+
 }

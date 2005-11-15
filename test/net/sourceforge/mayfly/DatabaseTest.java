@@ -2,6 +2,8 @@ package net.sourceforge.mayfly;
 
 import junit.framework.*;
 
+import net.sourceforge.mayfly.datastore.*;
+
 import java.util.*;
 
 public class DatabaseTest extends TestCase {
@@ -33,4 +35,23 @@ public class DatabaseTest extends TestCase {
         assertEquals(1, database.rowCount("foo"));
     }
     
+    public void testSnapshot() throws Exception {
+        Database original = new Database();
+        original.execute("create table foo (a integer)");
+        original.execute("insert into foo(a) values(6)");
+        DataStore dataStore = original.dataStore();
+
+        Database snapshot = new Database(dataStore);
+        snapshot.execute("insert into foo (a) values (70)");
+        snapshot.execute("create table bar (b integer)");
+        
+        original.execute("create table foo2 (c integer)");
+
+        assertEquals(new TreeSet(Arrays.asList(new String[] {"foo", "bar"})), snapshot.tables());
+        assertEquals(2, snapshot.rowCount("Foo"));
+
+        assertEquals(new TreeSet(Arrays.asList(new String[] {"foo", "foo2"})), original.tables());
+        assertEquals(1, original.rowCount("Foo"));
+    }
+
 }
