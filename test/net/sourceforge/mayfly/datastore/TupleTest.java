@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import junit.framework.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 
-public class TuplesTest extends TestCase {
+public class TupleTest extends TestCase {
 
     public void testHeaderIs() throws Exception {
         assertTrue(new Tuple.HeaderIs(new Column("colA")).evaluate(new TupleElement(new Column("colA"), new StringCell("a"))));
