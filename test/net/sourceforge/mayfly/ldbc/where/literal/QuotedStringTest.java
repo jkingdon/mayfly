@@ -19,11 +19,11 @@ public class QuotedStringTest extends TestCase {
     }
 
     public void testMatchesCell() throws Exception {
-        assertTrue(new QuotedString("'a'").matchesCell(new Cell("a")));
-        assertFalse(new QuotedString("'b'").matchesCell(new Cell("a")));
+        assertTrue(new QuotedString("'a'").matchesCell(new StringCell("a")));
+        assertFalse(new QuotedString("'b'").matchesCell(new StringCell("a")));
 
-        assertTrue(new QuotedString("'don''t'").matchesCell(new Cell("don't")));
-        assertFalse(new QuotedString("'don''t'").matchesCell(new Cell("don''t")));
+        assertTrue(new QuotedString("'don''t'").matchesCell(new StringCell("don't")));
+        assertFalse(new QuotedString("'don''t'").matchesCell(new StringCell("don''t")));
     }
 
     public void testValue() throws Exception {

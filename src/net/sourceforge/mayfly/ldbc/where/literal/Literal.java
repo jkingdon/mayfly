@@ -18,11 +18,11 @@ public abstract class Literal extends WhatElement implements Transformer {
     }
 
     public boolean matchesCell(Cell cell) {
-        return cell.equals(new Cell(valueForCellContentComparison()));
+        return cell.equals(Cell.fromContents(valueForCellContentComparison()));
     }
 
     public Object transform(Object from) {
-        return new Cell(valueForCellContentComparison());
+        return Cell.fromContents(valueForCellContentComparison());
     }
     
     public Columns columns() {

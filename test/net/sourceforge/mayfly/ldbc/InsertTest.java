@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
 
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
@@ -44,6 +45,17 @@ public class InsertTest extends TestCase {
                 Collections.singletonList(new Long(77))
             ),
             insert
+        );
+    }
+    
+    public void testParseNull() throws Exception {
+        assertEquals(
+            new Insert(
+                new InsertTable("foo"),
+                Arrays.asList(new String[] {"a"}),
+                Arrays.asList(new Object[] {NullCellContent.INSTANCE})
+            ),
+            Insert.insertFromTree(Tree.parse("insert into foo (a) values (null)"))
         );
     }
     

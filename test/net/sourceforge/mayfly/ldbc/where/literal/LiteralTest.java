@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.datastore.*;
 public class LiteralTest extends TestCase {
     public void testTransform() throws Exception {
         assertEquals(
-            new Cell("foo"),
+            new StringCell("foo"),
             new MyLiteral().transform("would be a row object but doesn't matter here")
         );
     }

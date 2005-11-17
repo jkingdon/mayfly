@@ -56,6 +56,9 @@ public class Insert extends Command {
         case SQLTokenTypes.QUOTED_STRING:
             return QuotedString.fromQuotedStringTree(value).valueForCellContentComparison();
 
+        case SQLTokenTypes.NULL_INSERT:
+            return NullCellContent.INSTANCE;
+
         default:
             throw new UnimplementedException("Don't know how to convert " + value);
         }

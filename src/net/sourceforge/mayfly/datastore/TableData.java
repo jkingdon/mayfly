@@ -32,7 +32,7 @@ public class TableData {
             tuple.append(
                 new TupleElement(
                     findColumn((String) columnNames.get(i)),
-                    new Cell(values.get(i))
+                    Cell.fromContents(values.get(i))
                 )
             );
         }
@@ -49,7 +49,7 @@ public class TableData {
             tuple.append(
                 new TupleElement(
                     columns.get(i),
-                    new Cell(new Long(0))
+                    new LongCell(0) // NullCell.INSTANCE would make more sense
                 )
             );
         }

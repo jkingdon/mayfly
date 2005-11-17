@@ -13,18 +13,18 @@ public class SingleColumnTest extends TestCase {
                 .appendColumnCellTuple("colB", "2")
         );
 
-        assertEquals(new Cell("1"), new SingleColumn("colA").transform(row));
-        assertEquals(new Cell("2"), new SingleColumn("colB").transform(row));
+        assertEquals(new StringCell("1"), new SingleColumn("colA").transform(row));
+        assertEquals(new StringCell("2"), new SingleColumn("colB").transform(row));
     }
 
     public void testProcess_Simple() throws Exception {
         Tuple original = new TupleBuilder()
-            .append(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new Cell("a")))
-            .append(new TupleElement(new Column(new TableIdentifier("bar"), "colB"), new Cell("b")))
+            .append(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new StringCell("a")))
+            .append(new TupleElement(new Column(new TableIdentifier("bar"), "colB"), new StringCell("b")))
             .asTuple();
 
         assertEquals(
-            new Tuple(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new Cell("a"))),
+            new Tuple(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new StringCell("a"))),
             new SingleColumn("colA").process(original, new M())
         );
     }
@@ -37,18 +37,18 @@ public class SingleColumnTest extends TestCase {
                 .entry("B", "bar");
 
         Tuple original = new TupleBuilder()
-            .append(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new Cell("a")))
-            .append(new TupleElement(new Column(new TableIdentifier("bar"), "colB"), new Cell("b")))
+            .append(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new StringCell("a")))
+            .append(new TupleElement(new Column(new TableIdentifier("bar"), "colB"), new StringCell("b")))
             .asTuple();
 
         assertEquals(
-            new Tuple(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new Cell("a"))),
+            new Tuple(new TupleElement(new Column(new TableIdentifier("foo"), "colA"), new StringCell("a"))),
             new SingleColumn("F", "cola")
                 .process(original, tableAliases)
         );
 
         assertEquals(
-            new Tuple(new TupleElement(new Column(new TableIdentifier("bar"), "colB"), new Cell("b"))),
+            new Tuple(new TupleElement(new Column(new TableIdentifier("bar"), "colB"), new StringCell("b"))),
             new SingleColumn("b", "COLB")
                 .process(original, tableAliases)
         );

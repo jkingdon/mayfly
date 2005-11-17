@@ -18,11 +18,11 @@ public class TupleBuilder {
     }
 
     public TupleBuilder appendColumnCellTuple(String tableName, String columnName, Object cellValue) {
-        return append(new TupleElement(new Column(tableName, columnName), new Cell(cellValue)));
+        return append(new TupleElement(new Column(tableName, columnName), Cell.fromContents(cellValue)));
     }
 
     public TupleBuilder appendColumnCellTuple(String columnName, Object cellValue) {
-        return append(new TupleElement(new Column(columnName), new Cell(cellValue)));
+        return append(new TupleElement(new Column(columnName), Cell.fromContents(cellValue)));
     }
     
     public Tuple asTuple() {

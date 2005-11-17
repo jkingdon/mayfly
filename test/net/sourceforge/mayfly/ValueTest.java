@@ -35,15 +35,15 @@ public class ValueTest extends SqlTestCase {
     }
     
     public void testNull() throws Exception {
-        if (CONNECT_TO_MAYFLY) {
-            // little/none of this is implemented yet
-            return;
-        }
-
         execute("create table foo (a integer)");
         execute("insert into foo (a) values (null)");
         assertResultSet(new String[] { }, query("select a from foo where a = 5"));
-        
+
+        if (CONNECT_TO_MAYFLY) {
+            // Not all of this is implemented yet.
+            return;
+        }
+
         {
             ResultSet results = query("select a from foo");
             assertTrue(results.next());

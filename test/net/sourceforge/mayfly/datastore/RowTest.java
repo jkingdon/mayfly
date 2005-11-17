@@ -17,8 +17,8 @@ public class RowTest extends TestCase {
                 .appendColumnCellTuple("colC", "3")
         );
 
-        assertEquals(new Cell("2"), row.cell(new Column("colB")));
-        assertEquals(new Cell("2"), row.cell(new Column("COLb")));
+        assertEquals(new StringCell("2"), row.cell(new Column("colB")));
+        assertEquals(new StringCell("2"), row.cell(new Column("COLb")));
     }
 
     public void testCellByAliasAndColumn() throws Exception {
@@ -29,8 +29,8 @@ public class RowTest extends TestCase {
                 .appendColumnCellTuple("Bar", "colA", "3")
         );
 
-        assertEquals(new Cell("2"), row.cell(null, "colB"));
-        assertEquals(new Cell("2"), row.cell(null, "COLb"));
+        assertEquals(new StringCell("2"), row.cell(null, "colB"));
+        assertEquals(new StringCell("2"), row.cell(null, "COLb"));
 
         try {
             row.cell(null, "colA");
@@ -39,9 +39,9 @@ public class RowTest extends TestCase {
             assertEquals("ambiguous column colA", e.getMessage());
         }
 
-        assertEquals(new Cell("1"), row.cell("Foo", "colA"));
-        assertEquals(new Cell("3"), row.cell("Bar", "colA"));
-        assertEquals(new Cell("3"), row.cell("Bar", "COLa"));
+        assertEquals(new StringCell("1"), row.cell("Foo", "colA"));
+        assertEquals(new StringCell("3"), row.cell("Bar", "colA"));
+        assertEquals(new StringCell("3"), row.cell("Bar", "COLa"));
 
         try {
             row.cell("Bar", "colB");

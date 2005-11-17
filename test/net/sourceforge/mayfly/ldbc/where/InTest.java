@@ -39,7 +39,7 @@ public class InTest extends TestCase {
 	}
 
     private Row row(long aValue) {
-        return new Row(new TupleElement(new Column("a"), new Cell(new Long(aValue))));
+        return new Row(new TupleElement(new Column("a"), new LongCell(aValue)));
     }
 
 }
