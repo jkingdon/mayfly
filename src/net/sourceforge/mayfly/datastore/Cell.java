@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.util.*;
 
-public class Cell extends ValueObject {
+public abstract class Cell extends ValueObject {
     public static Cell fromContents(Object contents) {
         if (contents instanceof Number) {
             Number number = (Number) contents;
@@ -18,30 +18,16 @@ public class Cell extends ValueObject {
         }
     }
 
-    private final Object content; // Needs to be immutable (currently Number, String)
+    abstract public int asInt();
 
-    public Cell(Object content) {
-        this.content = content;
-    }
+    abstract public long asLong();
 
-    public int asInt() {
-        return ((Number)content).intValue();
-    }
-
-    public long asLong() {
-        return ((Number)content).longValue();
-    }
-
-    public String asString() {
-        return (String)content;
-    }
+    abstract public String asString();
 
     public String toString() {
-        return content.toString();
+        return asObject().toString();
     }
 
-    public Object asObject() {
-        return content;
-    }
+    abstract public Object asObject();
 
 }

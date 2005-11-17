@@ -39,16 +39,17 @@ public class ValueTest extends SqlTestCase {
         execute("insert into foo (a) values (null)");
         assertResultSet(new String[] { }, query("select a from foo where a = 5"));
 
-        if (CONNECT_TO_MAYFLY) {
-            // Not all of this is implemented yet.
-            return;
-        }
-
         {
             ResultSet results = query("select a from foo");
             assertTrue(results.next());
     
             assertEquals(0, results.getInt(1));
+
+            if (CONNECT_TO_MAYFLY) {
+                // Not all of this is implemented yet.
+                return;
+            }
+
             assertTrue(results.wasNull());
     
             assertFalse(results.next());
