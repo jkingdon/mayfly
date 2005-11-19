@@ -25,8 +25,8 @@ public class In extends BooleanExpression {
 		this.list = list;
     }
 
-	public boolean evaluate(Object candidate) {
-        Row row = (Row) candidate;
+	public boolean evaluate(Object rowObject) {
+        Row row = (Row) rowObject;
         Cell cell = (Cell) leftSide.transform(row);
 
         for (Iterator iter = list.iterator(); iter.hasNext();) {

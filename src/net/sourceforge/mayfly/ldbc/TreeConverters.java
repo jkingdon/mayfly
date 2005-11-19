@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
@@ -90,6 +91,16 @@ public class TreeConverters {
                     return Gt.fromSmallerTree(from, converters);
                 }
             })
+            .register(SQLTokenTypes.IS_NULL,         new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return IsNull.fromIsNullTree(from, converters);
+                                                          }
+                                                      })
+            .register(SQLTokenTypes.IS_NOT_NULL,     new TreeConverters.Converter() {
+                                                          public Object convert(Tree from, TreeConverters converters) {
+                                                              return IsNull.fromIsNotNullTree(from, converters);
+                                                          }
+                                                      })
             .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return WhatElement.fromExpressionTree(from);
@@ -110,6 +121,11 @@ public class TreeConverters {
                                                               return MathematicalInt.fromDecimalValueTree(from);
                                                           }
                                                       })
+            .register(SQLTokenTypes.LITERAL_null,  new TreeConverters.Converter() {
+                public Object convert(Tree from, TreeConverters converters) {
+                    throw new MayflyException("To check for null, use IS NULL or IS NOT NULL, not a null literal");
+                }
+            })
             .register(SQLTokenTypes.OPEN_PAREN,    new TreeConverters.SkipLevelAndContinue())
             .register(SQLTokenTypes.CONDITION,    new TreeConverters.SkipLevelAndContinue());
     }

@@ -20,8 +20,8 @@ public class Or extends BooleanExpression {
         this.rightSide = rightSide;
     }
 
-    public boolean evaluate(Object candidate) {
-        return leftSide.evaluate(candidate) || rightSide.evaluate(candidate);
+    public boolean evaluate(Object row) {
+        return leftSide.evaluate(row) || rightSide.evaluate(row);
     }
 
     public int parameterCount() {

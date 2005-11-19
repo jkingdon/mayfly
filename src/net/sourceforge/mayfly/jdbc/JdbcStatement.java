@@ -13,7 +13,11 @@ public class JdbcStatement implements Statement {
     }
 
     public ResultSet executeQuery(String sql) throws SQLException {
-        return database.query(sql);
+        try {
+            return database.query(sql);
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
 
     public int executeUpdate(String sql) throws SQLException {

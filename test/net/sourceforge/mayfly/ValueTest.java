@@ -45,25 +45,13 @@ public class ValueTest extends SqlTestCase {
     
             assertEquals(0, results.getInt(1));
 
-            if (CONNECT_TO_MAYFLY) {
-                // Not all of this is implemented yet.
-                return;
-            }
-
             assertTrue(results.wasNull());
     
             assertFalse(results.next());
             results.close();
         }
 
-        {
-            // Wrong way to look for null.  Should this be an error?
-            // (apparently SQL specifies that "a = null" evaluates to null, but
-            // we need not implement this unless it is actually useful.  Is it?)
-            ResultSet results = query("select a from foo where a = null");
-            assertFalse(results.next());
-            results.close();
-        }
+        checkWrongWayToLookForNull();
 
         {
             // Right way to look for null.
@@ -84,13 +72,8 @@ public class ValueTest extends SqlTestCase {
         }
 
     }
-    
-    public void testNonNull() throws Exception {
-        if (CONNECT_TO_MAYFLY) {
-            // little/none of this is implemented yet
-            return;
-        }
 
+    public void testNonNull() throws Exception {
         execute("create table foo (a integer)");
         execute("insert into foo (a) values (5)");
         
@@ -105,13 +88,8 @@ public class ValueTest extends SqlTestCase {
             results.close();
         }
 
-        {
-            // Wrong way to look for null.
-            ResultSet results = query("select a from foo where a = null");
-            assertFalse(results.next());
-            results.close();
-        }
-        
+        checkWrongWayToLookForNull();
+
         {
             ResultSet results = query("select a from foo where a is null");
             assertFalse(results.next());
@@ -129,6 +107,29 @@ public class ValueTest extends SqlTestCase {
             results.close();
         }
 
+    }
+    
+    private void checkWrongWayToLookForNull() throws SQLException {
+        {
+            String wrongWayToLookForNull = "select a from foo where a = null";
+            if (CONNECT_TO_MAYFLY) {
+                expectQueryFailure(wrongWayToLookForNull, 
+                    "To check for null, use IS NULL or IS NOT NULL, not a null literal"
+                );
+            } else {
+                // Hypersonic behavior.  I think SQL specifies that "a = null"
+                // evaluates to null, which then means false, but is this
+                // really useful or just a trap?  Until proven otherwise,
+                // I'm going with "trap".
+                ResultSet results = query(wrongWayToLookForNull);
+                assertFalse(results.next());
+                results.close();
+            }
+        }
+    }
+    
+    public void testEmptyStringAsNull() throws Exception {
+        // TODO: empty string is treated as null, I think
     }
     
     public void testSelectExpression() throws Exception {

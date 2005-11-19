@@ -17,5 +17,4 @@ public class CellTest extends TestCase {
         assertEquals("a", new StringCell("a").asString());
     }
 
-
 }

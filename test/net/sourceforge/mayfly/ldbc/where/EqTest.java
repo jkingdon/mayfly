@@ -24,10 +24,11 @@ public class EqTest extends TestCase {
     public void testColumnAndQuotedString() throws Exception {
         Row row = new Row(
             new TupleBuilder()
-                .appendColumnCellTuple("colA", "1")
+                .appendColumnCellContents("colA", "1")
         );
 
         assertTrue(new Eq(new SingleColumn("colA"), new QuotedString("'1'")).evaluate(row));
         assertFalse(new Eq(new SingleColumn("colA"), new QuotedString("'2'")).evaluate(row));
     }
+
 }

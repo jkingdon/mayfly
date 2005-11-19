@@ -8,6 +8,7 @@ import java.sql.*;
 
 public final class MyResultSet extends ResultSetStub {
     private int pos = -1;
+    private boolean wasNull = false;
 
     private final Rows rows;
     private final Columns columns;
@@ -50,6 +51,10 @@ public final class MyResultSet extends ResultSetStub {
     public Object getObject(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asObject();
     }
+    
+    public boolean wasNull() throws SQLException {
+        return wasNull;
+    }
 
     private Cell cellFromName(String columnName) throws SQLException {
         return cell(columnFromName(columnName));
@@ -78,6 +83,7 @@ public final class MyResultSet extends ResultSetStub {
     private Cell cell(Column column) throws SQLException {
         Row row = (Row) rows.element(checkedRowNumber());
         Cell cell = row.cell(column);
+        wasNull = cell instanceof NullCell;
         return cell;
     }
 

@@ -10,7 +10,7 @@ public class TupleBuilderTest extends TestCase {
         assertEquals(
             new Tuple(new TupleElement(new Column("a"), new StringCell("val"))),
             new TupleBuilder()
-                .appendColumnCellTuple("a", "val")
+                .appendColumnCellContents("a", "val")
                 .asTuple()
         );
     }

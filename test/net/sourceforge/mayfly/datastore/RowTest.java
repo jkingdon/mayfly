@@ -12,9 +12,9 @@ public class RowTest extends TestCase {
     public void testCell() throws Exception {
         Row row = new Row(
             new TupleBuilder()
-                .appendColumnCellTuple("colA", "1")
-                .appendColumnCellTuple("colB", "2")
-                .appendColumnCellTuple("colC", "3")
+                .appendColumnCellContents("colA", "1")
+                .appendColumnCellContents("colB", "2")
+                .appendColumnCellContents("colC", "3")
         );
 
         assertEquals(new StringCell("2"), row.cell(new Column("colB")));
@@ -24,9 +24,9 @@ public class RowTest extends TestCase {
     public void testCellByAliasAndColumn() throws Exception {
         Row row = new Row(
             new TupleBuilder()
-                .appendColumnCellTuple("Foo", "colA", "1")
-                .appendColumnCellTuple("Foo", "colB", "2")
-                .appendColumnCellTuple("Bar", "colA", "3")
+                .appendColumnCellContents("Foo", "colA", "1")
+                .appendColumnCellContents("Foo", "colB", "2")
+                .appendColumnCellContents("Bar", "colA", "3")
         );
 
         assertEquals(new StringCell("2"), row.cell(null, "colB"));
@@ -61,20 +61,20 @@ public class RowTest extends TestCase {
     public void testPlus() throws Exception {
         Row row1 = new Row(
             new TupleBuilder()
-                .appendColumnCellTuple("colA", "1")
-                .appendColumnCellTuple("colB", "2")
+                .appendColumnCellContents("colA", "1")
+                .appendColumnCellContents("colB", "2")
         );
 
         Row row2 = new Row(
             new TupleBuilder()
-                .appendColumnCellTuple("colC", "3")
+                .appendColumnCellContents("colC", "3")
         );
 
         Row expected = new Row(
             new TupleBuilder()
-                .appendColumnCellTuple("colA", "1")
-                .appendColumnCellTuple("colB", "2")
-                .appendColumnCellTuple("colC", "3")
+                .appendColumnCellContents("colA", "1")
+                .appendColumnCellContents("colB", "2")
+                .appendColumnCellContents("colC", "3")
         );
 
         assertEquals(expected, row1.plus(row2));

@@ -9,8 +9,8 @@ public class SingleColumnTest extends TestCase {
     public void testRowTransform() throws Exception {
         Row row = new Row(
             new TupleBuilder()
-                .appendColumnCellTuple("colA", "1")
-                .appendColumnCellTuple("colB", "2")
+                .appendColumnCellContents("colA", "1")
+                .appendColumnCellContents("colB", "2")
         );
 
         assertEquals(new StringCell("1"), new SingleColumn("colA").transform(row));

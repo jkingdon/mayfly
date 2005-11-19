@@ -15,8 +15,8 @@ abstract public class RowExpression extends BooleanExpression {
         this.rightSide = rightSide;
     }
 
-    public boolean evaluate(Object candidate) {
-        Row row = (Row) candidate;
+    public boolean evaluate(Object rowObject) {
+        Row row = (Row) rowObject;
 
         return compare((Cell) leftSide.transform(row), (Cell) rightSide.transform(row));
     }

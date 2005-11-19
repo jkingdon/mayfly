@@ -22,7 +22,7 @@ public abstract class BooleanExpression extends ValueObject implements Selector 
 
     };
 
-    abstract public boolean evaluate(Object candidate);
+    abstract public boolean evaluate(Object row);
 
     abstract public int parameterCount();
 

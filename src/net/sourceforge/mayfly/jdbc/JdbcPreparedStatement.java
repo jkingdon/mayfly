@@ -24,9 +24,13 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public ResultSet executeQuery() throws SQLException {
-        Select select = Select.selectFromTree(Tree.parse(command));
-        select.substitute(parameters);
-        return database.query(select);
+        try {
+            Select select = Select.selectFromTree(Tree.parse(command));
+            select.substitute(parameters);
+            return database.query(select);
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
 
     public int executeUpdate() throws SQLException {

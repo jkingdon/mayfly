@@ -18,8 +18,8 @@ public class Not extends BooleanExpression {
         this.operand = operand;
     }
 
-    public boolean evaluate(Object candidate) {
-        return !operand.evaluate(candidate);
+    public boolean evaluate(Object row) {
+        return !operand.evaluate(row);
     }
 
     public int parameterCount() {

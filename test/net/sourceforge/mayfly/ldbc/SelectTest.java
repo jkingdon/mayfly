@@ -272,8 +272,8 @@ public class SelectTest extends TestCase {
                 new L()
                     .append(new Row(
                                 new TupleBuilder()
-                                    .appendColumnCellTuple("foo", "colA", "1a")
-                                    .appendColumnCellTuple("bar", "colX", "barXValue"))
+                                    .appendColumnCellContents("foo", "colA", "1a")
+                                    .appendColumnCellContents("bar", "colX", "barXValue"))
                 ).asImmutable()
             ),
             Select.selectFromTree(Tree.parse("select * from foo, bar")).query(store)
