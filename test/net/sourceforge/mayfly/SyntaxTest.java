@@ -1,35 +1,26 @@
 package net.sourceforge.mayfly;
 
-import java.sql.*;
 
 public class SyntaxTest extends SqlTestCase {
+    
+    // Should we have a SyntaxException which subclasses SQLException?
 
     public void testBadCommand() throws Exception {
-        try {
-            execute("PICK NOSE");
-            fail();
-        } catch (SQLException expected) {
-            assertMessage("unexpected token: PICK", expected);
-        }
+        expectExecuteFailure("PICK NOSE", "unexpected token: PICK");
     }
 
     public void testCommandsAreCaseInsensitive() throws Exception {
-        try {
-            execute("DrOp tAbLe FOo");
-            fail();
-        } catch (SQLException expected) {
-            assertMessage("no such table FOo", expected);
-        }
+        expectExecuteFailure("DrOp tAbLe FOo", "no table FOo");
     }
 
     public void testColumnsMissingOnCreate() throws Exception {
-        try {
-            execute("create table foo");
-            fail();
-        } catch (SQLException expected) {
-            // Really should try to do better than the JDBC/ANTLR "unexpected token: null"
-            //assertMessage("must specify columns on create", expected);
-        }
+        // Really should try to do better than "unexpected token: null".
+        // It comes from ANTLR; what is the right fix?
+//        expectExecuteFailure("create table foo", "must specify columns on create");
+        expectExecuteFailure("create table foo", "unexpected token: null");
+
+        //expectExecuteFailure("create table foo (a integer", "didn't see expected token )");
+        expectExecuteFailure("create table foo (a integer", "unexpected token: null");
     }
     
     // Apparently neither ldbc nor jsqlparser can quote identifiers

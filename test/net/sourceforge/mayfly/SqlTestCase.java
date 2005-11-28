@@ -9,7 +9,18 @@ import java.util.*;
 
 public abstract class SqlTestCase extends TestCase {
 
-    protected static final boolean CONNECT_TO_MAYFLY = true;
+    private static final boolean CONNECT_TO_MAYFLY = true;
+
+    // Turn this on to see a comparison of mayfly exception messages with
+    // the current database's messages.
+    private static final boolean SHOW_MESSAGES = false;
+
+    /** Should a test look for behavior in which Mayfly intentionally diverges
+     * from what hypersonic does? */
+    protected static final boolean EXPECT_MAYFLY_BEHAVIOR = CONNECT_TO_MAYFLY;
+    /** Should a test skip checking for behaviors which we plan to implement in Mayfly,
+     * but which aren't implemented yet?  */
+    protected static final boolean MAYFLY_MISSING = !CONNECT_TO_MAYFLY;
 
     private Database database;
     protected Connection connection;
@@ -69,26 +80,47 @@ public abstract class SqlTestCase extends TestCase {
             // But we would like to see that databases fail for the same
             // reasons.  So we provide the ability to manually inspect
             // the messages side by side.
-            if (false) {
+            if (SHOW_MESSAGES) {
                 System.out.print("Mayfly message would be " + expectedMessage + "\n");
                 System.out.print("Actual message was " + exception.getMessage() + "\n\n");
             }
         }
     }
 
-    private Set objectResultsAsSet(ResultSet rs, boolean strings) throws SQLException {
-        Set actual = new HashSet();
-        while (rs.next()) {
+    public static void assertResultSet(String[] rowsAsStrings, ResultSet results) throws SQLException {
+        Collection expected = new HashSet();
+        boolean strings = buildExpected(rowsAsStrings, expected);
+    
+        assertEquals(expected, buildActual(results, strings, new HashSet()));
+    }
+
+    public static void assertResultList(String[] rowsAsStrings, ResultSet results) throws SQLException {
+        Collection expected = new ArrayList();
+        boolean strings = buildExpected(rowsAsStrings, expected);
+    
+        assertEquals(expected, buildActual(results, strings, new ArrayList()));
+    }
+    
+    private static Collection buildActual(ResultSet results, boolean strings, Collection actual) 
+    throws SQLException {
+        while (results.next()) {
             L row = new L();
             boolean rowDone = false;
             int col = 1;
     
             while (!rowDone) {
                 try {
+                    Object value;
                     if (strings) {
-                        row.append(rs.getString(col));
+                        value = results.getString(col);
                     } else {
-                        row.append(new Integer(rs.getInt(col)));
+                        value = new Integer(results.getInt(col));
+                    }
+
+                    if (results.wasNull()) {
+                        row.append(null);
+                    } else {
+                        row.append(value);
                     }
                 } catch (SQLException ex) {
                     rowDone = true;
@@ -98,14 +130,12 @@ public abstract class SqlTestCase extends TestCase {
     
             actual.add(row);
         }
-        rs.close();
+        results.close();
         return actual;
     }
 
-    protected void assertResultSet(String[] rowsAsStrings, ResultSet rs) throws SQLException {
+    private static boolean buildExpected(String[] rowsAsStrings, Collection expected) {
         boolean strings = false;
-
-        Set expected = new HashSet();
         for (int i = 0; i < rowsAsStrings.length; i++) {
             String rowString = rowsAsStrings[i];
             String[] cells = rowString.split(",");
@@ -116,6 +146,8 @@ public abstract class SqlTestCase extends TestCase {
                 if (cell.startsWith("'")) {
                     strings = true;
                     row.append(cell.substring(1, cell.length() - 1));
+                } else if (cell.equals("null")) {
+                    row.append(null);
                 } else {
                     strings = false;
                     row.append(new Integer(Integer.parseInt(cell)));
@@ -123,11 +155,10 @@ public abstract class SqlTestCase extends TestCase {
             }
             expected.add(row);
         }
-    
-        assertEquals(expected, objectResultsAsSet(rs, strings));
-    
+        return strings;
     }
 
+    
     protected void expectQueryFailure(String sql, String expectedMessage) {
         try {
             query(sql);
@@ -137,6 +168,18 @@ public abstract class SqlTestCase extends TestCase {
             );
         } catch (SQLException e) {
             assertMessage(expectedMessage, e);
+        }
+    }
+
+    protected void expectExecuteFailure(String sql, String expectedMessage) {
+        try {
+            execute(sql);
+            fail("Did not find expected exception.\n" +
+                "expected message: " + expectedMessage + "\n" +
+                "command: " + sql + "\n"
+            );
+        } catch (SQLException expected) {
+            assertMessage(expectedMessage, expected);
         }
     }
     

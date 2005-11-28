@@ -1,11 +1,103 @@
 package net.sourceforge.mayfly;
 
+import net.sourceforge.mayfly.datastore.*;
+
 import java.sql.*;
 import java.util.*;
 
+/**
+ * <p>JDBC Driver for mayfly.</p>
+ * 
+ * <p>In many cases, it will be more convenient to instantiate a
+ * {@link net.sourceforge.mayfly.Database} object, and then
+ * call {@link net.sourceforge.mayfly.Database#openConnection()}
+ * on it (from there on out, you don't need to do anything
+ * mayfly-specific).</p>
+ * 
+ * <p>However, if you want to create a JDBC connection via
+ * non-mayfly-specific means (for example, via a database
+ * mapping layer like Hibernate or SqlMaps), you may need
+ * to access mayfly via a JDBC URL.  This creates a bit of
+ * work in terms of getting your tests to run independently
+ * of each other (one line summary: call {@link #shutdown}
+ * from your tearDown method).</p>
+ * 
+ * <p>JDBC URLs take two forms:</p>
+ * 
+ * <ol>
+ * <li>The URL <tt>jdbc:mayfly:</tt> means to open
+ * the default database.  The default database will be
+ * created if it doesn't exist (without tables or data).
+ * The default database is destroyed by calling {@link #shutdown}.
+ * </li>
+ * 
+ * <li>If you want to start a database with some tables or
+ * data, you can call {@link #create(DataStore)}, which will
+ * return a new URL to you.  This database lives until the next
+ * call to {@link #shutdown}.
+ * </li>
+ * </ol>
+ */
 public class JdbcDriver implements Driver {
 
-    private static final String JDBC_URL = "jdbc:mayfly:";
+    /** 
+     * <p>Create a database which you want to access via a JDBC URL.
+     * For many purposes, it will be more convenient to
+     * instantiate a {@link Database} object, but if you need a
+     * JDBC URL (for example, to pass to a database mapping layer
+     * like Hibernate or SqlMaps), call this method instead.</p>
+     * <p>Example:</p>
+     * <pre>
+    static final DataStore standardSetup = makeData();
+
+    private static DataStore makeData() {
+        try {
+            Database original = new Database();
+            original.execute("create table foo (a integer)");
+            original.execute("insert into foo(a) values(6)");
+            return original.dataStore();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    String jdbcUrl;
+    public void setUp() {
+        jdbcUrl = JdbcDriver.create(standardSetup);
+    }
+    
+    public void tearDown() {
+        JdbcDriver.shutdown();
+    }
+    </pre>
+     * @param dataStore The initial contents of the database.
+     */
+    public static String create(DataStore dataStore) {
+        return getMayflyDriver().createInDriver(dataStore);
+    }
+
+    /**
+     * <p>Destroy databases managed by {@link JdbcDriver}.  That is,
+     * all databases which have been created with {@link #create(DataStore)},
+     * plus the default database (the one with url <tt>jdbc:mayfly:</tt>).</p>
+     * 
+     * <p>Databases created by calling constructors of {@link Database} directly
+     * are instead garbage collected like any other object.</p>
+     */
+    public static void shutdown() {
+        getMayflyDriver().shutdownInDriver();
+    }
+
+    private static JdbcDriver getMayflyDriver() {
+        try {
+            return (JdbcDriver) DriverManager.getDriver(JDBC_URL_PREFIX);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static final String JDBC_URL_PREFIX = "jdbc:mayfly:";
+    private static final String DEFAULT_DATABASE = JDBC_URL_PREFIX;
 
     static {
         try {
@@ -18,23 +110,39 @@ public class JdbcDriver implements Driver {
         }
     }
     
-    // Could wait until connect() time to instantiate this (in the case
-    // where mayfly is just sitting around but not being used), but I
-    // guess I'll put that off until I have reason to think there is
-    // some significant cost to an empty Database object.
-    Database database = new Database();
+    HashMap databases = new HashMap();
+    int nextId;
 
     public Connection connect(String url, Properties info) throws SQLException {
-        if (!JDBC_URL.equals(url)) {
-            // Being strict about this will lessen future confusion in case we start to
-            // have multiple URLs which mean different things.
-            throw new SQLException("Mayfly only allows " + JDBC_URL + " for the JDBC URL");
+        return findDatabase(url).openConnection();
+    }
+
+    private Database findDatabase(String url) throws SQLException {
+        if (DEFAULT_DATABASE.equals(url)) {
+            if (!databases.containsKey(DEFAULT_DATABASE)) {
+                databases.put(DEFAULT_DATABASE, new Database());
+            }
         }
-        return database.openConnection();
+        
+        if (databases.containsKey(url)) {
+            return (Database) databases.get(url);
+        } else {
+            throw new SQLException("Mayfly JDBC URL " + url + " not recognized");
+        }
+    }
+
+    private String createInDriver(DataStore dataStore) {
+        String url = JDBC_URL_PREFIX + nextId++;
+        databases.put(url, new Database(dataStore));
+        return url;
+    }
+
+    private void shutdownInDriver() {
+        databases = new HashMap();
     }
 
     public boolean acceptsURL(String url) throws SQLException {
-        return url.startsWith(JDBC_URL);
+        return url != null && url.startsWith(JDBC_URL_PREFIX);
     }
 
     public DriverPropertyInfo[] getPropertyInfo(String url, Properties properties) throws SQLException {
@@ -52,4 +160,5 @@ public class JdbcDriver implements Driver {
     public boolean jdbcCompliant() {
         return false;
     }
+
 }

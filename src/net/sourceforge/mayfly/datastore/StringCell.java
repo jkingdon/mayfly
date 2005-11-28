@@ -26,4 +26,8 @@ public class StringCell extends Cell {
         return content;
     }
 
+    public int compareTo(Cell otherCell) {
+        return content.compareTo(((StringCell) otherCell).content);
+    }
+
 }

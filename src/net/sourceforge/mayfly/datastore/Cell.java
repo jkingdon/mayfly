@@ -30,4 +30,6 @@ public abstract class Cell extends ValueObject {
 
     abstract public Object asObject();
 
+    abstract public int compareTo(Cell otherCell);
+
 }

@@ -1,13 +1,12 @@
 package net.sourceforge.mayfly.ldbc;
 
-import org.ldbc.parser.*;
-
-import java.sql.*;
-import java.util.*;
-
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
+
+import org.ldbc.parser.*;
+
+import java.util.*;
 
 public abstract class Command extends ValueObject {
 
@@ -26,11 +25,11 @@ public abstract class Command extends ValueObject {
         }
     }
     
-    abstract public void substitute(Collection jdbcParameters) throws SQLException;
+    abstract public void substitute(Collection jdbcParameters);
 
     abstract public int parameterCount();
     
-    abstract public DataStore update(DataStore store) throws SQLException;
+    abstract public DataStore update(DataStore store);
 
     abstract public int rowsAffected();
 

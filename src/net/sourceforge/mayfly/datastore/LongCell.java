@@ -25,7 +25,9 @@ public class LongCell extends Cell {
     public String asString() {
         throw new MayflyException("Attempt to read number " + value + " as a string");
     }
-    
-    
+
+    public int compareTo(Cell otherCell) {
+        return new Long(value).compareTo(new Long(((LongCell) otherCell).value));
+    }
 
 }

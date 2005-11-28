@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.*;
 
-import java.sql.*;
 import java.util.*;
 
 public class DataStore {
@@ -21,33 +21,37 @@ public class DataStore {
         return new DataStore(tables.with(table, new TableData(Columns.fromColumnNames(table, columnNames))));
     }
 
-    public DataStore dropTable(String table) throws SQLException {
+    public DataStore dropTable(String table) {
         String canonicalTableName = lookUpTable(table);
         return new DataStore(tables.without(canonicalTableName));
     }
 
-    public TableData table(String table) throws SQLException {
+    public TableData table(String table) {
         String canonicalTableName = lookUpTable(table);
         
         return (TableData) tables.get(canonicalTableName);
     }
 
-    private String lookUpTable(String target) throws SQLException {
+    private String lookUpTable(String target) {
         for (Iterator iter = tables.keySet().iterator(); iter.hasNext(); ) {
             String canonicalTable = (String) iter.next();
             if (canonicalTable.equalsIgnoreCase(target)) {
                 return canonicalTable;
             }
         }
-        throw new SQLException("no such table " + target);
+        throw new MayflyException("no table " + target);
     }
 
     public Set tables() {
         return tables.keySet();
     }
 
-    public DataStore addRow(String table, List columnNames, List values) throws SQLException {
+    public DataStore addRow(String table, List columnNames, List values) {
         return new DataStore(tables.with(lookUpTable(table), table(table).addRow(columnNames, values)));
+    }
+
+    public DataStore addRow(String table, List values) {
+        return new DataStore(tables.with(lookUpTable(table), table(table).addRow(values)));
     }
 
 }

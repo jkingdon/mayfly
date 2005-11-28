@@ -4,7 +4,7 @@ import java.sql.*;
 
 public class JoinTest extends SqlTestCase {
 
-    public void testSimpleJoin() throws Exception {
+    public void testImplicitInnerJoin() throws Exception {
         execute("create table foo (a integer)");
         execute("create table bar (b integer)");
         execute("insert into foo (a) values (4)");
@@ -72,12 +72,13 @@ public class JoinTest extends SqlTestCase {
         execute("insert into foo (a) values (5)");
         execute("insert into bar (a) values (9)");
         
-        if (CONNECT_TO_MAYFLY) {
-            expectQueryFailure("select A from foo, bar", "ambiguous column A");
+        String ambiguousColumnNameQuery = "select A from foo, bar";
+        if (EXPECT_MAYFLY_BEHAVIOR) {
+            expectQueryFailure(ambiguousColumnNameQuery, "ambiguous column A");
         } else {
             // This is the hypersonic behavior.  It seems too "guess what I meant"-ish
             // for mayfly.
-            assertResultSet(new String[] {"5"}, query("select A from foo, bar"));
+            assertResultSet(new String[] {"5"}, query(ambiguousColumnNameQuery));
             assertResultSet(new String[] {"9"}, query("select A from bar, foo"));
         }
     }
@@ -114,11 +115,62 @@ public class JoinTest extends SqlTestCase {
         execute("insert into place (id, parent, name) values (100, 10, 'Bangalore')");
         assertResultSet(
             new String[] {
-                "'India', 'Karnataka'",
-                "'Karnataka', 'Bangalore'",
+                " 'Karnataka', 'India' ",
+                " 'Bangalore', 'Karnataka' ",
             },
-            query("select parent.name, child.name from place parent, place child " +
+            query("select child.name, parent.name from place parent, place child " +
                 "where parent.id = child.parent")
+        );
+    }
+
+    public void testLeftJoin() throws Exception {
+        execute("create table place (id integer, parent integer, name varchar(80))");
+        execute("insert into place (id, parent, name) values (1, 0, 'India')");
+        execute("insert into place (id, parent, name) values (10, 1, 'Karnataka')");
+        execute("insert into place (id, parent, name) values (100, 10, 'Bangalore')");
+        assertResultSet(
+            new String[] {
+                " 'India', null ",
+                " 'Karnataka', 'India' ",
+                " 'Bangalore', 'Karnataka' ",
+            },
+            query("select child.name, parent.name from place child left outer join place parent " +
+                "on parent.id = child.parent")
+        );
+    }
+    
+    public void testWordOuterIsOptional() throws Exception {
+        if (MAYFLY_MISSING) {
+            // The grammar, again.
+            execute("create table foo (a integer)");
+            assertNotNull(query("select * from foo left join foo on 1 = 1"));
+        }
+    }
+
+    public void testExplicitCrossJoin() throws Exception {
+        if (!MAYFLY_MISSING) {
+            // The parser doesn't have CROSS JOIN.
+            return;
+        }
+
+        // Is CROSS JOIN a synonym for INNER JOIN?  Need to look this up.
+        // I have seen CROSS JOIN from time to time on the web, so it seems like
+        // people use it.
+        execute("create table foo (a integer)");
+        execute("create table bar (b integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into bar (b) values (100)");
+        execute("insert into bar (b) values (101)");
+
+        assertResultSet(
+            new String[] {
+                "   4,  100 ",
+                "   4,  101 ",
+                "   5,  100 ",
+                "   5,  101 ",
+            },
+            query("select a, b from foo cross join bar on 1 = 1")
         );
     }
 
@@ -184,17 +236,24 @@ public class JoinTest extends SqlTestCase {
         // Hypersonic seems to say no, at least in the following case:
         // (I would think mayfly should reject this kind of usage, but what does SQL92 and/or
         // common practice say?)
-        if (!CONNECT_TO_MAYFLY) {
-          assertResultSet(
-              new String[] {
-                  " 5, 9 ",
-              },
-              query("select foo.a, bar.a from bar, foo inner join types on bar.a = type")
-          );
+        String onReachesOutOfJoinedColumnsQuery = 
+            "select foo.a, bar.a from bar, foo inner join types on bar.a = type";
+        if (EXPECT_MAYFLY_BEHAVIOR) {
+            if (MAYFLY_MISSING) {
+                // Parser problems.
+                expectQueryFailure(onReachesOutOfJoinedColumnsQuery, "todo");
+            }
+        } else {
+            assertResultSet(
+                new String[] {
+                    " 5, 9 ",
+                },
+                query(onReachesOutOfJoinedColumnsQuery)
+            );
         }
 
         // LDBC won't parse this
-        if (!CONNECT_TO_MAYFLY) {
+        if (MAYFLY_MISSING) {
             assertResultSet(
                 new String[] {
                     " 5, 9 ",
@@ -224,7 +283,7 @@ public class JoinTest extends SqlTestCase {
 
         /** We can't currently transform this 
          * {@link net.sourceforge.mayfly.ldbc.SelectTest#xtestNestedJoins()} */
-        if (!CONNECT_TO_MAYFLY) {
+        if (MAYFLY_MISSING) {
             assertResultSet(
                 new String[] {" 'FooVal', 'QuuxVal' " },
                 query("select foo.name, quux.name from foo inner join bar on f = b1 inner join quux on b2 = q")

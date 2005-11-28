@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -32,7 +33,7 @@ public class Tree implements AST {
         } catch (ANTLRException e) {
             // Do we want to report the text we were parsing, or line/column numbers?
             // Is there anything interesting about e other than its message (like its class?)
-            throw new SQLException(e.getMessage());
+            throw new MayflyException(e.getMessage());
         }
     }
 
@@ -256,10 +257,20 @@ public class Tree implements AST {
                         FromElement right = (FromElement) new Convert(converters).transform(rightTree);
                         Tree conditionTree = (Tree) selected.element(i + 3);
                         Where condition = (Where) new Convert(converters).transform(conditionTree);
-                        results.add(new Join(left, right, condition));
+                        results.add(new InnerJoin(left, right, condition));
+                        i += 3;
+                        continue;
+                    } else if (lookahead.getType() == SQLTokenTypes.LITERAL_left) {
+                        FromElement left = (FromElement) new Convert(converters).transform(tree);
+                        Tree rightTree = (Tree) selected.element(i + 2);
+                        FromElement right = (FromElement) new Convert(converters).transform(rightTree);
+                        Tree conditionTree = (Tree) selected.element(i + 3);
+                        Where condition = (Where) new Convert(converters).transform(conditionTree);
+                        results.add(new LeftJoin(left, right, condition));
                         i += 3;
                         continue;
                     }
+
                 }
                 
                 results.add(new Convert(converters).transform(tree));

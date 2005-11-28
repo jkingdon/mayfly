@@ -1,9 +1,8 @@
 package net.sourceforge.mayfly.ldbc;
 
-import java.sql.*;
-import java.util.*;
-
 import net.sourceforge.mayfly.datastore.*;
+
+import java.util.*;
 
 public class DropTable extends Command {
 
@@ -26,7 +25,7 @@ public class DropTable extends Command {
     public void substitute(Collection jdbcParameters) {
     }
 
-    public DataStore update(DataStore store) throws SQLException {
+    public DataStore update(DataStore store) {
         return store.dropTable(table());
     }
 

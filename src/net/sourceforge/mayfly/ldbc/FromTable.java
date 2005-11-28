@@ -3,9 +3,9 @@ package net.sourceforge.mayfly.ldbc;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
+
 import org.ldbc.antlr.collections.*;
 
-import java.sql.*;
 import java.util.*;
 
 public class FromTable extends ValueObject implements FromElement {
@@ -38,11 +38,11 @@ public class FromTable extends ValueObject implements FromElement {
         return fromElement;
     }
 
-    public Rows tableContents(DataStore store) throws SQLException {
+    public Rows tableContents(DataStore store) {
         return applyAlias(store.table(tableName).rows());
     }
 
-    public Rows dummyRows(DataStore store) throws SQLException {
+    public Rows dummyRows(DataStore store) {
         return applyAlias(store.table(tableName).dummyRows());
     }
 

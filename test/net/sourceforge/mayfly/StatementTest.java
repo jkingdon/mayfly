@@ -83,12 +83,12 @@ public class StatementTest extends SqlTestCase {
         prepared.close();
     }
     
-    public void xtestMissingSetCall() throws Exception {
+    public void testMissingSetCall() throws Exception {
         execute("create table Foo (a Integer, b integer)");
 
         PreparedStatement prepared = connection.prepareStatement("insert into foo (a, b) values (?, ?)");
         prepared.setInt(2, 90);
-        if (CONNECT_TO_MAYFLY) {
+        if (EXPECT_MAYFLY_BEHAVIOR) {
             try {
                 prepared.executeUpdate();
                 fail();
@@ -97,16 +97,17 @@ public class StatementTest extends SqlTestCase {
             }
             prepared.close();
         } else {
-            // Hypersonic behavior.  Defaulting to 0 seems too forgiving.
+            // Hypersonic behavior.  Defaulting to null seems too forgiving, especially given
+            // the way that JDBC, used straightforwardly, tends to turn null into 0.
             assertEquals(1, prepared.executeUpdate());
             prepared.close();
             
-            assertResultSet(new String[] { "0, 90" }, query("select a, b from foo"));
+            assertResultSet(new String[] { " null , 90 " }, query("select a, b from foo"));
         }
     }
     
     public void testSelect() throws Exception {
-        if (CONNECT_TO_MAYFLY) {
+        if (!MAYFLY_MISSING) {
             /** Still haven't implemented {@link net.sourceforge.mayfly.ldbc.Select#substitute(Collection)} */
             return;
         }

@@ -5,7 +5,6 @@ import net.sourceforge.mayfly.util.*;
 
 import org.ldbc.parser.*;
 
-import java.sql.*;
 import java.util.*;
 
 public class CreateTable extends Command {
@@ -42,10 +41,10 @@ public class CreateTable extends Command {
         return columnNames;
     }
 
-    public void substitute(Collection jdbcParameters) throws SQLException {
+    public void substitute(Collection jdbcParameters) {
     }
 
-    public DataStore update(DataStore store) throws SQLException {
+    public DataStore update(DataStore store) {
         return store.createTable(table(), columnNames());
     }
 

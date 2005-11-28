@@ -106,6 +106,17 @@ public class Columns extends Aggregate {
         throw new MayflyException("no column " + columnName);
     }
 
+    public void checkForDuplicates() {
+        Set names = new HashSet();
+        for (Iterator iter = iterator(); iter.hasNext();) {
+            Column column = (Column) iter.next();
+            if (!names.add(column.columnName().toLowerCase())) {
+                throw new MayflyException("duplicate column " + column.columnName());
+            }
+        }
+    }
+
+
     public static class ColumnMatching implements Selector{
         private String tableName;
         private String columnName;

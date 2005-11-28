@@ -11,22 +11,27 @@ import java.util.*;
 
 public class JdbcPreparedStatement implements PreparedStatement {
 
-    private final String command;
+    private final String sql;
     private Database database;
     private Vector parameters;
     private int parameterCount;
 
     JdbcPreparedStatement(String sql, Database database) throws SQLException {
-        this.command = sql;
-        this.database = database;
-        this.parameters = new Vector();
-        parameterCount = Command.fromTree(Tree.parse(sql)).parameterCount();;
+        try {
+            this.sql = sql;
+            this.database = database;
+            this.parameters = new Vector();
+            parameterCount = Command.fromTree(Tree.parse(sql)).parameterCount();;
+            parameters.setSize(parameterCount);
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
 
     public ResultSet executeQuery() throws SQLException {
         try {
-            Select select = Select.selectFromTree(Tree.parse(command));
-            select.substitute(parameters);
+            Select select = Select.selectFromTree(Tree.parse(sql));
+            substitute(select);
             return database.query(select);
         } catch (MayflyException e) {
             throw e.asSqlException();
@@ -34,7 +39,23 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public int executeUpdate() throws SQLException {
-        return database.execute(command, parameters);
+        try {
+            Command command = Command.fromTree(Tree.parse(sql));
+            substitute(command);
+            return database.executeUpdate(command);
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
+    }
+
+    private void substitute(Command command) throws SQLException {
+        for (int i = 0; i < parameterCount; ++i) {
+            if (parameters.get(i) == null) {
+                int oneBased = i + 1;
+                throw new MayflyException("Parameter " + oneBased + " missing");
+            }
+        }
+        command.substitute(parameters);
     }
 
     public void setNull(int parameterIndex, int sqlType) throws SQLException {

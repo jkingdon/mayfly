@@ -25,27 +25,21 @@ public class Database {
      * but is more convenient if you have a Database instance around.
      * @return Number of rows changed.
      */
-    public int execute(String command) throws SQLException {
-        return execute(command, Collections.EMPTY_LIST);
-    }
-
-    /**
-     * Execute an SQL command which does not return results.
-     * This is similar to the JDBC {@link PreparedStatement#executeUpdate()}
-     * but might be more convenient if you have a Database instance around.
-     * @param sql SQL command, with ? in place of values to be substituted.
-     * @param jdbcParameters Values to substitute for the parameters.
-     * @return Number of rows changed.
-     */
-    public int execute(String sql, List jdbcParameters) throws SQLException {
+    public int execute(String sql) throws SQLException {
         try {
             Command command = Command.fromTree(Tree.parse(sql));
-            command.substitute(jdbcParameters);
-            dataStore = command.update(dataStore);
-            return command.rowsAffected();
+            return executeUpdate(command);
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
+    }
+
+    /**
+     * Only intended for use within Mayfly.
+     */
+    public int executeUpdate(Command command) {
+        dataStore = command.update(dataStore);
+        return command.rowsAffected();
     }
 
     /**
@@ -54,14 +48,18 @@ public class Database {
      * but is more convenient if you have a Database instance around.
      */
     public ResultSet query(String command) throws SQLException {
-        Select select = Select.selectFromTree(Tree.parse(command));
-        return select.select(dataStore);
+        try {
+            Select select = Select.selectFromTree(Tree.parse(command));
+            return select.select(dataStore);
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
     
     /**
      * Only intended for use within Mayfly.
      */
-    public ResultSet query(Select select) throws SQLException {
+    public ResultSet query(Select select) {
         return select.select(dataStore);
     }
 

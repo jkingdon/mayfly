@@ -5,33 +5,16 @@ import java.sql.*;
 public class ValueTest extends SqlTestCase {
 
     public void testDropNonexisting() throws Exception {
-        try {
-            execute("DROP TABLE FOO");
-            fail();
-        } catch (SQLException expected) {
-            assertMessage("no such table FOO", expected);
-        }
+        expectExecuteFailure("DROP TABLE FOO", "no table FOO");
     }
-    
+
     public void testInsertWithBadColumnName() throws Exception {
         execute("CREATE TABLE FOO (A integer)");
-        try {
-            execute("INSERT INTO FOO (b) values (5)");
-            fail();
-        }
-        catch (SQLException e) {
-            assertMessage("no column b", e);
-        }
+        expectExecuteFailure("INSERT INTO FOO (b) values (5)", "no column b");
     }
     
     public void testInsertIntoNonexistentTable() throws Exception {
-        try {
-            execute("INSERT INTO FOO (b) values (5)");
-            fail();
-        }
-        catch (SQLException e) {
-            assertMessage("no such table FOO", e);
-        }
+        expectExecuteFailure("INSERT INTO FOO (b) values (5)", "no table FOO");
     }
     
     public void testNull() throws Exception {
@@ -110,30 +93,114 @@ public class ValueTest extends SqlTestCase {
     }
     
     private void checkWrongWayToLookForNull() throws SQLException {
-        {
-            String wrongWayToLookForNull = "select a from foo where a = null";
-            if (CONNECT_TO_MAYFLY) {
-                expectQueryFailure(wrongWayToLookForNull, 
-                    "To check for null, use IS NULL or IS NOT NULL, not a null literal"
-                );
-            } else {
-                // Hypersonic behavior.  I think SQL specifies that "a = null"
-                // evaluates to null, which then means false, but is this
-                // really useful or just a trap?  Until proven otherwise,
-                // I'm going with "trap".
-                ResultSet results = query(wrongWayToLookForNull);
-                assertFalse(results.next());
-                results.close();
-            }
+        String wrongWayToLookForNull = "select a from foo where a = null";
+        if (EXPECT_MAYFLY_BEHAVIOR) {
+            expectQueryFailure(wrongWayToLookForNull, 
+                "To check for null, use IS NULL or IS NOT NULL, not a null literal"
+            );
+        } else {
+            // Hypersonic behavior.  I think SQL specifies that "a = null"
+            // evaluates to null, which then means false, but is this
+            // really useful or just a trap?  Until proven otherwise,
+            // I'm going with "trap".
+            ResultSet results = query(wrongWayToLookForNull);
+            assertFalse(results.next());
+            results.close();
         }
     }
     
+    public void testAssertResultSetAndNull() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into foo (a) values (null)");
+        
+        assertResultSet(
+            new String[] {
+                " 5 ",
+                " null "
+            },
+            query("select a from foo")
+        );
+    }
+
     public void testEmptyStringAsNull() throws Exception {
-        // TODO: empty string is treated as null, I think
+        // TODO: empty string is supposed to be treated as null, I think
+        // Not the greatest SQL feature but I'm not sure it is one we should try
+        // to change.  (Or maybe we can somehow detect cases which cause
+        // trouble? Haven't thought too hard about this).
+    }
+    
+    public void testInsertSomeColumns() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo (b) values (5)");
+        assertResultSet(
+            new String[] { " null, 5 " },
+            query("select a, b from foo")
+        );
+    }
+    
+    public void testInsertAllColumns() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo values (5, 7)");
+        assertResultSet(
+            new String[] { " 5, 7 " },
+            query("select a, b from foo")
+        );
+    }
+    
+    public void testInsertBadColumnName() throws Exception {
+        execute("create table foo (a integer)");
+        // Do we want to know about all of them, or just the first?
+        // Just the first might be better in terms of avoiding
+        // information overload.
+        expectExecuteFailure("insert into foo (b, c) values (5, 7)", "no column b");
+    }
+    
+    public void testTooManyValues() throws Exception {
+        execute("create table foo (a integer)");
+        // Given a long list of column names, and a long list of values,
+        // it might not be obvious which value/name is misisng/surplus.
+        // So printing out the table of both is an attempt to make this
+        // easy to figure out.
+        expectExecuteFailure("insert into foo (a) values (5, 7)",
+            "Too many values.\n" +
+            "Columns and values were:\n" +
+            "a 5\n" +
+            "(none) 7\n"
+        );
+    }
+    
+    public void testTooFewValues() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        // Given a long list of column names, and a long list of values,
+        // it might not be obvious which value/name is misisng/surplus.
+        // So printing out the table of both is an attempt to make this
+        // easy to figure out.
+        expectExecuteFailure("insert into foo (a, b) values (5)",
+            "Too few values.\n" +
+            "Columns and values were:\n" +
+            "a 5\n" +
+            "b (none)\n"
+        );
+    }
+    
+    public void testInsertAllColumnsChecksForNumberOfValues() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        expectExecuteFailure("insert into foo values (5)",
+            "Too few values.\n" +
+            "Columns and values were:\n" +
+            "a 5\n" +
+            "b (none)\n"
+        );
+    }
+    
+    public void testDuplicateColumnName() throws Exception {
+        execute("create table foo (Id integer)");
+        expectExecuteFailure("insert into foo (Id, Id) values (5, 7)", "duplicate column Id");
     }
     
     public void testSelectExpression() throws Exception {
-        if (CONNECT_TO_MAYFLY) {
+        if (!MAYFLY_MISSING) {
             /** This turns out to be hard.  The fact that the {@link MyResultSet} takes
              * a {@link net.sourceforge.mayfly.ldbc.Columns}, which is a collection of
              * {@link net.sourceforge.mayfly.ldbc.what.Column} (rather than

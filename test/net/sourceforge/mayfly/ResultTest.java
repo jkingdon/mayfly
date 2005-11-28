@@ -12,7 +12,7 @@ public class ResultTest extends SqlTestCase {
     }
 
     public void testSelectFromBadTable() throws Exception {
-        expectQueryFailure("select a from foo", "no such table foo");
+        expectQueryFailure("select a from foo", "no table foo");
     }
 
     public void testBadColumnName() throws Exception {
@@ -120,5 +120,63 @@ public class ResultTest extends SqlTestCase {
 
         assertFalse(results.next());
     }
+    
+    public void testOrderBy() throws Exception {
+        execute("create table vehicles (name varchar(255), wheels integer, speed integer)");
+        execute("insert into vehicles (name, wheels, speed) values ('bicycle', 2, 15)");
+        execute("insert into vehicles (name, wheels, speed) values ('car', 4, 100)");
+        execute("insert into vehicles (name, wheels, speed) values ('tricycle', 3, 5)");
+        assertResultList(new String[] { "'bicycle'", "'tricycle'", "'car'" },
+            query("select name from vehicles order by wheels asc")
+        );
+        assertResultList(new String[] { "'car'", "'tricycle'", "'bicycle'" },
+            query("select name from vehicles order by wheels desc")
+        );
+        assertResultList(new String[] { "'tricycle'", "'bicycle'", "'car'" },
+            query("select name from vehicles order by speed")
+        );
+    }
+    
+    public void testOrderByWithAlias() throws Exception {
+        execute("create table places (id integer, parent integer, name varchar(255))");
+        execute("insert into places(id, parent, name) values(10, 1, 'B')");
+        execute("insert into places(id, parent, name) values(1, 20, 'A')");
+        execute("insert into places(id, parent, name) values(20, 0, 'C')");
+        String baseQuery = "select child.name from " +
+                "places child LEFT OUTER JOIN places parent " +
+                "on child.parent = parent.id";
+        assertResultList(new String[] { "'A'", "'B'", "'C'" },
+            query(baseQuery + " order by child.id")
+        );
+
+        assertResultList(new String[] { "'C'", "'B'", "'A'" },
+            query(baseQuery + " order by child.parent")
+        );
+        
+        // This one blows up because NullCell doesn't compare to LongCell.
+        // Worry about this later.
+//        assertResultList(new String[] { "'C'", "'B'", "'A'" },
+//            query(baseQuery + " order by parent.id")
+//        );
+        
+    }
+    
+    public void testOrderBySeveralColumns() throws Exception {
+        execute("create table foo (name varchar(255), major integer, minor integer)");
+        execute("insert into foo (name, major, minor) values ('E', 8, 2)");
+        execute("insert into foo (name, major, minor) values ('C', 6, 6)");
+        execute("insert into foo (name, major, minor) values ('A', 4, 99)");
+        execute("insert into foo (name, major, minor) values ('B', 6, 3)");
+        execute("insert into foo (name, major, minor) values ('D', 6, 9)");
+
+        assertResultList(new String[] { "'A'", "'B'", "'C'", "'D'", "'E'" },
+            query("select name from foo order by major, minor")
+        );
+    }
+
+    // TODO: order by a, b
+    // TODO: order by a   -- where a is in several columns, only one of which survives after the joins
+    // TODO: order by a   -- where a is ambiguous
+    // TODO: what other cases involving resolving column names?
     
 }

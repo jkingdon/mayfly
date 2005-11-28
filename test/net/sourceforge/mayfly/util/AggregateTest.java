@@ -182,6 +182,10 @@ public class AggregateTest extends TestCase {
             assertEquals("couldn't find d, try again", ex.getMessage());
         }
     }
+    
+    public void testToString() throws Exception {
+        assertEquals("[a, b]", new Strings("a", "b").toString());
+    }
 
     
 

@@ -10,6 +10,10 @@ import java.text.*;
 
 abstract public class Aggregate extends ValueObject implements Iterable {
     private String messageIfNotFound = "{0} not found";
+    
+    public String toString() {
+        return asList().toString();
+    }
 
     public L collect(final Transformer transformer) {
         final L results = new L();

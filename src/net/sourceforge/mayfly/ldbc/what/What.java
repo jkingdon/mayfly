@@ -5,7 +5,6 @@ import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.util.*;
 
-import java.sql.*;
 import java.util.*;
 
 public class What extends Aggregate {
@@ -33,7 +32,7 @@ public class What extends Aggregate {
         return this;
     }
 
-    public Columns selectedColumns() throws SQLException {
+    public Columns selectedColumns() {
         List result = new ArrayList();
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             WhatElement element = (WhatElement) iter.next();

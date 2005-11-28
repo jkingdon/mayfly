@@ -41,7 +41,12 @@ public class TreeConverters {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return Where.fromConditionTree(from);
                                                           }
-                                                      });
+                                                      })
+            .register(SQLTokenTypes.ORDER_BY,      new TreeConverters.Converter() {
+                public Object convert(Tree from, TreeConverters converters) {
+                    return OrderBy.fromTree(from);
+                }
+            });
     }
 
     public static TreeConverters forWhereTree() {
@@ -130,7 +135,22 @@ public class TreeConverters {
             .register(SQLTokenTypes.CONDITION,    new TreeConverters.SkipLevelAndContinue());
     }
 
+    public static TreeConverters forOrderBy() {
+        return new TreeConverters()
+            .register(SQLTokenTypes.ORDER_ITEM,   new TreeConverters.Converter() {
+                    public Object convert(Tree from, TreeConverters converters) {
+                        return OrderItem.fromTree(from, converters);
+                    }
+                })
+            .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
+                    public Object convert(Tree from, TreeConverters converters) {
+                        return WhatElement.fromExpressionTree(from);
+                    }
+                })
+            ;
+    }
 
+    
     private Map typeToConverter = new HashMap();
 
     public TreeConverters register(int type, Converter treeConverter) {

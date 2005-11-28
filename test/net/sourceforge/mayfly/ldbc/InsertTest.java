@@ -59,4 +59,15 @@ public class InsertTest extends TestCase {
         );
     }
     
+    public void testParseAll() throws Exception {
+        assertEquals(
+            new Insert(
+                new InsertTable("foo"),
+                null,
+                Arrays.asList(new Object[] {new Long(5)})
+            ),
+            Insert.insertFromTree(Tree.parse("insert into foo values (5)"))
+        );
+    }
+    
 }

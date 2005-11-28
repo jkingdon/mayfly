@@ -19,6 +19,10 @@ public class TupleBuilder {
 
     public TupleBuilder appendColumnCellContents(String tableName, String columnName, Object cellValue) {
         Cell cell = Cell.fromContents(cellValue);
+        return appendColumnCell(tableName, columnName, cell);
+    }
+
+    public TupleBuilder appendColumnCell(String tableName, String columnName, Cell cell) {
         return append(new TupleElement(new Column(tableName, columnName), cell));
     }
 

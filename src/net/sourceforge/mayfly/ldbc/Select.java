@@ -26,12 +26,18 @@ public class Select extends Command {
             converted.selectObjectsThatAre(Where.class).size() > 0 ?
                     (Where) converted.selectObjectThatIs(Where.class) :
                     Where.EMPTY;
+                    
+        OrderBy orderBy =
+            converted.selectObjectsThatAre(OrderBy.class).size() > 0 ?
+            (OrderBy) converted.selectObjectThatIs(OrderBy.class) :
+            new OrderBy();
 
         return
             new Select(
                 new What(converted.selectObjectsThatAre(WhatElement.class)),
                 new From(converted.selectObjectsThatAre(FromElement.class)),
-                where
+                where,
+                orderBy
             );
     }
 
@@ -39,28 +45,30 @@ public class Select extends Command {
     private What what;
     private From from;
     private Where where;
+    private final OrderBy orderBy;
 
     public Select(What what, From from, Where where) {
+        this(what, from, where, new OrderBy());
+    }
+
+    public Select(What what, From from, Where where, OrderBy orderBy) {
         this.what = what;
         this.from = from;
         this.where = where;
+        this.orderBy = orderBy;
     }
 
     public From from() {
         return from;
     }
 
-    public ResultSet select(final DataStore store) throws SQLException {
-        try {
-            Columns columns = what.selectedColumns();
-            checkColumns(store, columns);
-            return new MyResultSet(columns, query(store));
-        } catch (MayflyException e) {
-            throw e.asSqlException();
-        }
+    public ResultSet select(final DataStore store) {
+        Columns columns = what.selectedColumns();
+        checkColumns(store, columns);
+        return new MyResultSet(columns, query(store));
     }
 
-    private void checkColumns(final DataStore store, Columns columns) throws SQLException {
+    private void checkColumns(final DataStore store, Columns columns) {
         Row row = dummyRow(store);
 
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
@@ -71,7 +79,7 @@ public class Select extends Command {
         new Rows(row).select(where);
     }
 
-    private Row dummyRow(final DataStore store) throws SQLException {
+    private Row dummyRow(final DataStore store) {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();
@@ -86,7 +94,7 @@ public class Select extends Command {
         return (Row) joinedRows.element(0);
     }
 
-    public Rows query(DataStore store) throws SQLException {
+    public Rows query(DataStore store) {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();
@@ -96,10 +104,11 @@ public class Select extends Command {
             joinedRows = (Rows) joinedRows.cartesianJoin(table.tableContents(store));
         }
 
-        return (Rows) joinedRows.select(where);
+        Rows selected = (Rows) joinedRows.select(where);
+        return orderBy.sort(store, selected);
     }
 
-    public void substitute(Collection jdbcParameters) throws SQLException {
+    public void substitute(Collection jdbcParameters) {
         Iterator iter = jdbcParameters.iterator();
         what.substitute(iter);
         where.substitute(iter);
@@ -109,7 +118,7 @@ public class Select extends Command {
         return what.parameterCount() + where.parameterCount();
     }
 
-    public DataStore update(DataStore store) throws SQLException {
+    public DataStore update(DataStore store) {
         throw new UnimplementedException(UPDATE_MESSAGE);
     }
 

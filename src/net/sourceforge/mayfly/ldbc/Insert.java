@@ -7,7 +7,6 @@ import net.sourceforge.mayfly.util.*;
 
 import org.ldbc.parser.*;
 
-import java.sql.*;
 import java.util.*;
 
 public class Insert extends Command {
@@ -24,15 +23,30 @@ public class Insert extends Command {
 
     public static Insert insertFromTree(Tree tree) {
         Tree.Children children = tree.children();
+
         Tree tableIdentifier = (Tree) children.element(0);
-        Tree columnList = (Tree) children.element(1);
-        Tree values = (Tree) children.element(2);
-        
-        return new Insert(
-            new InsertTable(tableIdentifier.getText()),
-            fromColumnList(columnList),
-            fromValues(values)
-        );
+        InsertTable insertTable = new InsertTable(tableIdentifier.getText());
+
+        Tree secondChild = (Tree) children.element(1);
+        if (secondChild.getType() == SQLTokenTypes.COLUMN_LIST) {
+            Tree columnList = secondChild;
+            Tree values = (Tree) children.element(2);
+            
+            return new Insert(
+                insertTable,
+                fromColumnList(columnList),
+                fromValues(values)
+            );
+        } else {
+            Tree values = secondChild;
+            
+            return new Insert(
+                insertTable,
+                null,
+                fromValues(values)
+            );
+
+        }
     }
 
     private static List fromValues(Tree values) {
@@ -74,16 +88,8 @@ public class Insert extends Command {
         return result;
     }
 
-    public List columns() {
-        return columns;
-    }
-
     public String table() {
         return table.tableName();
-    }
-
-    public List values() {
-        return values;
     }
 
     public void substitute(Collection jdbcParameters) {
@@ -98,8 +104,12 @@ public class Insert extends Command {
         }
     }
 
-    public DataStore update(DataStore store) throws SQLException {
-        return store.addRow(table(), columns(), values());
+    public DataStore update(DataStore store) {
+        if (columns == null) {
+            return store.addRow(table(), values);
+        } else {
+            return store.addRow(table(), columns, values);
+        }
     }
 
     public int rowsAffected() {
@@ -108,7 +118,7 @@ public class Insert extends Command {
     
     public int parameterCount() {
         int count = 0;
-        for (int i = 0; i < values().size(); ++i) {
+        for (int i = 0; i < values.size(); ++i) {
             if (values.get(i) instanceof JdbcParameter) {
                 ++count;
             }

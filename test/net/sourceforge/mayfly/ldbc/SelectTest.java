@@ -1,6 +1,8 @@
 package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
+
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
@@ -10,6 +12,7 @@ import net.sourceforge.mayfly.util.*;
 import java.sql.*;
 
 public class SelectTest extends TestCase {
+
     public void testGrandParseIntegration() throws Exception {
         assertEquals(
             new Select(
@@ -75,6 +78,21 @@ public class SelectTest extends TestCase {
                 Where.EMPTY
             ),
             Select.selectFromTree(Tree.parse("select name from foo"))
+        );
+    }
+
+    public void testOrderBy() throws Exception {
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new All()),
+                new From()
+                    .add(new FromTable("foo")),
+                Where.EMPTY,
+                new OrderBy()
+                    .add(new SingleColumn("a"))
+            ),
+            Select.selectFromTree(Tree.parse("select * from foo order by a"))
         );
     }
 
@@ -181,7 +199,7 @@ public class SelectTest extends TestCase {
         try {
             Select.selectFromTree(Tree.parse("select x from foo"));
             fail();
-        } catch (SQLException e) {
+        } catch (MayflyException e) {
             assertEquals("unexpected token: x", e.getMessage());
         }
     }
@@ -192,7 +210,7 @@ public class SelectTest extends TestCase {
                 new What()
                     .add(new All()),
                 new From()
-                    .add(new Join(
+                    .add(new InnerJoin(
                         new FromTable("places"),
                         new FromTable("types"),
                         new Where(
@@ -207,9 +225,32 @@ public class SelectTest extends TestCase {
         );
     }
     
+    public void testParseLeftJoin() throws Exception {
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new All()),
+                new From()
+                    .add(new LeftJoin(
+                        new FromTable("places"),
+                        new FromTable("types"),
+                        new Where(
+                            new Eq(new SingleColumn("type"), new SingleColumn("id"))
+                        )
+                    )),
+                Where.EMPTY
+            ),
+            Select.selectFromTree(Tree.parse(
+                "select * from places left outer join types on type = id"
+            ))
+        );
+    }
+    
     public void xtestNestedJoins() throws Exception {
         // There's just no sane way to do this currently.  I think the grammar probably has
-        // to be smarter about what groups with what (?)
+        // to add another one of those
+        //     { #update = #([UPDATE, "update"], #update); }
+        // type thingies.
         System.out.println(Tree.parse(
                 "select * from foo inner join bar on f = b1 inner join quux on b2 = q"
             ).toString());
@@ -218,8 +259,8 @@ public class SelectTest extends TestCase {
                 new What()
                     .add(new All()),
                 new From()
-                    .add(new Join(
-                        new Join(
+                    .add(new InnerJoin(
+                        new InnerJoin(
                             new FromTable("foo"),
                             new FromTable("bar"),
                             new Where(
