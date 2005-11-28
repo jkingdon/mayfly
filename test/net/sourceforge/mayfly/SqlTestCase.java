@@ -89,43 +89,53 @@ public abstract class SqlTestCase extends TestCase {
 
     public static void assertResultSet(String[] rowsAsStrings, ResultSet results) throws SQLException {
         Collection expected = new HashSet();
-        boolean strings = buildExpected(rowsAsStrings, expected);
-    
-        assertEquals(expected, buildActual(results, strings, new HashSet()));
+        HashSet actual = new HashSet();
+        assertResults(rowsAsStrings, results, expected, actual);
     }
 
     public static void assertResultList(String[] rowsAsStrings, ResultSet results) throws SQLException {
         Collection expected = new ArrayList();
-        boolean strings = buildExpected(rowsAsStrings, expected);
-    
-        assertEquals(expected, buildActual(results, strings, new ArrayList()));
+        ArrayList actual = new ArrayList();
+        assertResults(rowsAsStrings, results, expected, actual);
     }
     
-    private static Collection buildActual(ResultSet results, boolean strings, Collection actual) 
+    private static void assertResults(String[] rowsAsStrings, ResultSet results, 
+        Collection expected, Collection actual) throws SQLException {
+        boolean strings = buildExpected(rowsAsStrings, expected);
+        int columnsToFetch = countColumnsOfFirstRow(expected);
+    
+        assertEquals(expected, buildActual(results, columnsToFetch, strings, actual));
+    }
+
+    private static int countColumnsOfFirstRow(Collection expected) {
+        Iterator iterator = expected.iterator();
+        if (iterator.hasNext()) {
+            return ((List) iterator.next()).size();
+        } else {
+            // We don't expect to fetch any rows in this case.
+            // So if the actual has a row, getting zero columns is fine.
+            return 0;
+        }
+    }
+
+    private static Collection buildActual(ResultSet results, int columnsToFetch, boolean strings, Collection actual) 
     throws SQLException {
         while (results.next()) {
             L row = new L();
-            boolean rowDone = false;
-            int col = 1;
     
-            while (!rowDone) {
-                try {
-                    Object value;
-                    if (strings) {
-                        value = results.getString(col);
-                    } else {
-                        value = new Integer(results.getInt(col));
-                    }
-
-                    if (results.wasNull()) {
-                        row.append(null);
-                    } else {
-                        row.append(value);
-                    }
-                } catch (SQLException ex) {
-                    rowDone = true;
+            for (int column = 1; column <= columnsToFetch; ++column) {
+                Object value;
+                if (strings) {
+                    value = results.getString(column);
+                } else {
+                    value = new Integer(results.getInt(column));
                 }
-                col++;
+
+                if (results.wasNull()) {
+                    row.append(null);
+                } else {
+                    row.append(value);
+                }
             }
     
             actual.add(row);

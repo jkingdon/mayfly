@@ -23,9 +23,8 @@ public class SingleColumn extends WhatElement implements Transformer {
     }
 
     public Object transform(Object from) {
-        //throw new RuntimeException("kill me");
         Row row = (Row) from;
-        return row.cell(new Column(tableOrAlias, columnName));
+        return row.cell(tableOrAlias, columnName);
     }
 
     public Tuple process(Tuple originalTuple, M aliasToTableName) {

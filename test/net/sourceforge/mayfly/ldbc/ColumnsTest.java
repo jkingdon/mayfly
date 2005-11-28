@@ -2,6 +2,9 @@ package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
 
+import java.util.*;
+
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
 import net.sourceforge.mayfly.datastore.*;
@@ -33,13 +36,6 @@ public class ColumnsTest extends TestCase {
         assertEquals("id", new Columns.ToLowercaseName().transform(new Column("Id")));
     }
 
-    public void testHasEquivalentName() throws Exception {
-        assertTrue(new Columns.HasEquivalentName("a").evaluate(new Column("a")));
-        assertTrue(new Columns.HasEquivalentName("a").evaluate(new Column("A")));
-        assertTrue(new Columns.HasEquivalentName("a").evaluate(new Column("foo", "a")));
-        assertFalse(new Columns.HasEquivalentName("a").evaluate(new Column("b")));
-    }
-
     public void testColumnMatching() throws Exception {
         Column a = new Column(new TableIdentifier("foo"), "a");
         Column b = new Column(new TableIdentifier("foo"), "b");
@@ -54,6 +50,36 @@ public class ColumnsTest extends TestCase {
         assertTrue(new Columns.ColumnMatching("bar", "C").evaluate(c));
 
         assertFalse(new Columns.ColumnMatching("bar", "C").evaluate(a));
+    }
+    
+    public void testLookup() throws Exception {
+        Columns columns = new Columns(new ImmutableList(Arrays.asList(
+            new Column[] {
+                new Column("foo", "a"),
+                new Column("bar", "a"),
+                new Column("foo", "b"),
+                new Column("d")
+            })));
+        
+        assertEquals(new Column("foo", "b"), columns.columnFromName("b"));
+        assertEquals(new Column("foo", "b"), columns.columnFromName("B"));
+
+        try {
+            columns.columnFromName("c");
+            fail();
+        } catch (MayflyException e) {
+            assertEquals("no column c", e.getMessage());
+        }
+
+        try {
+            columns.columnFromName("a");
+            fail();
+        } catch (MayflyException e) {
+            assertEquals("ambiguous column a", e.getMessage());
+        }
+        
+        assertEquals(new Column("d"), columns.columnFromName("d"));
+
     }
 
 

@@ -119,8 +119,60 @@ public class ResultTest extends SqlTestCase {
         }
 
         assertFalse(results.next());
+        results.close();
     }
     
+    public void testOrderByDoesNotCountAsWhat() throws Exception {
+        execute("create table vehicles (name varchar(255), wheels integer)");
+        execute("insert into vehicles (name, wheels) values ('bicycle', 2)");
+        ResultSet results = query("select name from vehicles order by wheels");
+        assertTrue(results.next());
+        assertEquals("bicycle", results.getString(1));
+        if (EXPECT_MAYFLY_BEHAVIOR) {
+            try {
+                results.getInt(2);
+                fail();
+            } catch (SQLException e) {
+                assertMessage("no column 2", e);
+            }
+        } else {
+            // Is this just a hypersonic quirk or do other databases do this?
+            assertEquals(2, results.getInt(2));
+        }
+
+        results.close();
+    }
+
+    public void testTwoMatchingColumns() throws Exception {
+        execute("CREATE TABLE FOO (A INTEGER)");
+        execute("CREATE TABLE BAR (A INTEGER)");
+        execute("INSERT INTO FOO (A) values (5)");
+        execute("INSERT INTO BAR (A) values (7)");
+        ResultSet results = query("select foo.a, bar.a from foo inner join bar on bar.a > foo.a");
+        assertTrue(results.next());
+        if (EXPECT_MAYFLY_BEHAVIOR) {
+            try {
+                results.getInt("a");
+                fail();
+            } catch (SQLException e) {
+                assertMessage("ambiguous column a", e);
+            }
+        } else {
+            // Seems to be in the confusing "guess what I might mean" category.
+            assertEquals(5, results.getInt("a"));
+        }
+        assertEquals(5, results.getInt(1));
+        assertEquals(7, results.getInt(2));
+        
+        try {
+            results.getInt("foo.a");
+            fail();
+        } catch (SQLException e) {
+            assertMessage("column name foo.a should not contain a period", e);
+        }
+    }
+    
+
     public void testOrderBy() throws Exception {
         execute("create table vehicles (name varchar(255), wheels integer, speed integer)");
         execute("insert into vehicles (name, wheels, speed) values ('bicycle', 2, 15)");
@@ -174,7 +226,6 @@ public class ResultTest extends SqlTestCase {
         );
     }
 
-    // TODO: order by a, b
     // TODO: order by a   -- where a is in several columns, only one of which survives after the joins
     // TODO: order by a   -- where a is ambiguous
     // TODO: what other cases involving resolving column names?

@@ -62,7 +62,7 @@ public final class MyResultSet extends ResultSetStub {
 
     private Column columnFromName(String columnName) throws SQLException {
         try {
-            return columns.columnFromName(columnName);
+            return currentRow().findColumn(columnName);
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
@@ -81,10 +81,13 @@ public final class MyResultSet extends ResultSetStub {
     }
 
     private Cell cell(Column column) throws SQLException {
-        Row row = (Row) rows.element(checkedRowNumber());
-        Cell cell = row.cell(column);
+        Cell cell = currentRow().cell(column);
         wasNull = cell instanceof NullCell;
         return cell;
+    }
+
+    private Row currentRow() throws SQLException {
+        return (Row) rows.element(checkedRowNumber());
     }
 
     private int checkedRowNumber() throws SQLException {

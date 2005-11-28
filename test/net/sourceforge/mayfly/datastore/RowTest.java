@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
 import junit.framework.*;
+
 import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.ldbc.what.*;
 
 public class RowTest extends TestCase {
 
@@ -17,8 +17,8 @@ public class RowTest extends TestCase {
                 .appendColumnCellContents("colC", "3")
         );
 
-        assertEquals(new StringCell("2"), row.cell(new Column("colB")));
-        assertEquals(new StringCell("2"), row.cell(new Column("COLb")));
+        assertEquals(new StringCell("2"), row.cell(row.findColumn("colB")));
+        assertEquals(new StringCell("2"), row.cell(row.findColumn("COLb")));
     }
 
     public void testCellByAliasAndColumn() throws Exception {

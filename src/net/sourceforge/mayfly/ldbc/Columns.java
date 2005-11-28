@@ -49,15 +49,6 @@ public class Columns extends Aggregate {
         return collect(new ToLowercaseName());
     }
 
-    /**
-     * Only suitable for the case in which we know the column to exist.
-     * If the column might not exist, {@link Columns#columnFromName(String)
-     * throws a better-worded exception.
-     */
-    public Column findColumnWithName(String columnNameString) {
-        return (Column) find(new HasEquivalentName(columnNameString));
-    }
-
     public Column columnMatching(String tableName, String columnName) {
         return (Column) find(new ColumnMatching(tableName, columnName));
     }
@@ -75,19 +66,6 @@ public class Columns extends Aggregate {
         }
     }
 
-    static class HasEquivalentName implements Selector {
-        private String columnNameString;
-
-        public HasEquivalentName(String columnNameString) {
-            this.columnNameString = columnNameString;
-        }
-
-        public boolean evaluate(Object candidate) {
-            Column column = (Column) candidate;
-            return column.matchesName(columnNameString);
-        }
-    }
-
     public ImmutableList asImmutableList() {
         return columns;
     }
@@ -97,13 +75,7 @@ public class Columns extends Aggregate {
     }
 
     public Column columnFromName(String columnName) {
-        for (int i = 0; i < size(); ++i) {
-            Column column = get(i);
-            if (column.matchesName(columnName)) {
-                return column;
-            }
-        }
-        throw new MayflyException("no column " + columnName);
+        return findColumn(null, columnName, columns.iterator());
     }
 
     public void checkForDuplicates() {
@@ -117,7 +89,27 @@ public class Columns extends Aggregate {
     }
 
 
-    public static class ColumnMatching implements Selector{
+    public static Column findColumn(String tableOrAlias, String columnName, Iterator columnIterator) {
+        Column found = null;
+        for (Iterator iter = columnIterator; iter.hasNext(); ) {
+            Column column = (Column) iter.next();
+            if (column.matches(tableOrAlias, columnName)) {
+                if (found != null) {
+                    throw new MayflyException("ambiguous column " + columnName);
+                } else {
+                    found = column;
+                }
+            }
+        }
+        if (found == null) {
+            throw new MayflyException("no column " + Column.displayName(tableOrAlias, columnName));
+        } else {
+            return found;
+        }
+    }
+
+
+    public static class ColumnMatching implements Selector {
         private String tableName;
         private String columnName;
 

@@ -139,14 +139,4 @@ public class TableData {
         return rows;
     }
 
-    public boolean hasColumn(String target) {
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            Column column = (Column) iter.next();
-            if (column.matchesName(target)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 }

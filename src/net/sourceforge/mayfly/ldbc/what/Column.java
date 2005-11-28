@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.ldbc.what;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.util.*;
 import net.sourceforge.mayfly.datastore.*;
 
@@ -30,14 +31,23 @@ public class Column extends ValueObject implements CellHeader {
     }
 
     public boolean matchesName(String otherName) {
-        return columnName.equalsIgnoreCase(otherName);
+        return matches(null, otherName);
     }
 
     public boolean matches(String tableOrAlias, String target) {
+        if (target.indexOf('.') != -1) {
+            throw new MayflyException("column name " + target + " should not contain a period");
+        }
+
         if (tableOrAlias != null && !tableOrAlias.equalsIgnoreCase(this.tableOrAlias)) {
             return false;
         }
-        return matchesName(target);
+        return columnName.equalsIgnoreCase(target);
+    }
+
+    public boolean matches2(String tableName, String columnName) {
+        return tableIdentifier.equals(new TableIdentifier(tableName)) 
+            && columnName.toLowerCase().equals(this.columnName);
     }
 
     public String tableOrAlias() {
@@ -56,7 +66,4 @@ public class Column extends ValueObject implements CellHeader {
         }
     }
 
-    public boolean matches2(String tableName, String columnName) {
-        return tableIdentifier.equals(new TableIdentifier(tableName)) && columnName.toLowerCase().equals(this.columnName);
-    }
 }
