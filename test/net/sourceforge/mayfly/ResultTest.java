@@ -226,8 +226,40 @@ public class ResultTest extends SqlTestCase {
         );
     }
 
+    public void testOrderByAmbiguous() throws Exception {
+        execute("CREATE TABLE FOO (A INTEGER)");
+        execute("CREATE TABLE BAR (A INTEGER)");
+        String sql = "select foo.a, bar.a from foo, bar order by a";
+        if (EXPECT_MAYFLY_BEHAVIOR) {
+            expectQueryFailure(sql, "ambiguous column a");
+        } else {
+            assertResultSet(new String[] { }, query(sql));
+        }
+    }
+
     // TODO: order by a   -- where a is in several columns, only one of which survives after the joins
-    // TODO: order by a   -- where a is ambiguous
     // TODO: what other cases involving resolving column names?
+    
+    public void testLimit() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo (a) values (1)");
+        execute("insert into foo (a) values (8)");
+        execute("insert into foo (a) values (2)");
+        execute("insert into foo (a) values (7)");
+        execute("insert into foo (a) values (3)");
+        execute("insert into foo (a) values (6)");
+        execute("insert into foo (a) values (3)");
+        execute("insert into foo (a) values (6)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into foo (a) values (4)");
+
+        if (MAYFLY_MISSING) {
+            assertResultList(new String[] {"4", "5"}, query("select a from foo order by a limit 2 offset 4"));
+        
+            // Without an ORDER BY, just reject LIMIT? (The postgres manual specifically
+            // warns against LIMIT without ORDER BY, for example).
+            expectQueryFailure("select a from foo limit 2 offset 4", "Must specify ORDER BY with LIMIT");
+        }
+    }
     
 }

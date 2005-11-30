@@ -77,6 +77,7 @@ public class Select extends Command {
         }
 
         new Rows(row).select(where);
+        orderBy.check(row);
     }
 
     private Row dummyRow(final DataStore store) {

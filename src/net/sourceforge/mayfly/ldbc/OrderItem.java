@@ -36,4 +36,8 @@ public class OrderItem extends ValueObject {
         return ascending ? comparison : - comparison;
     }
 
+    public void check(Row dummyRow) {
+        column.transform(dummyRow);
+    }
+
 }

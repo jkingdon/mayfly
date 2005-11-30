@@ -64,4 +64,11 @@ public class OrderBy extends Aggregate {
         return new Rows(new ImmutableList(rowList));
     }
 
+    public void check(Row dummyRow) {
+        for (Iterator iter = elements.iterator(); iter.hasNext();) {
+            OrderItem item = (OrderItem) iter.next();
+            item.check(dummyRow);
+        }
+    }
+
 }
