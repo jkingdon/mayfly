@@ -220,17 +220,26 @@ public class JoinTest extends SqlTestCase {
             new String[] {
                 " 9 ",
             },
-            query("select bar.a from bar inner join types on a = type")
+            query("select a from bar inner join types on a = type")
         );
 
-        // LDBC won't parse this
         // Hypersonic says column A is ambiguous
-//        assertResultSet(
-//                new String[] {
-//                    " 5, 9 ",
-//                },
-//                query("select foo.a, bar.a from foo, bar inner join types on a = type")
-//            );
+        if (EXPECT_MAYFLY_BEHAVIOR) {
+            assertResultSet(
+                new String[] {
+                    " 5, 9 ",
+                },
+                query("select foo.a, bar.a from foo, bar inner join types on a = type")
+            );
+        }
+
+        // Hypersonic-friendly variant of above case
+        assertResultSet(
+            new String[] {
+                " 5, 9 ",
+            },
+            query("select foo.a, bar.a from foo, bar inner join types on bar.a = type")
+        );
 
         // Which raises the question of whether the ON is really any different from the WHERE.
         // Hypersonic seems to say no, at least in the following case:
@@ -239,10 +248,7 @@ public class JoinTest extends SqlTestCase {
         String onReachesOutOfJoinedColumnsQuery = 
             "select foo.a, bar.a from bar, foo inner join types on bar.a = type";
         if (EXPECT_MAYFLY_BEHAVIOR) {
-            if (MAYFLY_MISSING) {
-                // Parser problems.
-                expectQueryFailure(onReachesOutOfJoinedColumnsQuery, "todo");
-            }
+            expectQueryFailure(onReachesOutOfJoinedColumnsQuery, "no column bar.a");
         } else {
             assertResultSet(
                 new String[] {
@@ -252,15 +258,12 @@ public class JoinTest extends SqlTestCase {
             );
         }
 
-        // LDBC won't parse this
-        if (MAYFLY_MISSING) {
-            assertResultSet(
-                new String[] {
-                    " 5, 9 ",
-                },
-                query("select foo.a, bar.a from bar inner join types on a = type, foo")
-            );
-        }
+        assertResultSet(
+            new String[] {
+                " 5, 9 ",
+            },
+            query("select foo.a, bar.a from bar inner join types on a = type, foo")
+        );
     }
     
     public void testNestedJoins() throws Exception {
