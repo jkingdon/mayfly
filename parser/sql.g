@@ -422,16 +422,15 @@ select_list:
 ;
 
 table_list:
-    selected_table table_list_more
+	(from_item ( COMMA! from_item)* )
 ;
 
-table_list_more:
-    ( ( COMMA selected_table ) * )
-    | join
+from_item:
+	selected_table | join
 ;
 
 join:
-    ("inner" | "left" "outer"!) "join"! selected_table "on"! condition (join)?
+    selected_table ("inner" | "left" "outer"!) "join"! selected_table "on"! condition (join)?
     { #join = #([JOIN, "join"], #join); }
 ;
 

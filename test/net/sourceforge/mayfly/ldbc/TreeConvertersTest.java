@@ -7,7 +7,6 @@ import net.sourceforge.mayfly.parser.*;
 public class TreeConvertersTest extends TestCase {
     private Tree asterisk;
     private Tree foo;
-    private Tree comma;
     private Tree bar;
     private Tree where;
     private Tree t;
@@ -17,11 +16,9 @@ public class TreeConvertersTest extends TestCase {
 
         t = Tree.parse("select * from foo f, bar b where f.id=b.id and f.name='steve'");
 
-
         asterisk = new Tree(t.getFirstChild());
         foo = new Tree(asterisk.getNextSibling());
-        comma = new Tree(foo.getNextSibling());
-        bar = new Tree(comma.getNextSibling());
+        bar = new Tree(foo.getNextSibling());
         where = new Tree(bar.getNextSibling());
     }
 

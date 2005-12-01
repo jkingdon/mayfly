@@ -37,6 +37,11 @@ public class TreeConverters {
                                                               return FromTable.fromSeletedTableTree(from);
                                                           }
                                                       })
+            .register(SQLTokenTypes.JOIN,      new TreeConverters.Converter() {
+                public Object convert(Tree from, TreeConverters converters) {
+                    return Join.fromJoinTree(from, converters);
+                }
+            })
             .register(SQLTokenTypes.CONDITION,     new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return Where.fromConditionTree(from);

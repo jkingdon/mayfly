@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.parser.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -71,23 +70,23 @@ public class Tree implements AST {
     }
 
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        treeString("", this, sb);
-        return sb.toString();
+        StringBuilder result = new StringBuilder();
+        treeString("", this, result);
+        return result.toString();
     }
 
 
-    private void treeString(String prefix, AST ast, StringBuilder sb) {
-        sb.append(prefix + ast.getText() + " (" + typeName(ast.getType()) + ")" + "\n");
+    private void treeString(String prefix, AST ast, StringBuilder result) {
+        result.append(prefix + ast.getText() + " (" + typeName(ast.getType()) + ")" + "\n");
 
         AST child = ast.getFirstChild();
-        if (child!=null) {
-            treeString(prefix + " |-> ", child, sb);
+        if (child != null) {
+            treeString(prefix + " |-> ", child, result);
         }
 
         AST nextSibling = ast.getNextSibling();
-        if (nextSibling!=null) {
-            treeString(prefix, nextSibling, sb);
+        if (nextSibling != null) {
+            treeString(prefix, nextSibling, result);
         }
     }
 
@@ -259,32 +258,7 @@ public class Tree implements AST {
             final L results = new L();
             
             for (int i = 0; i < selected.size(); i++) {
-                int lookaheadIndex = i + 1;
                 Tree tree = (Tree) selected.element(i);
-
-                if (lookaheadIndex < selected.size()) {
-                    Tree lookahead = (Tree) selected.element(lookaheadIndex);
-                    if (lookahead.getType() == SQLTokenTypes.JOIN) {
-                        FromElement left = (FromElement) new Convert(converters).transform(tree);
-                        Children joinChildren = lookahead.children();
-                        Tree type = (Tree) joinChildren.element(0);
-
-                        Tree rightTree = (Tree) joinChildren.element(1);
-                        FromElement right = (FromElement) new Convert(converters).transform(rightTree);
-                        Tree conditionTree = (Tree) joinChildren.element(2);
-                        Where condition = (Where) new Convert(converters).transform(conditionTree);
-                        
-                        if (type.getType() == SQLTokenTypes.LITERAL_inner) {
-                            results.add(new InnerJoin(left, right, condition));
-                        } else if (type.getType() == SQLTokenTypes.LITERAL_left) {
-                            results.add(new LeftJoin(left, right, condition));
-                        }
-                        i += 1;
-                        continue;
-                    }
-
-                }
-                
                 results.add(new Convert(converters).transform(tree));
             }
             
