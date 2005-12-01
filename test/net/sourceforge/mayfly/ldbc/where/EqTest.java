@@ -1,11 +1,12 @@
 package net.sourceforge.mayfly.ldbc.where;
 
 import junit.framework.*;
+
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import org.ldbc.parser.*;
+import net.sourceforge.mayfly.parser.*;
 
 public class EqTest extends TestCase {
 

@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
 
-import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
@@ -194,14 +193,19 @@ public class SelectTest extends TestCase {
         return command;
     }
 
-    // Evidently, X is reserved to ldbc (but not jsqlparser)
+    // Some versions of ldbc reserved X, but seemingly not the grammar
+    // we have now.
     public void testX() throws Exception {
-        try {
-            Select.selectFromTree(Tree.parse("select x from foo"));
-            fail();
-        } catch (MayflyException e) {
-            assertEquals("unexpected token: x", e.getMessage());
-        }
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new SingleColumn("x")),
+                new From()
+                    .add(new FromTable("foo")),
+                Where.EMPTY
+            ),
+            Select.selectFromTree(Tree.parse("select x from foo"))
+        );
     }
     
     public void testParseExplicitJoin() throws Exception {

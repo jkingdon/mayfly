@@ -5,8 +5,7 @@ import junit.framework.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
-
-import org.ldbc.parser.*;
+import net.sourceforge.mayfly.parser.*;
 
 public class IsNullTest extends TestCase {
 

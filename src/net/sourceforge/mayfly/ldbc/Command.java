@@ -2,9 +2,8 @@ package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.parser.*;
 import net.sourceforge.mayfly.util.*;
-
-import org.ldbc.parser.*;
 
 import java.util.*;
 

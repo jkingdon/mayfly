@@ -1,10 +1,11 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import junit.framework.TestCase;
+import junit.framework.*;
+
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.ldbc.what.*;
-import org.ldbc.parser.*;
+import net.sourceforge.mayfly.ldbc.where.literal.*;
+import net.sourceforge.mayfly.parser.*;
 
 public class OrTest extends TestCase {
     public void testParse() throws Exception {

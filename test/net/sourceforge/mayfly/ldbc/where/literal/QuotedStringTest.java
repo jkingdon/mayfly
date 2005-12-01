@@ -1,9 +1,10 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
 import junit.framework.*;
+
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
-import org.ldbc.parser.*;
+import net.sourceforge.mayfly.parser.*;
 
 public class QuotedStringTest extends TestCase {
     public void testParse() throws Exception {

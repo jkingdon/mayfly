@@ -4,7 +4,7 @@ import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import org.ldbc.parser.*;
+import net.sourceforge.mayfly.parser.*;
 
 import java.util.*;
 

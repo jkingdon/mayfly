@@ -1,7 +1,8 @@
 package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.TestCase;
-import org.ldbc.parser.*;
+
+import net.sourceforge.mayfly.parser.*;
 
 public class TreeConvertersTest extends TestCase {
     private Tree asterisk;

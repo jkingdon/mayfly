@@ -2,12 +2,13 @@ package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.where.*;
+import net.sourceforge.mayfly.parser.*;
 import net.sourceforge.mayfly.util.*;
 
 import org.apache.commons.lang.*;
-import org.ldbc.antlr.*;
-import org.ldbc.antlr.collections.*;
-import org.ldbc.parser.*;
+
+import antlr.*;
+import antlr.collections.*;
 
 import java.io.*;
 import java.lang.reflect.*;
@@ -190,6 +191,18 @@ public class Tree implements AST {
 
     public String toStringTree() {
         return delegate.toStringTree();
+    }
+
+    public int getColumn() {
+        return delegate.getColumn();
+    }
+
+    public int getLine() {
+        return delegate.getLine();
+    }
+
+    public int getNumberOfChildren() {
+        return delegate.getNumberOfChildren();
     }
 
     public Children children() {

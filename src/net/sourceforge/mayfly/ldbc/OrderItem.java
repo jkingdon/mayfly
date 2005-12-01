@@ -1,9 +1,8 @@
 package net.sourceforge.mayfly.ldbc;
 
-import org.ldbc.parser.*;
-
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.parser.*;
 import net.sourceforge.mayfly.util.*;
 
 public class OrderItem extends ValueObject {

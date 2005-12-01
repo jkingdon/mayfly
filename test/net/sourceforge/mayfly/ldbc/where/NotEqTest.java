@@ -5,8 +5,7 @@ import junit.framework.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-
-import org.ldbc.parser.*;
+import net.sourceforge.mayfly.parser.*;
 
 public class NotEqTest extends TestCase {
     public void testParse() throws Exception {

@@ -1,11 +1,11 @@
 package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
-import org.ldbc.parser.*;
+
+import net.sourceforge.mayfly.parser.*;
+import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
-
-import net.sourceforge.mayfly.util.*;
 
 public class TreeTest extends TestCase {
     private Tree asterisk;
