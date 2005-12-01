@@ -69,6 +69,7 @@ tokens {
     ALTER_TABLE_RENAME;
     ALTER_TABLE_ADD_COLUMN;
     TABLE_ASTERISK;
+    JOIN;
 }
 
 condition:
@@ -431,6 +432,7 @@ table_list_more:
 
 join:
     ("inner" | "left" "outer"!) "join"! selected_table "on"! condition (join)?
+    { #join = #([JOIN, "join"], #join); }
 ;
 
 select_item:

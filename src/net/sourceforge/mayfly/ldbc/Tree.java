@@ -264,23 +264,22 @@ public class Tree implements AST {
 
                 if (lookaheadIndex < selected.size()) {
                     Tree lookahead = (Tree) selected.element(lookaheadIndex);
-                    if (lookahead.getType() == SQLTokenTypes.LITERAL_inner) {
+                    if (lookahead.getType() == SQLTokenTypes.JOIN) {
                         FromElement left = (FromElement) new Convert(converters).transform(tree);
-                        Tree rightTree = (Tree) selected.element(i + 2);
+                        Children joinChildren = lookahead.children();
+                        Tree type = (Tree) joinChildren.element(0);
+
+                        Tree rightTree = (Tree) joinChildren.element(1);
                         FromElement right = (FromElement) new Convert(converters).transform(rightTree);
-                        Tree conditionTree = (Tree) selected.element(i + 3);
+                        Tree conditionTree = (Tree) joinChildren.element(2);
                         Where condition = (Where) new Convert(converters).transform(conditionTree);
-                        results.add(new InnerJoin(left, right, condition));
-                        i += 3;
-                        continue;
-                    } else if (lookahead.getType() == SQLTokenTypes.LITERAL_left) {
-                        FromElement left = (FromElement) new Convert(converters).transform(tree);
-                        Tree rightTree = (Tree) selected.element(i + 2);
-                        FromElement right = (FromElement) new Convert(converters).transform(rightTree);
-                        Tree conditionTree = (Tree) selected.element(i + 3);
-                        Where condition = (Where) new Convert(converters).transform(conditionTree);
-                        results.add(new LeftJoin(left, right, condition));
-                        i += 3;
+                        
+                        if (type.getType() == SQLTokenTypes.LITERAL_inner) {
+                            results.add(new InnerJoin(left, right, condition));
+                        } else if (type.getType() == SQLTokenTypes.LITERAL_left) {
+                            results.add(new LeftJoin(left, right, condition));
+                        }
+                        i += 1;
                         continue;
                     }
 

@@ -32,7 +32,7 @@
 
     <target name="parser">
     	<mkdir dir="build/parser/net/sourceforge/mayfly/parser"/>
-        <java classname="antlr.Tool" fork="true">
+        <java classname="antlr.Tool" fork="true" failonerror="true">
             <classpath refid="classpath"/>
             <arg value="-o"/>
             <arg value="build/parser/net/sourceforge/mayfly/parser"/>
