@@ -71,4 +71,8 @@ public class OrderBy extends Aggregate {
         }
     }
 
+    public boolean isEmpty() {
+        return elements.size() == 0;
+    }
+
 }

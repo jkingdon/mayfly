@@ -31,12 +31,18 @@ public class Select extends Command {
             (OrderBy) converted.selectObjectThatIs(OrderBy.class) :
             new OrderBy();
 
+        Limit limit =
+            converted.selectObjectsThatAre(Limit.class).size() > 0 ?
+            (Limit) converted.selectObjectThatIs(Limit.class) :
+                Limit.NONE;
+
         return
             new Select(
                 new What(converted.selectObjectsThatAre(WhatElement.class)),
                 new From(converted.selectObjectsThatAre(FromElement.class)),
                 where,
-                orderBy
+                orderBy,
+                limit
             );
     }
 
@@ -45,16 +51,18 @@ public class Select extends Command {
     private From from;
     private Where where;
     private final OrderBy orderBy;
+    private final Limit limit;
 
     public Select(What what, From from, Where where) {
-        this(what, from, where, new OrderBy());
+        this(what, from, where, new OrderBy(), Limit.NONE);
     }
 
-    public Select(What what, From from, Where where, OrderBy orderBy) {
+    public Select(What what, From from, Where where, OrderBy orderBy, Limit limit) {
         this.what = what;
         this.from = from;
         this.where = where;
         this.orderBy = orderBy;
+        this.limit = limit;
     }
 
     public From from() {
@@ -63,11 +71,11 @@ public class Select extends Command {
 
     public ResultSet select(final DataStore store) {
         Columns columns = what.selectedColumns();
-        checkColumns(store, columns);
+        check(store, columns);
         return new MyResultSet(columns, query(store));
     }
 
-    private void checkColumns(final DataStore store, Columns columns) {
+    private void check(final DataStore store, Columns columns) {
         Row row = dummyRow(store);
 
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
@@ -77,6 +85,10 @@ public class Select extends Command {
 
         new Rows(row).select(where);
         orderBy.check(row);
+        
+        if (orderBy.isEmpty() && limit.isSpecified()) {
+            throw new MayflyException("Must specify ORDER BY with LIMIT");
+        }
     }
 
     private Row dummyRow(final DataStore store) {
@@ -105,7 +117,8 @@ public class Select extends Command {
         }
 
         Rows selected = (Rows) joinedRows.select(where);
-        return orderBy.sort(store, selected);
+        Rows sorted = orderBy.sort(store, selected);
+        return limit.limit(sorted);
     }
 
     public void substitute(Collection jdbcParameters) {

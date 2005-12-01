@@ -36,6 +36,7 @@ tokens {
     GROUP_BY;
     ORDER_BY;
     ORDER_ITEM;
+    LIMIT;
     NOT;
     BETWEEN;
     NOT_BETWEEN;
@@ -395,6 +396,7 @@ select:
     ( "group"! "by"! group_by )?
     ( "having" condition )?
     ( "order"! "by"! order_by )?
+    ( "limit"! limit )?
     { #select = #([SELECT, "select"], #select); }
 ;
 
@@ -604,6 +606,11 @@ order_by:
 order_item:
     ( column ) ( "asc" | "desc" )? 
     { #order_item = #([ORDER_ITEM, "order_item"], #order_item); }
+;
+
+limit:
+    NUMBER ( "offset"! NUMBER )?
+    { #limit = #([LIMIT, "limit"], #limit); }
 ;
 
 //

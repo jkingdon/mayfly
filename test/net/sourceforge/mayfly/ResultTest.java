@@ -240,7 +240,7 @@ public class ResultTest extends SqlTestCase {
     // TODO: order by a   -- where a is in several columns, only one of which survives after the joins
     // TODO: what other cases involving resolving column names?
     
-    public void testLimit() throws Exception {
+    public void testLimitWithOffset() throws Exception {
         execute("create table foo (a integer)");
         execute("insert into foo (a) values (1)");
         execute("insert into foo (a) values (8)");
@@ -248,18 +248,28 @@ public class ResultTest extends SqlTestCase {
         execute("insert into foo (a) values (7)");
         execute("insert into foo (a) values (3)");
         execute("insert into foo (a) values (6)");
-        execute("insert into foo (a) values (3)");
-        execute("insert into foo (a) values (6)");
         execute("insert into foo (a) values (5)");
         execute("insert into foo (a) values (4)");
 
-        if (MAYFLY_MISSING) {
-            assertResultList(new String[] {"4", "5"}, query("select a from foo order by a limit 2 offset 4"));
-        
-            // Without an ORDER BY, just reject LIMIT? (The postgres manual specifically
-            // warns against LIMIT without ORDER BY, for example).
-            expectQueryFailure("select a from foo limit 2 offset 4", "Must specify ORDER BY with LIMIT");
-        }
+        assertResultList(new String[] {"4", "5"}, query("select a from foo order by a limit 2 offset 3"));
+    
+        assertResultList(new String[] {"7", "8"}, query("select a from foo order by a limit 50 offset 6"));
+
+        assertResultList(new String[] { }, query("select a from foo order by a limit 50 offset 8"));
+
+        // Without an ORDER BY, just reject LIMIT (The postgres manual specifically
+        // warns against LIMIT without ORDER BY, for example).
+        expectQueryFailure("select a from foo limit 2 offset 3", "Must specify ORDER BY with LIMIT");
+    }
+    
+    public void testLimitNoOffset() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo (a) values (2)");
+        execute("insert into foo (a) values (1)");
+
+        assertResultList(new String[] {"1"}, query("select a from foo order by a limit 1"));
+        assertResultList(new String[] {"1", "2"}, query("select a from foo order by a limit 2"));
+        assertResultList(new String[] {"1", "2"}, query("select a from foo order by a limit 3"));
     }
     
 }

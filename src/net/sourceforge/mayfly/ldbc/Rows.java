@@ -27,5 +27,9 @@ public class Rows extends Aggregate {
     public Iterator iterator() {
         return rows.iterator();
     }
+    
+    public int size() {
+        return rows.size();
+    }
 
 }

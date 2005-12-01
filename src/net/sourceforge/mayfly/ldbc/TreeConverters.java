@@ -51,7 +51,13 @@ public class TreeConverters {
                 public Object convert(Tree from, TreeConverters converters) {
                     return OrderBy.fromTree(from);
                 }
-            });
+            })
+            .register(SQLTokenTypes.LIMIT,      new TreeConverters.Converter() {
+                public Object convert(Tree from, TreeConverters converters) {
+                    return Limit.fromTree(from);
+                }
+            })
+            ;
     }
 
     public static TreeConverters forWhereTree() {

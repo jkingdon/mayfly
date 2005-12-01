@@ -89,7 +89,7 @@ public class SelectTest extends TestCase {
                     .add(new FromTable("foo")),
                 Where.EMPTY,
                 new OrderBy()
-                    .add(new SingleColumn("a"))
+                    .add(new SingleColumn("a")), Limit.NONE
             ),
             Select.selectFromTree(Tree.parse("select * from foo order by a"))
         );
