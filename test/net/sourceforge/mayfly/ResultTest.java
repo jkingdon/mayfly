@@ -256,6 +256,7 @@ public class ResultTest extends SqlTestCase {
         assertResultList(new String[] {"7", "8"}, query("select a from foo order by a limit 50 offset 6"));
 
         assertResultList(new String[] { }, query("select a from foo order by a limit 50 offset 8"));
+        assertResultList(new String[] { }, query("select a from foo order by a limit 50 offset 9"));
 
         // Without an ORDER BY, just reject LIMIT (The postgres manual specifically
         // warns against LIMIT without ORDER BY, for example).

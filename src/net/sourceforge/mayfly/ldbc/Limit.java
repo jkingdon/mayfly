@@ -33,6 +33,10 @@ public class Limit {
         if (offset == 0 && count >= rows.size()) {
             return rows;
         }
+        
+        if (offset > rows.size()) {
+            return new Rows();
+        }
         int end = Math.min(offset + count, rows.size());
         return new Rows(new ImmutableList(rows.asList().subList(offset, end)));
     }
