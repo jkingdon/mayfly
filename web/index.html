@@ -45,6 +45,13 @@ SQL database as easy as creating any other in-memory data structure.</p>
 <p>Some of what has been implemented so far:</p>
 
 <ul>
+<li>The ability to very cheaply snapshot the database (both metadata and
+data) and restore from that point.</li>
+
+<!-- Need link to javadoc
+<li>Your choice of JDBC or the Mayfly-specific Database class</li>
+-->
+
 <li>Any number of tables, columns, and rows (limited by available memory and
 to a certain extent by query speed).</li>
 
@@ -64,7 +71,9 @@ to a certain extent by query speed).</li>
 
 <p>See Martin Fowler's <a 
 href="http://martinfowler.com/bliki/InMemoryDatabase.html"
->InMemoryDatabase</a>.  We don't disagree with him about
+>InMemoryDatabase</a>.</p>
+<!-- 
+We don't disagree with him about
 wanting a Repository layer for your querying code, but we do regard
 an in-memory SQL database as generally more practical than a test-only
 implementation of
@@ -72,7 +81,7 @@ your Repository with java collections in an ad-hoc way (and getting
 the view of the data provided by the various queries to agree with
 each other).  His idea of a Prevayler-like journal
 has occurred to us as well, although memory-only usage for unit
-tests is our current focus.</p>
+tests is our current focus.</p>-->
 
 </td>
 </tr>
