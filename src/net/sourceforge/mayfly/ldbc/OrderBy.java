@@ -40,7 +40,7 @@ public class OrderBy extends Aggregate {
     }
 
     public Rows sort(final DataStore store, Rows rows) {
-        if (elements.size() == 0) {
+        if (isEmpty()) {
             return rows;
         }
 

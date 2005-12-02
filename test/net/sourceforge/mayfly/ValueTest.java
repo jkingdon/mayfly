@@ -124,10 +124,10 @@ public class ValueTest extends SqlTestCase {
     }
 
     public void testEmptyStringAsNull() throws Exception {
-        // TODO: empty string is supposed to be treated as null, I think
-        // Not the greatest SQL feature but I'm not sure it is one we should try
-        // to change.  (Or maybe we can somehow detect cases which cause
-        // trouble? Haven't thought too hard about this).
+        // TODO: empty string is treated as null by Oracle, but not by
+        // Postgres.  I've seen Postgres examples like 'foo' || '' => 'foo'
+        // but 'foo' || null => null.
+        // So what should Mayfly do?
     }
     
     public void testInsertSomeColumns() throws Exception {
