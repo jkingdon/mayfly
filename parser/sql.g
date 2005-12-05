@@ -432,7 +432,8 @@ from_item:
 ;
 
 join:
-    selected_table ("inner" | "left" "outer"!) "join"! selected_table "on"! condition (join)?
+    selected_table ("inner" | "left" "outer"!) "join"! selected_table "on"! condition
+//    | selected_table "cross" "join"! selected_table
     { #join = #([JOIN, "join"], #join); }
 ;
 

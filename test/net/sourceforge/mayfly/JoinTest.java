@@ -147,15 +147,17 @@ public class JoinTest extends SqlTestCase {
         }
     }
 
-    public void testExplicitCrossJoin() throws Exception {
+    public void testCrossJoin() throws Exception {
+        // Hypersonic, and to a certain extent MySQL, treat CROSS JOIN as being
+        // just like INNER JOIN.  Mayfly, Oracle, and Postgres hew more closely
+        // to the SQL standard: INNER JOIN must have ON and CROSS JOIN cannot have ON.
+
         if (!MAYFLY_MISSING) {
-            // The parser doesn't have CROSS JOIN.
+            // The above describes the intended mayfly behavior, but I can't figure out
+            // how to get ANTLR to parse CROSS JOIN.  Something dumb, I'm sure.
             return;
         }
 
-        // Is CROSS JOIN a synonym for INNER JOIN?  Need to look this up.
-        // I have seen CROSS JOIN from time to time on the web, so it seems like
-        // people use it.
         execute("create table foo (a integer)");
         execute("create table bar (b integer)");
         execute("insert into foo (a) values (4)");
@@ -163,15 +165,30 @@ public class JoinTest extends SqlTestCase {
         execute("insert into bar (b) values (100)");
         execute("insert into bar (b) values (101)");
 
-        assertResultSet(
-            new String[] {
-                "   4,  100 ",
-                "   4,  101 ",
-                "   5,  100 ",
-                "   5,  101 ",
-            },
-            query("select a, b from foo cross join bar on 1 = 1")
-        );
+        String[] fullCartesianProduct = new String[] {
+            "   4,  100 ",
+            "   4,  101 ",
+            "   5,  100 ",
+            "   5,  101 ",
+        };
+
+        String crossJoinNoOn = "select a, b from foo cross join bar";
+        if (EXPECT_MAYFLY_BEHAVIOR) {
+            assertResultSet(fullCartesianProduct, query(crossJoinNoOn));
+        } else {
+            expectQueryFailure(crossJoinNoOn, null);
+        }
+        
+        String crossJoinWithOn = "select a, b from foo cross join bar on 1 = 1";
+        if (EXPECT_MAYFLY_BEHAVIOR) {
+            expectQueryFailure(crossJoinWithOn,
+                "Specify INNER JOIN, not CROSS JOIN, if you want an ON condition");
+        } else {
+            assertResultSet(fullCartesianProduct, query(crossJoinWithOn));
+        }
+
+        expectQueryFailure("select a, b from foo inner join bar",
+            "Specify CROSS JOIN, not INNER JOIN, if you want to omit an ON condition");
     }
 
     public void testExplicitJoin() throws Exception {

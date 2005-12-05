@@ -251,10 +251,7 @@ public class SelectTest extends TestCase {
     }
     
     public void xtestNestedJoins() throws Exception {
-        // There's just no sane way to do this currently.  I think the grammar probably has
-        // to add another one of those
-        //     { #update = #([UPDATE, "update"], #update); }
-        // type thingies.
+        // Parser issue.  Something about which rules to apply in which order or something, I guess.
         System.out.println(Tree.parse(
                 "select * from foo inner join bar on f = b1 inner join quux on b2 = q"
             ).toString());
