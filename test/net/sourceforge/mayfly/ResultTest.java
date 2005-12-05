@@ -296,6 +296,24 @@ public class ResultTest extends SqlTestCase {
         assertFalse(results.next());
     }
 
+    public void testSelectAllFromTable() throws Exception {
+        execute("create table foo (x integer, y integer)");
+        execute("create table bar (x integer, z integer)");
+        execute("insert into foo(x, y) values (3, 7)");
+        execute("insert into foo(x, y) values (5, 9)");
+        execute("insert into bar(x, z) values (3, 80)");
+        execute("insert into bar(x, z) values (4, 70)");
+        
+        ResultSet results = query("select bar.* from foo inner join bar on foo.x = bar.x");
+        assertTrue(results.next());
+
+        assertEquals(3, results.getInt(1));
+        assertEquals(80, results.getInt(2));
+        assertNoColumn(results, 3);
+
+        assertFalse(results.next());
+    }
+
     private void assertNoColumn(ResultSet results, int columnIndex) {
         try {
             results.getInt(columnIndex);

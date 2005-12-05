@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
@@ -25,6 +27,18 @@ public class Tuple extends Aggregate {
 
     public Iterator iterator() {
         return elements.iterator();
+    }
+
+    public Columns columnsForTable(String aliasOrTable) {
+        L found = new L();
+        for (int i = 0; i < elements.size(); ++i) {
+            TupleElement element = (TupleElement) elements.get(i);
+            Column column = element.column();
+            if (column.matchesAliasOrTable(aliasOrTable)) {
+                found.add(column);
+            }
+        }
+        return new Columns(new ImmutableList(found));
     }
 
     public Cell cellFor(CellHeader header) {
@@ -71,4 +85,5 @@ public class Tuple extends Aggregate {
             return ((TupleElement)from).cell();
         }
     }
+
 }

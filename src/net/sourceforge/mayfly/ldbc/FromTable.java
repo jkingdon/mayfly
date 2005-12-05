@@ -66,11 +66,8 @@ public class FromTable extends ValueObject implements FromElement {
         TupleBuilder newTuples = new TupleBuilder();
         for (Iterator iter = row.iterator(); iter.hasNext(); ) {
             TupleElement entry = (TupleElement) iter.next();
-            Column column = (Column) entry.header();
-            Cell cell = entry.cell();
-
-            Column newColumn = new Column(alias, column.columnName());
-            newTuples.append(new TupleElement(newColumn, cell));
+            Column newColumn = new Column(alias, entry.column().columnName());
+            newTuples.append(new TupleElement(newColumn, entry.cell()));
         }
         return new Row(newTuples);
     }

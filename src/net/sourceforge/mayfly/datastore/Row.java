@@ -51,6 +51,10 @@ public class Row extends Aggregate {
         return new Columns(ImmutableList.fromIterable(tuple.headers()));
     }
 
+    public Columns columnsForTable(String aliasOrTable) {
+        return tuple.columnsForTable(aliasOrTable);
+    }
+
     public String toString() {
         String columns = tuple.headers().toString();
         String cells = tuple.cells().toString();
@@ -64,4 +68,5 @@ public class Row extends Aggregate {
     public Tuple tuple() {
         return tuple;
     }
+
 }

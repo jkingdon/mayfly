@@ -39,10 +39,14 @@ public class Column extends ValueObject implements CellHeader {
             throw new MayflyException("column name " + target + " should not contain a period");
         }
 
-        if (tableOrAlias != null && !tableOrAlias.equalsIgnoreCase(this.tableOrAlias)) {
+        if (tableOrAlias != null && !matchesAliasOrTable(tableOrAlias)) {
             return false;
         }
         return columnName.equalsIgnoreCase(target);
+    }
+
+    public boolean matchesAliasOrTable(String tableOrAlias) {
+        return tableOrAlias.equalsIgnoreCase(this.tableOrAlias);
     }
 
     public boolean matches2(String tableName, String columnName) {

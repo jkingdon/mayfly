@@ -11,14 +11,14 @@ public class AllColumnsFromTable extends WhatElement {
         return new AllColumnsFromTable(dimensionIdentifier);
     }
 
-    /*private*/ String dimension;
+    private String aliasOrTable;
 
-    public AllColumnsFromTable(String dimension) {
-        this.dimension = dimension;
+    public AllColumnsFromTable(String aliasOrTable) {
+        this.aliasOrTable = aliasOrTable;
     }
 
     public Columns columns(Row dummyRow) {
-        throw new UnimplementedException("selecting everything from a table (select table.*) not implemeneted");
+        return dummyRow.columnsForTable(aliasOrTable);
     }
 
     public Tuple process(Tuple originalTuple, M aliasToTableName) {

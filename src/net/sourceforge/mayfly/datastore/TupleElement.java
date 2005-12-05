@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
 
 public class TupleElement extends ValueObject {
@@ -13,6 +14,10 @@ public class TupleElement extends ValueObject {
 
     public CellHeader header() {
         return header;
+    }
+
+    public Column column() {
+        return (Column)header;
     }
 
     public Cell cell() {
