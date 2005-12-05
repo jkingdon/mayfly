@@ -10,7 +10,7 @@ import antlr.collections.*;
 
 abstract public class WhatElement extends ValueObject {
 
-    abstract public Columns columns();
+    abstract public Columns columns(Row dummyRow);
 
     public static Object fromExpressionTree(Tree column) {
         switch (column.getType()) {

@@ -32,11 +32,11 @@ public class What extends Aggregate {
         return this;
     }
 
-    public Columns selectedColumns() {
+    public Columns selectedColumns(Row dummyRow) {
         List result = new ArrayList();
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             WhatElement element = (WhatElement) iter.next();
-            result.addAll(element.columns().asImmutableList());
+            result.addAll(element.columns(dummyRow).asImmutableList());
         }
         return new Columns(new ImmutableList(result));
     }

@@ -70,21 +70,20 @@ public class Select extends Command {
     }
 
     public ResultSet select(final DataStore store) {
-        Columns columns = what.selectedColumns();
-        check(store, columns);
+        Row dummyRow = dummyRow(store);
+        Columns columns = what.selectedColumns(dummyRow);
+        check(store, columns, dummyRow);
         return new MyResultSet(columns, query(store));
     }
 
-    private void check(final DataStore store, Columns columns) {
-        Row row = dummyRow(store);
-
+    private void check(final DataStore store, Columns columns, Row dummyRow) {
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
             Column column = (Column) iter.next();
-            row.cell(column);
+            dummyRow.cell(column);
         }
 
-        new Rows(row).select(where);
-        orderBy.check(row);
+        new Rows(dummyRow).select(where);
+        orderBy.check(dummyRow);
         
         if (orderBy.isEmpty() && limit.isSpecified()) {
             throw new MayflyException("Must specify ORDER BY with LIMIT");

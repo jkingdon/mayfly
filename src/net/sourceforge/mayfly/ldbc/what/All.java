@@ -7,8 +7,8 @@ import net.sourceforge.mayfly.ldbc.*;
 
 public class All extends WhatElement {
 
-    public Columns columns() {
-        throw new UnimplementedException("selecting everything (select *) not implemented");
+    public Columns columns(Row dummyRow) {
+        return dummyRow.columns();
     }
 
     public Tuple process(Tuple originalTuple, M aliasToTableName) {

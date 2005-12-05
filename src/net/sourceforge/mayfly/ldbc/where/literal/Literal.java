@@ -25,7 +25,7 @@ public abstract class Literal extends WhatElement implements Transformer {
         return Cell.fromContents(valueForCellContentComparison());
     }
     
-    public Columns columns() {
+    public Columns columns(Row dummyRow) {
         return new Columns(new ImmutableList());
     }
 

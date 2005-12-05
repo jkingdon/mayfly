@@ -12,7 +12,7 @@ public class JdbcParameter extends WhatElement implements Transformer {
     private JdbcParameter() {
     }
 
-    public Columns columns() {
+    public Columns columns(Row dummyRow) {
         throw new MayflyException("internal error: should have substituted jdbc parameters by now");
     }
 

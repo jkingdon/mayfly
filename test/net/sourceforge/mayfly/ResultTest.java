@@ -102,26 +102,14 @@ public class ResultTest extends SqlTestCase {
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
 
-        try {
-            results.getInt(0);
-            fail();
-        } catch (SQLException e) {
-            assertMessage("no column 0", e);
-        }
-
+        assertNoColumn(results, 0);
         assertEquals(5, results.getInt(1));
-
-        try {
-            results.getInt(2);
-            fail();
-        } catch (SQLException e) {
-            assertMessage("no column 2", e);
-        }
+        assertNoColumn(results, 2);
 
         assertFalse(results.next());
         results.close();
     }
-    
+
     public void testOrderByDoesNotCountAsWhat() throws Exception {
         execute("create table vehicles (name varchar(255), wheels integer)");
         execute("insert into vehicles (name, wheels) values ('bicycle', 2)");
@@ -271,6 +259,50 @@ public class ResultTest extends SqlTestCase {
         assertResultList(new String[] {"1"}, query("select a from foo order by a limit 1"));
         assertResultList(new String[] {"1", "2"}, query("select a from foo order by a limit 2"));
         assertResultList(new String[] {"1", "2"}, query("select a from foo order by a limit 3"));
+    }
+    
+
+    public void testSelectAll() throws Exception {
+        execute("create table foo (x integer, y integer)");
+        execute("insert into foo(x, y) values (3, 7)");
+        
+        ResultSet results = query("select * from foo");
+        assertTrue(results.next());
+
+        assertEquals(3, results.getInt(1));
+        assertEquals(7, results.getInt(2));
+        assertNoColumn(results, 3);
+
+        assertFalse(results.next());
+    }
+
+    public void testSelectAllWithJoin() throws Exception {
+        execute("create table foo (x integer, y integer)");
+        execute("create table bar (x integer, z integer)");
+        execute("insert into foo(x, y) values (3, 7)");
+        execute("insert into foo(x, y) values (5, 9)");
+        execute("insert into bar(x, z) values (3, 80)");
+        execute("insert into bar(x, z) values (4, 70)");
+        
+        ResultSet results = query("select * from foo inner join bar on foo.x = bar.x");
+        assertTrue(results.next());
+
+        assertEquals(3, results.getInt(1));
+        assertEquals(7, results.getInt(2));
+        assertEquals(3, results.getInt(3));
+        assertEquals(80, results.getInt(4));
+        assertNoColumn(results, 5);
+
+        assertFalse(results.next());
+    }
+
+    private void assertNoColumn(ResultSet results, int columnIndex) {
+        try {
+            results.getInt(columnIndex);
+            fail();
+        } catch (SQLException e) {
+            assertMessage("no column " + columnIndex, e);
+        }
     }
     
 }

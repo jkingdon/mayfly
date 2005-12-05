@@ -159,7 +159,7 @@ public class ValueTest extends SqlTestCase {
     public void testTooManyValues() throws Exception {
         execute("create table foo (a integer)");
         // Given a long list of column names, and a long list of values,
-        // it might not be obvious which value/name is misisng/surplus.
+        // it might not be obvious which value/name is missing/surplus.
         // So printing out the table of both is an attempt to make this
         // easy to figure out.
         expectExecuteFailure("insert into foo (a) values (5, 7)",
@@ -173,7 +173,7 @@ public class ValueTest extends SqlTestCase {
     public void testTooFewValues() throws Exception {
         execute("create table foo (a integer, b integer)");
         // Given a long list of column names, and a long list of values,
-        // it might not be obvious which value/name is misisng/surplus.
+        // it might not be obvious which value/name is missing/surplus.
         // So printing out the table of both is an attempt to make this
         // easy to figure out.
         expectExecuteFailure("insert into foo (a, b) values (5)",
@@ -212,7 +212,7 @@ public class ValueTest extends SqlTestCase {
 
         execute("create table foo (dummy integer)");
         execute("insert into foo(dummy) values(5)");
-        assertResultSet(new String[] {"5"}, query("select 5 from foo"));
+        assertResultSet(new String[] {"7"}, query("select 7 from foo"));
     }
 
 }
