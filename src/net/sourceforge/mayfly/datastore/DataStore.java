@@ -5,6 +5,18 @@ import net.sourceforge.mayfly.ldbc.*;
 
 import java.util.*;
 
+/**
+ * A data store is an immutable object containing data
+ * and metadata for a set of tables.
+ * 
+ * <p>You typically get one via {@link net.sourceforge.mayfly.Database#dataStore()}
+ * and then pass it to {@link net.sourceforge.mayfly.Database#Database(DataStore)}.</p>
+ * 
+ * @internal
+ * As with the rest of our immutable objects, all fields should
+ * be final and types which are immutable (like String,
+ * Double, ImmutableList, long, etc).
+ */
 public class DataStore {
 
     private final ImmutableMap tables;

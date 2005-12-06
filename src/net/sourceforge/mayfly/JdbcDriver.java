@@ -6,7 +6,7 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * <p>JDBC Driver for mayfly.</p>
+ * JDBC Driver for Mayfly.
  * 
  * <p>In many cases, it will be more convenient to instantiate a
  * {@link net.sourceforge.mayfly.Database} object, and then
@@ -22,7 +22,8 @@ import java.util.*;
  * of each other (one line summary: call {@link #shutdown}
  * from your tearDown method).</p>
  * 
- * <p>JDBC URLs take two forms:</p>
+ * <p>One connects via standard JDBC mechanisms, using
+ * a JDBC URL of one of the following two forms:</p>
  * 
  * <ol>
  * <li>The URL <tt>jdbc:mayfly:</tt> means to open
@@ -37,6 +38,15 @@ import java.util.*;
  * call to {@link #shutdown}.
  * </li>
  * </ol>
+ * 
+ * <p>If you specify a username or a password via JDBC,
+ * Mayfly ignores them.</p>
+ * 
+ * <p>Example:</p>
+ * <pre>
+ * Class.forName("net.sourceforge.mayfly.JdbcDriver");
+ * Connection connection = DriverManager.getConnection("jdbc:mayfly:");
+ * </pre>
  */
 public class JdbcDriver implements Driver {
 
@@ -47,27 +57,27 @@ public class JdbcDriver implements Driver {
      * JDBC URL (for example, to pass to a database mapping layer
      * like Hibernate or SqlMaps), call this method instead.</p>
      * <p>Example:</p>
-     * <pre>
+    <pre>
     static final DataStore standardSetup = makeData();
 
     private static DataStore makeData() {
-        try {
-            Database original = new Database();
-            original.execute("create table foo (a integer)");
-            original.execute("insert into foo(a) values(6)");
-            return original.dataStore();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    &nbsp;&nbsp;&nbsp;&nbsp;try {
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Database original = new Database();
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;original.execute("create table foo (a integer)");
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;original.execute("insert into foo(a) values(6)");
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return original.dataStore();
+    &nbsp;&nbsp;&nbsp;&nbsp;} catch (SQLException e) {
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;throw new RuntimeException(e);
+    &nbsp;&nbsp;&nbsp;&nbsp;}
     }
 
     String jdbcUrl;
     public void setUp() {
-        jdbcUrl = JdbcDriver.create(standardSetup);
+    &nbsp;&nbsp;&nbsp;&nbsp;jdbcUrl = JdbcDriver.create(standardSetup);
     }
     
     public void tearDown() {
-        JdbcDriver.shutdown();
+    &nbsp;&nbsp;&nbsp;&nbsp;JdbcDriver.shutdown();
     }
     </pre>
      * @param dataStore The initial contents of the database.

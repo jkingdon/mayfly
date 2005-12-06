@@ -2,6 +2,7 @@ package net.sourceforge.mayfly;
 import java.sql.*;
 
 /**
+ * @internal
  * For errors which we don't think will
  * make it out of mayfly itself, we can use this exception, or
  * RuntimeException, or IllegalArgumentException (etc).

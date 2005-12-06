@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
 /**
+ * @internal
  * Emulate the Java 1.5 StringBuilder class, so that when we switch to 1.5 we don't
  * need to find and replace StringBuffer all through the code.
  */

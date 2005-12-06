@@ -2,8 +2,8 @@ package net.sourceforge.mayfly;
 
 import java.sql.*;
 
-public class DataDefinitionTest extends SqlTestCase {
     
+public class DataDefinitionTest extends SqlTestCase {
     public void testDuplicateColumnName() throws Exception {
         try {
             execute("create table foo (Id integer, Id integer)");

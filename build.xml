@@ -18,9 +18,9 @@
         <fileset dir="src/lib">
             <include name="**/*.jar"/>
         </fileset>
-    	<fileset dir="build/parser">
-    		<include name="parser.jar"/>
-    	</fileset>
+        <fileset dir="build/parser">
+            <include name="parser.jar"/>
+        </fileset>
     </path>
 
     <target name="compile" depends="parser">
@@ -31,7 +31,7 @@
     </target>
 
     <target name="parser">
-    	<mkdir dir="build/parser/net/sourceforge/mayfly/parser"/>
+        <mkdir dir="build/parser/net/sourceforge/mayfly/parser"/>
         <java classname="antlr.Tool" fork="true" failonerror="true">
             <classpath refid="classpath"/>
             <arg value="-o"/>
@@ -39,26 +39,25 @@
             <arg value="parser/sql.g"/>
         </java>
 
-    	<!-- All this jar stuff is for eclipse, mainly, because compiler
+        <!-- All this jar stuff is for eclipse, mainly, because compiler
             warning setting are per-project, not per-directory -->
-    	<mkdir dir="build/parser/classes"/>
+        <mkdir dir="build/parser/classes"/>
         <javac srcdir="build/parser/net/sourceforge/mayfly/parser" destdir="build/parser/classes">
-        	<classpath refid="classpath.lib"/>
-    	</javac>
+            <classpath refid="classpath.lib"/>
+        </javac>
         <jar jarfile="build/parser/parser.jar" basedir="build/parser/classes"/>
     </target>
 
-	<!-- target name="javadoc">
-        <mkdir dir="build/apidocs"/>
-        <javadoc packagenames="org.tinytemplate"
-            sourcepath="src"
-            windowtitle="Tiny Template version ${version}"
-            version="true"
-            bottom="Tiny Template version ${version}.  For more information see &lt;a href=&quot;http://www.tinytemplate.org/&quot;&gt;tinytemplate.org&lt;a&gt;."
-            destdir="build/apidocs">
-            <classpath refid="classpath"/>
-        </javadoc>
-    </target -->
+    <!-- Although we use javadoc syntax for the benefit of tools like Eclipse and IDEA,
+        we generate the actual documentation with doxygen.  javadoc/gjdoc provide very little help
+        for things like @internal, so going with doxygen seems nicer than writing
+        a bunch of custom doclets. -->
+    <target name="doc" description="regenerate documentation from source">
+        <mkdir dir="build/doc"/>
+        <exec executable="doxygen">
+            <arg value="doc/Doxyfile"/>
+        </exec>
+    </target>
 
     <path id="test.classpath">
         <path refid="classpath"/>
@@ -80,8 +79,8 @@
         </javac>
     </target>
 
-    <target name="test" depends="compile-tests">
-    	<!-- Don't see an easy way to find the tests in this case
+    <target name="test" depends="compile-tests" description="run unit tests">
+        <!-- Don't see an easy way to find the tests in this case
         <java classname="junit.textui.TestRunner"
             classpathref="runtest.classpath"
             fork="yes" failonerror="yes">
@@ -89,13 +88,13 @@
         </java>
         -->
         <junit fork="yes" haltonfailure="true" haltonerror="true">
-	        <classpath refid="runtest.classpath"/>
+            <classpath refid="runtest.classpath"/>
             <formatter usefile="false" type="brief"/>
             <batchtest>
                 <fileset dir="test">
-        	        <include name="**/*Test.java"/>
-        	    </fileset>
-        	</batchtest>
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
         </junit>
 
     </target>
@@ -104,7 +103,7 @@
         <jar jarfile="build/tinytemplate.jar" basedir="build/classes"/>
     </target>
 
-    <target name="dist" depends="jar,javadoc">
+    <target name="dist" depends="jar,doc">
         <zip destfile="tinytemplate-${version}.zip">
             <fileset dir="build">
                 <include name="tinytemplate.jar"/>
