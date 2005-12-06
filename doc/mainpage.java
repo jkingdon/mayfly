@@ -1,18 +1,13 @@
 /**
 @mainpage
 
-@section motivation Motivation
+@section introduction Introduction
 
-<p>Although there are a vast number of free and non-free SQL
-implementations in Java, few of them are really good for unit testing.  A
-database for unit testing should be very fast on small data sets and
-should not present performance or other obstacles to setting up
-databases, adding and removing tables, and destroying databases.  A
-typical unit test run will want to create thousands of databases.
-With most SQL databases, this is not achievable, and one must resort
-to compromises such as keeping the tables around and only setting up
-data on each unit test run.  Mayfly aims to make creating an in-memory
-SQL database as easy as creating any other in-memory data structure.</p>
+<p>Mayfly is an SQL implementation in Java which is intended
+for unit testing.  You'll be linking the Mayfly jars into your
+application, and then writing unit tests which create mayfly
+databases (as in-memory objects) and connect to them (using
+the JDBC database interface or slight variations thereof).</p>
 
 <p>One key feature is the ability to very cheaply snapshot the database
 (both metadata and data) and restore from that point.  This is further
@@ -20,11 +15,19 @@ described at {@link net.sourceforge.mayfly.Database#dataStore()}.</p>
 
 @section installation Installation
 
-Download Mayfly and put the supplied jar files in your classpath.  You 
+Download mayfly-<var>version</var>.zip and put the supplied jar files in your classpath.  You 
 probably want to first write a simple unit test which just creates
 a mayfly database, connects to it, and executes a few SQL commands.
-It's easier to do that first and subsequently hook in Mayfly to the
+It's easier to make that work first and subsequently hook in Mayfly to the
 rest of your application.
+
+The source download mayfly-<var>version</var>-src.zip is useful if you
+want to be able to browse Mayfly source (for example, the "attach sources"
+feature found in Java development tools can help you distinguish between
+methods you would ordinarily call and methods which are public but would
+generally only be called form within Mayfly).  The source download also
+includes the Mayfly tests, which you might want to browse to get an idea
+of what SQL features are and are not implemented.
 
 @section connecting Connecting
 
