@@ -20,8 +20,11 @@ described at {@link net.sourceforge.mayfly.Database#dataStore()}.</p>
 
 @section installation Installation
 
-Download Mayfly and put mayfly.jar in your classpath.  You are
-now ready to write your unit tests to connect to mayfly.
+Download Mayfly and put the supplied jar files in your classpath.  You 
+probably want to first write a simple unit test which just creates
+a mayfly database, connects to it, and executes a few SQL commands.
+It's easier to do that first and subsequently hook in Mayfly to the
+rest of your application.
 
 @section connecting Connecting
 

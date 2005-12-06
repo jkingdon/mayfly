@@ -99,25 +99,31 @@
 
     </target>
 
-    <!-- target name="jar" depends="compile,test">
-        <jar jarfile="build/tinytemplate.jar" basedir="build/classes"/>
+    <target name="jar" depends="compile,test">
+        <jar jarfile="build/mayfly-${version}.jar">
+            <fileset dir="build/classes"/>
+            <fileset dir="build/parser/classes"/>
+        </jar>
     </target>
 
+    <!-- TODO: source distribution too -->
     <target name="dist" depends="jar,doc">
-        <zip destfile="tinytemplate-${version}.zip">
+        <zip destfile="mayfly-${version}.zip">
             <fileset dir="build">
-                <include name="tinytemplate.jar"/>
-                <include name="apidocs/**"/>
+                <include name="mayfly-${version}.jar"/>
+                <include name="doc/**"/>
             </fileset>
-            <fileset dir="lib">
-                <include name="${jdom}"/>
-                <include name="${xpp3}"/>
+            <fileset dir="src/lib">
+                <include name="antlr-2.7.5.jar"/>
+                <include name="commons-collections-3.1.jar"/>
+                <include name="commons-lang-2.1.jar"/>
             </fileset>
             <fileset dir=".">
-                <include name="README.txt"/>
-                <include name="src/**"/>
-                <include name="test/**"/>
+                <include name="DESCRIPTION.txt"/>
+                <include name="IDEAS.txt"/>
+                <include name="LICENSE-2.0.txt"/>
             </fileset>
         </zip>
-    </target -->
+    </target>
+
 </project>
