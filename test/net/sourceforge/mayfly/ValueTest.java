@@ -27,7 +27,6 @@ public class ValueTest extends SqlTestCase {
             assertTrue(results.next());
     
             assertEquals(0, results.getInt(1));
-
             assertTrue(results.wasNull());
     
             assertFalse(results.next());
@@ -92,6 +91,39 @@ public class ValueTest extends SqlTestCase {
 
     }
     
+    public void testWasNullGetsClearedForNextColumn() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo (a, b) values (null, 5)");
+        ResultSet results = query("select a, b from foo");
+        assertTrue(results.next());
+
+        assertEquals(0, results.getInt("a"));
+        assertTrue(results.wasNull());
+
+        assertEquals(5, results.getInt("b"));
+        assertFalse(results.wasNull());
+        
+        assertFalse(results.next());
+    }
+
+    public void testWasNullGetsClearedForNextRow() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo (a) values (null)");
+        execute("insert into foo (a) values (7)");
+        ResultSet results = query("select a from foo");
+        assertTrue(results.next());
+
+        assertEquals(0, results.getInt("a"));
+        assertTrue(results.wasNull());
+
+        assertTrue(results.next());
+
+        assertEquals(7, results.getInt("a"));
+        assertFalse(results.wasNull());
+
+        assertFalse(results.next());
+    }
+
     private void checkWrongWayToLookForNull() throws SQLException {
         String wrongWayToLookForNull = "select a from foo where a = null";
         if (EXPECT_MAYFLY_BEHAVIOR) {
@@ -200,16 +232,6 @@ public class ValueTest extends SqlTestCase {
     }
     
     public void testSelectExpression() throws Exception {
-        if (!MAYFLY_MISSING) {
-            /** This turns out to be hard.  The fact that the {@link MyResultSet} takes
-             * a {@link net.sourceforge.mayfly.ldbc.Columns}, which is a collection of
-             * {@link net.sourceforge.mayfly.ldbc.what.Column} (rather than
-             * {@link net.sourceforge.mayfly.ldbc.what.WhatElement} or some such), would
-             * need to be changed to make this work.
-             */ 
-            return;
-        }
-
         execute("create table foo (dummy integer)");
         execute("insert into foo(dummy) values(5)");
         assertResultSet(new String[] {"7"}, query("select 7 from foo"));

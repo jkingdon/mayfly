@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.ldbc.what;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
@@ -32,13 +33,13 @@ public class What extends Aggregate {
         return this;
     }
 
-    public Columns selectedColumns(Row dummyRow) {
-        List result = new ArrayList();
+    public What selected(Row dummyRow) {
+        L result = new L();
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             WhatElement element = (WhatElement) iter.next();
-            result.addAll(element.columns(dummyRow).asImmutableList());
+            result.addAll(element.selected(dummyRow));
         }
-        return new Columns(new ImmutableList(result));
+        return new What(result);
     }
 
     public int parameterCount() {
@@ -72,6 +73,15 @@ public class What extends Aggregate {
                 elements.set(i, Literal.fromValue(jdbcParameters.next()));
             }
         }
+    }
+
+    public Cell evaluate(int oneBasedColumn, Row row) {
+        int zeroBasedColumn = oneBasedColumn - 1;
+        if (zeroBasedColumn < 0 || zeroBasedColumn >= elements.size()) {
+            throw new MayflyException("no column " + oneBasedColumn);
+        }
+        WhatElement element = (WhatElement) elements.get(zeroBasedColumn);
+        return element.evaluate(row);
     }
 
 }

@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.ldbc.what;
 
+import java.util.*;
+
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
@@ -9,8 +11,6 @@ import net.sourceforge.mayfly.util.*;
 import antlr.collections.*;
 
 abstract public class WhatElement extends ValueObject {
-
-    abstract public Columns columns(Row dummyRow);
 
     public static Object fromExpressionTree(Tree column) {
         switch (column.getType()) {
@@ -45,6 +45,23 @@ abstract public class WhatElement extends ValueObject {
         return WhatElement.fromExpressionTree(column);
     }
 
+    public What selected(Row dummyRow) {
+        return new What(Collections.singletonList(this));
+    }
+
+    abstract public Cell evaluate(Row row);
+
     //TODO: name sucks
     abstract public Tuple process(Tuple originalTuple, M aliasToTableName);
+
+    protected What selectedFromColumns(Columns columns) {
+        L result = new L();
+        Iterator iter = columns.iterator();
+        while (iter.hasNext()) {
+            Column column = (Column) iter.next();
+            result.add(new SingleColumn(column.tableOrAlias(), column.columnName()));
+        }
+        return new What(result);
+    }
+
 }

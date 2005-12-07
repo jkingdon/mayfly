@@ -17,9 +17,8 @@ public class SingleColumn extends WhatElement implements Transformer {
         this.columnName = columnName;
     }
 
-    public Columns columns(Row dummyRow) {
-        //throw new RuntimeException("kill me");
-        return new Columns(ImmutableList.singleton(new Column(tableOrAlias, columnName)));
+    public Cell evaluate(Row row) {
+        return row.cell(tableOrAlias, columnName);
     }
 
     public Object transform(Object from) {

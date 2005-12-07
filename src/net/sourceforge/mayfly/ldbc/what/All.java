@@ -7,8 +7,16 @@ import net.sourceforge.mayfly.ldbc.*;
 
 public class All extends WhatElement {
 
-    public Columns columns(Row dummyRow) {
+    private Columns columns(Row dummyRow) {
         return dummyRow.columns();
+    }
+    
+    public What selected(Row dummyRow) {
+        return selectedFromColumns(columns(dummyRow));
+    }
+
+    public Cell evaluate(Row row) {
+        throw new MayflyInternalException("should have converted this to SingleColumn objects by now");
     }
 
     public Tuple process(Tuple originalTuple, M aliasToTableName) {

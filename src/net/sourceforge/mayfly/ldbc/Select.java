@@ -71,15 +71,15 @@ public class Select extends Command {
 
     public ResultSet select(final DataStore store) {
         Row dummyRow = dummyRow(store);
-        Columns columns = what.selectedColumns(dummyRow);
-        check(store, columns, dummyRow);
-        return new MyResultSet(columns, query(store));
+        What selected = what.selected(dummyRow);
+        check(store, selected, dummyRow);
+        return new MayflyResultSet(selected, query(store));
     }
 
-    private void check(final DataStore store, Columns columns, Row dummyRow) {
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            Column column = (Column) iter.next();
-            dummyRow.cell(column);
+    private void check(final DataStore store, What selected, Row dummyRow) {
+        for (Iterator iter = selected.iterator(); iter.hasNext();) {
+            WhatElement element = (WhatElement) iter.next();
+            element.evaluate(dummyRow);
         }
 
         new Rows(dummyRow).select(where);

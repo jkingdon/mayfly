@@ -6,16 +6,16 @@ import net.sourceforge.mayfly.ldbc.what.*;
 
 import java.sql.*;
 
-public final class MyResultSet extends ResultSetStub {
+public final class MayflyResultSet extends ResultSetStub {
     private int pos = -1;
     private boolean wasNull = false;
 
     private final Rows rows;
-    private final Columns columns;
+    private final What what;
 
-    public MyResultSet(Columns columns, Rows rows) {
+    public MayflyResultSet(What what, Rows rows) {
         super();
-        this.columns = columns;
+        this.what = what;
         this.rows = rows;
     }
 
@@ -69,15 +69,13 @@ public final class MyResultSet extends ResultSetStub {
     }
 
     private Cell cellFromIndex(int oneBasedColumn) throws SQLException {
-        return cell(columnFromIndex(oneBasedColumn));
-    }
-
-    private Column columnFromIndex(int oneBasedColumn) throws SQLException {
-        int zeroBasedColumn = oneBasedColumn - 1;
-        if (zeroBasedColumn < 0 || zeroBasedColumn >= columns.size()) {
-            throw new SQLException("no column " + oneBasedColumn);
+        try {
+            Cell cell = what.evaluate(oneBasedColumn, currentRow());
+            wasNull = cell instanceof NullCell;
+            return cell;
+        } catch (MayflyException e) {
+            throw e.asSqlException();
         }
-        return columns.get(zeroBasedColumn);
     }
 
     private Cell cell(Column column) throws SQLException {

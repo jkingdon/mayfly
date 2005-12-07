@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc.where.literal;
 
 import junit.framework.*;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 
 public class LiteralTest extends TestCase {
@@ -13,6 +14,10 @@ public class LiteralTest extends TestCase {
     }
 
     class MyLiteral extends Literal {
+
+        public Cell evaluate(Row row) {
+            throw new UnimplementedException();
+        }
 
         public Object valueForCellContentComparison() {
             return "foo";

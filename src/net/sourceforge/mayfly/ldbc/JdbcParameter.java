@@ -12,15 +12,15 @@ public class JdbcParameter extends WhatElement implements Transformer {
     private JdbcParameter() {
     }
 
-    public Columns columns(Row dummyRow) {
-        throw new MayflyException("internal error: should have substituted jdbc parameters by now");
-    }
-
     public Object transform(Object from) {
-        throw new MayflyException("internal error: should have substituted jdbc parameters by now");
+        throw new MayflyInternalException("should have substituted jdbc parameters by now");
     }
 
     public Tuple process(Tuple originalTuple, M aliasToTableName) {
         throw new UnimplementedException();
+    }
+
+    public Cell evaluate(Row row) {
+        throw new MayflyInternalException("should have substituted jdbc parameters by now");
     }
 }
