@@ -231,10 +231,4 @@ public class ValueTest extends SqlTestCase {
         expectExecuteFailure("insert into foo (Id, Id) values (5, 7)", "duplicate column Id");
     }
     
-    public void testSelectExpression() throws Exception {
-        execute("create table foo (dummy integer)");
-        execute("insert into foo(dummy) values(5)");
-        assertResultSet(new String[] {"7"}, query("select 7 from foo"));
-    }
-
 }
