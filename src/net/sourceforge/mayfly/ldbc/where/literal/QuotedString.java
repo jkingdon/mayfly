@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
-import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 
@@ -21,7 +20,7 @@ public class QuotedString extends Literal {
     }
 
     public Cell evaluate(Row row) {
-        throw new UnimplementedException();
+        return new StringCell(stringWithoutQuotes());
     }
 
     public Object valueForCellContentComparison() {

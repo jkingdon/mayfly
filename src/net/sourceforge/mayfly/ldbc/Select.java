@@ -21,20 +21,11 @@ public class Select extends Command {
         L converted =
             selectTree.children().convertUsing(TreeConverters.forSelectTree(), typesToIgnore);
 
-        Where where =
-            converted.selectObjectsThatAre(Where.class).size() > 0 ?
-                    (Where) converted.selectObjectThatIs(Where.class) :
-                    Where.EMPTY;
+        Where where = (Where) converted.selectSingle(Where.class, Where.EMPTY);
                     
-        OrderBy orderBy =
-            converted.selectObjectsThatAre(OrderBy.class).size() > 0 ?
-            (OrderBy) converted.selectObjectThatIs(OrderBy.class) :
-            new OrderBy();
+        OrderBy orderBy = (OrderBy) converted.selectSingle(OrderBy.class, new OrderBy());
 
-        Limit limit =
-            converted.selectObjectsThatAre(Limit.class).size() > 0 ?
-            (Limit) converted.selectObjectThatIs(Limit.class) :
-                Limit.NONE;
+        Limit limit = (Limit) converted.selectSingle(Limit.class, Limit.NONE);
 
         return
             new Select(
@@ -45,7 +36,6 @@ public class Select extends Command {
                 limit
             );
     }
-
 
     private What what;
     private From from;

@@ -1,6 +1,8 @@
 package net.sourceforge.mayfly.util;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+
 import org.apache.commons.collections.*;
 import org.apache.commons.lang.*;
 
@@ -41,6 +43,18 @@ public class L extends Aggregate implements List {
                     return type.isAssignableFrom(candidate.getClass());
                 }
             });
+    }
+
+    public Object selectSingle(Class aClass, Object defaultValue) {
+        int matchCount = selectObjectsThatAre(aClass).size();
+        if (matchCount == 0) {
+            return defaultValue;
+        } else if (matchCount == 1) {
+            return selectObjectThatIs(aClass);
+        } else {
+            throw new MayflyInternalException("Expected none or one of type " + aClass.getName() + 
+                ", got " + matchCount);
+        }
     }
 
     public boolean contains(int candidate) {
@@ -197,4 +211,5 @@ public class L extends Aggregate implements List {
     public L asUnmodifiable() {
         return new L(Collections.unmodifiableList(this));
     }
+
 }

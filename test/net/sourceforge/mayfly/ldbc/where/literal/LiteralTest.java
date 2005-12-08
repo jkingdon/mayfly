@@ -9,18 +9,18 @@ public class LiteralTest extends TestCase {
     public void testTransform() throws Exception {
         assertEquals(
             new StringCell("foo"),
-            new MyLiteral().transform("would be a row object but doesn't matter here")
+            new MyLiteral().transform(new Row(new TupleBuilder()))
         );
     }
 
     class MyLiteral extends Literal {
 
         public Cell evaluate(Row row) {
-            throw new UnimplementedException();
+            return new StringCell("foo");
         }
 
         public Object valueForCellContentComparison() {
-            return "foo";
+            throw new UnimplementedException();
         }
 
     }

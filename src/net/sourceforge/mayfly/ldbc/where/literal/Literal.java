@@ -21,7 +21,7 @@ public abstract class Literal extends WhatElement implements Transformer {
     }
 
     public Object transform(Object from) {
-        return Cell.fromContents(valueForCellContentComparison());
+        return evaluate((Row) from);
     }
     
     abstract public Object valueForCellContentComparison();

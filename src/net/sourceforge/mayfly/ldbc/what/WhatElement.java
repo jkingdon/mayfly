@@ -12,13 +12,13 @@ import antlr.collections.*;
 
 abstract public class WhatElement extends ValueObject {
 
-    public static Object fromExpressionTree(Tree column) {
-        switch (column.getType()) {
+    public static WhatElement fromExpressionTree(Tree expression) {
+        switch (expression.getType()) {
         case SQLTokenTypes.PARAMETER:
             return JdbcParameter.INSTANCE;
 
         case SQLTokenTypes.COLUMN:
-            AST firstIdentifier = column.getFirstChild();
+            AST firstIdentifier = expression.getFirstChild();
             AST secondIdentifier = firstIdentifier.getNextSibling();
 
             if (secondIdentifier == null) {
@@ -31,10 +31,19 @@ abstract public class WhatElement extends ValueObject {
             }
 
         case SQLTokenTypes.DECIMAL_VALUE:
-            return MathematicalInt.fromDecimalValueTree(column);
+            return MathematicalInt.fromDecimalValueTree(expression);
+
+        case SQLTokenTypes.QUOTED_STRING:
+            return QuotedString.fromQuotedStringTree(expression);
+
+        case SQLTokenTypes.VERTBARS:
+            L children = expression.children().asList();
+            Tree left = (Tree) children.get(0);
+            Tree right = (Tree) children.get(1);
+            return new Concatenate(fromExpressionTree(left), fromExpressionTree(right));
 
         default:
-            throw new MayflyException("Unrecognized token in what clause at:\n" + column.toString());
+            throw new MayflyException("Unrecognized token in what clause at:\n" + expression.toString());
         }
     }
 
