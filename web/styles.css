@@ -1,10 +1,16 @@
 .sidebar {
+    vertical-align: top;
     background-color: #C3C048;
     padding: 10px;
-    list-style-type: none;
 }
 
-.sourceforge-logo {
+.sidebar ul, .sidebar li {
+    list-style-type: none;
+    margin-left: 0;
+    padding-left: 0;
+}
+
+.sourceforge-logo img {
     border-width: 0;
 }
 
