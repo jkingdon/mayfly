@@ -34,9 +34,22 @@ public class What extends Aggregate {
     }
 
     public What selected(Row dummyRow) {
+        String firstColumn = null;
+        WhatElement firstAggregate = null;
+
         L result = new L();
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             WhatElement element = (WhatElement) iter.next();
+            if (firstColumn == null) {
+                firstColumn = element.firstColumn();
+            }
+            if (firstAggregate == null && element.isAggregate()) {
+                firstAggregate = element;
+            }
+            
+            if (firstColumn != null && firstAggregate != null) {
+                throw new MayflyException(firstColumn + " is a column but " + firstAggregate + " is an aggregate");
+            }
             result.addAll(element.selected(dummyRow));
         }
         return new What(result);

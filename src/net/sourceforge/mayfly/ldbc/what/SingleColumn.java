@@ -41,5 +41,9 @@ public class SingleColumn extends WhatElement implements Transformer {
 
         return new Tuple(originalTuple.withHeader(column));
     }
+    
+    public String firstColumn() {
+        return Column.displayName(tableOrAlias, columnName);
+    }
 
 }
