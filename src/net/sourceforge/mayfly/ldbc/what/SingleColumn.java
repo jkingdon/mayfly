@@ -43,6 +43,10 @@ public class SingleColumn extends WhatElement implements Transformer {
     }
     
     public String firstColumn() {
+        return displayName();
+    }
+
+    public String displayName() {
         return Column.displayName(tableOrAlias, columnName);
     }
 

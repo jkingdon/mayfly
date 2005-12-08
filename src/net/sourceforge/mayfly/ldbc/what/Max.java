@@ -6,7 +6,12 @@ import net.sourceforge.mayfly.util.*;
 
 public class Max extends WhatElement {
 
-    public Max(SingleColumn column) {
+    private final SingleColumn column;
+    private final String spellingOfMax;
+
+    public Max(SingleColumn column, String spellingOfMax) {
+        this.column = column;
+        this.spellingOfMax = spellingOfMax;
     }
 
     public Cell evaluate(Row row) {
@@ -17,8 +22,8 @@ public class Max extends WhatElement {
         throw new UnimplementedException();
     }
     
-    public boolean isAggregate() {
-        return true;
+    public String firstAggregate() {
+        return spellingOfMax + "(" + column.displayName() + ")";
     }
 
 }

@@ -44,7 +44,7 @@ abstract public class WhatElement extends ValueObject {
             
         case SQLTokenTypes.LITERAL_max:
             Tree column = (Tree) expression.children().element(0);
-            return new Max((SingleColumn) fromExpressionTree(column));
+            return new Max((SingleColumn) fromExpressionTree(column), expression.getText());
 
         default:
             throw new MayflyException("Unrecognized token in what clause at:\n" + expression.toString());
@@ -67,8 +67,8 @@ abstract public class WhatElement extends ValueObject {
     //TODO: name sucks
     abstract public Tuple process(Tuple originalTuple, M aliasToTableName);
     
-    public boolean isAggregate() {
-        return false;
+    public String firstAggregate() {
+        return null;
     }
 
     public String firstColumn() {

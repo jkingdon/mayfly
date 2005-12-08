@@ -16,17 +16,14 @@ public class AggregateTest extends SqlTestCase {
     }
 
     public void testColumnAndAggregate() throws Exception {
-        if (!MAYFLY_MISSING) {
-            // Almost there.
-            return;
-        }
-
         execute("create table foo (x integer)");
         execute("insert into foo (x) values (5)");
         
         expectQueryFailure("select x, max(x) from foo", "x is a column but max(x) is an aggregate");
-        expectQueryFailure("select x || 'L', max(x) from foo", "x is a column but max(x) is an aggregate");
-        expectQueryFailure("select '#' || x , max(x) from foo", "x is a column but max(x) is an aggregate");
+        expectQueryFailure("select X || 'L', Max(x) from foo", "X is a column but Max(x) is an aggregate");
+        expectQueryFailure("select '#' || x , MAX(X) from foo", "x is a column but MAX(X) is an aggregate");
+        expectQueryFailure("select max(x) || 'L', x from foo", "x is a column but max(x) is an aggregate");
+        expectQueryFailure("select '#' || max(x) , x from foo", "x is a column but max(x) is an aggregate");
     }
 
     public void testLiteralAndAggregate() throws Exception {
@@ -45,6 +42,19 @@ public class AggregateTest extends SqlTestCase {
         execute("insert into foo (x) values (5)");
         
         assertResultSet(new String[] { " 3, 5 " }, query("select 3, x from foo")); 
+    }
+
+    public void testWhere() throws Exception {
+        if (!MAYFLY_MISSING) {
+            return;
+        }
+
+        execute("create table foo (x integer, y integer)");
+        execute("insert into foo (x, y) values (5, 10)");
+        execute("insert into foo (x, y) values (null, 10)");
+        execute("insert into foo (x, y) values (9, 9)");
+        
+        assertResultSet(new String[] { " 5 " }, query("select max(x) from foo where y = 10"));
     }
 
     public void testCount() throws Exception {

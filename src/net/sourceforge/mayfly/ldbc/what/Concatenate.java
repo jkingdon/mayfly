@@ -24,4 +24,20 @@ public class Concatenate extends WhatElement {
         throw new UnimplementedException();
     }
 
+    public String firstColumn() {
+        String firstInLeft = left.firstColumn();
+        if (firstInLeft != null) {
+            return firstInLeft;
+        }
+        return right.firstColumn();
+    }
+
+    public String firstAggregate() {
+        String firstInLeft = left.firstAggregate();
+        if (firstInLeft != null) {
+            return firstInLeft;
+        }
+        return right.firstAggregate();
+    }
+
 }

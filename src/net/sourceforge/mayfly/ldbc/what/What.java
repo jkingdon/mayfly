@@ -35,7 +35,7 @@ public class What extends Aggregate {
 
     public What selected(Row dummyRow) {
         String firstColumn = null;
-        WhatElement firstAggregate = null;
+        String firstAggregate = null;
 
         L result = new L();
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
@@ -43,8 +43,8 @@ public class What extends Aggregate {
             if (firstColumn == null) {
                 firstColumn = element.firstColumn();
             }
-            if (firstAggregate == null && element.isAggregate()) {
-                firstAggregate = element;
+            if (firstAggregate == null) {
+                firstAggregate = element.firstAggregate();
             }
             
             if (firstColumn != null && firstAggregate != null) {
