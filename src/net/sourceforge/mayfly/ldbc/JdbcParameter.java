@@ -23,4 +23,9 @@ public class JdbcParameter extends WhatElement implements Transformer {
     public Cell evaluate(Row row) {
         throw new MayflyInternalException("should have substituted jdbc parameters by now");
     }
+    
+    public Cell aggregate(Rows rows) {
+        throw new MayflyInternalException("should have substituted jdbc parameters by now");
+    }
+
 }

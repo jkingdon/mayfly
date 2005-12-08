@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc.where.literal;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -24,10 +25,20 @@ public abstract class Literal extends WhatElement implements Transformer {
         return evaluate((Row) from);
     }
     
+    public final Cell evaluate(Row row) {
+        return valueAsCell();
+    }
+
+    public final Cell aggregate(Rows rows) {
+        return valueAsCell();
+    }
+    
     abstract public Object valueForCellContentComparison();
 
     public Tuple process(Tuple originalTuple, M aliasToTableName) {
         throw new UnimplementedException();
     }
+
+    protected abstract Cell valueAsCell();
 
 }

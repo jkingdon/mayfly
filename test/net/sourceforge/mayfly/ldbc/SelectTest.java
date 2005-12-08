@@ -295,8 +295,12 @@ public class SelectTest extends TestCase {
 
         assertEquals(
             store.table("foo").rows().cartesianJoin(store.table("bar").rows()),
-            Select.selectFromTree(Tree.parse("select * from foo, bar")).query(store)
+            query(store, "select * from foo, bar")
         );
+    }
+
+    private Rows query(DataStore store, String sql) {
+        return Select.selectFromTree(Tree.parse(sql)).query(store, new What());
     }
 
     public void testSmallerJoin() throws Exception {
@@ -318,7 +322,7 @@ public class SelectTest extends TestCase {
                                     .appendColumnCellContents("bar", "colX", "barXValue"))
                 ).asImmutable()
             ),
-            Select.selectFromTree(Tree.parse("select * from foo, bar")).query(store)
+            query(store, "select * from foo, bar")
         );
     }
 
@@ -332,7 +336,7 @@ public class SelectTest extends TestCase {
 
         assertEquals(
             store.table("foo").rows().elements(new int[]{1, 2}),
-            Select.selectFromTree(Tree.parse("select * from foo where colB = 'xx'")).query(store)
+            query(store, "select * from foo where colB = 'xx'")
         );
     }
 

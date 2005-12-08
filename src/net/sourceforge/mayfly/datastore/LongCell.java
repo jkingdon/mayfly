@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.*;
 
 public class LongCell extends Cell {
 
@@ -23,7 +22,7 @@ public class LongCell extends Cell {
     }
 
     public String asString() {
-        throw new MayflyException("Attempt to read number " + value + " as a string");
+        return String.valueOf(value);
     }
 
     public int compareTo(Cell otherCell) {

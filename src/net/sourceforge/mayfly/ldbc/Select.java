@@ -63,7 +63,7 @@ public class Select extends Command {
         Row dummyRow = dummyRow(store);
         What selected = what.selected(dummyRow);
         check(store, selected, dummyRow);
-        return new MayflyResultSet(selected, query(store));
+        return new MayflyResultSet(selected, query(store, selected));
     }
 
     private void check(final DataStore store, What selected, Row dummyRow) {
@@ -95,7 +95,7 @@ public class Select extends Command {
         return (Row) joinedRows.element(0);
     }
 
-    public Rows query(DataStore store) {
+    public Rows query(DataStore store, What selected) {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();
@@ -105,8 +105,11 @@ public class Select extends Command {
             joinedRows = (Rows) joinedRows.cartesianJoin(table.tableContents(store));
         }
 
-        Rows selected = (Rows) joinedRows.select(where);
-        Rows sorted = orderBy.sort(store, selected);
+        Rows afterWhere = (Rows) joinedRows.select(where);
+        if (selected.isAggregate()) {
+            return selected.aggregate(afterWhere);
+        }
+        Rows sorted = orderBy.sort(store, afterWhere);
         return limit.limit(sorted);
     }
 

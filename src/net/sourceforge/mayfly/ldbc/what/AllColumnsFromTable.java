@@ -28,6 +28,10 @@ public class AllColumnsFromTable extends WhatElement {
     public Cell evaluate(Row row) {
         throw new MayflyInternalException("should have converted this to SingleColumn objects by now");
     }
+    
+    public Cell aggregate(Rows rows) {
+        throw new MayflyInternalException("should have converted this to SingleColumn objects by now");
+    }
 
     public Tuple process(Tuple originalTuple, M aliasToTableName) {
         throw new UnimplementedException();

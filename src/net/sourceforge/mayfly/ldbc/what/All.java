@@ -19,6 +19,10 @@ public class All extends WhatElement {
         throw new MayflyInternalException("should have converted this to SingleColumn objects by now");
     }
 
+    public Cell aggregate(Rows rows) {
+        throw new MayflyInternalException("should have converted this to SingleColumn objects by now");
+    }
+
     public Tuple process(Tuple originalTuple, M aliasToTableName) {
         throw new UnimplementedException();
     }

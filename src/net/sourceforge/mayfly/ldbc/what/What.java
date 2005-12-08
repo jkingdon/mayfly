@@ -10,13 +10,20 @@ import java.util.*;
 
 public class What extends Aggregate {
 
-    private List elements = new ArrayList();
+    private List elements;
+    private final boolean isAggregate;
 
     public What() {
+        this(new ArrayList());
     }
 
     public What(List elements) {
+        this(elements, false);
+    }
+
+    public What(List elements, boolean isAggregate) {
         this.elements = elements;
+        this.isAggregate = isAggregate;
     }
 
 
@@ -52,7 +59,7 @@ public class What extends Aggregate {
             }
             result.addAll(element.selected(dummyRow));
         }
-        return new What(result);
+        return new What(result, firstAggregate != null);
     }
 
     public int parameterCount() {
@@ -94,7 +101,26 @@ public class What extends Aggregate {
             throw new MayflyException("no column " + oneBasedColumn);
         }
         WhatElement element = (WhatElement) elements.get(zeroBasedColumn);
+        if (isAggregate) {
+            TupleElement tupleElement = (TupleElement) row.element(zeroBasedColumn);
+            return tupleElement.cell();
+        }
         return element.evaluate(row);
+    }
+
+    public boolean isAggregate() {
+        return isAggregate;
+    }
+
+    public Rows aggregate(Rows rows) {
+        TupleBuilder builder = new TupleBuilder();
+        Iterator iter = elements.iterator();
+        while (iter.hasNext()) {
+            WhatElement element = (WhatElement) iter.next();
+            builder.append(new TupleElement(new CellHeader() { }, element.aggregate(rows)));
+        }
+        Row resultRow = new Row(builder);
+        return new Rows(resultRow);
     }
 
 }

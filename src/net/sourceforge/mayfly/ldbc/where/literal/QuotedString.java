@@ -19,12 +19,12 @@ public class QuotedString extends Literal {
         return withoutQuotes.replaceAll("''", "'");
     }
 
-    public Cell evaluate(Row row) {
-        return new StringCell(stringWithoutQuotes());
-    }
-
     public Object valueForCellContentComparison() {
         return stringWithoutQuotes();
+    }
+
+    protected Cell valueAsCell() {
+        return new StringCell(stringWithoutQuotes());
     }
 
 }

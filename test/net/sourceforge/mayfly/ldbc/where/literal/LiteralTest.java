@@ -15,12 +15,12 @@ public class LiteralTest extends TestCase {
 
     class MyLiteral extends Literal {
 
-        public Cell evaluate(Row row) {
-            return new StringCell("foo");
-        }
-
         public Object valueForCellContentComparison() {
             throw new UnimplementedException();
+        }
+
+        protected Cell valueAsCell() {
+            return new StringCell("foo");
         }
 
     }

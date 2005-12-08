@@ -11,14 +11,13 @@ import antlr.collections.*;
 
 import java.io.*;
 import java.lang.reflect.*;
-import java.sql.*;
 import java.util.*;
 import java.util.List;
 
 public class Tree implements AST {
 
 
-    public static Tree parse(String sql) throws SQLException {
+    public static Tree parse(String sql) {
         try {
             StringReader in = new StringReader(sql);
             SQLLexer lexer = new SQLLexer(in);

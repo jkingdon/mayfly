@@ -15,7 +15,7 @@ public class MathematicalInt extends Literal {
         return new MathematicalInt(Integer.parseInt(tree.getFirstChild().getText()));
     }
 
-    public Cell evaluate(Row row) {
+    protected Cell valueAsCell() {
         return new LongCell(value);
     }
 

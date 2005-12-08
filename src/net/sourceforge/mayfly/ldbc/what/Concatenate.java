@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
 public class Concatenate extends WhatElement {
@@ -17,9 +18,19 @@ public class Concatenate extends WhatElement {
     public Cell evaluate(Row row) {
         Cell leftCell = left.evaluate(row);
         Cell rightCell = right.evaluate(row);
-        return new StringCell(leftCell.asString() + rightCell.asString());
+        return combine(leftCell, rightCell);
     }
 
+    public Cell aggregate(Rows rows) {
+        Cell leftCell = left.aggregate(rows);
+        Cell rightCell = right.aggregate(rows);
+        return combine(leftCell, rightCell);
+    }
+
+    private StringCell combine(Cell leftCell, Cell rightCell) {
+        return new StringCell(leftCell.asString() + rightCell.asString());
+    }
+    
     public Tuple process(Tuple originalTuple, M aliasToTableName) {
         throw new UnimplementedException();
     }

@@ -231,4 +231,31 @@ public class ValueTest extends SqlTestCase {
         expectExecuteFailure("insert into foo (Id, Id) values (5, 7)", "duplicate column Id");
     }
     
+    public void testNegativeNumber() throws Exception {
+        if (!MAYFLY_MISSING) {
+            return;
+        }
+
+        execute("create table foo (x integer)");
+        execute("insert into foo (x) values (-5)");
+        execute("insert into foo (x) values (-3)");
+        execute("insert into foo (x) values (7)");
+        
+        assertResultSet(new String[] { " -5 " }, query("select x from foo where x < -4"));
+    }
+    
+    public void testReadInteger() throws Exception {
+        execute("create table foo (x integer)");
+        execute("insert into foo (x) values (5)");
+        
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+        assertEquals(5, results.getInt("x"));
+        assertEquals("5", results.getString("x"));
+        if (MAYFLY_MISSING) {
+            assertEquals(5.0, results.getDouble("x"), 0.00001);
+        }
+        assertFalse(results.next());
+    }
+    
 }
