@@ -3,13 +3,14 @@ package net.sourceforge.mayfly;
 
 public class AggregateTest extends SqlTestCase {
     
-    public void testMax() throws Exception {
+    public void testBasics() throws Exception {
         execute("create table foo (x integer)");
         execute("insert into foo (x) values (5)");
         execute("insert into foo (x) values (null)");
         execute("insert into foo (x) values (9)");
         
         assertResultSet(new String[] { " 9 " }, query("select max(x) from foo"));
+        assertResultSet(new String[] { " 5 " }, query("select min(x) from foo"));
     }
 
     public void testColumnAndAggregate() throws Exception {
@@ -58,10 +59,25 @@ public class AggregateTest extends SqlTestCase {
     public void testNoRows() throws Exception {
         execute("create table foo (x integer)");
         assertResultSet(new String[] { " null " }, query("select max(x) from foo"));
-
+        assertResultSet(new String[] { " null " }, query("select min(x) from foo"));
         if (MAYFLY_MISSING) {
-            assertResultSet(new String[] { " null " }, query("select min(x) from foo"));
             assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
+            assertResultSet(new String[] { " 0 " }, query("select count(*) from foo"));
+            assertResultSet(new String[] { " null " }, query("select sum(x) from foo"));
+            assertResultSet(new String[] { " null " }, query("select avg(x) from foo"));
+        }
+
+        expectQueryFailure("select max(y) from foo", "no column y");
+    }
+
+    public void testNullRowsOnly() throws Exception {
+        execute("create table foo (x integer)");
+        execute("insert into foo (x) values (null)");
+        assertResultSet(new String[] { " null " }, query("select max(x) from foo"));
+        assertResultSet(new String[] { " null " }, query("select min(x) from foo"));
+        if (MAYFLY_MISSING) {
+            assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
+            assertResultSet(new String[] { " 1 " }, query("select count(*) from foo"));
             assertResultSet(new String[] { " null " }, query("select sum(x) from foo"));
             assertResultSet(new String[] { " null " }, query("select avg(x) from foo"));
         }

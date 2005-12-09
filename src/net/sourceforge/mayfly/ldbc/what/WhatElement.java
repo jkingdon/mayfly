@@ -56,9 +56,15 @@ abstract public class WhatElement extends ValueObject {
             Tree right = (Tree) children.get(1);
             return new Concatenate(fromExpressionTree(left), fromExpressionTree(right));
             
-        case SQLTokenTypes.LITERAL_max:
+        case SQLTokenTypes.LITERAL_max: {
             Tree column = (Tree) expression.children().element(0);
             return new Max((SingleColumn) fromExpressionTree(column), expression.getText());
+        }
+
+        case SQLTokenTypes.LITERAL_min: {
+            Tree column = (Tree) expression.children().element(0);
+            return new Min((SingleColumn) fromExpressionTree(column), expression.getText());
+        }
 
         default:
             throw new MayflyException("Unrecognized token in what clause at:\n" + expression.toString());
