@@ -13,9 +13,7 @@ public class AggregateTest extends SqlTestCase {
         assertResultSet(new String[] { " 2 " }, query("select count(x) from foo"));
         assertResultSet(new String[] { " 3 " }, query("select count(*) from foo"));
         assertResultSet(new String[] { " 14 " }, query("select sum(x) from foo"));
-        if (MAYFLY_MISSING) {
-            assertResultSet(new String[] { " 7 " }, query("select avg(x) from foo"));
-        }
+        assertResultSet(new String[] { " 7 " }, query("select avg(x) from foo"));
     }
 
     public void testColumnAndAggregate() throws Exception {
@@ -73,9 +71,7 @@ public class AggregateTest extends SqlTestCase {
         assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
         assertResultSet(new String[] { " 0 " }, query("select count(*) from foo"));
         assertResultSet(new String[] { " null " }, query("select sum(x) from foo"));
-        if (MAYFLY_MISSING) {
-            assertResultSet(new String[] { " null " }, query("select avg(x) from foo"));
-        }
+        assertResultSet(new String[] { " null " }, query("select avg(x) from foo"));
 
         expectQueryFailure("select max(y) from foo", "no column y");
     }
@@ -88,9 +84,7 @@ public class AggregateTest extends SqlTestCase {
         assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
         assertResultSet(new String[] { " 1 " }, query("select count(*) from foo"));
         assertResultSet(new String[] { " null " }, query("select sum(x) from foo"));
-        if (MAYFLY_MISSING) {
-            assertResultSet(new String[] { " null " }, query("select avg(x) from foo"));
-        }
+        assertResultSet(new String[] { " null " }, query("select avg(x) from foo"));
 
         expectQueryFailure("select max(y) from foo", "no column y");
     }

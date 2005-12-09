@@ -30,30 +30,39 @@ public abstract class AggregateExpression extends WhatElement {
         return functionName + "(" + column.displayName() + ")";
     }
 
-    protected abstract long startValue();
-
-    protected abstract long accumulate(long oldAccumulatedValue, long value);
-
-    protected abstract Cell valueForNoRows();
-
     public Cell aggregate(Rows rows) {
-        boolean foundOne = false;
-        long accumulatedValue = startValue();
+        long min = Long.MAX_VALUE;
+        long max = Long.MIN_VALUE;
+        long count = 0;
+        long sum = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             Cell cell = evaluate(row);
             if (!(cell instanceof NullCell)) {
                 long value = cell.asLong();
-                foundOne = true;
-                accumulatedValue = accumulate(accumulatedValue, value);
+                min = Math.min(min, value);
+                max = Math.max(max, value);
+                count++;
+                sum += value;
             }
         }
         
-        if (foundOne) {
-            return new LongCell(accumulatedValue);
+        if (count > 0) {
+            return pickOne(new LongCell(min), new LongCell(max),
+                new LongCell(count), new LongCell(sum), new LongCell(sum / count));
         } else {
-            return valueForNoRows();
+            return pickOne(NullCell.INSTANCE, NullCell.INSTANCE, 
+                new LongCell(0), 
+                
+                // Lame (0 would be more convenient), but standard.
+                // Is it possible/desirable for Mayfly to help?
+                // (giving an error and pointing out a better way, or whatever).
+                NullCell.INSTANCE,
+                
+                NullCell.INSTANCE);
         }
     }
+
+    abstract protected Cell pickOne(Cell min, Cell max, Cell count, Cell sum, Cell average);
 
 }

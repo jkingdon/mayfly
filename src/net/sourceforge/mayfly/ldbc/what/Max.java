@@ -8,16 +8,8 @@ public class Max extends AggregateExpression {
         super(column, spellingOfMax);
     }
 
-    protected long startValue() {
-        return Long.MIN_VALUE;
-    }
-
-    protected long accumulate(long oldAccumulatedValue, long value) {
-        return Math.max(oldAccumulatedValue, value);
-    }
-
-    protected Cell valueForNoRows() {
-        return NullCell.INSTANCE;
+    protected Cell pickOne(Cell min, Cell max, Cell count, Cell sum, Cell average) {
+        return max;
     }
 
 }

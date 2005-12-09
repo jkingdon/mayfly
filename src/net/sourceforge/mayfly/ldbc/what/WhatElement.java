@@ -80,6 +80,11 @@ abstract public class WhatElement extends ValueObject {
             return new Sum((SingleColumn) fromExpressionTree(column), expression.getText());
         }
         
+        case SQLTokenTypes.LITERAL_avg: {
+            Tree column = (Tree) expression.children().element(0);
+            return new Average((SingleColumn) fromExpressionTree(column), expression.getText());
+        }
+        
         default:
             throw new MayflyException("Unrecognized token in what clause at:\n" + expression.toString());
         }
