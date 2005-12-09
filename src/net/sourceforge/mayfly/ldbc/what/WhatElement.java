@@ -65,7 +65,21 @@ abstract public class WhatElement extends ValueObject {
             Tree column = (Tree) expression.children().element(0);
             return new Min((SingleColumn) fromExpressionTree(column), expression.getText());
         }
+        
+        case SQLTokenTypes.LITERAL_count: {
+            Tree arg = (Tree) expression.children().element(0);
+            if (arg.getType() == SQLTokenTypes.ASTERISK) {
+                return new CountAll(expression.getText());
+            } else {
+                return new Count((SingleColumn) fromExpressionTree(arg), expression.getText());
+            }
+        }
 
+        case SQLTokenTypes.LITERAL_sum: {
+            Tree column = (Tree) expression.children().element(0);
+            return new Sum((SingleColumn) fromExpressionTree(column), expression.getText());
+        }
+        
         default:
             throw new MayflyException("Unrecognized token in what clause at:\n" + expression.toString());
         }

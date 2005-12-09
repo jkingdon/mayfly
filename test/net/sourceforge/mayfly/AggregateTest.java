@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly;
 
-
 public class AggregateTest extends SqlTestCase {
     
     public void testBasics() throws Exception {
@@ -11,6 +10,12 @@ public class AggregateTest extends SqlTestCase {
         
         assertResultSet(new String[] { " 9 " }, query("select max(x) from foo"));
         assertResultSet(new String[] { " 5 " }, query("select min(x) from foo"));
+        assertResultSet(new String[] { " 2 " }, query("select count(x) from foo"));
+        assertResultSet(new String[] { " 3 " }, query("select count(*) from foo"));
+        assertResultSet(new String[] { " 14 " }, query("select sum(x) from foo"));
+        if (MAYFLY_MISSING) {
+            assertResultSet(new String[] { " 7 " }, query("select avg(x) from foo"));
+        }
     }
 
     public void testColumnAndAggregate() throws Exception {
@@ -22,6 +27,11 @@ public class AggregateTest extends SqlTestCase {
         expectQueryFailure("select '#' || x , MAX(X) from foo", "x is a column but MAX(X) is an aggregate");
         expectQueryFailure("select max(x) || 'L', x from foo", "x is a column but max(x) is an aggregate");
         expectQueryFailure("select '#' || max(x) , x from foo", "x is a column but max(x) is an aggregate");
+    }
+    
+    public void testColumnAndCountAll() throws Exception {
+        execute("create table foo (x integer)");
+        expectQueryFailure("select x, coUNt ( * ) from foo", "x is a column but coUNt(*) is an aggregate");
     }
 
     public void testLiteralAndAggregate() throws Exception {
@@ -60,10 +70,10 @@ public class AggregateTest extends SqlTestCase {
         execute("create table foo (x integer)");
         assertResultSet(new String[] { " null " }, query("select max(x) from foo"));
         assertResultSet(new String[] { " null " }, query("select min(x) from foo"));
+        assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
+        assertResultSet(new String[] { " 0 " }, query("select count(*) from foo"));
+        assertResultSet(new String[] { " null " }, query("select sum(x) from foo"));
         if (MAYFLY_MISSING) {
-            assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
-            assertResultSet(new String[] { " 0 " }, query("select count(*) from foo"));
-            assertResultSet(new String[] { " null " }, query("select sum(x) from foo"));
             assertResultSet(new String[] { " null " }, query("select avg(x) from foo"));
         }
 
@@ -75,10 +85,10 @@ public class AggregateTest extends SqlTestCase {
         execute("insert into foo (x) values (null)");
         assertResultSet(new String[] { " null " }, query("select max(x) from foo"));
         assertResultSet(new String[] { " null " }, query("select min(x) from foo"));
+        assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
+        assertResultSet(new String[] { " 1 " }, query("select count(*) from foo"));
+        assertResultSet(new String[] { " null " }, query("select sum(x) from foo"));
         if (MAYFLY_MISSING) {
-            assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
-            assertResultSet(new String[] { " 1 " }, query("select count(*) from foo"));
-            assertResultSet(new String[] { " null " }, query("select sum(x) from foo"));
             assertResultSet(new String[] { " null " }, query("select avg(x) from foo"));
         }
 
@@ -91,20 +101,6 @@ public class AggregateTest extends SqlTestCase {
         
         assertResultSet(new String[] { " 'L5' " }, query("select 'L' || max(x) from foo")); 
         expectQueryFailure("select 'L' || max(y) from foo", "no column y");
-    }
-
-    public void testCount() throws Exception {
-        if (!MAYFLY_MISSING) {
-            return;
-        }
-
-        execute("create table foo (x integer)");
-        execute("insert into foo (x) values (5)");
-        execute("insert into foo (x) values (null)");
-        execute("insert into foo (x) values (9)");
-        
-        assertResultSet(new String[] { " 2 " }, query("select count(x) from foo"));
-        assertResultSet(new String[] { " 3 " }, query("select count(*) from foo"));
     }
 
     public void testDistinctAndAll() throws Exception {
