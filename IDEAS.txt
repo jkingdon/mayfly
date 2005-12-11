@@ -42,7 +42,17 @@ Possible features (beyond those in DESCRIPTION.txt):
   in a ResultSet.
 
 * VARCHAR(7) -> enforce the length (exception on attempt to store anything longer)
-   
+  (SQLite ignores the length.  Truncation seems like a mistake).
+  
+* Can we use mayfly with Ruby on Rails?
+  (How does this work without mayfly?  There's a test database mentioned in config/database.yml
+  and there are fixtures which can load data from YAML or CSV files.  But how does it clear
+  things out between tests?  How well is one test isolated from the next?)
+
+  - Running ruby in jruby is one choice.  Then it can just call mayfly.
+  - Some kind of remote protocol so they can communicate over a socket?
+    Does MySQL, Postgres, etc, have a protocol we can adopt?  
+
 
 Open source projects to serve as acceptance tests (criteria: must use SQL
 and have automated tests which can be run against Mayfly):
@@ -59,6 +69,9 @@ and have automated tests which can be run against Mayfly):
   http://cvs.open-bio.org/cgi-bin/viewcvs/viewcvs.cgi/biosql-schema/sql/?cvsroot=biosql
   but they just seem to have libraries which use it, not tests or 
   even a full fledged application
+  
+* JForum (not sure the tests are very good, but the author wants to improve
+  testability, we're told).
 
 
 Things to document somewhere:
@@ -84,3 +97,7 @@ but I haven't seen it crashing.
 
 There are some java-related items in:
 http://www.fedoraproject.org/wiki/FC5Future
+
+* Associating types with values rather than columns.  This is what SQLite does.
+  For better compatibility we may want to implement what SQLite calls "type
+  affinity" (in which the column type gives a preferred type for the value).
