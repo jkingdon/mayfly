@@ -1,7 +1,6 @@
-package net.sourceforge.mayfly;
+package net.sourceforge.mayfly.acceptance;
 
 import java.sql.*;
-
     
 public class DataDefinitionTest extends SqlTestCase {
     public void testDuplicateColumnName() throws Exception {

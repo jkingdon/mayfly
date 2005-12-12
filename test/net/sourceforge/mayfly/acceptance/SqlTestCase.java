@@ -1,7 +1,8 @@
-package net.sourceforge.mayfly;
+package net.sourceforge.mayfly.acceptance;
 
 import junit.framework.*;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.util.*;
 
 import java.sql.*;

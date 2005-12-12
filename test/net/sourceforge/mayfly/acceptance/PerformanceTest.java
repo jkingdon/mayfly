@@ -1,8 +1,8 @@
-package net.sourceforge.mayfly;
-
-import java.sql.*;
+package net.sourceforge.mayfly.acceptance;
 
 import net.sourceforge.mayfly.ldbc.*;
+
+import java.sql.*;
 
 public class PerformanceTest extends SqlTestCase {
     

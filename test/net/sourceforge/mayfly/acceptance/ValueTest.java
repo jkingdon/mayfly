@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly;
+package net.sourceforge.mayfly.acceptance;
 
 import java.sql.*;
 

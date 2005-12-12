@@ -2,6 +2,7 @@ package net.sourceforge.mayfly;
 
 import junit.framework.*;
 
+import net.sourceforge.mayfly.acceptance.*;
 import net.sourceforge.mayfly.datastore.*;
 
 import java.sql.*;

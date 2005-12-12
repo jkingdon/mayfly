@@ -1,4 +1,5 @@
-package net.sourceforge.mayfly;
+package net.sourceforge.mayfly.acceptance;
+
 
 
 public class SyntaxTest extends SqlTestCase {

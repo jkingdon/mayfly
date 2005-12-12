@@ -1,5 +1,6 @@
 //
-// LDBC SQL grammar
+// Mayfly SQL grammer
+// Based on the grammer from LDBC ( http://ldbc.sourceforge.net/ )
 //
 
 header {
