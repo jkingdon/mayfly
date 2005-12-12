@@ -12,5 +12,9 @@ public class HypersonicDialect extends Dialect {
     public void shutdown(Connection connection) throws Exception {
         SqlTestCase.execute("SHUTDOWN", connection); // So next test gets a new database.
     }
+    
+    public boolean detectsAmbiguousColumns() {
+        return false;
+    }
 
 }

@@ -126,7 +126,7 @@ public class ValueTest extends SqlTestCase {
 
     private void checkWrongWayToLookForNull() throws SQLException {
         String wrongWayToLookForNull = "select a from foo where a = null";
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.expectMayflyBehavior()) {
             expectQueryFailure(wrongWayToLookForNull, 
                 "To check for null, use IS NULL or IS NOT NULL, not a null literal"
             );

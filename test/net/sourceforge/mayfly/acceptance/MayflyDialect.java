@@ -25,5 +25,9 @@ public class MayflyDialect extends Dialect {
     public void assertMessage(String expectedMessage, SQLException exception) {
         Assert.assertEquals(expectedMessage, exception.getMessage());
     }
+    
+    public boolean expectMayflyBehavior() {
+        return true;
+    }
 
 }

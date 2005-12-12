@@ -9,27 +9,20 @@ import java.util.*;
 
 public abstract class SqlTestCase extends TestCase {
 
-    private static final boolean CONNECT_TO_MAYFLY = true;
+    protected Dialect dialect =
+        new MayflyDialect()
+        //new HypersonicDialect()
+        //new MySqlDialect()
+        ;
 
     // Turn this on to see a comparison of mayfly exception messages with
     // the current database's messages.
     static final boolean SHOW_MESSAGES = false;
 
-    /** Should a test look for behavior in which Mayfly intentionally diverges
-     * from what hypersonic does? */
-    protected static final boolean EXPECT_MAYFLY_BEHAVIOR = CONNECT_TO_MAYFLY;
-
     protected Connection connection;
     private Statement statement;
-    private Dialect dialect;
 
     public void setUp() throws Exception {
-        if (CONNECT_TO_MAYFLY) {
-            dialect = new MayflyDialect();
-        } else {
-            dialect = new HypersonicDialect();
-        }
-        
         connection = dialect.openConnection();
     }
 

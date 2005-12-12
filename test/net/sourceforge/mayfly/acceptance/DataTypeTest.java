@@ -34,11 +34,25 @@ public class DataTypeTest extends SqlTestCase {
 
     public void testAsciiPunctuation() throws Exception {
         execute("create table foo (value varchar(255))");
-        execute("insert into foo (value) values (' !\"#$%&''()*+,-./:;<=>?@[\\]^_`{|}~')");
+        execute("insert into foo (value) values (' !\"#$%&''()*+,-./:;<=>?@[]^_`{|}~')");
 
-        ResultSet results = query("select value from foo where value = ' !\"#$%&''()*+,-./:;<=>?@[\\]^_`{|}~'");
+        ResultSet results = query("select value from foo where value = ' !\"#$%&''()*+,-./:;<=>?@[]^_`{|}~'");
         assertTrue(results.next());
-        assertEquals(" !\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~", results.getString(1));
+        assertEquals(" !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~", results.getString(1));
+        assertFalse(results.next());
+    }
+    
+    public void testBackSlash() throws Exception {
+        if (dialect.backslashMeansSomethingInAString()) {
+            return;
+        }
+
+        execute("create table foo (value varchar(255))");
+        execute("insert into foo (value) values ('\\')");
+
+        ResultSet results = query("select value from foo where value = '\\'");
+        assertTrue(results.next());
+        assertEquals("\\", results.getString(1));
         assertFalse(results.next());
     }
 

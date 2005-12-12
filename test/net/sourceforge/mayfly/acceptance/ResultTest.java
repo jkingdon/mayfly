@@ -116,7 +116,7 @@ public class ResultTest extends SqlTestCase {
         ResultSet results = query("select name from vehicles order by wheels");
         assertTrue(results.next());
         assertEquals("bicycle", results.getString(1));
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.expectMayflyBehavior()) {
             try {
                 results.getInt(2);
                 fail();
@@ -138,7 +138,7 @@ public class ResultTest extends SqlTestCase {
         execute("INSERT INTO BAR (A) values (7)");
         ResultSet results = query("select foo.a, bar.a from foo inner join bar on bar.a > foo.a");
         assertTrue(results.next());
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.expectMayflyBehavior()) {
             try {
                 results.getInt("a");
                 fail();
@@ -218,7 +218,7 @@ public class ResultTest extends SqlTestCase {
         execute("CREATE TABLE FOO (A INTEGER)");
         execute("CREATE TABLE BAR (A INTEGER)");
         String sql = "select foo.a, bar.a from foo, bar order by a";
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.expectMayflyBehavior()) {
             expectQueryFailure(sql, "ambiguous column a");
         } else {
             assertResultSet(new String[] { }, query(sql));

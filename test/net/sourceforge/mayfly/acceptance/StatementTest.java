@@ -88,7 +88,7 @@ public class StatementTest extends SqlTestCase {
 
         PreparedStatement prepared = connection.prepareStatement("insert into foo (a, b) values (?, ?)");
         prepared.setInt(2, 90);
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.expectMayflyBehavior()) {
             try {
                 prepared.executeUpdate();
                 fail();

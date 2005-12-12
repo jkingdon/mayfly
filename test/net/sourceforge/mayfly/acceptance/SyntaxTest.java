@@ -32,5 +32,15 @@ public class SyntaxTest extends SqlTestCase {
         query("select \"x\" from \"foo\"");
         //query("select \"x\" from foo"); // not legal, at least in hypersonic
     }
+    
+    public void testTableNamesCaseInsensitive() throws Exception {
+        if (dialect.tableNamesMightBeCaseSensitive()) {
+            return;
+        }
+
+        execute("create table foo (x integer)");
+        execute("insert into Foo (X) values (5)");
+        assertResultSet(new String[] { " 5 " } , query("select x from FOO"));
+    }
 
 }

@@ -61,19 +61,19 @@ public class JoinTest extends SqlTestCase {
 
         expectQueryFailure("select a from foo, bar where bar.A = 5", "no column bar.A");
 
-        execute("insert into foo (a) values (7)");
+        execute("insert into FOO (a) values (7)");
         execute("insert into bar (b) values (8)");
         expectQueryFailure("select a from foo, bar where bar.A = 5", "no column bar.A");
     }
 
     public void testAmbiguousColumnName() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER)");
+        execute("CREATE TABLE foo (A INTEGER)");
         execute("CREATE TABLE bar (a INTEGER)");
         execute("insert into foo (a) values (5)");
         execute("insert into bar (a) values (9)");
         
         String ambiguousColumnNameQuery = "select A from foo, bar";
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.detectsAmbiguousColumns()) {
             expectQueryFailure(ambiguousColumnNameQuery, "ambiguous column A");
         } else {
             // This is the hypersonic behavior.  It seems too "guess what I meant"-ish
@@ -143,8 +143,25 @@ public class JoinTest extends SqlTestCase {
         if (mayflyMissing()) {
             // The grammar, again.
             execute("create table foo (a integer)");
-            assertNotNull(query("select * from foo left join foo on 1 = 1"));
+            execute("create table bar (a integer)");
+            assertNotNull(query("select * from foo left join bar on 1 = 1"));
         }
+    }
+
+    public void testOuterSelfJoin() throws Exception {
+        execute("create table foo (Id integer, parent integer)");
+        assertResultSet(new String[] { }, 
+            query("select * from foo child left outer join foo parent on child.parent = parent.id"));
+    }
+    
+    public void xtestAmbiguousColumnViaJoin() throws Exception {
+        // So the case here is that there are two copies of foo.a.
+        // and the "*" picks them up, or something?  This might be worth
+        // looking into more.  I'm not really sure what is going on,
+        // whether it should be an error, and what error message makes
+        // sense.
+        execute("create table foo (a integer)");
+        expectQueryFailure("select * from foo left outer join foo on 1 = 1", "ambiguous column a");
     }
 
     public void testCrossJoin() throws Exception {
@@ -173,14 +190,14 @@ public class JoinTest extends SqlTestCase {
         };
 
         String crossJoinNoOn = "select a, b from foo cross join bar";
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.expectMayflyBehavior()) {
             assertResultSet(fullCartesianProduct, query(crossJoinNoOn));
         } else {
             expectQueryFailure(crossJoinNoOn, null);
         }
         
         String crossJoinWithOn = "select a, b from foo cross join bar on 1 = 1";
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.expectMayflyBehavior()) {
             expectQueryFailure(crossJoinWithOn,
                 "Specify INNER JOIN, not CROSS JOIN, if you want an ON condition");
         } else {
@@ -241,7 +258,7 @@ public class JoinTest extends SqlTestCase {
         );
 
         // Hypersonic says column A is ambiguous
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.expectMayflyBehavior()) {
             assertResultSet(
                 new String[] {
                     " 5, 9 ",
@@ -261,10 +278,10 @@ public class JoinTest extends SqlTestCase {
         // Which raises the question of whether the ON is really any different from the WHERE.
         // Hypersonic seems to say no, at least in the following case:
         // (I would think mayfly should reject this kind of usage, but what does SQL92 and/or
-        // common practice say?)
+        // common practice say? - I think they say it should work ;-()
         String onReachesOutOfJoinedColumnsQuery = 
             "select foo.a, bar.a from bar, foo inner join types on bar.a = type";
-        if (EXPECT_MAYFLY_BEHAVIOR) {
+        if (dialect.expectMayflyBehavior()) {
             expectQueryFailure(onReachesOutOfJoinedColumnsQuery, "no column bar.a");
         } else {
             assertResultSet(

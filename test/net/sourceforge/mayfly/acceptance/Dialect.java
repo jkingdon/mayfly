@@ -25,4 +25,27 @@ public abstract class Dialect {
         }
     }
 
+    public boolean backslashMeansSomethingInAString() {
+        // For most SQL dialects (including SQL92 I believe), '\' is just a string
+        // with one character in it.
+        return false;
+    }
+
+    public boolean tableNamesMightBeCaseSensitive() {
+        return false;
+    }
+
+    public boolean detectsAmbiguousColumns() {
+        return true;
+    }
+
+    /** Should a test look for behavior in which Mayfly intentionally diverges
+     * from what hypersonic does?
+     * 
+     * (This doesn't make as much sense as the individual tests for specific questions
+     * like detectsAmbiguousColumns or whatever).  */
+    public boolean expectMayflyBehavior() {
+        return false;
+    }
+
 }
