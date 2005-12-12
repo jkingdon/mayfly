@@ -158,7 +158,7 @@ public class WhereTest extends SqlTestCase {
             query("select b from foo where not foo.a in (1, 3)")
         );
 
-        if (MAYFLY_MISSING) {
+        if (mayflyMissing()) {
             // Needs fixing in LDBC grammar.
             assertResultSet(
                 new String[] {
@@ -171,7 +171,7 @@ public class WhereTest extends SqlTestCase {
     }
 
     public void testInWithSubselect() throws Exception {
-        if (!MAYFLY_MISSING) {
+        if (!mayflyMissing()) {
             // Needs fixing in LDBC grammar.
             return;
         }

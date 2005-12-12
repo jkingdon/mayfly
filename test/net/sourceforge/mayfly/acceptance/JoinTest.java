@@ -140,7 +140,7 @@ public class JoinTest extends SqlTestCase {
     }
     
     public void testWordOuterIsOptional() throws Exception {
-        if (MAYFLY_MISSING) {
+        if (mayflyMissing()) {
             // The grammar, again.
             execute("create table foo (a integer)");
             assertNotNull(query("select * from foo left join foo on 1 = 1"));
@@ -152,7 +152,7 @@ public class JoinTest extends SqlTestCase {
         // just like INNER JOIN.  Mayfly, Oracle, and Postgres hew more closely
         // to the SQL standard: INNER JOIN must have ON and CROSS JOIN cannot have ON.
 
-        if (!MAYFLY_MISSING) {
+        if (!mayflyMissing()) {
             // The above describes the intended mayfly behavior, but I can't figure out
             // how to get ANTLR to parse CROSS JOIN.  Something dumb, I'm sure.
             return;
@@ -303,7 +303,7 @@ public class JoinTest extends SqlTestCase {
 
         /** We can't currently transform this 
          * {@link net.sourceforge.mayfly.ldbc.SelectTest#xtestNestedJoins()} */
-        if (MAYFLY_MISSING) {
+        if (mayflyMissing()) {
             assertResultSet(
                 new String[] {" 'FooVal', 'QuuxVal' " },
                 query("select foo.name, quux.name from foo inner join bar on f = b1 inner join quux on b2 = q")

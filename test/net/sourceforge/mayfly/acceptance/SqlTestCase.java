@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.acceptance;
 
 import junit.framework.*;
 
-import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.util.*;
 
 import java.sql.*;
@@ -14,41 +13,46 @@ public abstract class SqlTestCase extends TestCase {
 
     // Turn this on to see a comparison of mayfly exception messages with
     // the current database's messages.
-    private static final boolean SHOW_MESSAGES = false;
+    static final boolean SHOW_MESSAGES = false;
 
     /** Should a test look for behavior in which Mayfly intentionally diverges
      * from what hypersonic does? */
     protected static final boolean EXPECT_MAYFLY_BEHAVIOR = CONNECT_TO_MAYFLY;
-    /** Should a test skip checking for behaviors which we plan to implement in Mayfly,
-     * but which aren't implemented yet?  */
-    protected static final boolean MAYFLY_MISSING = !CONNECT_TO_MAYFLY;
 
-    private Database database;
     protected Connection connection;
     private Statement statement;
+    private Dialect dialect;
 
     public void setUp() throws Exception {
         if (CONNECT_TO_MAYFLY) {
-            database = new Database();
-            connection = database.openConnection();
+            dialect = new MayflyDialect();
         } else {
-            Class.forName("org.hsqldb.jdbcDriver");
-            connection = DriverManager.getConnection("jdbc:hsqldb:mem:SqlTestCase");
+            dialect = new HypersonicDialect();
         }
+        
+        connection = dialect.openConnection();
     }
 
     public void tearDown() throws Exception {
-        if (!CONNECT_TO_MAYFLY) {
-            execute("SHUTDOWN"); // So next test gets a new database.
-        }
+        dialect.shutdown(connection);
 
         if (statement != null) {
             statement.close();
         }
         connection.close();
     }
+    
+    protected boolean mayflyMissing() {
+        /** Should a test skip checking for behaviors which we plan to implement in Mayfly,
+         * but which aren't implemented yet?  */
+        return !(dialect instanceof MayflyDialect);
+    }
 
     protected int execute(String sql) throws SQLException {
+        return execute(sql, connection);
+    }
+
+    static int execute(String sql, Connection connection) throws SQLException {
         Statement statement = connection.createStatement();
         int rowsAffected = statement.executeUpdate(sql);
         statement.close();
@@ -64,28 +68,11 @@ public abstract class SqlTestCase extends TestCase {
     }
 
     protected void assertTableCount(int expected) {
-        if (CONNECT_TO_MAYFLY) {
-            assertEquals(expected, database.tables().size());
-        } else {
-            // Could probably do this with JDBC metadata or database-specific tricks.
-            // Not clear we should bother.
-        }
+        dialect.assertTableCount(expected);
     }
 
     protected void assertMessage(String expectedMessage, SQLException exception) {
-        if (CONNECT_TO_MAYFLY) {
-            assertEquals(expectedMessage, exception.getMessage());
-        } else {
-            // To assert on this we'd need to keep lists of messages for many
-            // databases in many versions.  That seems hard.
-            // But we would like to see that databases fail for the same
-            // reasons.  So we provide the ability to manually inspect
-            // the messages side by side.
-            if (SHOW_MESSAGES) {
-                System.out.print("Mayfly message would be " + expectedMessage + "\n");
-                System.out.print("Actual message was " + exception.getMessage() + "\n\n");
-            }
-        }
+        dialect.assertMessage(expectedMessage, exception);
     }
 
     public static void assertResultSet(String[] rowsAsStrings, ResultSet results) throws SQLException {

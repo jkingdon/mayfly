@@ -107,7 +107,7 @@ public class StatementTest extends SqlTestCase {
     }
     
     public void testSelect() throws Exception {
-        if (!MAYFLY_MISSING) {
+        if (!mayflyMissing()) {
             /** Still haven't implemented {@link net.sourceforge.mayfly.ldbc.Select#substitute(Collection)} */
             return;
         }

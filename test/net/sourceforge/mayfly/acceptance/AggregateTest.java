@@ -99,7 +99,7 @@ public class AggregateTest extends SqlTestCase {
     }
 
     public void testDistinctAndAll() throws Exception {
-        if (!MAYFLY_MISSING) {
+        if (!mayflyMissing()) {
             // Needs parser work, first of all
             return;
         }
