@@ -16,5 +16,22 @@ public class HypersonicDialect extends Dialect {
     public boolean detectsAmbiguousColumns() {
         return false;
     }
+    
+    public boolean crossJoinRequiresOn() {
+        // In hypersonic, CROSS JOIN seems to be a synonym for INNER JOIN
+        return true;
+    }
+    
+    public boolean crossJoinCanHaveOn() {
+        return true;
+    }
+    
+    public boolean requiresAllParameters() {
+        return false;
+    }
+    
+    public boolean orderByCountsAsWhat() {
+        return true;
+    }
 
 }

@@ -17,12 +17,22 @@ public class ExpressionTest extends SqlTestCase {
     }
     
     public void testMissingFrom() throws Exception {
-        // Omitting the FROM is a MySQL extension which we don't provide.
-        // TODO: error message should be more like "FROM missing"
-        expectQueryFailure("select 7", "unexpected token: 7");
+        // Omitting the FROM is a MySQL extension.  It implicitly implies a single row.
+        
+        String missingFrom = "select 7";
+        if (dialect.fromIsOptional()) {
+            assertResultSet(new String[] { " 7 " }, query(missingFrom));
+        } else {
+            // TODO: error message should be more like "FROM missing"
+            expectQueryFailure(missingFrom, "unexpected token: 7");
+        }
     }
     
     public void testConcat() throws Exception {
+        if (!dialect.verticalBarsMeanConcatenation()) {
+            return;
+        }
+
         execute("create table names (first varchar(255), last varchar(255))");
         execute("insert into names(first, last) values ('John', 'Jones')");
         ResultSet results = query("select first || ' ' || last from names");

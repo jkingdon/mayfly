@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc.where;
 
 import java.util.*;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -9,7 +10,12 @@ public class Not extends BooleanExpression {
 
     public static Not fromNotTree(Tree notTree, TreeConverters converters) {
         L converted = notTree.children().convertUsing(converters);
-        return new Not((BooleanExpression) converted.get(0));
+        Object operand = converted.get(0);
+        if (operand instanceof BooleanExpression) {
+            return new Not((BooleanExpression) operand);
+        } else {
+            throw new MayflyException("operand of NOT must be a boolean expression");
+        }
     }
 
     private final BooleanExpression operand;

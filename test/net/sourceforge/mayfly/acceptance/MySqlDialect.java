@@ -32,4 +32,44 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean crossJoinCanHaveOn() {
+        return true;
+    }
+    
+    public boolean innerJoinRequiresOn() {
+        return false;
+    }
+
+    public boolean considerTablesMentionedAfterJoin() {
+        return true;
+    }
+    
+    public boolean detectsSyntaxErrorsInPrepareStatement() {
+        return false;
+    }
+    
+    public boolean stringComparisonsAreCaseInsensitive() {
+        return true;
+    }
+    
+    public boolean notBindsMoreTightlyThanIn() {
+        return true;
+    }
+
+    public boolean canHaveLimitWithoutOrderBy() {
+        return true;
+    }
+    
+    public boolean fromIsOptional() {
+        return true;
+    }
+    
+    public boolean verticalBarsMeanConcatenation() {
+        return false;
+    }
+    
+    public boolean maySpecifyTableDotColumnToJdbc() {
+        return true;
+    }
+
 }

@@ -6,7 +6,7 @@ import java.util.*;
 public class ResultTest extends SqlTestCase {
     
     public void testSelectEmpty() throws Exception {
-        execute("CREATE TABLE FOO (a INTEGER)");
+        execute("CREATE TABLE foo (a INTEGER)");
         ResultSet results = query("select a from foo");
         assertFalse(results.next());
     }
@@ -21,8 +21,8 @@ public class ResultTest extends SqlTestCase {
     }
 
     public void testSelect() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER)");
-        execute("INSERT INTO FOO (A) values (5)");
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
         assertEquals(5, results.getInt("a"));
@@ -30,8 +30,8 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testAskResultSetForUnqueriedColumn() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER)");
-        execute("INSERT INTO FOO (A) values (5)");
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
         try {
@@ -43,8 +43,8 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testTryToGetResultsBeforeCallingNext() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER)");
-        execute("INSERT INTO FOO (A) values (5)");
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
         ResultSet results = query("select a from foo");
         try {
             results.getInt("a");
@@ -55,8 +55,8 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testTryToGetResultsAfterNextReturnsFalse() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER)");
-        execute("INSERT INTO FOO (A) values (5)");
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
         assertFalse(results.next());
@@ -69,9 +69,9 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testTwoRows() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER)");
-        execute("INSERT INTO FOO (A) values (5)");
-        execute("INSERT INTO FOO (a) values (7)");
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
+        execute("INSERT INTO foo (a) values (7)");
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
         int firstResult = results.getInt("a");
@@ -87,8 +87,8 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testMultipleColumns() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER, b INTEGER)");
-        execute("INSERT INTO FOO (a, B) values (5, 25)");
+        execute("CREATE TABLE foo (A INTEGER, b INTEGER)");
+        execute("INSERT INTO foo (a, B) values (5, 25)");
         ResultSet results = query("select A, b from foo");
         assertTrue(results.next());
         assertEquals(5, results.getInt("a"));
@@ -97,8 +97,8 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testColumnNumbers() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER)");
-        execute("INSERT INTO FOO (A) values (5)");
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
         ResultSet results = query("select a from foo");
         assertTrue(results.next());
 
@@ -116,7 +116,7 @@ public class ResultTest extends SqlTestCase {
         ResultSet results = query("select name from vehicles order by wheels");
         assertTrue(results.next());
         assertEquals("bicycle", results.getString(1));
-        if (dialect.expectMayflyBehavior()) {
+        if (!dialect.orderByCountsAsWhat()) {
             try {
                 results.getInt(2);
                 fail();
@@ -132,10 +132,10 @@ public class ResultTest extends SqlTestCase {
     }
 
     public void testTwoMatchingColumns() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER)");
-        execute("CREATE TABLE BAR (A INTEGER)");
-        execute("INSERT INTO FOO (A) values (5)");
-        execute("INSERT INTO BAR (A) values (7)");
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("CREATE TABLE bar (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
+        execute("INSERT INTO bar (A) values (7)");
         ResultSet results = query("select foo.a, bar.a from foo inner join bar on bar.a > foo.a");
         assertTrue(results.next());
         if (dialect.expectMayflyBehavior()) {
@@ -152,11 +152,16 @@ public class ResultTest extends SqlTestCase {
         assertEquals(5, results.getInt(1));
         assertEquals(7, results.getInt(2));
         
-        try {
-            results.getInt("foo.a");
-            fail();
-        } catch (SQLException e) {
-            assertMessage("column name foo.a should not contain a period", e);
+        if (dialect.maySpecifyTableDotColumnToJdbc()) {
+            // I guess this would make sense.  Maybe we'll get around to implementing it in Mayfly.
+            assertEquals(5, results.getInt("foo.a"));
+        } else {
+            try {
+                results.getInt("foo.a");
+                fail();
+            } catch (SQLException e) {
+                assertMessage("column name foo.a should not contain a period", e);
+            }
         }
     }
     
@@ -215,10 +220,10 @@ public class ResultTest extends SqlTestCase {
     }
 
     public void testOrderByAmbiguous() throws Exception {
-        execute("CREATE TABLE FOO (A INTEGER)");
-        execute("CREATE TABLE BAR (A INTEGER)");
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("CREATE TABLE bar (A INTEGER)");
         String sql = "select foo.a, bar.a from foo, bar order by a";
-        if (dialect.expectMayflyBehavior()) {
+        if (dialect.detectsAmbiguousColumns()) {
             expectQueryFailure(sql, "ambiguous column a");
         } else {
             assertResultSet(new String[] { }, query(sql));
@@ -248,7 +253,17 @@ public class ResultTest extends SqlTestCase {
 
         // Without an ORDER BY, just reject LIMIT (The postgres manual specifically
         // warns against LIMIT without ORDER BY, for example).
-        expectQueryFailure("select a from foo limit 2 offset 3", "Must specify ORDER BY with LIMIT");
+        String limitWithoutOrderBy = "select a from foo limit 2 offset 3";
+        if (!dialect.canHaveLimitWithoutOrderBy()) {
+            expectQueryFailure(limitWithoutOrderBy, "Must specify ORDER BY with LIMIT");
+        } else {
+            // Don't know which rows we'll get, but we should get exactly 2 of them.
+            ResultSet results = query(limitWithoutOrderBy);
+            assertTrue(results.next());
+            assertTrue(results.next());
+            assertFalse(results.next());
+            results.close();
+        }
     }
     
     public void testLimitNoOffset() throws Exception {

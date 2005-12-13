@@ -6,7 +6,7 @@ public class StatementTest extends SqlTestCase {
 
     public void testReturnValueFromExecuteUpdate() throws Exception {
         Statement statement = connection.createStatement();
-        assertEquals(0, statement.executeUpdate("CREATE Table Foo (b integer)"));
+        assertEquals(0, statement.executeUpdate("CREATE Table foo (b integer)"));
         assertEquals(1, statement.executeUpdate("inSERT into foo (b) values (77)"));
         statement.close();
         
@@ -16,6 +16,10 @@ public class StatementTest extends SqlTestCase {
     }
     
     public void testSyntaxErrorDetectedEarly() throws Exception {
+        if (!dialect.detectsSyntaxErrorsInPrepareStatement()) {
+            return;
+        }
+
         try {
             connection.prepareStatement("insert into some place or another");
             fail();
@@ -25,7 +29,7 @@ public class StatementTest extends SqlTestCase {
     }
     
     public void testQuestionMarkInPreparedStatement() throws Exception {
-        execute("create table Foo (B Integer, a integer)");
+        execute("create table foo (B Integer, a integer)");
 
         PreparedStatement prepared = connection.prepareStatement("insert into foo (a, b) values (?, ?)");
         prepared.setInt(1, 70);
@@ -84,11 +88,11 @@ public class StatementTest extends SqlTestCase {
     }
     
     public void testMissingSetCall() throws Exception {
-        execute("create table Foo (a Integer, b integer)");
+        execute("create table foo (a Integer, b integer)");
 
         PreparedStatement prepared = connection.prepareStatement("insert into foo (a, b) values (?, ?)");
         prepared.setInt(2, 90);
-        if (dialect.expectMayflyBehavior()) {
+        if (dialect.requiresAllParameters()) {
             try {
                 prepared.executeUpdate();
                 fail();

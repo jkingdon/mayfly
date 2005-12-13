@@ -94,7 +94,11 @@ public class AggregateTest extends SqlTestCase {
         execute("create table foo (x integer)");
         execute("insert into foo (x) values (5)");
         
-        assertResultSet(new String[] { " 'L5' " }, query("select 'L' || max(x) from foo")); 
+        if (dialect.verticalBarsMeanConcatenation()) {
+            assertResultSet(new String[] { " 'L5' " }, query("select 'L' || max(x) from foo"));
+        } else {
+            assertResultSet(new String[] { " 6 " }, query("select 1 + max(x) from foo"));
+        }
         expectQueryFailure("select 'L' || max(y) from foo", "no column y");
     }
 

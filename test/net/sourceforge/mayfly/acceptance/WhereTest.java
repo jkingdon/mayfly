@@ -21,6 +21,10 @@ public class WhereTest extends SqlTestCase {
         execute("create table foo (a varchar(80))");
         execute("insert into foo (a) values ('Foo')");
         ResultSet wrongCase = query("select a from foo where a = 'FOO'");
+        if (dialect.stringComparisonsAreCaseInsensitive()) {
+            assertTrue(wrongCase.next());
+            assertEquals("Foo", wrongCase.getString("a"));
+        }
         assertFalse(wrongCase.next());
 
         ResultSet correctCase = query("select a from foo where a = 'Foo'");
@@ -150,12 +154,12 @@ public class WhereTest extends SqlTestCase {
             },
             query("select b from foo where foo.a in (1, 3)")
         );
-
+        
         assertResultSet(
             new String[] {
                 "   4 ",
             },
-            query("select b from foo where not foo.a in (1, 3)")
+            query("select b from foo where not (foo.a in (1, 3))")
         );
 
         if (mayflyMissing()) {
@@ -168,6 +172,38 @@ public class WhereTest extends SqlTestCase {
             );
         }
 
+    }
+    
+    public void testInPrecedence() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo (a, b) values (1, 1)");
+        execute("insert into foo (a, b) values (2, 4)");
+        execute("insert into foo (a, b) values (3, 9)");
+
+        String negateTheIn = "select b from foo where not foo.a in (1, 3)";
+        if (dialect.notBindsMoreTightlyThanIn()) {
+            assertResultSet(
+                new String[] { },
+                query(negateTheIn)
+            );
+        } else {
+            assertResultSet(
+                new String[] {
+                    "   4 "
+                },
+                query(negateTheIn)
+            );
+        }
+        
+        String booleanAsLeftSideOfIn = "select b from foo where (not foo.a) in (1, 3)";
+        if (dialect.expectMayflyBehavior()) {
+            // Mayfly aims to be pickier than most databases about boolean vs non-boolean
+            // If some writes SQL like that they are either making a mistake, or they are
+            // being too clever for our tastes.
+            expectQueryFailure(booleanAsLeftSideOfIn, "operand of NOT must be a boolean expression");
+        } else {
+            assertResultSet(new String[] { }, query(booleanAsLeftSideOfIn));
+        }
     }
 
     public void testInWithSubselect() throws Exception {

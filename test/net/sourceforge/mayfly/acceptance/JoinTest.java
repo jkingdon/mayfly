@@ -190,22 +190,27 @@ public class JoinTest extends SqlTestCase {
         };
 
         String crossJoinNoOn = "select a, b from foo cross join bar";
-        if (dialect.expectMayflyBehavior()) {
-            assertResultSet(fullCartesianProduct, query(crossJoinNoOn));
-        } else {
+        if (dialect.crossJoinRequiresOn()) {
             expectQueryFailure(crossJoinNoOn, null);
+        } else {
+            assertResultSet(fullCartesianProduct, query(crossJoinNoOn));
         }
         
         String crossJoinWithOn = "select a, b from foo cross join bar on 1 = 1";
-        if (dialect.expectMayflyBehavior()) {
+        if (dialect.crossJoinCanHaveOn()) {
+            assertResultSet(fullCartesianProduct, query(crossJoinWithOn));
+        } else {
             expectQueryFailure(crossJoinWithOn,
                 "Specify INNER JOIN, not CROSS JOIN, if you want an ON condition");
-        } else {
-            assertResultSet(fullCartesianProduct, query(crossJoinWithOn));
         }
 
-        expectQueryFailure("select a, b from foo inner join bar",
-            "Specify CROSS JOIN, not INNER JOIN, if you want to omit an ON condition");
+        String innerJoinNoOn = "select a, b from foo inner join bar";
+        if (dialect.innerJoinRequiresOn()) {
+            expectQueryFailure(innerJoinNoOn, 
+                "Specify CROSS JOIN, not INNER JOIN, if you want to omit an ON condition");
+        } else {
+            assertResultSet(fullCartesianProduct, query(innerJoinNoOn));
+        }
     }
 
     public void testExplicitJoin() throws Exception {
@@ -236,7 +241,7 @@ public class JoinTest extends SqlTestCase {
 
     public void testCombineExplicitAndImplicitJoins() throws Exception {
         // It is useful/common to have a query with both an explicit and
-        // implicit join in it?
+        // implicit join in it?  (It is common if one is an outer join...)
 
         // Another case if these can be made to work:
         // from foo, bar outer join baz  => the "left" is bar, not the result of foo cross bar
@@ -251,27 +256,24 @@ public class JoinTest extends SqlTestCase {
         
         // Illustrates setup but isn't the point of this test
         assertResultSet(
-            new String[] {
-                " 9 ",
-            },
+            new String[] { " 9 " },
             query("select a from bar inner join types on a = type")
         );
 
-        // Hypersonic says column A is ambiguous
+        // Hypersonic/MySQL say column A is ambiguous
+        String ambiguousIfReachesOutOfJoin = "select foo.a, bar.a from foo, bar inner join types on a = type";
         if (dialect.expectMayflyBehavior()) {
             assertResultSet(
-                new String[] {
-                    " 5, 9 ",
-                },
-                query("select foo.a, bar.a from foo, bar inner join types on a = type")
+                new String[] { " 5, 9 " },
+                query(ambiguousIfReachesOutOfJoin)
             );
+        } else {
+            expectQueryFailure(ambiguousIfReachesOutOfJoin, "ambiguous column a");
         }
 
         // Hypersonic-friendly variant of above case
         assertResultSet(
-            new String[] {
-                " 5, 9 ",
-            },
+            new String[] { " 5, 9 " },
             query("select foo.a, bar.a from foo, bar inner join types on bar.a = type")
         );
 
@@ -285,19 +287,23 @@ public class JoinTest extends SqlTestCase {
             expectQueryFailure(onReachesOutOfJoinedColumnsQuery, "no column bar.a");
         } else {
             assertResultSet(
-                new String[] {
-                    " 5, 9 ",
-                },
+                new String[] { " 5, 9 " },
                 query(onReachesOutOfJoinedColumnsQuery)
             );
         }
 
-        assertResultSet(
-            new String[] {
-                " 5, 9 ",
-            },
-            query("select foo.a, bar.a from bar inner join types on a = type, foo")
-        );
+        String ambiguousIfOneConsidersTablesMentionedAfterJoin =
+            "select foo.a, bar.a from bar inner join types on a = type, foo";
+        if (dialect.considerTablesMentionedAfterJoin()) {
+            expectQueryFailure(ambiguousIfOneConsidersTablesMentionedAfterJoin, "ambiguous column a");
+        } else {
+            assertResultSet(
+                new String[] { " 5, 9 " },
+                query(ambiguousIfOneConsidersTablesMentionedAfterJoin)
+            );
+        }
+        // Next would be the case just like that but where the ON explicitly says "foo.a"
+
     }
     
     public void testNestedJoins() throws Exception {

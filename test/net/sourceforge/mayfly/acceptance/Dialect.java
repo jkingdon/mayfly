@@ -48,4 +48,56 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean crossJoinRequiresOn() {
+        return false;
+    }
+
+    public boolean crossJoinCanHaveOn() {
+        return false;
+    }
+
+    public boolean innerJoinRequiresOn() {
+        return true;
+    }
+
+    public boolean considerTablesMentionedAfterJoin() {
+        return false;
+    }
+    
+    public boolean detectsSyntaxErrorsInPrepareStatement() {
+        return true;
+    }
+
+    public boolean requiresAllParameters() {
+        return true;
+    }
+
+    public boolean stringComparisonsAreCaseInsensitive() {
+        return false;
+    }
+
+    public boolean notBindsMoreTightlyThanIn() {
+        return false;
+    }
+
+    public boolean orderByCountsAsWhat() {
+        return false;
+    }
+
+    public boolean canHaveLimitWithoutOrderBy() {
+        return false;
+    }
+
+    public boolean fromIsOptional() {
+        return false;
+    }
+
+    public boolean verticalBarsMeanConcatenation() {
+        return true;
+    }
+
+    public boolean maySpecifyTableDotColumnToJdbc() {
+        return false;
+    }
+
 }

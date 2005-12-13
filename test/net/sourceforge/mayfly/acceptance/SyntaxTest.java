@@ -41,6 +41,8 @@ public class SyntaxTest extends SqlTestCase {
         execute("create table foo (x integer)");
         execute("insert into Foo (X) values (5)");
         assertResultSet(new String[] { " 5 " } , query("select x from FOO"));
+        assertResultSet(new String[] { " 5 " } , query("select Foo.x from foo"));
+        assertResultSet(new String[] { " 5 " } , query("select x from foo where FOO.x = 5"));
     }
 
 }
