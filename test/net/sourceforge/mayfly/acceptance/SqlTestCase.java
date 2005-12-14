@@ -36,7 +36,7 @@ public abstract class SqlTestCase extends TestCase {
     }
     
     protected boolean mayflyMissing() {
-        /** Should a test skip checking for behaviors which we plan to implement in Mayfly,
+        /** Should we test for behaviors which we plan to implement in Mayfly,
          * but which aren't implemented yet?  */
         return !(dialect instanceof MayflyDialect);
     }
