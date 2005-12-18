@@ -35,6 +35,7 @@ import java.util.*;
 public class Database {
 
     private DataStore dataStore;
+    private String currentSchema;
 
     /**
      * Create an empty database (one with no tables).
@@ -50,6 +51,7 @@ public class Database {
      */
     public Database(DataStore store) {
         dataStore = store;
+        currentSchema = DataStore.ANONYMOUS_SCHEMA;
     }
 
     /**
@@ -72,7 +74,14 @@ public class Database {
      * Only intended for use within Mayfly.
      */
     public int executeUpdate(Command command) {
-        dataStore = command.update(dataStore);
+        if (command instanceof SetSchema) {
+            SetSchema setSchema = (SetSchema) command;
+            String proposed = setSchema.name();
+            dataStore.schema(proposed);
+            currentSchema = proposed;
+            return setSchema.rowsAffected();
+        }
+        dataStore = command.update(dataStore, currentSchema);
         return command.rowsAffected();
     }
 
@@ -84,7 +93,7 @@ public class Database {
     public ResultSet query(String command) throws SQLException {
         try {
             Select select = Select.selectFromTree(Tree.parse(command));
-            return select.select(dataStore);
+            return select.select(dataStore, currentSchema);
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
@@ -95,7 +104,7 @@ public class Database {
      * Only intended for use within Mayfly.
      */
     public ResultSet query(Select select) {
-        return select.select(dataStore);
+        return select.select(dataStore, currentSchema);
     }
 
     /**
@@ -119,7 +128,7 @@ public class Database {
      * some kind of convenience method.
      */
     public List columnNames(String tableName) throws SQLException {
-        TableData tableData = dataStore.table(tableName);
+        TableData tableData = dataStore.table(currentSchema, tableName);
         return tableData.columnNames();
     }
 
@@ -132,7 +141,7 @@ public class Database {
      * But this method may be convenient in tests.
      */
     public int rowCount(String tableName) throws SQLException {
-        TableData tableData = dataStore.table(tableName);
+        TableData tableData = dataStore.table(currentSchema, tableName);
         return tableData.rowCount();
     }
 

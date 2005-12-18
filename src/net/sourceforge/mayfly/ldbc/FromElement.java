@@ -4,8 +4,8 @@ import net.sourceforge.mayfly.datastore.*;
 
 public interface FromElement {
 
-    public abstract Rows tableContents(DataStore store);
+    public abstract Rows tableContents(DataStore store, String currentSchema);
 
-    public abstract Rows dummyRows(DataStore store);
+    public abstract Rows dummyRows(DataStore store, String currentSchema);
 
 }

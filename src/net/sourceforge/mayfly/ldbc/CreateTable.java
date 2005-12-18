@@ -43,8 +43,14 @@ public class CreateTable extends Command {
     public void substitute(Collection jdbcParameters) {
     }
 
-    public DataStore update(DataStore store) {
-        return store.createTable(table(), columnNames());
+    public DataStore update(DataStore store, String schema) {
+        Schema oldSchema = store.schema(schema);
+        Schema updatedSchema = update(oldSchema);
+        return store.with(schema, updatedSchema);
+    }
+
+    public Schema update(Schema anonymousSchema) {
+        return anonymousSchema.createTable(table(), columnNames());
     }
 
     public int rowsAffected() {

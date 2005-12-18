@@ -59,11 +59,11 @@ public class Select extends Command {
         return from;
     }
 
-    public ResultSet select(final DataStore store) {
-        Row dummyRow = dummyRow(store);
+    public ResultSet select(final DataStore store, String currentSchema) {
+        Row dummyRow = dummyRow(store, currentSchema);
         What selected = what.selected(dummyRow);
         check(store, selected, dummyRow);
-        return new MayflyResultSet(selected, query(store, selected));
+        return new MayflyResultSet(selected, query(store, currentSchema, selected));
     }
 
     private void check(final DataStore store, What selected, Row dummyRow) {
@@ -80,14 +80,14 @@ public class Select extends Command {
         }
     }
 
-    private Row dummyRow(final DataStore store) {
+    private Row dummyRow(final DataStore store, String currentSchema) {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();
-        Rows joinedRows = firstTable.dummyRows(store);
+        Rows joinedRows = firstTable.dummyRows(store, currentSchema);
         while (iterator.hasNext()) {
             FromElement table = (FromElement) iterator.next();
-            joinedRows = (Rows)joinedRows.cartesianJoin(table.dummyRows(store));
+            joinedRows = (Rows)joinedRows.cartesianJoin(table.dummyRows(store, currentSchema));
         }
         if (joinedRows.size() != 1) {
             throw new RuntimeException("internal error: got " + joinedRows.size());
@@ -95,14 +95,14 @@ public class Select extends Command {
         return (Row) joinedRows.element(0);
     }
 
-    public Rows query(DataStore store, What selected) {
+    Rows query(DataStore store, String currentSchema, What selected) {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();
-        Rows joinedRows = firstTable.tableContents(store);
+        Rows joinedRows = firstTable.tableContents(store, currentSchema);
         while (iterator.hasNext()) {
             FromElement table = (FromElement) iterator.next();
-            joinedRows = (Rows) joinedRows.cartesianJoin(table.tableContents(store));
+            joinedRows = (Rows) joinedRows.cartesianJoin(table.tableContents(store, currentSchema));
         }
 
         Rows afterWhere = (Rows) joinedRows.select(where);
@@ -123,7 +123,7 @@ public class Select extends Command {
         return what.parameterCount() + where.parameterCount();
     }
 
-    public DataStore update(DataStore store) {
+    public DataStore update(DataStore store, String schema) {
         throw new UnimplementedException(UPDATE_MESSAGE);
     }
 

@@ -300,7 +300,7 @@ public class SelectTest extends TestCase {
     }
 
     private Rows query(DataStore store, String sql) {
-        return Select.selectFromTree(Tree.parse(sql)).query(store, new What());
+        return Select.selectFromTree(Tree.parse(sql)).query(store, DataStore.ANONYMOUS_SCHEMA, new What());
     }
 
     public void testSmallerJoin() throws Exception {

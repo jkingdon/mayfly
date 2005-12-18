@@ -15,12 +15,16 @@ public abstract class Command extends ValueObject {
             return DropTable.dropTableFromTree(tree);
         case SQLTokenTypes.CREATE_TABLE:
             return CreateTable.createTableFromTree(tree);
+        case SQLTokenTypes.CREATE_SCHEMA:
+            return CreateSchema.createSchemaFromTree(tree);
+        case SQLTokenTypes.SET_SCHEMA:
+            return SetSchema.setSchemaFromTree(tree);
         case SQLTokenTypes.INSERT:
             return Insert.insertFromTree(tree);
         case SQLTokenTypes.SELECT:
             return Select.selectFromTree(tree);
         default:
-            throw new UnimplementedException("Unrecognized command " + tree);
+            throw new UnimplementedException("Unrecognized command " + tree.toStringTree());
         }
     }
     
@@ -28,7 +32,7 @@ public abstract class Command extends ValueObject {
 
     abstract public int parameterCount();
     
-    abstract public DataStore update(DataStore store);
+    abstract public DataStore update(DataStore store, String schema);
 
     abstract public int rowsAffected();
 

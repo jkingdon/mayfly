@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.ldbc.*;
 
 import java.util.*;
 
@@ -14,56 +13,68 @@ import java.util.*;
  * 
  * @internal
  * As with the rest of our immutable objects, all fields should
- * be final and types which are immutable (like String,
+ * be final and have types which are immutable (like String,
  * Double, ImmutableList, long, etc).
  */
 public class DataStore {
 
-    private final ImmutableMap tables;
+    public static final String ANONYMOUS_SCHEMA = new String();
+
+    private final ImmutableMap namedSchemas;
     
     public DataStore() {
-        this(new ImmutableMap());
+        this(new ImmutableMap().with(ANONYMOUS_SCHEMA, new Schema()));
     }
 
-    public DataStore(ImmutableMap tables) {
-        this.tables = tables;
+    public DataStore(ImmutableMap namedSchemas) {
+        this.namedSchemas = namedSchemas;
+    }
+
+    public DataStore with(String newSchemaName, Schema newSchema) {
+        return new DataStore(namedSchemas.with(newSchemaName, newSchema));
     }
 
     public DataStore createTable(String table, List columnNames) {
-        return new DataStore(tables.with(table, new TableData(Columns.fromColumnNames(table, columnNames))));
+        return with(ANONYMOUS_SCHEMA, anonymousSchema().createTable(table, columnNames));
+    }
+    
+    public Schema schema(String schema) {
+        if (namedSchemas.containsKey(schema)) {
+            return (Schema) namedSchemas.get(schema);
+        }
+        throw new MayflyException("no schema " + schema);
     }
 
-    public DataStore dropTable(String table) {
-        String canonicalTableName = lookUpTable(table);
-        return new DataStore(tables.without(canonicalTableName));
+    public Schema anonymousSchema() {
+        return (Schema) namedSchemas.get(ANONYMOUS_SCHEMA);
+    }
+    
+    public DataStore dropTable(String schema, String table) {
+        return with(schema, schema(schema).dropTable(table));
+    }
+
+    public TableData table(String schema, String table) {
+        return schema(schema).table(table);
     }
 
     public TableData table(String table) {
-        String canonicalTableName = lookUpTable(table);
-        
-        return (TableData) tables.get(canonicalTableName);
-    }
-
-    private String lookUpTable(String target) {
-        for (Iterator iter = tables.keySet().iterator(); iter.hasNext(); ) {
-            String canonicalTable = (String) iter.next();
-            if (canonicalTable.equalsIgnoreCase(target)) {
-                return canonicalTable;
-            }
-        }
-        throw new MayflyException("no table " + target);
+        return table(ANONYMOUS_SCHEMA, table);
     }
 
     public Set tables() {
-        return tables.keySet();
+        return anonymousSchema().tables();
     }
 
-    public DataStore addRow(String table, List columnNames, List values) {
-        return new DataStore(tables.with(lookUpTable(table), table(table).addRow(columnNames, values)));
+    public DataStore addRow(String schema, String table, List columnNames, List values) {
+        return with(schema, schema(schema).addRow(table, columnNames, values));
     }
 
     public DataStore addRow(String table, List values) {
-        return new DataStore(tables.with(lookUpTable(table), table(table).addRow(values)));
+        return with(ANONYMOUS_SCHEMA, anonymousSchema().addRow(table, values));
+    }
+
+    public DataStore addRow(String table, List columnNames, List values) {
+        return addRow(ANONYMOUS_SCHEMA, table, columnNames, values);
     }
 
 }

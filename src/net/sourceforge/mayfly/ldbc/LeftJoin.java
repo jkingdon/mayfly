@@ -12,9 +12,9 @@ public class LeftJoin extends Join implements FromElement {
         super(left, right, condition);
     }
 
-    public Rows tableContents(DataStore store) {
-        Rows leftRows = left.tableContents(store);
-        Rows rightRows = right.tableContents(store);
+    public Rows tableContents(DataStore store, String currentSchema) {
+        Rows leftRows = left.tableContents(store, currentSchema);
+        Rows rightRows = right.tableContents(store, currentSchema);
 
         final L joinResult = new L();
 
@@ -36,7 +36,7 @@ public class LeftJoin extends Join implements FromElement {
             }
             
             if (!haveJoinedThisLeftRow) {
-                Row nullRightRow = (Row) right.dummyRows(store).element(0);
+                Row nullRightRow = (Row) right.dummyRows(store, currentSchema).element(0);
                 Row withNulls = (Row) leftRow.plus(nullRightRow);
                 joinResult.append(withNulls);
             }

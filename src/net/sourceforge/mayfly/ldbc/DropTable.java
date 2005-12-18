@@ -25,8 +25,8 @@ public class DropTable extends Command {
     public void substitute(Collection jdbcParameters) {
     }
 
-    public DataStore update(DataStore store) {
-        return store.dropTable(table());
+    public DataStore update(DataStore store, String schema) {
+        return store.dropTable(schema, table());
     }
 
     public int rowsAffected() {

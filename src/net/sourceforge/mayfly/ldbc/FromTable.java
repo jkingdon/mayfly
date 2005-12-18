@@ -8,18 +8,6 @@ import antlr.collections.*;
 import java.util.*;
 
 public class FromTable extends ValueObject implements FromElement {
-    private String tableName;
-    private String alias;
-
-    public FromTable(String tableName) {
-        this(tableName, null);
-    }
-
-    public FromTable(String tableName, String alias) {
-        this.tableName = tableName;
-        this.alias = alias;
-    }
-
 
     public static FromElement fromSeletedTableTree(Tree table) {
         AST firstIdentifier = table.getFirstChild();
@@ -37,12 +25,24 @@ public class FromTable extends ValueObject implements FromElement {
         return fromElement;
     }
 
-    public Rows tableContents(DataStore store) {
-        return applyAlias(store.table(tableName).rows());
+    private String tableName;
+    private String alias;
+
+    public FromTable(String tableName) {
+        this(tableName, null);
     }
 
-    public Rows dummyRows(DataStore store) {
-        return applyAlias(store.table(tableName).dummyRows());
+    public FromTable(String tableName, String alias) {
+        this.tableName = tableName;
+        this.alias = alias;
+    }
+
+    public Rows tableContents(DataStore store, String currentSchema) {
+        return applyAlias(store.table(currentSchema, tableName).rows());
+    }
+
+    public Rows dummyRows(DataStore store, String currentSchema) {
+        return applyAlias(store.table(currentSchema, tableName).dummyRows());
     }
 
     private Rows applyAlias(Rows storedRows) {

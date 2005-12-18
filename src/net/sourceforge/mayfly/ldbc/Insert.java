@@ -103,11 +103,11 @@ public class Insert extends Command {
         }
     }
 
-    public DataStore update(DataStore store) {
+    public DataStore update(DataStore store, String schema) {
         if (columns == null) {
             return store.addRow(table(), values);
         } else {
-            return store.addRow(table(), columns, values);
+            return store.addRow(schema, table(), columns, values);
         }
     }
 

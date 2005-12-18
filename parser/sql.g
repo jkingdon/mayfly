@@ -19,6 +19,7 @@ options {
 tokens {
     COLUMN_LIST;
     CREATE_TABLE;
+    CREATE_SCHEMA;
     UPDATE;
     INSERT;
     SELECT;
@@ -66,6 +67,7 @@ tokens {
     FOREIGN_KEY;
     SET_AUTOCOMMIT_TRUE;
     SET_AUTOCOMMIT_FALSE;
+    SET_SCHEMA;
     GET_AUTOINCREMENT_KEY;
     ALTER_TABLE_DROP_CONSTRAINT;
     ALTER_TABLE_RENAME;
@@ -191,6 +193,7 @@ statement:
     | delete 
     | insert
     | create_table
+    | create_schema
     | create_index
     | drop_table
     | drop_index
@@ -198,6 +201,7 @@ statement:
     | commit
     | rollback
     | set_autocommit
+    | set_schema
     | get_autoincrement_key
     )
     EOF!
@@ -226,6 +230,11 @@ set_autocommit:
     { #set_autocommit = #([SET_AUTOCOMMIT_FALSE, "set_autocommit_false"], #set_autocommit); }
 ;
 
+set_schema:
+    "set"! "schema"! identifier
+    { #set_schema = #([SET_SCHEMA, "set_schema"], #set_schema); }
+;
+
 insert:
     "insert"! "into"! table_name
     ( column_list )?
@@ -248,6 +257,11 @@ create_table:
     ( "option" OPEN_PAREN! QUOTED_STRING CLOSE_PAREN! ) ?
     OPEN_PAREN column_def (COMMA! column_def)* CLOSE_PAREN!
     { #create_table = #([CREATE_TABLE, "create_table"], #create_table); }
+;
+
+create_schema:
+    "create"! "schema"! identifier "authorization"! "dba"! create_table
+    { #create_schema = #([CREATE_SCHEMA, "create_schema"], #create_schema); }
 ;
 
 create_index:
