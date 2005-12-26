@@ -112,20 +112,20 @@ public class Database {
      * which you have explicitly created; there are no tables here
      * which are for Mayfly's own use.</p>
      * 
-     * If a future version of Mayfly implements this functionality in
+     * <p>If a future version of Mayfly implements this functionality in
      * java.sql.DatabaseMetaData, this method may go away or become
-     * some kind of convenience method.
+     * a convenience method.</p>
      */
     public Set tables() {
-        return dataStore.tables();
+        return dataStore.tables(currentSchema);
     }
 
     /**
-     * Column names in given table.
+     * <p>Column names in given table.</p>
      * 
-     * If a future version of Mayfly implements this functionality in
+     * <p>If a future version of Mayfly implements this functionality in
      * java.sql.DatabaseMetaData, this method may go away or become
-     * some kind of convenience method.
+     * some kind of convenience method.</p>
      */
     public List columnNames(String tableName) throws SQLException {
         TableData tableData = dataStore.table(currentSchema, tableName);

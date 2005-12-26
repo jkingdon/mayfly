@@ -23,23 +23,39 @@ public class DataStore {
     private final ImmutableMap namedSchemas;
     
     public DataStore() {
-        this(new ImmutableMap().with(ANONYMOUS_SCHEMA, new Schema()));
+        this(new Schema());
+    }
+
+    public DataStore(Schema anonymousSchema) {
+        this(new ImmutableMap().with(ANONYMOUS_SCHEMA, anonymousSchema));
     }
 
     public DataStore(ImmutableMap namedSchemas) {
         this.namedSchemas = namedSchemas;
     }
 
-    public DataStore with(String newSchemaName, Schema newSchema) {
+    public DataStore addSchema(String newSchemaName, Schema newSchema) {
+        if (schemaExists(newSchemaName)) {
+            throw new MayflyException("schema " + newSchemaName + " already exists");
+        }
         return new DataStore(namedSchemas.with(newSchemaName, newSchema));
     }
 
-    public DataStore createTable(String table, List columnNames) {
-        return with(ANONYMOUS_SCHEMA, anonymousSchema().createTable(table, columnNames));
+    public DataStore replace(String newSchemaName, Schema newSchema) {
+        if (schemaExists(newSchemaName)) {
+            return new DataStore(namedSchemas.with(newSchemaName, newSchema));
+        } else {
+            throw new MayflyInternalException("no schema " + newSchemaName);
+        }
     }
-    
+
+    private boolean schemaExists(String newSchemaName) {
+        // FIXME: should be case insensitive
+        return namedSchemas.containsKey(newSchemaName);
+    }
+
     public Schema schema(String schema) {
-        if (namedSchemas.containsKey(schema)) {
+        if (schemaExists(schema)) {
             return (Schema) namedSchemas.get(schema);
         }
         throw new MayflyException("no schema " + schema);
@@ -50,7 +66,7 @@ public class DataStore {
     }
     
     public DataStore dropTable(String schema, String table) {
-        return with(schema, schema(schema).dropTable(table));
+        return replace(schema, schema(schema).dropTable(table));
     }
 
     public TableData table(String schema, String table) {
@@ -58,23 +74,19 @@ public class DataStore {
     }
 
     public TableData table(String table) {
-        return table(ANONYMOUS_SCHEMA, table);
+        return anonymousSchema().table(table);
     }
 
-    public Set tables() {
-        return anonymousSchema().tables();
+    public Set tables(String schema) {
+        return schema(schema).tables();
     }
 
     public DataStore addRow(String schema, String table, List columnNames, List values) {
-        return with(schema, schema(schema).addRow(table, columnNames, values));
+        return replace(schema, schema(schema).addRow(table, columnNames, values));
     }
 
-    public DataStore addRow(String table, List values) {
-        return with(ANONYMOUS_SCHEMA, anonymousSchema().addRow(table, values));
-    }
-
-    public DataStore addRow(String table, List columnNames, List values) {
-        return addRow(ANONYMOUS_SCHEMA, table, columnNames, values);
+    public DataStore addRow(String schema, String table, List values) {
+        return replace(schema, schema(schema).addRow(table, values));
     }
 
 }

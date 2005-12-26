@@ -53,5 +53,21 @@ public class DatabaseTest extends TestCase {
         assertEquals(new TreeSet(Arrays.asList(new String[] {"foo", "foo2"})), original.tables());
         assertEquals(1, original.rowCount("Foo"));
     }
+    
+    public void testTables() throws Exception {
+        database.execute("create table inAnonymousSchema (x integer)");
+        database.execute("create schema mars authorization dba create table foo (x integer)");
+        assertEquals(Collections.singleton("inAnonymousSchema"), database.tables());
+        database.execute("set schema mars");
+        assertEquals(Collections.singleton("foo"), database.tables());
+    }
+    
+    public void testColumnNames() throws Exception {
+        database.execute("create table inAnonymousSchema (x integer)");
+        database.execute("create schema mars authorization dba create table foo (y integer)");
+        assertEquals(Collections.singletonList("x"), database.columnNames("inAnonymousSchema"));
+        database.execute("set schema mars");
+        assertEquals(Collections.singletonList("y"), database.columnNames("foo"));
+    }
 
 }

@@ -17,7 +17,7 @@ public class Dumper {
      * <tt>new Dumper().dump(database.dataStore(), System.out)</tt>
      */
     public void dump(DataStore store, Writer out) throws IOException {
-        for (Iterator iter = store.tables().iterator(); iter.hasNext();) {
+        for (Iterator iter = store.anonymousSchema().tables().iterator(); iter.hasNext();) {
             String tableName = (String) iter.next();
             dump(store, tableName, out);
         }

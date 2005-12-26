@@ -46,7 +46,7 @@ public class CreateTable extends Command {
     public DataStore update(DataStore store, String schema) {
         Schema oldSchema = store.schema(schema);
         Schema updatedSchema = update(oldSchema);
-        return store.with(schema, updatedSchema);
+        return store.replace(schema, updatedSchema);
     }
 
     public Schema update(Schema anonymousSchema) {

@@ -283,15 +283,16 @@ public class SelectTest extends TestCase {
 
     public void testExecuteSimpleJoin() throws Exception {
         DataStore store =
-            new DataStore()
-                .createTable("foo", new L().append("colA").append("colB"))
-                .addRow("foo", new L().append("colA").append("colB"), new L().append("1a").append("1b"))
-                .addRow("foo", new L().append("colA").append("colB"), new L().append("2a").append("2b"))
-                .createTable("bar", new L().append("colX").append("colY"))
-                .addRow("bar", new L().append("colX").append("colY"), new L().append("1a").append("1b"))
-                .addRow("bar", new L().append("colX").append("colY"), new L().append("2a").append("2b"))
-                .addRow("bar", new L().append("colX").append("colY"), new L().append("3a").append("3b"));
-
+            new DataStore(
+                new Schema()
+                    .createTable("foo", new L().append("colA").append("colB"))
+                    .addRow("foo", new L().append("colA").append("colB"), new L().append("1a").append("1b"))
+                    .addRow("foo", new L().append("colA").append("colB"), new L().append("2a").append("2b"))
+                    .createTable("bar", new L().append("colX").append("colY"))
+                    .addRow("bar", new L().append("colX").append("colY"), new L().append("1a").append("1b"))
+                    .addRow("bar", new L().append("colX").append("colY"), new L().append("2a").append("2b"))
+                    .addRow("bar", new L().append("colX").append("colY"), new L().append("3a").append("3b"))
+            );
 
         assertEquals(
             store.table("foo").rows().cartesianJoin(store.table("bar").rows()),
@@ -305,12 +306,13 @@ public class SelectTest extends TestCase {
 
     public void testSmallerJoin() throws Exception {
         DataStore store =
-            new DataStore()
-                .createTable("foo", new L().append("colA"))
-                .addRow("foo", new L().append("colA"), new L().append("1a"))
-                .createTable("bar", new L().append("colX"))
-                .addRow("bar", new L().append("colX"), new L().append("barXValue"))
-                ;
+            new DataStore(
+                new Schema()
+                    .createTable("foo", new L().append("colA"))
+                    .addRow("foo", new L().append("colA"), new L().append("1a"))
+                    .createTable("bar", new L().append("colX"))
+                    .addRow("bar", new L().append("colX"), new L().append("barXValue"))
+                );
 
 
         assertEquals(
@@ -328,11 +330,13 @@ public class SelectTest extends TestCase {
 
     public void testSimpleWhere() throws Exception {
         DataStore store =
-            new DataStore()
-                .createTable("foo", new L().append("colA").append("colB"))
-                .addRow("foo", new L().append("colA").append("colB"), new L().append("1a").append("1b"))
-                .addRow("foo", new L().append("colA").append("colB"), new L().append("2a").append("xx"))
-                .addRow("foo", new L().append("colA").append("colB"), new L().append("3a").append("xx"));
+            new DataStore(
+                new Schema()
+                    .createTable("foo", new L().append("colA").append("colB"))
+                    .addRow("foo", new L().append("colA").append("colB"), new L().append("1a").append("1b"))
+                    .addRow("foo", new L().append("colA").append("colB"), new L().append("2a").append("xx"))
+                    .addRow("foo", new L().append("colA").append("colB"), new L().append("3a").append("xx"))
+            );
 
         assertEquals(
             store.table("foo").rows().elements(new int[]{1, 2}),
