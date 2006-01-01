@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.util;
 
-import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 
 import java.util.*;

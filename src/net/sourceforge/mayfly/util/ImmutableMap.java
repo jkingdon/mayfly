@@ -1,10 +1,7 @@
-package net.sourceforge.mayfly.datastore;
-
-import net.sourceforge.mayfly.util.*;
+package net.sourceforge.mayfly.util;
 
 import java.util.*;
 
-// TODO: Move to util package.
 public class ImmutableMap extends ValueObject implements Map {
 
     Map delegate;

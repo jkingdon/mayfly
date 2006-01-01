@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.util;
 
 import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
 
 import org.apache.commons.collections.*;
 import org.apache.commons.lang.*;

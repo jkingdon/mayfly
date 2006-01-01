@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.datastore;
+package net.sourceforge.mayfly.util;
 
 import junit.framework.*;
 
