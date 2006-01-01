@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
 
+//TODO: Move to util package.
 public class ImmutableList implements List {
 
     public static ImmutableList singleton(Object singleElement) {

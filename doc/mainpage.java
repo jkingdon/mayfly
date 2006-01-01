@@ -142,4 +142,13 @@ An <var>expression</var> is:
   NULL
 </pre>
 
+@section References
+
+One good reference is <i>SQL in a Nutshell</i>, by Kline, Kline and Hunt,
+published by O'Reilly.
+It has a detailed guide to syntax and semantics, including the SQL2003 standard and
+the differences among the most common SQL implementations.
+
+One good SQL reference/tutorial web site is <a href="http://www.sqlzoo.net/" >SQLzoo</a>.
+
 */

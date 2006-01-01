@@ -51,7 +51,7 @@ public class Database {
      */
     public Database(DataStore store) {
         dataStore = store;
-        currentSchema = DataStore.ANONYMOUS_SCHEMA;
+        currentSchema = DataStore.ANONYMOUS_SCHEMA_NAME;
     }
 
     /**
@@ -118,6 +118,19 @@ public class Database {
      */
     public Set tables() {
         return dataStore.tables(currentSchema);
+    }
+
+    /**
+     * <p>Return schema names.  This returned list only includes schemas
+     * which you have explicitly created.  The anonymous schema is not
+     * included in the returned list, but will always exist.</p>
+     * 
+     * <p>If a future version of Mayfly implements this functionality in
+     * java.sql.DatabaseMetaData, this method may go away or become
+     * a convenience method.</p>
+     */
+    public Set schemas() {
+        return dataStore.schemas();
     }
 
     /**

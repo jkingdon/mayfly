@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
 
@@ -18,7 +19,8 @@ import java.util.*;
  */
 public class DataStore {
 
-    public static final String ANONYMOUS_SCHEMA = new String();
+    public static final String ANONYMOUS_SCHEMA_NAME = "";
+    public static final CaseInsensitiveString ANONYMOUS_SCHEMA = new CaseInsensitiveString(ANONYMOUS_SCHEMA_NAME);
 
     private final ImmutableMap namedSchemas;
     
@@ -30,7 +32,7 @@ public class DataStore {
         this(new ImmutableMap().with(ANONYMOUS_SCHEMA, anonymousSchema));
     }
 
-    public DataStore(ImmutableMap namedSchemas) {
+    private DataStore(ImmutableMap namedSchemas) {
         this.namedSchemas = namedSchemas;
     }
 
@@ -38,25 +40,24 @@ public class DataStore {
         if (schemaExists(newSchemaName)) {
             throw new MayflyException("schema " + newSchemaName + " already exists");
         }
-        return new DataStore(namedSchemas.with(newSchemaName, newSchema));
+        return new DataStore(namedSchemas.with(new CaseInsensitiveString(newSchemaName), newSchema));
     }
 
     public DataStore replace(String newSchemaName, Schema newSchema) {
         if (schemaExists(newSchemaName)) {
-            return new DataStore(namedSchemas.with(newSchemaName, newSchema));
+            return new DataStore(namedSchemas.with(new CaseInsensitiveString(newSchemaName), newSchema));
         } else {
             throw new MayflyInternalException("no schema " + newSchemaName);
         }
     }
 
     private boolean schemaExists(String newSchemaName) {
-        // FIXME: should be case insensitive
-        return namedSchemas.containsKey(newSchemaName);
+        return namedSchemas.containsKey(new CaseInsensitiveString(newSchemaName));
     }
 
     public Schema schema(String schema) {
         if (schemaExists(schema)) {
-            return (Schema) namedSchemas.get(schema);
+            return (Schema) namedSchemas.get(new CaseInsensitiveString(schema));
         }
         throw new MayflyException("no schema " + schema);
     }
@@ -87,6 +88,17 @@ public class DataStore {
 
     public DataStore addRow(String schema, String table, List values) {
         return replace(schema, schema(schema).addRow(table, values));
+    }
+
+    public Set schemas() {
+        Set names = new TreeSet();
+        for (Iterator iter = namedSchemas.keySet().iterator(); iter.hasNext();) {
+            CaseInsensitiveString key = (CaseInsensitiveString) iter.next();
+            if (!key.equals(ANONYMOUS_SCHEMA)) {
+                names.add(key.getString());
+            }
+        }
+        return names;
     }
 
 }

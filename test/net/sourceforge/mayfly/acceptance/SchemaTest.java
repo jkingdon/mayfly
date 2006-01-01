@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.acceptance;
 
-
 public class SchemaTest extends SqlTestCase {
 
     public void testHypersonicSyntax() throws Exception {
@@ -45,7 +44,7 @@ public class SchemaTest extends SqlTestCase {
             return;
         }
         if (dialect instanceof MayflyDialect) {
-            // I don't know how to get ANTLR to parser this.
+            // I don't know how to get ANTLR to parse this.
             // I'm not sure what ANTLR is complaining about...
             return;
         }
@@ -66,10 +65,25 @@ public class SchemaTest extends SqlTestCase {
         );
     }
     
+    public void testSetSchemaIsCaseInsensitive() throws Exception {
+        if (dialect instanceof MySqlDialect) {
+            return;
+        }
+        
+        execute("create schema mars authorization dba create table foo (x integer)");
+        execute("set schema MARS");
+        assertResultSet(new String[] { }, query("select * from foo"));
+
+        // If this message were to include the schema name, I think we'd want it to
+        // say mars not MARS.
+        expectQueryFailure("select * from nonexist", "no table nonexist");
+        
+        // Test that error message is case preserving
+        expectExecuteFailure("set schema Venus", "no schema Venus");
+    }
+    
     // test mars.foo syntax (where is this legal?)
-    // make sure that set schema really affects everything (maybe unit test for this...)
-    // case insensitive on SET SCHEMA
-    // case preserving on error messages, listing schemas, etc
+    // case insensitive on mars.foo
     // world?.col where ? is JDBC parameter (int or string)
 
 }

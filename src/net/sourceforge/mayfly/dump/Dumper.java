@@ -31,7 +31,7 @@ public class Dumper {
      * <tt>new Dumper().dump(database.dataStore(), "INVOICES", System.out)</tt>
      */
     public void dump(DataStore store, String tableName, Writer out) throws IOException {
-        TableData table = store.table(DataStore.ANONYMOUS_SCHEMA, tableName);
+        TableData table = store.table(DataStore.ANONYMOUS_SCHEMA_NAME, tableName);
         for (Iterator iter = table.rows().iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             dumpRow(tableName, row, out);

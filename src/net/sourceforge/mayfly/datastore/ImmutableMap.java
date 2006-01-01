@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
 
+// TODO: Move to util package.
 public class ImmutableMap extends ValueObject implements Map {
 
     Map delegate;
@@ -46,7 +47,7 @@ public class ImmutableMap extends ValueObject implements Map {
 
 
     public void clear() {
-        delegate.clear();
+        throw new UnsupportedOperationException("Attempt to mutate immutable map");
     }
 
     public boolean containsKey(Object key) {
@@ -82,15 +83,15 @@ public class ImmutableMap extends ValueObject implements Map {
     }
 
     public Object put(Object key, Object value) {
-        return delegate.put(key, value);
+        throw new UnsupportedOperationException("Attempt to mutate immutable map");
     }
 
     public void putAll(Map m) {
-        delegate.putAll(m);
+        throw new UnsupportedOperationException("Attempt to mutate immutable map");
     }
 
     public Object remove(Object key) {
-        return delegate.remove(key);
+        throw new UnsupportedOperationException("Attempt to mutate immutable map");
     }
 
     public int size() {

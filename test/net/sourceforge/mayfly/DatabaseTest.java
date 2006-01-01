@@ -2,8 +2,10 @@ package net.sourceforge.mayfly;
 
 import junit.framework.*;
 
+import net.sourceforge.mayfly.acceptance.*;
 import net.sourceforge.mayfly.datastore.*;
 
+import java.sql.*;
 import java.util.*;
 
 public class DatabaseTest extends TestCase {
@@ -69,5 +71,28 @@ public class DatabaseTest extends TestCase {
         database.execute("set schema mars");
         assertEquals(Collections.singletonList("y"), database.columnNames("foo"));
     }
-
+    
+    public void testQueryAndSchema() throws Exception {
+        database.execute("create table inAnonymousSchema (x integer)");
+        database.execute("create schema mars authorization dba create table foo (y integer)");
+        String fooQuery = "select * from foo";
+        try {
+            database.query(fooQuery);
+            fail();
+        } catch (SQLException e) {
+            assertEquals("no table foo", e.getMessage());
+        }
+        database.execute("set schema mars");
+        SqlTestCase.assertResultSet(new String[] { }, database.query(fooQuery));
+    }
+    
+    public void testSchemas() throws Exception {
+        database.execute("create schema MARS authorization dba create table foo (x integer)");
+        database.execute("create schema Venus authorization dba create table foo (x integer)");
+        Set expected = new TreeSet();
+        expected.add("MARS");
+        expected.add("Venus");
+        assertEquals(expected, database.schemas());
+    }
+    
 }

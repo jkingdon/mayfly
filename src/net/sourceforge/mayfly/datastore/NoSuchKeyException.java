@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
+//TODO: Move to util package.
 public class NoSuchKeyException extends RuntimeException {
 
     public NoSuchKeyException() {
