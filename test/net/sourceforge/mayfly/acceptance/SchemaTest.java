@@ -82,6 +82,15 @@ public class SchemaTest extends SqlTestCase {
         expectExecuteFailure("set schema Venus", "no schema Venus");
     }
     
+    public void testSchemaNameDotTable() throws Exception {
+        if (dialect instanceof MySqlDialect) {
+            return;
+        }
+        
+        execute("create schema mars authorization dba create table foo (x integer)");
+        execute("insert into mars.foo (x) values (7)");
+    }
+    
     // test mars.foo syntax (where is this legal?)
     // case insensitive on mars.foo
     // world?.col where ? is JDBC parameter (int or string)

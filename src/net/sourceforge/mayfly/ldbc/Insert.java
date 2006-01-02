@@ -23,8 +23,8 @@ public class Insert extends Command {
     public static Insert insertFromTree(Tree tree) {
         Tree.Children children = tree.children();
 
-        Tree tableIdentifier = (Tree) children.element(0);
-        InsertTable insertTable = new InsertTable(tableIdentifier.getText());
+        Tree table = (Tree) children.element(0);
+        InsertTable insertTable = tableFromTableTree(table);
 
         Tree secondChild = (Tree) children.element(1);
         if (secondChild.getType() == SQLTokenTypes.COLUMN_LIST) {
@@ -45,6 +45,23 @@ public class Insert extends Command {
                 fromValues(values)
             );
 
+        }
+    }
+
+    private static InsertTable tableFromTableTree(Tree table) {
+        if (table.getType() != SQLTokenTypes.TABLE) {
+            throw new MayflyInternalException("Didn't expect " + table.toStringTree());
+        }
+
+        if (table.getNumberOfChildren() == 1) {
+            Tree firstChild = table.children().singleSubtreeOfType(SQLTokenTypes.IDENTIFIER);
+            return new InsertTable(firstChild.getText());
+        } else if (table.getNumberOfChildren() == 2) {
+            Tree firstChild = (Tree) table.children().element(0);
+            Tree secondChild = (Tree) table.children().element(1);
+            return new InsertTable(firstChild.getText(), secondChild.getText());
+        } else {
+            throw new MayflyInternalException("Unexpected number of children in " + table.toStringTree());
         }
     }
 
@@ -103,12 +120,16 @@ public class Insert extends Command {
         }
     }
 
-    public DataStore update(DataStore store, String schema) {
+    public DataStore update(DataStore store, String currentSchema) {
         if (columns == null) {
-            return store.addRow(schema, table(), values);
+            return store.addRow(schemaToUse(currentSchema), table(), values);
         } else {
-            return store.addRow(schema, table(), columns, values);
+            return store.addRow(schemaToUse(currentSchema), table(), columns, values);
         }
+    }
+
+    private String schemaToUse(String currentSchema) {
+        return table.schema(currentSchema);
     }
 
     public int rowsAffected() {

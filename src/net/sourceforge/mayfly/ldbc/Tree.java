@@ -244,7 +244,7 @@ public class Tree implements AST {
         }
 
         public Tree singleSubtreeOfType(int type) {
-            return (Tree)find(new TypeIs(type));
+            return (Tree)findOne(new TypeIs(type));
         }
 
         public L convertUsing(final TreeConverters converters) {

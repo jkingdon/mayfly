@@ -46,7 +46,7 @@ public class Tuple extends Aggregate {
     }
 
     public TupleElement withHeader(CellHeader header) {
-        return ((TupleElement)find(new HeaderIs(header)));
+        return ((TupleElement)findFirst(new HeaderIs(header)));
     }
 
     public CellHeaders headers() {

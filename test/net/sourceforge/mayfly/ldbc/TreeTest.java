@@ -69,6 +69,16 @@ public class TreeTest extends TestCase {
     public void testSingleSubtreeOfType() throws Exception {
         assertEquals(asterisk, t.children().singleSubtreeOfType(SQLTokenTypes.ASTERISK));
     }
+    
+    public void testSingleSubtreeOfTypeAmbiguous() throws Exception {
+        Tree tree = Tree.parse("select f.a, b.b from foo f, bar b");
+        try {
+            tree.children().singleSubtreeOfType(SQLTokenTypes.SELECT_ITEM);
+            fail();
+        } catch (RuntimeException e) {
+            assertEquals("found more than one", e.getMessage());
+        }
+    }
 
     public void testConvertUsingConverters() throws Exception {
         Transformer transformer =

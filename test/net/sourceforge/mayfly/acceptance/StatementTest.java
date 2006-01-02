@@ -24,7 +24,7 @@ public class StatementTest extends SqlTestCase {
             connection.prepareStatement("insert into some place or another");
             fail();
         } catch (SQLException e) {
-            assertMessage("unexpected token: place", e);
+            assertMessage("unexpected token: some", e);
         }
     }
     

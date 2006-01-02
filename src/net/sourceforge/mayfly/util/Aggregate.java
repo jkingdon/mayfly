@@ -52,11 +52,11 @@ abstract public class Aggregate extends ValueObject implements Iterable {
 
     abstract protected Aggregate createNew(Iterable items);
 
-    public Object find(Selector selector) {
-        return find(selector, false);
+    public Object findFirst(Selector selector) {
+        return findFirst(selector, false);
     }
 
-    private Object find(Selector selector, boolean shouldReturnNull) {
+    private Object findFirst(Selector selector, boolean shouldReturnNull) {
 
         for (Iterator iterator = this.iterator(); iterator.hasNext();) {
             Object element = iterator.next();
@@ -71,9 +71,30 @@ abstract public class Aggregate extends ValueObject implements Iterable {
             return null;
         }
     }
+    
+    public Object findOne(Selector selector) {
+        Object foundElement = null;
+        boolean found = false;
+        for (Iterator iterator = this.iterator(); iterator.hasNext();) {
+            Object element = iterator.next();
+            if (selector.evaluate(element)) {
+                if (found) {
+                    throw new RuntimeException("found more than one");
+                }
+                found = true;
+                foundElement = element;
+            }
+        }
+
+        if (found) {
+            return foundElement;
+        } else {
+            throw new MayflyException(MessageFormat.format(messageIfNotFound, new Object[] {selector.toString()}));
+        }
+    }
 
     public boolean exists(Selector selector) {
-        return find(selector, true)!=null;
+        return findFirst(selector, true)!=null;
     }
 
     public Aggregate plus(Aggregate other) {

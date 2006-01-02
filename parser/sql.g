@@ -74,6 +74,7 @@ tokens {
     ALTER_TABLE_ADD_COLUMN;
     TABLE_ASTERISK;
     JOIN;
+    TABLE;
 }
 
 condition:
@@ -236,7 +237,7 @@ set_schema:
 ;
 
 insert:
-    "insert"! "into"! table_name
+    "insert"! "into"! table_reference
     ( column_list )?
     insert_values
     { #insert = #([INSERT, "insert"], #insert); }
@@ -469,6 +470,14 @@ select_item:
 
 table_name: 
     identifier 
+;
+
+table_reference:
+	(
+	    identifier
+        | identifier DOT! identifier
+    )
+    { #table_reference = #([TABLE, "table_reference"], #table_reference); }
 ;
 
 alias: 

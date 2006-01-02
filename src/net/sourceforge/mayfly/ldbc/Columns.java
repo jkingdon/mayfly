@@ -49,7 +49,7 @@ public class Columns extends Aggregate {
     }
 
     public Column columnMatching(String tableName, String columnName) {
-        return (Column) find(new ColumnMatching(tableName, columnName));
+        return (Column) findFirst(new ColumnMatching(tableName, columnName));
     }
 
 

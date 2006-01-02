@@ -126,7 +126,7 @@ public class M extends Aggregate implements Map {
     }
 
     public Object getCaseInsensitive(String key) {
-        return ((Map.Entry)find(new CaseInsensitiveKeyIs(key))).getValue();
+        return ((Map.Entry)findFirst(new CaseInsensitiveKeyIs(key))).getValue();
     }
 
 

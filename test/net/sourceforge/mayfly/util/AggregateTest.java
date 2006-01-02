@@ -39,7 +39,7 @@ public class AggregateTest extends TestCase {
     public void testFindAndExists() throws Exception {
         assertEquals("b",
                      new Strings("a", "b", "c")
-                        .find(
+                        .findFirst(
                             new Selector() {
                                 public boolean evaluate(Object candidate) {
                                     return candidate.equals("b");
@@ -169,7 +169,7 @@ public class AggregateTest extends TestCase {
         try {
             new Strings("a", "b", "c")
                 .messageIfNotFound("couldn''t find {0}, try again")
-                .find(new Selector() {
+                .findFirst(new Selector() {
                     public boolean evaluate(Object candidate) {
                         return candidate.equals("d");
                     }
