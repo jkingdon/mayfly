@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
@@ -11,27 +12,38 @@ import java.io.*;
 import java.util.*;
 
 /** @internal
- * This is an experimental attempt at a hand-written recursive
- * descent parser.
+ * Hand-written recursive descent parser.
+ * So far this has brought far fewer headaches than ANTLR (which might
+ * mean I just don't understand ANTLR).  It is also nicer to unit test
+ * this parser, there is no crazy build.xml junk like with ANTLR, and
+ * who knows what other benefits.
+ * 
+ * The lexer is still the ANTLR one, at least for now.
  */
 public class Parser {
 
-    private static List getAllTokens(String sql) throws ANTLRException {
-        StringReader in = new StringReader(sql);
-        SQLLexer lexer = new SQLLexer(in);
-        List tokens = new ArrayList();
-        while (true) {
-            Token token = lexer.nextToken();
-            tokens.add(token);
-            if (token.getType() == SQLTokenTypes.EOF) {
-                return tokens;
+    private static List getAllTokens(String sql) {
+        try {
+            StringReader in = new StringReader(sql);
+            SQLLexer lexer = new SQLLexer(in);
+            List tokens = new ArrayList();
+            while (true) {
+                Token token = lexer.nextToken();
+                tokens.add(token);
+                if (token.getType() == SQLTokenTypes.EOF) {
+                    return tokens;
+                }
             }
+        } catch (TokenStreamException e) {
+            // Do we want to report the text we were parsing, or line/column numbers?
+            // Is there anything interesting about e other than its message (like its class?)
+            throw new MayflyException(e.getMessage());
         }
     }
 
     private List tokens;
 
-    public Parser(String sql) throws ANTLRException {
+    public Parser(String sql) {
         this(getAllTokens(sql));
     }
 
@@ -48,7 +60,7 @@ public class Parser {
         Where where;
         if (currentTokenType() == SQLTokenTypes.LITERAL_where) {
             expectAndConsume(SQLTokenTypes.LITERAL_where);
-            where = parseCondition();
+            where = parseWhere();
         } else {
             where = Where.EMPTY;
         }
@@ -80,20 +92,56 @@ public class Parser {
         }
     }
 
-    Where parseCondition() {
+    Where parseWhere() {
+        return new Where(parseCondition());
+    }
+
+    private BooleanExpression parseCondition() {
+        BooleanExpression firstTerm = parseBooleanTerm();
+        
+        if (currentTokenType() == SQLTokenTypes.LITERAL_or) {
+            expectAndConsume(SQLTokenTypes.LITERAL_or);
+            BooleanExpression right = parseBooleanTerm();
+            return new Or(firstTerm, right);
+        }
+
+        return firstTerm;
+    }
+
+    private BooleanExpression parseBooleanTerm() {
+        BooleanExpression firstFactor = parseBooleanFactor();
+        
+        if (currentTokenType() == SQLTokenTypes.LITERAL_and) {
+            expectAndConsume(SQLTokenTypes.LITERAL_and);
+            BooleanExpression right = parseBooleanFactor();
+            return new And(firstFactor, right);
+        }
+
+        return firstFactor;
+    }
+
+    private BooleanExpression parseBooleanFactor() {
+        return parseBooleanPrimary();
+    }
+
+    private BooleanExpression parseBooleanPrimary() {
         Transformer left = parsePrimary();
         expectAndConsume(SQLTokenTypes.EQUAL);
         Transformer right = parsePrimary();
-        return new Where(new Eq(left, right));
+        return new Eq(left, right);
     }
 
-    private Transformer parsePrimary() {
+    Transformer parsePrimary() {
         if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {
             return parseColumnReference();
         }
         else if (currentTokenType() == SQLTokenTypes.NUMBER) {
             Token number = expectAndConsume(SQLTokenTypes.NUMBER);
             return new MathematicalInt(Integer.parseInt(number.getText()));
+        }
+        else if (currentTokenType() == SQLTokenTypes.QUOTED_STRING) {
+            Token literal = expectAndConsume(SQLTokenTypes.QUOTED_STRING);
+            return new QuotedString(literal.getText());
         }
         else {
             throw new ParserException("expected primary, got " + describeToken(currentToken()));
@@ -140,7 +188,7 @@ public class Parser {
             expectAndConsume(SQLTokenTypes.LITERAL_join);
             FromTable right = parseTableReference();
             expectAndConsume(SQLTokenTypes.LITERAL_on);
-            Where condition = parseCondition();
+            Where condition = parseWhere();
             return new InnerJoin(left, right, condition);
         }
         else if (currentTokenType() == SQLTokenTypes.LITERAL_left) {
@@ -151,7 +199,7 @@ public class Parser {
             expectAndConsume(SQLTokenTypes.LITERAL_join);
             FromTable right = parseTableReference();
             expectAndConsume(SQLTokenTypes.LITERAL_on);
-            Where condition = parseCondition();
+            Where condition = parseWhere();
             return new LeftJoin(left, right, condition);
         }
         else {

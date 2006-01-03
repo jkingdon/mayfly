@@ -16,6 +16,7 @@ public class Select extends Command {
 
     public static Select selectFromSql(String sql) {
         return selectFromTree(Tree.parse(sql));
+        //return new Parser(sql).parseSelect();
     }
 
     public static Select selectFromTree(Tree selectTree) {

@@ -43,12 +43,12 @@ public class SelectTest extends TestCase {
 
                 )
             ),
-            Select.selectFromTree(Tree.parse("select f.*, b.name from foo f, bar b " +
+            Select.selectFromSql("select f.*, b.name from foo f, bar b " +
                                        "where (f.name='steve' and " +
                                                 " (size = 4 or 6 >size ) ) " +
                                              " and " +
                                                  "(color='red' or " +
-                                                            " (day <>7 and day != 6) )"))
+                                                            " (day <>7 and day != 6) )")
         );
     }
 

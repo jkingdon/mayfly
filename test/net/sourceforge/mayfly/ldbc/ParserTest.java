@@ -5,6 +5,7 @@ import junit.framework.*;
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
+import net.sourceforge.mayfly.ldbc.where.literal.*;
 
 import antlr.*;
 
@@ -128,19 +129,19 @@ public class ParserTest extends TestCase {
     
     public void testTableDotColumn() throws Exception {
         Parser parser = new Parser("f.a = b");
-        parser.parseCondition();
+        parser.parseWhere();
         assertEquals("", parser.remainingTokens());
     }
 
     public void testTableDotColumnRightHandSide() throws Exception {
         Parser parser = new Parser("f = g.b");
-        parser.parseCondition();
+        parser.parseWhere();
         assertEquals("", parser.remainingTokens());
     }
 
     public void testTableDot() throws Exception {
         try {
-            new Parser("f. = b").parseCondition();
+            new Parser("f. = b").parseWhere();
             fail();
         } catch (ParserException e) {
             assertEquals("expected IDENTIFIER but got EQUAL", e.getMessage());
@@ -149,16 +150,28 @@ public class ParserTest extends TestCase {
 
     public void testMissingOperator() throws Exception {
         try {
-            new Parser("f 5").parseCondition();
+            new Parser("f 5").parseWhere();
             fail();
         } catch (ParserException e) {
             assertEquals("expected EQUAL but got 5", e.getMessage());
         }
     }
     
-    public void testLiteral() throws Exception {
+    public void testAnd() throws Exception {
+        Parser parser = new Parser("a = 5 and b = c");
+        parser.parseWhere();
+        assertEquals("", parser.remainingTokens());
+    }
+    
+    public void testLiteralNumber() throws Exception {
         Parser parser = new Parser("f = 5");
-        parser.parseCondition();
+        parser.parseWhere();
+        assertEquals("", parser.remainingTokens());
+    }
+    
+    public void testLiteralString() throws Exception {
+        Parser parser = new Parser("'hi'");
+        assertEquals(new QuotedString("'hi'"), parser.parsePrimary());
         assertEquals("", parser.remainingTokens());
     }
     
