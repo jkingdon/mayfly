@@ -9,6 +9,10 @@ import java.util.*;
 
 public abstract class Command extends ValueObject {
 
+    public static Command fromSql(String sql) {
+        return fromTree(Tree.parse(sql));
+    }
+
     public static Command fromTree(Tree tree) {
         switch (tree.getType()) {
         case SQLTokenTypes.DROP_TABLE:

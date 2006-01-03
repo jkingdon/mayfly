@@ -21,7 +21,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
             this.sql = sql;
             this.database = database;
             this.parameters = new Vector();
-            parameterCount = Command.fromTree(Tree.parse(sql)).parameterCount();;
+            parameterCount = Command.fromSql(sql).parameterCount();;
             parameters.setSize(parameterCount);
         } catch (MayflyException e) {
             throw e.asSqlException();
@@ -30,7 +30,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public ResultSet executeQuery() throws SQLException {
         try {
-            Select select = Select.selectFromTree(Tree.parse(sql));
+            Select select = Select.selectFromSql(sql);
             substitute(select);
             return database.query(select);
         } catch (MayflyException e) {
@@ -40,7 +40,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public int executeUpdate() throws SQLException {
         try {
-            Command command = Command.fromTree(Tree.parse(sql));
+            Command command = Command.fromSql(sql);
             substitute(command);
             return database.executeUpdate(command);
         } catch (MayflyException e) {

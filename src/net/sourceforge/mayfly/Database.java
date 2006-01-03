@@ -62,7 +62,7 @@ public class Database {
      */
     public int execute(String sql) throws SQLException {
         try {
-            Command command = Command.fromTree(Tree.parse(sql));
+            Command command = Command.fromSql(sql);
             return executeUpdate(command);
         } catch (MayflyException e) {
             throw e.asSqlException();
@@ -92,7 +92,7 @@ public class Database {
      */
     public ResultSet query(String command) throws SQLException {
         try {
-            Select select = Select.selectFromTree(Tree.parse(command));
+            Select select = Select.selectFromSql(command);
             return select.select(dataStore, currentSchema);
         } catch (MayflyException e) {
             throw e.asSqlException();
