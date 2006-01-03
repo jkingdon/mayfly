@@ -245,6 +245,7 @@ public class JoinTest extends SqlTestCase {
 
         // Another case if these can be made to work:
         // from foo, bar outer join baz  => the "left" is bar, not the result of foo cross bar
+        //   (or is it?)
 
         execute("create table foo (a integer)");
         execute("create table bar (a integer)");

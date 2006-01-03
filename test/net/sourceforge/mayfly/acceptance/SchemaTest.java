@@ -89,6 +89,11 @@ public class SchemaTest extends SqlTestCase {
         
         execute("create schema mars authorization dba create table foo (x integer)");
         execute("insert into mars.foo (x) values (7)");
+        
+        if (mayflyMissing()) {
+            assertResultSet(new String[] { " 7 " }, query("select x from mars.foo"));
+            assertResultSet(new String[] { " 7 " }, query("select foo.x from mars.foo"));
+        }
     }
     
     // test mars.foo syntax (where is this legal?)

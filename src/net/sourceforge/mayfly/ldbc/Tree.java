@@ -89,7 +89,11 @@ public class Tree implements AST {
         }
     }
 
-    private String typeName(int code) {
+    public static String typeName(int code) {
+        if (code == SQLTokenTypes.EOF) {
+            // "EOF" seems a bit cryptic
+            return "end of file";
+        }
 
         try {
             SQLTokenTypes t = new SQLTokenTypes() {};
