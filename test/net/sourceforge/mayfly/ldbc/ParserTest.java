@@ -3,6 +3,8 @@ package net.sourceforge.mayfly.ldbc;
 import junit.framework.*;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.where.*;
 
 import antlr.*;
 
@@ -155,7 +157,9 @@ public class ParserTest extends TestCase {
     }
     
     public void testLiteral() throws Exception {
-        new Parser("f = 5").parseCondition();
+        Parser parser = new Parser("f = 5");
+        parser.parseCondition();
+        assertEquals("", parser.remainingTokens());
     }
     
     public void testSingleColumnAsWhat() throws Exception {
@@ -174,6 +178,20 @@ public class ParserTest extends TestCase {
         Parser parser = new Parser("b, foo.a");
         parser.parseWhat();
         assertEquals("", parser.remainingTokens());
+    }
+
+    public void testAliasOmitted() throws Exception {
+        Parser parser = new Parser("select name from foo");
+        assertEquals(
+            new Select(
+                new What()
+                    .add(new SingleColumn("name")),
+                new From()
+                    .add(new FromTable("foo")),
+                Where.EMPTY
+            ),
+            parser.parseSelect()
+        );
     }
 
     private void expectFailure(String sql, String expectedMessage) throws ANTLRException {

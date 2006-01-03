@@ -7,13 +7,13 @@ import java.util.*;
 
 public class From extends Aggregate {
 
-    private List dimensions = new ArrayList();
+    private List fromElements = new ArrayList();
 
 
     public From() { }
 
-    public From(List dimensions) {
-        this.dimensions = dimensions;
+    public From(List fromElements) {
+        this.fromElements = fromElements;
     }
 
 
@@ -22,11 +22,11 @@ public class From extends Aggregate {
     }
 
     public Iterator iterator() {
-        return dimensions.iterator();
+        return fromElements.iterator();
     }
 
     public From add(FromElement fromElement) {
-        dimensions.add(fromElement);
+        fromElements.add(fromElement);
         return this;
     }
 

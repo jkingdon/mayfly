@@ -1,6 +1,10 @@
 package net.sourceforge.mayfly.ldbc;
 
+import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.where.*;
+import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.parser.*;
+import net.sourceforge.mayfly.util.*;
 import antlr.*;
 
 import java.io.*;
@@ -35,106 +39,150 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    public void parseSelect() {
+    public Select parseSelect() {
         expectAndConsume(SQLTokenTypes.LITERAL_select);
-        parseWhat();
+        What what = parseWhat();
         expectAndConsume(SQLTokenTypes.LITERAL_from);
-        parseFromItems();
+        From from = parseFromItems();
         
+        Where where;
         if (currentTokenType() == SQLTokenTypes.LITERAL_where) {
             expectAndConsume(SQLTokenTypes.LITERAL_where);
-            parseCondition();
+            where = parseCondition();
+        } else {
+            where = Where.EMPTY;
         }
         
         expectAndConsume(SQLTokenTypes.EOF);
+        return new Select(what, from, where);
     }
 
-    void parseWhat() {
-        parseWhatElement();
+    What parseWhat() {
+        What what = new What();
+        what.add(parseWhatElement());
         
         while (currentTokenType() == SQLTokenTypes.COMMA) {
             expectAndConsume(SQLTokenTypes.COMMA);
-            parseWhatElement();
+            what.add(parseWhatElement());
         }
+        
+        return what;
     }
 
-    private void parseWhatElement() {
+    private WhatElement parseWhatElement() {
         if (currentTokenType() == SQLTokenTypes.ASTERISK) {
             expectAndConsume(SQLTokenTypes.ASTERISK);
+            return new All();
         } else if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {
-            parseColumnReference();
+            return parseColumnReference();
+        } else {
+            throw new ParserException("expected something to select, got " + describeToken(currentToken()));
         }
     }
 
-    void parseCondition() {
-        parsePrimary();
+    Where parseCondition() {
+        Transformer left = parsePrimary();
         expectAndConsume(SQLTokenTypes.EQUAL);
-        parsePrimary();
+        Transformer right = parsePrimary();
+        return new Where(new Eq(left, right));
     }
 
-    private void parsePrimary() {
+    private Transformer parsePrimary() {
         if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {
-            parseColumnReference();
-        } else if (currentTokenType() == SQLTokenTypes.DECIMAL_VALUE) {
-            expectAndConsume(SQLTokenTypes.DECIMAL_VALUE);
+            return parseColumnReference();
+        }
+        else if (currentTokenType() == SQLTokenTypes.NUMBER) {
+            Token number = expectAndConsume(SQLTokenTypes.NUMBER);
+            return new MathematicalInt(Integer.parseInt(number.getText()));
+        }
+        else {
+            throw new ParserException("expected primary, got " + describeToken(currentToken()));
         }
     }
 
-    private void parseColumnReference() {
-        expectAndConsume(SQLTokenTypes.IDENTIFIER);
+    private SingleColumn parseColumnReference() {
+        String firstIdentifier = consumeIdentifier();
         if (currentTokenType() == SQLTokenTypes.DOT) {
             expectAndConsume(SQLTokenTypes.DOT);
-            expectAndConsume(SQLTokenTypes.IDENTIFIER);
+            String column = consumeIdentifier();
+            return new SingleColumn(firstIdentifier, column);
+        } else {
+            return new SingleColumn(firstIdentifier);
         }
     }
 
-    void parseFromItems() {
-        parseFromItem();
+    private String consumeIdentifier() {
+        Token token = expectAndConsume(SQLTokenTypes.IDENTIFIER);
+        return token.getText();
+    }
+
+    From parseFromItems() {
+        From from = new From();
+        from.add(parseFromItem());
         
         while (currentTokenType() == SQLTokenTypes.COMMA) {
             expectAndConsume(SQLTokenTypes.COMMA);
-            parseFromItem();
+            from.add(parseFromItem());
         }
+        return from;
     }
 
-    private void parseFromItem() {
-        parseTableReference();
+    private FromElement parseFromItem() {
+        FromTable left = parseTableReference();
         if (currentTokenType() == SQLTokenTypes.LITERAL_cross) {
             expectAndConsume(SQLTokenTypes.LITERAL_cross);
             expectAndConsume(SQLTokenTypes.LITERAL_join);
-            parseTableReference();
-        } else if (currentTokenType() == SQLTokenTypes.LITERAL_inner) {
+            FromTable right = parseTableReference();
+            return new InnerJoin(left, right, Where.EMPTY);
+        }
+        else if (currentTokenType() == SQLTokenTypes.LITERAL_inner) {
             expectAndConsume(SQLTokenTypes.LITERAL_inner);
             expectAndConsume(SQLTokenTypes.LITERAL_join);
-            parseTableReference();
+            FromTable right = parseTableReference();
             expectAndConsume(SQLTokenTypes.LITERAL_on);
-            parseCondition();
-        } else if (currentTokenType() == SQLTokenTypes.LITERAL_left) {
+            Where condition = parseCondition();
+            return new InnerJoin(left, right, condition);
+        }
+        else if (currentTokenType() == SQLTokenTypes.LITERAL_left) {
             expectAndConsume(SQLTokenTypes.LITERAL_left);
             if (currentTokenType() == SQLTokenTypes.LITERAL_outer) {
                 expectAndConsume(SQLTokenTypes.LITERAL_outer);
             }
             expectAndConsume(SQLTokenTypes.LITERAL_join);
-            parseTableReference();
+            FromTable right = parseTableReference();
             expectAndConsume(SQLTokenTypes.LITERAL_on);
-            parseCondition();
+            Where condition = parseCondition();
+            return new LeftJoin(left, right, condition);
+        }
+        else {
+            return left;
         }
     }
 
-    public void parseTableReference() {
-        expectAndConsume(SQLTokenTypes.IDENTIFIER);
+    public FromTable parseTableReference() {
+        String firstIdentifier = consumeIdentifier();
+        String table;
         if (currentTokenType() == SQLTokenTypes.DOT) {
             expectAndConsume(SQLTokenTypes.DOT);
-            expectAndConsume(SQLTokenTypes.IDENTIFIER);
+            table = consumeIdentifier();
+        } else {
+            table = firstIdentifier;
         }
 
         if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {
-            expectAndConsume(SQLTokenTypes.IDENTIFIER);
+            String alias = consumeIdentifier();
+            return new FromTable(table, alias);
+        } else {
+            return new FromTable(table);
         }
     }
 
     private int currentTokenType() {
-        return ((Token) tokens.get(0)).getType();
+        return currentToken().getType();
+    }
+
+    private Token currentToken() {
+        return (Token) tokens.get(0);
     }
     
     public String remainingTokens() {
@@ -173,7 +221,7 @@ public class Parser {
     }
 
     private Token expectAndConsume(int expectedType) {
-        Token token = (Token) tokens.get(0);
+        Token token = currentToken();
         if (token.getType() != expectedType) {
             throw new ParserException(
                 "expected " +
