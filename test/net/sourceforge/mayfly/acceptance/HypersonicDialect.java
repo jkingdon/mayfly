@@ -26,6 +26,10 @@ public class HypersonicDialect extends Dialect {
         return true;
     }
     
+    public boolean rightHandArgumentToJoinCanBeJoin() {
+        return false;
+    }
+    
     public boolean requiresAllParameters() {
         return false;
     }

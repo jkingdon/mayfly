@@ -319,20 +319,31 @@ public class JoinTest extends SqlTestCase {
         execute("insert into quux (q, name) values (9, 'QuuxVal')");
         execute("insert into quux (q, name) values (8, 'QuuxDecoy')");
         
-        // Neither LDBC nor Hypersonic parse this.  But the SQL92 grammar seems to allow it (I think)
-//        assertResultSet(
-//            new String[] {" 'FooVal', 'QuuxVal' " },
-//            query("select foo.name, quux.name from foo inner join bar inner join quux on b2 = q on f = b1")
-//        );
-
-        /** We can't currently transform this 
-         * {@link net.sourceforge.mayfly.ldbc.SelectTest#xtestNestedJoins()} */
-        if (mayflyMissing()) {
+        String onsAtEnd = "select foo.name, quux.name from foo inner join bar inner join quux on b2 = q on f = b1";
+        if (dialect.rightHandArgumentToJoinCanBeJoin()) {
             assertResultSet(
                 new String[] {" 'FooVal', 'QuuxVal' " },
-                query("select foo.name, quux.name from foo inner join bar on f = b1 inner join quux on b2 = q")
+                query(onsAtEnd)
             );
+        } else {
+            expectQueryFailure(onsAtEnd, null);
         }
+
+        String parenthesizedQuery = 
+            "select foo.name, quux.name from foo inner join (bar inner join quux on b2 = q) on f = b1";
+        if (dialect.rightHandArgumentToJoinCanBeJoin()) {
+            assertResultSet(
+                new String[] {" 'FooVal', 'QuuxVal' " },
+                query(parenthesizedQuery)
+            );
+        } else {
+            expectQueryFailure(parenthesizedQuery, null);
+        }
+
+        assertResultSet(
+            new String[] {" 'FooVal', 'QuuxVal' " },
+            query("select foo.name, quux.name from foo inner join bar on f = b1 inner join quux on b2 = q")
+        );
     }
     
 }

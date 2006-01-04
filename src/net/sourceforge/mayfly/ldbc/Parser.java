@@ -302,34 +302,42 @@ public class Parser {
     }
 
     private FromElement parseFromItem() {
-        FromTable left = parseTableReference();
-        if (currentTokenType() == SQLTokenTypes.LITERAL_cross) {
-            expectAndConsume(SQLTokenTypes.LITERAL_cross);
-            expectAndConsume(SQLTokenTypes.LITERAL_join);
-            FromTable right = parseTableReference();
-            return new InnerJoin(left, right, Where.EMPTY);
+        if (consumeIfMatches(SQLTokenTypes.OPEN_PAREN)) {
+            FromElement fromElement = parseFromItem();
+            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+            return fromElement;
         }
-        else if (currentTokenType() == SQLTokenTypes.LITERAL_inner) {
-            expectAndConsume(SQLTokenTypes.LITERAL_inner);
-            expectAndConsume(SQLTokenTypes.LITERAL_join);
-            FromTable right = parseTableReference();
-            expectAndConsume(SQLTokenTypes.LITERAL_on);
-            Where condition = parseWhere();
-            return new InnerJoin(left, right, condition);
-        }
-        else if (currentTokenType() == SQLTokenTypes.LITERAL_left) {
-            expectAndConsume(SQLTokenTypes.LITERAL_left);
-            if (currentTokenType() == SQLTokenTypes.LITERAL_outer) {
-                expectAndConsume(SQLTokenTypes.LITERAL_outer);
+
+        FromElement left = parseTableReference();
+        while (true) {
+            if (currentTokenType() == SQLTokenTypes.LITERAL_cross) {
+                expectAndConsume(SQLTokenTypes.LITERAL_cross);
+                expectAndConsume(SQLTokenTypes.LITERAL_join);
+                FromElement right = parseFromItem();
+                left = new InnerJoin(left, right, Where.EMPTY);
             }
-            expectAndConsume(SQLTokenTypes.LITERAL_join);
-            FromTable right = parseTableReference();
-            expectAndConsume(SQLTokenTypes.LITERAL_on);
-            Where condition = parseWhere();
-            return new LeftJoin(left, right, condition);
-        }
-        else {
-            return left;
+            else if (currentTokenType() == SQLTokenTypes.LITERAL_inner) {
+                expectAndConsume(SQLTokenTypes.LITERAL_inner);
+                expectAndConsume(SQLTokenTypes.LITERAL_join);
+                FromElement right = parseFromItem();
+                expectAndConsume(SQLTokenTypes.LITERAL_on);
+                Where condition = parseWhere();
+                left = new InnerJoin(left, right, condition);
+            }
+            else if (currentTokenType() == SQLTokenTypes.LITERAL_left) {
+                expectAndConsume(SQLTokenTypes.LITERAL_left);
+                if (currentTokenType() == SQLTokenTypes.LITERAL_outer) {
+                    expectAndConsume(SQLTokenTypes.LITERAL_outer);
+                }
+                expectAndConsume(SQLTokenTypes.LITERAL_join);
+                FromElement right = parseFromItem();
+                expectAndConsume(SQLTokenTypes.LITERAL_on);
+                Where condition = parseWhere();
+                left = new LeftJoin(left, right, condition);
+            }
+            else {
+                return left;
+            }
         }
     }
 

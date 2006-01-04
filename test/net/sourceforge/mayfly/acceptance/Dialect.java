@@ -59,6 +59,10 @@ public abstract class Dialect {
     public boolean innerJoinRequiresOn() {
         return true;
     }
+    
+    public boolean rightHandArgumentToJoinCanBeJoin() {
+        return true;
+    }
 
     public boolean considerTablesMentionedAfterJoin() {
         return false;
