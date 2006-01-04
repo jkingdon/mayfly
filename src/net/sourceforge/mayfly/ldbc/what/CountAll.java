@@ -5,7 +5,7 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
-public class CountAll extends WhatElement {
+public class CountAll extends WhatElement implements Transformer {
 
     private final String functionName;
 
@@ -28,6 +28,10 @@ public class CountAll extends WhatElement {
 
     public Cell aggregate(Rows rows) {
         return new LongCell(rows.size());
+    }
+
+    public Object transform(Object from) {
+        throw new UnimplementedException();
     }
 
 }

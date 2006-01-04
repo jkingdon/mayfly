@@ -23,8 +23,7 @@ public class ExpressionTest extends SqlTestCase {
         if (dialect.fromIsOptional()) {
             assertResultSet(new String[] { " 7 " }, query(missingFrom));
         } else {
-            // TODO: error message should be more like "FROM missing"
-            expectQueryFailure(missingFrom, "unexpected token: 7");
+            expectQueryFailure(missingFrom, "expected FROM but got end of file");
         }
     }
     

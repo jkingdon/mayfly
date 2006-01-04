@@ -63,7 +63,7 @@ public class SelectTest extends TestCase {
                     new Eq(new SingleColumn("a"), new MathematicalInt(5))
                 )
             ),
-            Select.selectFromTree(Tree.parse("select * from foo where a = 5"))
+            Select.selectFromSql("select * from foo where a = 5")
         );
     }
 
@@ -76,7 +76,7 @@ public class SelectTest extends TestCase {
                     .add(new FromTable("foo")),
                 Where.EMPTY
             ),
-            Select.selectFromTree(Tree.parse("select name from foo"))
+            Select.selectFromSql("select name from foo")
         );
     }
 
@@ -89,9 +89,10 @@ public class SelectTest extends TestCase {
                     .add(new FromTable("foo")),
                 Where.EMPTY,
                 new OrderBy()
-                    .add(new SingleColumn("a")), Limit.NONE
+                    .add(new SingleColumn("a")),
+                Limit.NONE
             ),
-            Select.selectFromTree(Tree.parse("select * from foo order by a"))
+            Select.selectFromSql("select * from foo order by a")
         );
     }
 
@@ -104,7 +105,7 @@ public class SelectTest extends TestCase {
                     .add(new FromTable("foo")),
                 Where.EMPTY
             ),
-            Select.selectFromTree(Tree.parse("select 5 from foo"))
+            Select.selectFromSql("select 5 from foo")
         );
     }
 
@@ -119,7 +120,7 @@ public class SelectTest extends TestCase {
                     new Eq(new SingleColumn("a"), JdbcParameter.INSTANCE)
                 )
             ),
-            Select.selectFromTree(Tree.parse("select ? from foo where a = ?"))
+            Select.selectFromSql("select ? from foo where a = ?")
         );
     }
 
@@ -130,7 +131,7 @@ public class SelectTest extends TestCase {
     }
 
     private void checkParameterCount(int expected, String sql) throws SQLException {
-        assertEquals(expected, Select.selectFromTree(Tree.parse(sql)).parameterCount());
+        assertEquals(expected, Select.selectFromSql(sql).parameterCount());
     }
 
     public void testSubstituteMultipleValues() throws Exception {
@@ -188,7 +189,7 @@ public class SelectTest extends TestCase {
     }
 
     private Command substitute(String sql) throws SQLException {
-        Command command = Command.fromTree(Tree.parse(sql));
+        Command command = Command.fromSql(sql);
         command.substitute(L.fromArray(new int[] { 5, 6, 7, 8 }));
         return command;
     }
@@ -204,7 +205,7 @@ public class SelectTest extends TestCase {
                     .add(new FromTable("foo")),
                 Where.EMPTY
             ),
-            Select.selectFromTree(Tree.parse("select x from foo"))
+            Select.selectFromSql("select x from foo")
         );
     }
     
@@ -223,9 +224,9 @@ public class SelectTest extends TestCase {
                     )),
                 Where.EMPTY
             ),
-            Select.selectFromTree(Tree.parse(
+            Select.selectFromSql(
                 "select * from places inner join types on type = id"
-            ))
+            )
         );
     }
     
@@ -244,9 +245,9 @@ public class SelectTest extends TestCase {
                     )),
                 Where.EMPTY
             ),
-            Select.selectFromTree(Tree.parse(
+            Select.selectFromSql(
                 "select * from places left outer join types on type = id"
-            ))
+            )
         );
     }
     
@@ -301,7 +302,7 @@ public class SelectTest extends TestCase {
     }
 
     private Rows query(DataStore store, String sql) {
-        return Select.selectFromTree(Tree.parse(sql)).query(store, DataStore.ANONYMOUS_SCHEMA_NAME, new What());
+        return Select.selectFromSql(sql).query(store, DataStore.ANONYMOUS_SCHEMA_NAME, new What());
     }
 
     public void testSmallerJoin() throws Exception {

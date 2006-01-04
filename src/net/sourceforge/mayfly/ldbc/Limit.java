@@ -4,8 +4,8 @@ import net.sourceforge.mayfly.util.*;
 
 public class Limit {
 
-    private static final int NO_OFFSET = 0;
-    private static final int NO_LIMIT = Integer.MAX_VALUE;
+    public static final int NO_OFFSET = 0;
+    public static final int NO_LIMIT = Integer.MAX_VALUE;
 
     public static Limit fromTree(Tree tree) {
         Tree.Children children = tree.children();

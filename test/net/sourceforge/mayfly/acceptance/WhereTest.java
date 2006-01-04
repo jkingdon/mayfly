@@ -162,15 +162,12 @@ public class WhereTest extends SqlTestCase {
             query("select b from foo where not (foo.a in (1, 3))")
         );
 
-        if (mayflyMissing()) {
-            // Needs fixing in LDBC grammar.
-            assertResultSet(
-                new String[] {
-                    "   4 ",
-                },
-                query("select b from foo where foo.a not in (1, 3)")
-            );
-        }
+        assertResultSet(
+            new String[] {
+                "   4 ",
+            },
+            query("select b from foo where foo.a not in (1, 3)")
+        );
 
     }
     
@@ -200,7 +197,10 @@ public class WhereTest extends SqlTestCase {
             // Mayfly aims to be pickier than most databases about boolean vs non-boolean
             // If some writes SQL like that they are either making a mistake, or they are
             // being too clever for our tastes.
-            expectQueryFailure(booleanAsLeftSideOfIn, "operand of NOT must be a boolean expression");
+            expectQueryFailure(booleanAsLeftSideOfIn, "expected boolean operator but got CLOSE_PAREN");
+            
+            // Is this message clearer?  It would be hard to get it...
+//          expectQueryFailure(booleanAsLeftSideOfIn, "operand of NOT must be a boolean expression");
         } else {
             assertResultSet(new String[] { }, query(booleanAsLeftSideOfIn));
         }

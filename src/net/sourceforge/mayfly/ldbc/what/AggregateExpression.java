@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
-public abstract class AggregateExpression extends WhatElement {
+public abstract class AggregateExpression extends WhatElement implements Transformer {
 
     private final SingleColumn column;
     private final String functionName;
@@ -64,5 +64,9 @@ public abstract class AggregateExpression extends WhatElement {
     }
 
     abstract protected Cell pickOne(Cell min, Cell max, Cell count, Cell sum, Cell average);
+    
+    public Object transform(Object from) {
+        throw new UnimplementedException();
+    }
 
 }

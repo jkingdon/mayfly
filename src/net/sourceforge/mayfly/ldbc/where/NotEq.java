@@ -9,6 +9,7 @@ public class NotEq {
         L both = notEqualTree.children().convertUsing(treeConverters);
 
         // Is there a reason to do this rather than Not(Eq(l, r)) ?
+        // (null handling is the reason... which we don't do yet)
         return new Not(new Eq((Transformer)both.get(0), (Transformer) both.get(1)));
     }
 

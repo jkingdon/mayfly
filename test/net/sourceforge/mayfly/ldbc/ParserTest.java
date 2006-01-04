@@ -148,12 +148,39 @@ public class ParserTest extends TestCase {
         }
     }
 
+    public void testBadTokenAfterIs() throws Exception {
+        try {
+            new Parser("a IS BORING").parseWhere();
+            fail();
+        } catch (ParserException e) {
+            assertEquals("expected NULL but got BORING", e.getMessage());
+        }
+    }
+
+    public void testBadTokenAfterNot() throws Exception {
+        try {
+            new Parser("a NOT INTERESTING").parseWhere();
+            fail();
+        } catch (ParserException e) {
+            assertEquals("expected IN but got INTERESTING", e.getMessage());
+        }
+    }
+
+    public void testBadTokenAfterIsNot() throws Exception {
+        try {
+            new Parser("a IS NOT SENSIBLE").parseWhere();
+            fail();
+        } catch (ParserException e) {
+            assertEquals("expected NULL but got SENSIBLE", e.getMessage());
+        }
+    }
+
     public void testMissingOperator() throws Exception {
         try {
             new Parser("f 5").parseWhere();
             fail();
         } catch (ParserException e) {
-            assertEquals("expected EQUAL but got 5", e.getMessage());
+            assertEquals("expected boolean operator but got 5", e.getMessage());
         }
     }
     
@@ -190,6 +217,23 @@ public class ParserTest extends TestCase {
     public void testTwoWhatElements() throws Exception {
         Parser parser = new Parser("b, foo.a");
         parser.parseWhat();
+        assertEquals("", parser.remainingTokens());
+    }
+
+    public void testAllNotLegalWithOthers() throws Exception {
+        Parser parser = new Parser("a, *");
+        try {
+            parser.parseWhat();
+            fail();
+        } catch (ParserException e) {
+            // Really, primary->expression
+            assertEquals("expected primary but got ASTERISK", e.getMessage());
+        }
+    }
+
+    public void testConcatenate() throws Exception {
+        Parser parser = new Parser("a || b");
+        parser.parseWhatElement();
         assertEquals("", parser.remainingTokens());
     }
 

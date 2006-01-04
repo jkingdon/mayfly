@@ -10,7 +10,7 @@ import java.util.*;
 public class In extends BooleanExpression {
 
     private Transformer leftSide;
-	private List list;
+	private List expressions;
 
 	public static In fromInTree(Tree inTree, TreeConverters converters) {
         L converted = inTree.children().convertUsing(converters);
@@ -20,16 +20,16 @@ public class In extends BooleanExpression {
         return new In(leftSide, list);
     }
 
-    public In(Transformer leftSide, List list) {
+    public In(Transformer leftSide, List expressions) {
 		this.leftSide = leftSide;
-		this.list = list;
+		this.expressions = expressions;
     }
 
 	public boolean evaluate(Object rowObject) {
         Row row = (Row) rowObject;
         Cell cell = (Cell) leftSide.transform(row);
 
-        for (Iterator iter = list.iterator(); iter.hasNext();) {
+        for (Iterator iter = expressions.iterator(); iter.hasNext();) {
 			Literal element = (Literal) iter.next();
 			if (element.matchesCell(cell)) {
                 return true;
@@ -40,16 +40,16 @@ public class In extends BooleanExpression {
 
     public int parameterCount() {
         int listCount = 0;
-        for (int i = 0; i < list.size(); ++i) {
-            listCount += parameterCount((Transformer) list.get(i));
+        for (int i = 0; i < expressions.size(); ++i) {
+            listCount += parameterCount((Transformer) expressions.get(i));
         }
         return parameterCount(leftSide) + listCount;
     }
 
     public void substitute(Iterator jdbcParameters) {
         leftSide = substitute(leftSide, jdbcParameters);
-        for (int i = 0; i < list.size(); ++i) {
-            list.set(i, substitute((Transformer) list.get(i), jdbcParameters));
+        for (int i = 0; i < expressions.size(); ++i) {
+            expressions.set(i, substitute((Transformer) expressions.get(i), jdbcParameters));
         }
     }
 

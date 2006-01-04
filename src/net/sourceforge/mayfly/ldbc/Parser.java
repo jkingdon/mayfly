@@ -58,18 +58,26 @@ public class Parser {
         From from = parseFromItems();
         
         Where where;
-        if (currentTokenType() == SQLTokenTypes.LITERAL_where) {
-            expectAndConsume(SQLTokenTypes.LITERAL_where);
+        if (consumeIfMatches(SQLTokenTypes.LITERAL_where)) {
             where = parseWhere();
-        } else {
+        }
+        else {
             where = Where.EMPTY;
         }
         
+        OrderBy orderBy = parseOrderBy();
+        
+        Limit limit = parseLimit();
+
         expectAndConsume(SQLTokenTypes.EOF);
-        return new Select(what, from, where);
+        return new Select(what, from, where, orderBy, limit);
     }
 
     What parseWhat() {
+        if (consumeIfMatches(SQLTokenTypes.ASTERISK)) {
+            return new What(Collections.singletonList(new All()));
+        }
+
         What what = new What();
         what.add(parseWhatElement());
         
@@ -81,15 +89,26 @@ public class Parser {
         return what;
     }
 
-    private WhatElement parseWhatElement() {
-        if (currentTokenType() == SQLTokenTypes.ASTERISK) {
+    WhatElement parseWhatElement() {
+        if (currentTokenType() == SQLTokenTypes.IDENTIFIER
+            && ((Token) tokens.get(1)).getType() == SQLTokenTypes.DOT
+            && ((Token) tokens.get(2)).getType() == SQLTokenTypes.ASTERISK) {
+
+            String firstIdentifier = consumeIdentifier();
+            expectAndConsume(SQLTokenTypes.DOT);
             expectAndConsume(SQLTokenTypes.ASTERISK);
-            return new All();
-        } else if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {
-            return parseColumnReference();
-        } else {
-            throw new ParserException("expected something to select, got " + describeToken(currentToken()));
+            return new AllColumnsFromTable(firstIdentifier);
         }
+        
+        return parseExpression();
+    }
+
+    private WhatElement parseExpression() {
+        WhatElement left = (WhatElement) parsePrimary();
+        if (consumeIfMatches(SQLTokenTypes.VERTBARS)) {
+            return new Concatenate(left, parseExpression());
+        }
+        return left;
     }
 
     Where parseWhere() {
@@ -125,10 +144,77 @@ public class Parser {
     }
 
     private BooleanExpression parseBooleanPrimary() {
+        if (consumeIfMatches(SQLTokenTypes.LITERAL_not)) {
+            BooleanExpression expression = parseBooleanPrimary();
+            return new Not(expression);
+        }
+
+        if (consumeIfMatches(SQLTokenTypes.OPEN_PAREN)) {
+            BooleanExpression expression = parseCondition();
+            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+            return expression;
+        }
+
         Transformer left = parsePrimary();
-        expectAndConsume(SQLTokenTypes.EQUAL);
-        Transformer right = parsePrimary();
-        return new Eq(left, right);
+        if (consumeIfMatches(SQLTokenTypes.EQUAL)) {
+            Transformer right = parsePrimary();
+            return new Eq(left, right);
+        }
+        else if (consumeIfMatches(SQLTokenTypes.NOT_EQUAL)) {
+            Transformer right = parsePrimary();
+            return new Not(new Eq(left, right));
+        }
+        else if (consumeIfMatches(SQLTokenTypes.NOT_EQUAL_2)) {
+            Transformer right = parsePrimary();
+            return new Not(new Eq(left, right));
+        }
+        else if (consumeIfMatches(SQLTokenTypes.BIGGER)) {
+            Transformer right = parsePrimary();
+            return new Gt(left, right);
+        }
+        else if (consumeIfMatches(SQLTokenTypes.SMALLER)) {
+            Transformer right = parsePrimary();
+            return new Gt(right, left);
+        }
+        else if (consumeIfMatches(SQLTokenTypes.LITERAL_not)) {
+            return new Not(parseIn(left));
+        }
+        else if (currentTokenType() == SQLTokenTypes.LITERAL_in) {
+            return parseIn(left);
+        }
+        else if (consumeIfMatches(SQLTokenTypes.LITERAL_is)) {
+            if (consumeIfMatches(SQLTokenTypes.LITERAL_not)) {
+                return new Not(parseIs(left));
+            }
+            return parseIs(left);
+        }
+        else {
+            throw new ParserException("expected boolean operator but got " + describeToken(currentToken()));
+        }
+    }
+
+    private BooleanExpression parseIs(Transformer left) {
+        expectAndConsume(SQLTokenTypes.LITERAL_null);
+        return new IsNull(left);
+    }
+
+    private BooleanExpression parseIn(Transformer left) {
+        expectAndConsume(SQLTokenTypes.LITERAL_in);
+        expectAndConsume(SQLTokenTypes.OPEN_PAREN);
+        List expressions = parseExpressionList();
+        expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+        return new In(left, expressions);
+    }
+
+    private List parseExpressionList() {
+        List expressions = new ArrayList();
+        expressions.add(parsePrimary());
+        
+        while (consumeIfMatches(SQLTokenTypes.COMMA)) {
+            expressions.add(parsePrimary());
+        }
+        
+        return expressions;
     }
 
     Transformer parsePrimary() {
@@ -136,16 +222,61 @@ public class Parser {
             return parseColumnReference();
         }
         else if (currentTokenType() == SQLTokenTypes.NUMBER) {
-            Token number = expectAndConsume(SQLTokenTypes.NUMBER);
-            return new MathematicalInt(Integer.parseInt(number.getText()));
+            int number = consumeInteger();
+            return new MathematicalInt(number);
         }
         else if (currentTokenType() == SQLTokenTypes.QUOTED_STRING) {
             Token literal = expectAndConsume(SQLTokenTypes.QUOTED_STRING);
             return new QuotedString(literal.getText());
         }
-        else {
-            throw new ParserException("expected primary, got " + describeToken(currentToken()));
+        else if (consumeIfMatches(SQLTokenTypes.PARAMETER)) {
+            return JdbcParameter.INSTANCE;
         }
+        else if (consumeIfMatches(SQLTokenTypes.LITERAL_null)) {
+            throw new MayflyException("To check for null, use IS NULL or IS NOT NULL, not a null literal");
+        }
+        else if (currentTokenType() == SQLTokenTypes.LITERAL_max) {
+            Token max = expectAndConsume(SQLTokenTypes.LITERAL_max);
+            WhatElement expression = parseParenthesizedExpression();
+            return new Max((SingleColumn) expression, max.getText());
+        }
+        else if (currentTokenType() == SQLTokenTypes.LITERAL_min) {
+            Token min = expectAndConsume(SQLTokenTypes.LITERAL_min);
+            WhatElement expression = parseParenthesizedExpression();
+            return new Min((SingleColumn) expression, min.getText());
+        }
+        else if (currentTokenType() == SQLTokenTypes.LITERAL_sum) {
+            Token sum = expectAndConsume(SQLTokenTypes.LITERAL_sum);
+            WhatElement expression = parseParenthesizedExpression();
+            return new Sum((SingleColumn) expression, sum.getText());
+        }
+        else if (currentTokenType() == SQLTokenTypes.LITERAL_avg) {
+            Token average = expectAndConsume(SQLTokenTypes.LITERAL_avg);
+            WhatElement expression = parseParenthesizedExpression();
+            return new Average((SingleColumn) expression, average.getText());
+        }
+        else if (currentTokenType() == SQLTokenTypes.LITERAL_count) {
+            Token count = expectAndConsume(SQLTokenTypes.LITERAL_count);
+            expectAndConsume(SQLTokenTypes.OPEN_PAREN);
+            if (consumeIfMatches(SQLTokenTypes.ASTERISK)) {
+                CountAll countAll = new CountAll(count.getText());
+                expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+                return countAll;
+            }
+            WhatElement expression = parseExpression();
+            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+            return new Count((SingleColumn) expression, count.getText());
+        }
+        else {
+            throw new ParserException("expected primary but got " + describeToken(currentToken()));
+        }
+    }
+
+    private WhatElement parseParenthesizedExpression() {
+        expectAndConsume(SQLTokenTypes.OPEN_PAREN);
+        WhatElement expression = parseExpression();
+        expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+        return expression;
     }
 
     private SingleColumn parseColumnReference() {
@@ -157,11 +288,6 @@ public class Parser {
         } else {
             return new SingleColumn(firstIdentifier);
         }
-    }
-
-    private String consumeIdentifier() {
-        Token token = expectAndConsume(SQLTokenTypes.IDENTIFIER);
-        return token.getText();
     }
 
     From parseFromItems() {
@@ -225,6 +351,49 @@ public class Parser {
         }
     }
 
+    private OrderBy parseOrderBy() {
+        if (consumeIfMatches(SQLTokenTypes.LITERAL_order)) {
+            expectAndConsume(SQLTokenTypes.LITERAL_by);
+            
+            OrderBy orderBy = new OrderBy();
+            orderBy.add(parseOrderItem());
+            
+            while (consumeIfMatches(SQLTokenTypes.COMMA)) {
+                orderBy.add(parseOrderItem());
+            }
+            return orderBy;
+        }
+        else {
+            return new OrderBy();
+        }
+    }
+
+    private OrderItem parseOrderItem() {
+        SingleColumn column = parseColumnReference();
+        if (consumeIfMatches(SQLTokenTypes.LITERAL_asc)) {
+        } else if (consumeIfMatches(SQLTokenTypes.LITERAL_desc)) {
+            return new OrderItem(column, false);
+        }
+        return new OrderItem(column, true);
+    }
+
+    private Limit parseLimit() {
+        if (currentTokenType() == SQLTokenTypes.LITERAL_limit) {
+            expectAndConsume(SQLTokenTypes.LITERAL_limit);
+            int count = consumeInteger();
+            
+            if (consumeIfMatches(SQLTokenTypes.LITERAL_offset)) {
+                int offset = consumeInteger();
+                return new Limit(count, offset);
+            }
+            
+            return new Limit(count, Limit.NO_OFFSET);
+        }
+        else {
+            return Limit.NONE;
+        }
+    }
+
     private int currentTokenType() {
         return currentToken().getType();
     }
@@ -268,6 +437,24 @@ public class Parser {
         return result.toString();
     }
 
+    private String consumeIdentifier() {
+        Token token = expectAndConsume(SQLTokenTypes.IDENTIFIER);
+        return token.getText();
+    }
+
+    private int consumeInteger() {
+        Token number = expectAndConsume(SQLTokenTypes.NUMBER);
+        return Integer.parseInt(number.getText());
+    }
+
+    private boolean consumeIfMatches(int type) {
+        if (currentTokenType() == type) {
+            expectAndConsume(type);
+            return true;
+        }
+        return false;
+    }
+
     private Token expectAndConsume(int expectedType) {
         Token token = currentToken();
         if (token.getType() != expectedType) {
@@ -299,7 +486,11 @@ public class Parser {
 
         if (token.getType() == SQLTokenTypes.NUMBER) {
             return token.getText();
-        } else {
+        }
+        else if (token.getType() == SQLTokenTypes.IDENTIFIER) {
+            return token.getText();
+        }
+        else {
             return Tree.typeName(token.getType());
         }
     }
@@ -307,6 +498,18 @@ public class Parser {
     private String niceTokenTypeName(int type) {
         if (type == SQLTokenTypes.LITERAL_on) {
             return "ON";
+        }
+        else if (type == SQLTokenTypes.LITERAL_from) {
+            return "FROM";
+        }
+        else if (type == SQLTokenTypes.LITERAL_in) {
+            return "IN";
+        }
+        else if (type == SQLTokenTypes.LITERAL_not) {
+            return "NOT";
+        }
+        else if (type == SQLTokenTypes.LITERAL_null) {
+            return "NULL";
         }
         return null;
     }

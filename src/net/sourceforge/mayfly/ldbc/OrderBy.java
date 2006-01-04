@@ -26,7 +26,7 @@ public class OrderBy extends Aggregate {
         return add(new OrderItem(column, true));
     }
 
-    private OrderBy add(OrderItem item) {
+    public OrderBy add(OrderItem item) {
         elements.add(item);
         return this;
     }
