@@ -21,7 +21,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
             this.sql = sql;
             this.database = database;
             this.parameters = new Vector();
-            parameterCount = Command.fromSql(sql).parameterCount();;
+            parameterCount = Command.fromSql(sql).parameterCount();
             parameters.setSize(parameterCount);
         } catch (MayflyException e) {
             throw e.asSqlException();

@@ -7,18 +7,6 @@ public class Limit {
     public static final int NO_OFFSET = 0;
     public static final int NO_LIMIT = Integer.MAX_VALUE;
 
-    public static Limit fromTree(Tree tree) {
-        Tree.Children children = tree.children();
-        Tree count = (Tree) children.element(0);
-        int offset;
-        if (children.size() > 1) {
-            offset = Integer.parseInt(((Tree) children.element(1)).getText());
-        } else {
-            offset = NO_OFFSET;
-        }
-        return new Limit(Integer.parseInt(count.getText()), offset);
-    }
-    
     public static final Limit NONE = new Limit(NO_LIMIT, NO_OFFSET);
 
     private final int count;

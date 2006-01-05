@@ -10,7 +10,12 @@ import java.util.*;
 public abstract class Command extends ValueObject {
 
     public static Command fromSql(String sql) {
-        return fromTree(Tree.parse(sql));
+        Parser parser = new Parser(sql);
+        if (parser.isSelect()) {
+            return parser.parseSelect();
+        } else {
+            return fromTree(Tree.parse(sql));
+        }
     }
 
     public static Command fromTree(Tree tree) {
@@ -26,7 +31,7 @@ public abstract class Command extends ValueObject {
         case SQLTokenTypes.INSERT:
             return Insert.insertFromTree(tree);
         case SQLTokenTypes.SELECT:
-            return Select.selectFromTree(tree);
+            throw new UnimplementedException("Should have handled select via the other parser");
         default:
             throw new UnimplementedException("Unrecognized command " + tree.toStringTree());
         }

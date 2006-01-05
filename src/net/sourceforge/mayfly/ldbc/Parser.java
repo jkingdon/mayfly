@@ -51,6 +51,10 @@ public class Parser {
         this.tokens = tokens;
     }
 
+    public boolean isSelect() {
+        return currentTokenType() == SQLTokenTypes.LITERAL_select;
+    }
+
     public Select parseSelect() {
         expectAndConsume(SQLTokenTypes.LITERAL_select);
         What what = parseWhat();
@@ -111,16 +115,16 @@ public class Parser {
         return left;
     }
 
-    Where parseWhere() {
+    public Where parseWhere() {
         return new Where(parseCondition());
     }
 
-    private BooleanExpression parseCondition() {
+    public BooleanExpression parseCondition() {
         BooleanExpression firstTerm = parseBooleanTerm();
         
         if (currentTokenType() == SQLTokenTypes.LITERAL_or) {
             expectAndConsume(SQLTokenTypes.LITERAL_or);
-            BooleanExpression right = parseBooleanTerm();
+            BooleanExpression right = parseCondition();
             return new Or(firstTerm, right);
         }
 
@@ -132,7 +136,7 @@ public class Parser {
         
         if (currentTokenType() == SQLTokenTypes.LITERAL_and) {
             expectAndConsume(SQLTokenTypes.LITERAL_and);
-            BooleanExpression right = parseBooleanFactor();
+            BooleanExpression right = parseBooleanTerm();
             return new And(firstFactor, right);
         }
 

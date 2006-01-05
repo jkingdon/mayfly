@@ -6,17 +6,13 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.parser.*;
 
 public class GtTest extends TestCase {
-    public void testParse() throws Exception {
-        Tree gtTree = Tree.parse("select * from foo where size > 6")
-                            .children().singleSubtreeOfType(SQLTokenTypes.CONDITION)
-                                .children().singleSubtreeOfType(SQLTokenTypes.BIGGER);
 
+    public void testParse() throws Exception {
         assertEquals(
                 new Gt(new SingleColumn("size"), new MathematicalInt(6)),
-                Gt.fromBiggerTree(gtTree, TreeConverters.forWhereTree())
+                new Parser("size > 6").parseCondition()
         );
     }
 

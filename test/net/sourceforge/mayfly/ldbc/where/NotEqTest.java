@@ -5,30 +5,19 @@ import junit.framework.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.parser.*;
 
 public class NotEqTest extends TestCase {
     public void testParse() throws Exception {
-        Tree selectTree = Tree.parse("select * from foo where name <> 'steve'");
-
-        Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
-        Tree notEqualTree = new Tree(whereClause.getFirstChild());
-
         assertEquals(
                 new Not(new Eq(new SingleColumn("name"), new QuotedString("'steve'"))),
-                NotEq.fromNotEqualTree(notEqualTree, TreeConverters.forWhereTree())
+                new Parser("name <> 'steve'").parseCondition()
         );
     }
 
     public void testParse2() throws Exception {
-        Tree selectTree = Tree.parse("select * from foo where name != 'steve'");
-
-        Tree whereClause = selectTree.children().singleSubtreeOfType(SQLTokenTypes.CONDITION);
-        Tree notEqualTree = new Tree(whereClause.getFirstChild());
-
         assertEquals(
                 new Not(new Eq(new SingleColumn("name"), new QuotedString("'steve'"))),
-                NotEq.fromNotEqualTree(notEqualTree, TreeConverters.forWhereTree())
+                new Parser("name != 'steve'").parseCondition()
         );
     }
 

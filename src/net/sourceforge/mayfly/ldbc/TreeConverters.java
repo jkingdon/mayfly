@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.parser.*;
@@ -17,46 +16,6 @@ public class TreeConverters {
                                                               return Select.selectFromTree(from);
                                                           }
                                                       })
-            .register(SQLTokenTypes.TABLE_ASTERISK, new TreeConverters.Converter() {
-                                                          public Object convert(Tree from, TreeConverters converters) {
-                                                              return AllColumnsFromTable.fromTree(from);
-                                                          }
-                                                      })
-            .register(SQLTokenTypes.SELECT_ITEM,    new TreeConverters.Converter() {
-                                                          public Object convert(Tree from, TreeConverters converters) {
-                                                              return WhatElement.fromSelectItemTree(from);
-                                                          }
-                                                      })
-            .register(SQLTokenTypes.ASTERISK,       new TreeConverters.Converter() {
-                                                          public Object convert(Tree from, TreeConverters converters) {
-                                                              return new All();
-                                                          }
-                                                      })
-            .register(SQLTokenTypes.SELECTED_TABLE,new TreeConverters.Converter() {
-                                                          public Object convert(Tree from, TreeConverters converters) {
-                                                              return FromTable.fromSeletedTableTree(from);
-                                                          }
-                                                      })
-            .register(SQLTokenTypes.JOIN,      new TreeConverters.Converter() {
-                public Object convert(Tree from, TreeConverters converters) {
-                    return Join.fromJoinTree(from, converters);
-                }
-            })
-            .register(SQLTokenTypes.CONDITION,     new TreeConverters.Converter() {
-                                                          public Object convert(Tree from, TreeConverters converters) {
-                                                              return Where.fromConditionTree(from);
-                                                          }
-                                                      })
-            .register(SQLTokenTypes.ORDER_BY,      new TreeConverters.Converter() {
-                public Object convert(Tree from, TreeConverters converters) {
-                    return OrderBy.fromTree(from);
-                }
-            })
-            .register(SQLTokenTypes.LIMIT,      new TreeConverters.Converter() {
-                public Object convert(Tree from, TreeConverters converters) {
-                    return Limit.fromTree(from);
-                }
-            })
             ;
     }
 
@@ -117,11 +76,6 @@ public class TreeConverters {
                                                               return IsNull.fromIsNotNullTree(from, converters);
                                                           }
                                                       })
-            .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
-                                                          public Object convert(Tree from, TreeConverters converters) {
-                                                              return WhatElement.fromExpressionTree(from);
-                                                          }
-                                                      })
             .register(SQLTokenTypes.PARAMETER,       new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
                                                               return JdbcParameter.INSTANCE;
@@ -151,11 +105,6 @@ public class TreeConverters {
             .register(SQLTokenTypes.ORDER_ITEM,   new TreeConverters.Converter() {
                     public Object convert(Tree from, TreeConverters converters) {
                         return OrderItem.fromTree(from, converters);
-                    }
-                })
-            .register(SQLTokenTypes.COLUMN,        new TreeConverters.Converter() {
-                    public Object convert(Tree from, TreeConverters converters) {
-                        return WhatElement.fromExpressionTree(from);
                     }
                 })
             ;

@@ -1,14 +1,10 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import java.util.*;
-
-import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.parser.*;
 import net.sourceforge.mayfly.util.*;
-import antlr.collections.*;
+
+import java.util.*;
 
 /**
  * @internal
@@ -25,77 +21,6 @@ import antlr.collections.*;
  * it would clean up the aggregation code, for example.
  */
 abstract public class WhatElement extends ValueObject {
-
-    public static WhatElement fromExpressionTree(Tree expression) {
-        switch (expression.getType()) {
-        case SQLTokenTypes.PARAMETER:
-            return JdbcParameter.INSTANCE;
-
-        case SQLTokenTypes.COLUMN:
-            AST firstIdentifier = expression.getFirstChild();
-            AST secondIdentifier = firstIdentifier.getNextSibling();
-
-            if (secondIdentifier == null) {
-                String columnName = firstIdentifier.getText();
-                return new SingleColumn(columnName);
-            } else {
-                String tableOrAlias = firstIdentifier.getText();
-                String columnName = secondIdentifier.getText();
-                return new SingleColumn(tableOrAlias, columnName);
-            }
-
-        case SQLTokenTypes.DECIMAL_VALUE:
-            return MathematicalInt.fromDecimalValueTree(expression);
-
-        case SQLTokenTypes.QUOTED_STRING:
-            return QuotedString.fromQuotedStringTree(expression);
-
-        case SQLTokenTypes.VERTBARS:
-            L children = expression.children().asList();
-            Tree left = (Tree) children.get(0);
-            Tree right = (Tree) children.get(1);
-            return new Concatenate(fromExpressionTree(left), fromExpressionTree(right));
-            
-        case SQLTokenTypes.LITERAL_max: {
-            Tree column = (Tree) expression.children().element(0);
-            return new Max((SingleColumn) fromExpressionTree(column), expression.getText(), false);
-        }
-
-        case SQLTokenTypes.LITERAL_min: {
-            Tree column = (Tree) expression.children().element(0);
-            return new Min((SingleColumn) fromExpressionTree(column), expression.getText(), false);
-        }
-        
-        case SQLTokenTypes.LITERAL_count: {
-            Tree arg = (Tree) expression.children().element(0);
-            if (arg.getType() == SQLTokenTypes.ASTERISK) {
-                return new CountAll(expression.getText());
-            } else {
-                return new Count((SingleColumn) fromExpressionTree(arg), expression.getText(), false);
-            }
-        }
-
-        case SQLTokenTypes.LITERAL_sum: {
-            Tree column = (Tree) expression.children().element(0);
-            return new Sum((SingleColumn) fromExpressionTree(column), expression.getText(), false);
-        }
-        
-        case SQLTokenTypes.LITERAL_avg: {
-            Tree column = (Tree) expression.children().element(0);
-            return new Average((SingleColumn) fromExpressionTree(column), expression.getText(), false);
-        }
-        
-        default:
-            throw new MayflyException("Unrecognized token in what clause at:\n" + expression.toString());
-        }
-    }
-
-    public static Object fromSelectItemTree(Tree t) {
-        AST expression = t.getFirstChild();
-
-        Tree column = new Tree(expression.getFirstChild());
-        return WhatElement.fromExpressionTree(column);
-    }
 
     public What selected(Row dummyRow) {
         return new What(Collections.singletonList(this));

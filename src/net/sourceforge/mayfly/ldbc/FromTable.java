@@ -3,27 +3,10 @@ package net.sourceforge.mayfly.ldbc;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
-import antlr.collections.*;
 
 import java.util.*;
 
 public class FromTable extends ValueObject implements FromElement {
-
-    public static FromElement fromSeletedTableTree(Tree table) {
-        AST firstIdentifier = table.getFirstChild();
-        String tableName = firstIdentifier.getText();
-
-        AST secondIdentifier = firstIdentifier.getNextSibling();
-
-        FromElement fromElement;
-        if (secondIdentifier==null) {
-            fromElement = new FromTable(tableName);
-        } else {
-            String alias = secondIdentifier.getText();
-            fromElement = new FromTable(tableName, alias);
-        }
-        return fromElement;
-    }
 
     private String tableName;
     private String alias;

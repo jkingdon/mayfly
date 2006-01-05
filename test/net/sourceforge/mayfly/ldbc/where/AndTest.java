@@ -5,16 +5,9 @@ import junit.framework.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.parser.*;
 
 public class AndTest extends TestCase {
-    public void testParse() throws Exception {
-        Tree selectTree = Tree.parse("select * from foo where name='steve' and species='homo sapiens' and size = 6");
-
-        Tree andTree = selectTree.children()
-                                .singleSubtreeOfType(SQLTokenTypes.CONDITION).children()
-                                    .singleSubtreeOfType(SQLTokenTypes.LITERAL_and);
-
+    public void testParseWithParens() throws Exception {
         assertEquals(
                 new And(
                     new And(
@@ -23,17 +16,11 @@ public class AndTest extends TestCase {
                     ),
                     new Eq(new SingleColumn("size"), new MathematicalInt(6))
                 ),
-            And.fromAndTree(andTree, TreeConverters.forWhereTree())
+                new Parser("(name='steve' and species='homo sapiens') and size = 6").parseCondition()
         );
     }
 
-    public void testParseWithParens() throws Exception {
-        Tree selectTree = Tree.parse("select * from foo where name='steve' and (species='homo sapiens' and size = 6)");
-
-        Tree andTree = selectTree.children()
-                                .singleSubtreeOfType(SQLTokenTypes.CONDITION).children()
-                                    .singleSubtreeOfType(SQLTokenTypes.LITERAL_and);
-
+    public void testParse() throws Exception {
         assertEquals(
                 new And(
                     new Eq(new SingleColumn("name"), new QuotedString("'steve'")),
@@ -42,7 +29,7 @@ public class AndTest extends TestCase {
                         new Eq(new SingleColumn("size"), new MathematicalInt(6))
                     )
                 ),
-            And.fromAndTree(andTree, TreeConverters.forWhereTree())
+                new Parser("name='steve' and species='homo sapiens' and size = 6").parseCondition()
         );
     }
 

@@ -6,10 +6,6 @@ import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
 public class AllColumnsFromTable extends WhatElement {
-    public static WhatElement fromTree(Tree t) {
-        String dimensionIdentifier = t.getFirstChild().getText();
-        return new AllColumnsFromTable(dimensionIdentifier);
-    }
 
     private String aliasOrTable;
 

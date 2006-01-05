@@ -5,18 +5,13 @@ import junit.framework.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.parser.*;
 
 public class NotTest extends TestCase {
     
     public void testParse() throws Exception {
-        Tree selectTree = Tree.parse("select * from foo where not name = 'jim'");
-        Tree notTree = selectTree.children()
-            .singleSubtreeOfType(SQLTokenTypes.CONDITION).children()
-                .singleSubtreeOfType(SQLTokenTypes.NOT);
         assertEquals(
             new Not(new Eq(new SingleColumn("name"), new QuotedString("'jim'"))),
-            Not.fromNotTree(notTree, TreeConverters.forWhereTree())
+            new Parser("not name = 'jim'").parseCondition()
         );
     }
     

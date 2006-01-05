@@ -9,17 +9,6 @@ import net.sourceforge.mayfly.util.*;
 
 public class OrderBy extends Aggregate {
 
-    public static OrderBy fromTree(Tree tree) {
-        OrderBy orderBy = new OrderBy();
-        Iterator childIterator = tree.children().iterator();
-        while (childIterator.hasNext()) {
-            Tree child = (Tree) childIterator.next();
-            OrderItem item = (OrderItem) TreeConverters.forOrderBy().transform(child);
-            orderBy.add(item);
-        }
-        return orderBy;
-    }
-
     private List elements = new ArrayList();
 
     public OrderBy add(SingleColumn column) {
