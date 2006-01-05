@@ -19,7 +19,6 @@ options {
 tokens {
     COLUMN_LIST;
     CREATE_TABLE;
-    CREATE_SCHEMA;
     UPDATE;
     INSERT;
     SELECT;
@@ -194,7 +193,6 @@ statement:
     | delete 
     | insert
     | create_table
-    | create_schema
     | create_index
     | drop_table
     | drop_index
@@ -258,11 +256,6 @@ create_table:
     ( "option" OPEN_PAREN! QUOTED_STRING CLOSE_PAREN! ) ?
     OPEN_PAREN column_def (COMMA! column_def)* CLOSE_PAREN!
     { #create_table = #([CREATE_TABLE, "create_table"], #create_table); }
-;
-
-create_schema:
-    "create"! "schema"! identifier "authorization"! "dba"! create_table
-    { #create_schema = #([CREATE_SCHEMA, "create_schema"], #create_schema); }
 ;
 
 create_index:
@@ -652,11 +645,13 @@ quoted_string:
 
 //
 // SQL-92 keywords
+// Uh, this doesn't seem close to the list at http://sqlzoo.net/sql92.html
+// Will the real keyword list please stand up?
 //
 
 keyword:
     "abs" | "add" | "all" | "alter" | "and" | "as" |
-    "asc" | "avg" | "before" | "between" | "bigint" |
+    "asc" | "authorization" | "avg" | "before" | "between" | "bigint" |
     "binary" | "bit" | "blob" | "boolean" | "both" |
     "by" | "cached" | "cascade" | "case" | "cast" |
     "char" | "character" | "character_length" |

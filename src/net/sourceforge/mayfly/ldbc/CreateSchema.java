@@ -33,7 +33,7 @@ public class CreateSchema extends Command {
         createTableCommands = new L();
     }
 
-    private void add(CreateTable command) {
+    public void add(CreateTable command) {
         createTableCommands.add(command);
     }
 

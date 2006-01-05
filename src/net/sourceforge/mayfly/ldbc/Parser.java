@@ -51,8 +51,71 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    public boolean isSelect() {
-        return currentTokenType() == SQLTokenTypes.LITERAL_select;
+    public boolean canParse() {
+        return currentTokenType() == SQLTokenTypes.LITERAL_select ||
+            currentTokenType() == SQLTokenTypes.LITERAL_create && 
+                ((Token) tokens.get(1)).getType() == SQLTokenTypes.LITERAL_schema
+        ;
+    }
+    
+    public Command parse() {
+        if (currentTokenType() == SQLTokenTypes.LITERAL_select) {
+            return parseSelect();
+        }
+        else if (consumeIfMatches(SQLTokenTypes.LITERAL_create)) {
+            if (consumeIfMatches(SQLTokenTypes.LITERAL_schema)) {
+                return parseCreateSchema();
+            }
+            else {
+                throw new ParserException("expected create command but got " + describeToken(currentToken()));
+            }
+        }
+        else {
+            throw new ParserException("expected command but got " + describeToken(currentToken()));
+        }
+    }
+
+    private CreateSchema parseCreateSchema() {
+        String schemaName = consumeIdentifier();
+        expectAndConsume(SQLTokenTypes.LITERAL_authorization);
+        String user = consumeIdentifier();
+        if (!user.equalsIgnoreCase("dba")) {
+            throw new MayflyException("Can only create specify user dba in create schema but was " + user);
+        }
+
+        CreateSchema schema = new CreateSchema(schemaName);
+        while (consumeIfMatches(SQLTokenTypes.LITERAL_create)) {
+            expectAndConsume(SQLTokenTypes.LITERAL_table);
+            CreateTable createTable = parseCreateTable();
+            schema.add(createTable);
+        }
+        return schema;
+    }
+
+    private CreateTable parseCreateTable() {
+        String tableName = consumeIdentifier();
+        List columnNames = new ArrayList();
+        expectAndConsume(SQLTokenTypes.OPEN_PAREN);
+
+        columnNames.add(parseColumnDefinition());
+        while (consumeIfMatches(SQLTokenTypes.COMMA)) {
+            columnNames.add(parseColumnDefinition());
+        }
+
+        expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+        return new CreateTable(tableName, columnNames);
+    }
+
+    private String parseColumnDefinition() {
+        String name = consumeIdentifier();
+        if (consumeIfMatches(SQLTokenTypes.LITERAL_integer)) {
+        }
+        if (consumeIfMatches(SQLTokenTypes.LITERAL_varchar)) {
+            expectAndConsume(SQLTokenTypes.OPEN_PAREN);
+            expectAndConsume(SQLTokenTypes.NUMBER);
+            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+        }
+        return name;
     }
 
     public Select parseSelect() {

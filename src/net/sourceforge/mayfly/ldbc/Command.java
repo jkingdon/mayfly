@@ -11,8 +11,8 @@ public abstract class Command extends ValueObject {
 
     public static Command fromSql(String sql) {
         Parser parser = new Parser(sql);
-        if (parser.isSelect()) {
-            return parser.parseSelect();
+        if (parser.canParse()) {
+            return parser.parse();
         } else {
             return fromTree(Tree.parse(sql));
         }
@@ -24,14 +24,10 @@ public abstract class Command extends ValueObject {
             return DropTable.dropTableFromTree(tree);
         case SQLTokenTypes.CREATE_TABLE:
             return CreateTable.createTableFromTree(tree);
-        case SQLTokenTypes.CREATE_SCHEMA:
-            return CreateSchema.createSchemaFromTree(tree);
         case SQLTokenTypes.SET_SCHEMA:
             return SetSchema.setSchemaFromTree(tree);
         case SQLTokenTypes.INSERT:
             return Insert.insertFromTree(tree);
-        case SQLTokenTypes.SELECT:
-            throw new UnimplementedException("Should have handled select via the other parser");
         default:
             throw new UnimplementedException("Unrecognized command " + tree.toStringTree());
         }
