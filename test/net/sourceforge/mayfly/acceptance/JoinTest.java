@@ -169,12 +169,6 @@ public class JoinTest extends SqlTestCase {
         // just like INNER JOIN.  Mayfly, Oracle, and Postgres hew more closely
         // to the SQL standard: INNER JOIN must have ON and CROSS JOIN cannot have ON.
 
-        if (!mayflyMissing()) {
-            // The above describes the intended mayfly behavior, but I can't figure out
-            // how to get ANTLR to parse CROSS JOIN.  Something dumb, I'm sure.
-            return;
-        }
-
         execute("create table foo (a integer)");
         execute("create table bar (b integer)");
         execute("insert into foo (a) values (4)");
@@ -201,13 +195,25 @@ public class JoinTest extends SqlTestCase {
             assertResultSet(fullCartesianProduct, query(crossJoinWithOn));
         } else {
             expectQueryFailure(crossJoinWithOn,
-                "Specify INNER JOIN, not CROSS JOIN, if you want an ON condition");
+                // This message might be worthwhile, but I'm not sure whether the
+                // parser should be trying to guess that an ON goes with a CROSS JOIN.
+                // Especially in a dangling ON situation that might create other problems.
+//                "Specify INNER JOIN, not CROSS JOIN, if you want an ON condition"
+                
+                "expected end of file but got ON"
+            );
         }
 
         String innerJoinNoOn = "select a, b from foo inner join bar";
         if (dialect.innerJoinRequiresOn()) {
             expectQueryFailure(innerJoinNoOn, 
-                "Specify CROSS JOIN, not INNER JOIN, if you want to omit an ON condition");
+                // Might not be too hard to produce this error message but would it
+                // really be right? In "FOO INNER JOIN BAR BAZ QUUX ON A = B" is
+                // the ON omitted or is QUUX just an extraneous token?
+//                "Specify CROSS JOIN, not INNER JOIN, if you want to omit an ON condition"
+
+                "expected ON but got end of file"
+            );
         } else {
             assertResultSet(fullCartesianProduct, query(innerJoinNoOn));
         }
