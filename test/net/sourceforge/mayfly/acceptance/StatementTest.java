@@ -111,11 +111,6 @@ public class StatementTest extends SqlTestCase {
     }
     
     public void testSelect() throws Exception {
-        if (!mayflyMissing()) {
-            /** Still haven't implemented {@link net.sourceforge.mayfly.ldbc.Select#substitute(Collection)} */
-            return;
-        }
-
         execute("create table foo (a integer, b integer, c integer)");
         execute("insert into foo (a, b, c) values (4, 5, 6)");
         execute("insert into foo (a, b, c) values (7, 8, 9)");

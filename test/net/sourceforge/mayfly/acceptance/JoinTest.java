@@ -140,12 +140,9 @@ public class JoinTest extends SqlTestCase {
     }
     
     public void testWordOuterIsOptional() throws Exception {
-        if (mayflyMissing()) {
-            // The grammar, again.
-            execute("create table foo (a integer)");
-            execute("create table bar (a integer)");
-            assertNotNull(query("select * from foo left join bar on 1 = 1"));
-        }
+        execute("create table foo (a integer)");
+        execute("create table bar (a integer)");
+        assertNotNull(query("select * from foo left join bar on 1 = 1"));
     }
 
     public void testOuterSelfJoin() throws Exception {
