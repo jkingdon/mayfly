@@ -43,11 +43,7 @@ public class SchemaTest extends SqlTestCase {
         if (dialect.schemasMissing()) {
             return;
         }
-        if (!mayflyMissing()) {
-            // I don't know how to get ANTLR to parse this.
-            // I'm not sure what ANTLR is complaining about...
-            return;
-        }
+
         execute("create schema mars authorization dba create table foo (x integer) create table bar (x integer)");
         execute("set schema mars");
         assertEquals(1, execute("insert into bar(x) values (5)"));
