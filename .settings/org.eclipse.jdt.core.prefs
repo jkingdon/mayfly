@@ -1,4 +1,4 @@
-#Wed Nov 30 20:08:12 PST 2005
+#Wed Jan 04 17:19:51 PST 2006
 org.eclipse.jdt.core.compiler.problem.unusedDeclaredThrownExceptionWhenOverriding=disabled
 org.eclipse.jdt.core.formatter.insert_space_after_at_in_annotation_type_declaration=do not insert
 org.eclipse.jdt.core.formatter.keep_empty_array_initializer_on_one_line=false
@@ -81,7 +81,7 @@ org.eclipse.jdt.core.formatter.insert_space_before_colon_in_assert=insert
 org.eclipse.jdt.core.formatter.insert_space_after_comma_in_constructor_declaration_parameters=insert
 org.eclipse.jdt.core.formatter.alignment_for_arguments_in_allocation_expression=16
 org.eclipse.jdt.core.formatter.insert_space_before_opening_bracket_in_array_reference=do not insert
-org.eclipse.jdt.core.formatter.insert_new_line_before_else_in_if_statement=do not insert
+org.eclipse.jdt.core.formatter.insert_new_line_before_else_in_if_statement=insert
 org.eclipse.jdt.core.formatter.insert_space_before_comma_in_superinterfaces=do not insert
 org.eclipse.jdt.core.formatter.brace_position_for_method_declaration=end_of_line
 org.eclipse.jdt.core.formatter.comment.insert_new_line_before_root_tags=insert

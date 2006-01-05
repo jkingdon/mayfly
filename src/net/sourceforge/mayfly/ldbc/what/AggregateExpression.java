@@ -11,10 +11,12 @@ public abstract class AggregateExpression extends WhatElement implements Transfo
 
     private final SingleColumn column;
     private final String functionName;
+    private final boolean distinct;
 
-    protected AggregateExpression(SingleColumn column, String functionName) {
+    protected AggregateExpression(SingleColumn column, String functionName, boolean distinct) {
         this.column = column;
         this.functionName = functionName;
+        this.distinct = distinct;
     }
 
     public Cell evaluate(Row row) {
@@ -31,20 +33,18 @@ public abstract class AggregateExpression extends WhatElement implements Transfo
     }
 
     public Cell aggregate(Rows rows) {
+        Collection values = findValues(rows);
+
         long min = Long.MAX_VALUE;
         long max = Long.MIN_VALUE;
         long count = 0;
         long sum = 0;
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            Row row = (Row) iter.next();
-            Cell cell = evaluate(row);
-            if (!(cell instanceof NullCell)) {
-                long value = cell.asLong();
-                min = Math.min(min, value);
-                max = Math.max(max, value);
-                count++;
-                sum += value;
-            }
+        for (Iterator iter = values.iterator(); iter.hasNext();) {
+            long value = ((Long) iter.next()).longValue();
+            min = Math.min(min, value);
+            max = Math.max(max, value);
+            count++;
+            sum += value;
         }
         
         if (count > 0) {
@@ -61,6 +61,25 @@ public abstract class AggregateExpression extends WhatElement implements Transfo
                 
                 NullCell.INSTANCE);
         }
+    }
+
+    private Collection findValues(Rows rows) {
+        Collection values;
+        if (distinct) {
+            values = new HashSet();
+        }
+        else {
+            values = new ArrayList();
+        }
+
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            Cell cell = evaluate(row);
+            if (!(cell instanceof NullCell)) {
+                values.add(new Long(cell.asLong()));
+            }
+        }
+        return values;
     }
 
     abstract protected Cell pickOne(Cell min, Cell max, Cell count, Cell sum, Cell average);

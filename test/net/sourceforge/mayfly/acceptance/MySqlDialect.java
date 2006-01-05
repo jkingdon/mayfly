@@ -71,5 +71,15 @@ public class MySqlDialect extends Dialect {
     public boolean maySpecifyTableDotColumnToJdbc() {
         return true;
     }
+    
+    public boolean schemasMissing() {
+        // Not something missing in MySQL so much as something we haven't figured
+        // out how to test.
+        return true;
+    }
+    
+    public boolean aggregateDistinctIsForCountOnly() {
+        return true;
+    }
 
 }

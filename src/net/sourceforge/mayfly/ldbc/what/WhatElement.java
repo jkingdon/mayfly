@@ -58,12 +58,12 @@ abstract public class WhatElement extends ValueObject {
             
         case SQLTokenTypes.LITERAL_max: {
             Tree column = (Tree) expression.children().element(0);
-            return new Max((SingleColumn) fromExpressionTree(column), expression.getText());
+            return new Max((SingleColumn) fromExpressionTree(column), expression.getText(), false);
         }
 
         case SQLTokenTypes.LITERAL_min: {
             Tree column = (Tree) expression.children().element(0);
-            return new Min((SingleColumn) fromExpressionTree(column), expression.getText());
+            return new Min((SingleColumn) fromExpressionTree(column), expression.getText(), false);
         }
         
         case SQLTokenTypes.LITERAL_count: {
@@ -71,18 +71,18 @@ abstract public class WhatElement extends ValueObject {
             if (arg.getType() == SQLTokenTypes.ASTERISK) {
                 return new CountAll(expression.getText());
             } else {
-                return new Count((SingleColumn) fromExpressionTree(arg), expression.getText());
+                return new Count((SingleColumn) fromExpressionTree(arg), expression.getText(), false);
             }
         }
 
         case SQLTokenTypes.LITERAL_sum: {
             Tree column = (Tree) expression.children().element(0);
-            return new Sum((SingleColumn) fromExpressionTree(column), expression.getText());
+            return new Sum((SingleColumn) fromExpressionTree(column), expression.getText(), false);
         }
         
         case SQLTokenTypes.LITERAL_avg: {
             Tree column = (Tree) expression.children().element(0);
-            return new Average((SingleColumn) fromExpressionTree(column), expression.getText());
+            return new Average((SingleColumn) fromExpressionTree(column), expression.getText(), false);
         }
         
         default:

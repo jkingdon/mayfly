@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.sql.*;
 
 public class AggregateTest extends SqlTestCase {
     
@@ -102,19 +103,62 @@ public class AggregateTest extends SqlTestCase {
         expectQueryFailure("select 'L' || max(y) from foo", "no column y");
     }
 
-    public void testDistinctAndAll() throws Exception {
-        if (!mayflyMissing()) {
-            // Needs parser work, first of all
-            return;
-        }
-
+    public void testCountDistinctAndAll() throws Exception {
         execute("create table foo (x integer, y integer)");
-        execute("insert into foo (x, y) values (5, 70)");
+        execute("insert into foo (x, y) values (5, 60)");
         execute("insert into foo (x, y) values (5, 90)");
         execute("insert into foo (x, y) values (7, 90)");
         
         assertResultSet(new String[] { " 3 " }, query("select count(all x) from foo"));
         assertResultSet(new String[] { " 2 " }, query("select count(distinct x) from foo"));
+    }
+
+    public void testAll() throws Exception {
+        execute("create table foo (x integer, y integer)");
+        execute("insert into foo (x, y) values (5, 60)");
+        execute("insert into foo (x, y) values (5, 90)");
+        execute("insert into foo (x, y) values (7, 90)");
+        
+        assertResultSet(new String[] { " 80 " }, query("select avg(all y) from foo"));
+        assertResultSet(new String[] { " 17 " }, query("select sum(all x) from foo"));
+        assertResultSet(new String[] { " 5 " }, query("select min(all x) from foo"));
+        assertResultSet(new String[] { " 7 " }, query("select max(all x) from foo"));
+    }
+
+    public void testDistinct() throws Exception {
+        execute("create table foo (x integer, y integer)");
+        execute("insert into foo (x, y) values (5, 60)");
+        execute("insert into foo (x, y) values (5, 90)");
+        execute("insert into foo (x, y) values (7, 90)");
+        
+        checkDistinct(75, "select avg(distinct y) from foo");
+
+        checkDistinct(12, "select sum(distinct x) from foo");
+
+        // Minimum/maximum are kind of pointless, but legal it would seem
+        checkDistinct(5, "select min(distinct x) from foo");
+        checkDistinct(7, "select max(distinct x) from foo");
+    }
+
+    private void checkDistinct(int expected, String sql) throws SQLException {
+        if (dialect.aggregateDistinctIsForCountOnly()) {
+            expectQueryFailure(sql, null);
+        } else {
+            assertResultSet(new String[] { "" + expected }, query(sql));
+        }
+    }
+    
+    public void testAsteriskOnlyForCount() throws Exception {
+        execute("create table foo (x integer, y integer)");
+        if (!dialect.aggregateAsteriskIsForCountOnly()) {
+            // Hypersonic has a variety of behaviors, depending on whether there
+            // are any rows, and which function.  None of them seem very useful.
+            return;
+        }
+        expectQueryFailure("select avg(*) from foo", "expected primary but got ASTERISK");
+        expectQueryFailure("select sum(*) from foo", "expected primary but got ASTERISK");
+        expectQueryFailure("select min(*) from foo", "expected primary but got ASTERISK");
+        expectQueryFailure("select max(*) from foo", "expected primary but got ASTERISK");
     }
 
 }

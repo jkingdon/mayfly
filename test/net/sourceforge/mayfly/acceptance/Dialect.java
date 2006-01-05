@@ -104,4 +104,16 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean schemasMissing() {
+        return false;
+    }
+
+    public boolean aggregateDistinctIsForCountOnly() {
+        return false;
+    }
+
+    public boolean aggregateAsteriskIsForCountOnly() {
+        return true;
+    }
+
 }

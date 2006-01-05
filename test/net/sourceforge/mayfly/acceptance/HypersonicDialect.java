@@ -37,5 +37,9 @@ public class HypersonicDialect extends Dialect {
     public boolean orderByCountsAsWhat() {
         return true;
     }
+    
+    public boolean aggregateAsteriskIsForCountOnly() {
+        return false;
+    }
 
 }

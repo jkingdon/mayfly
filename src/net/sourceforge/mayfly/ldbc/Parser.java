@@ -218,6 +218,8 @@ public class Parser {
     }
 
     Transformer parsePrimary() {
+        AggregateArgumentParser argumentParser = new AggregateArgumentParser();
+
         if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {
             return parseColumnReference();
         }
@@ -235,48 +237,61 @@ public class Parser {
         else if (consumeIfMatches(SQLTokenTypes.LITERAL_null)) {
             throw new MayflyException("To check for null, use IS NULL or IS NOT NULL, not a null literal");
         }
-        else if (currentTokenType() == SQLTokenTypes.LITERAL_max) {
-            Token max = expectAndConsume(SQLTokenTypes.LITERAL_max);
-            WhatElement expression = parseParenthesizedExpression();
-            return new Max((SingleColumn) expression, max.getText());
+        else if (argumentParser.parse(SQLTokenTypes.LITERAL_max, false)) {
+            return new Max(
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
-        else if (currentTokenType() == SQLTokenTypes.LITERAL_min) {
-            Token min = expectAndConsume(SQLTokenTypes.LITERAL_min);
-            WhatElement expression = parseParenthesizedExpression();
-            return new Min((SingleColumn) expression, min.getText());
+        else if (argumentParser.parse(SQLTokenTypes.LITERAL_min, false)) {
+            return new Min(
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
-        else if (currentTokenType() == SQLTokenTypes.LITERAL_sum) {
-            Token sum = expectAndConsume(SQLTokenTypes.LITERAL_sum);
-            WhatElement expression = parseParenthesizedExpression();
-            return new Sum((SingleColumn) expression, sum.getText());
+        else if (argumentParser.parse(SQLTokenTypes.LITERAL_sum, false)) {
+            return new Sum(
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
-        else if (currentTokenType() == SQLTokenTypes.LITERAL_avg) {
-            Token average = expectAndConsume(SQLTokenTypes.LITERAL_avg);
-            WhatElement expression = parseParenthesizedExpression();
-            return new Average((SingleColumn) expression, average.getText());
+        else if (argumentParser.parse(SQLTokenTypes.LITERAL_avg, false)) {
+            return new Average(
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
-        else if (currentTokenType() == SQLTokenTypes.LITERAL_count) {
-            Token count = expectAndConsume(SQLTokenTypes.LITERAL_count);
-            expectAndConsume(SQLTokenTypes.OPEN_PAREN);
-            if (consumeIfMatches(SQLTokenTypes.ASTERISK)) {
-                CountAll countAll = new CountAll(count.getText());
-                expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
-                return countAll;
+        else if (argumentParser.parse(SQLTokenTypes.LITERAL_count, true)) {
+            if (argumentParser.gotAsterisk) {
+                return new CountAll(argumentParser.functionName);
+            } else {
+                return new Count(
+                    (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
             }
-            WhatElement expression = parseExpression();
-            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
-            return new Count((SingleColumn) expression, count.getText());
         }
         else {
             throw new ParserException("expected primary but got " + describeToken(currentToken()));
         }
     }
 
-    private WhatElement parseParenthesizedExpression() {
-        expectAndConsume(SQLTokenTypes.OPEN_PAREN);
-        WhatElement expression = parseExpression();
-        expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
-        return expression;
+    class AggregateArgumentParser {
+        WhatElement expression;
+        String functionName;
+        boolean gotAsterisk;
+        boolean distinct;
+
+        boolean parse(int aggregateTokenType, boolean allowAsterisk) {
+            if (currentTokenType() == aggregateTokenType) {
+                Token max = expectAndConsume(aggregateTokenType);
+                functionName = max.getText();
+                expectAndConsume(SQLTokenTypes.OPEN_PAREN);
+                if (allowAsterisk && consumeIfMatches(SQLTokenTypes.ASTERISK)) {
+                    gotAsterisk = true;
+                } else {
+                    if (consumeIfMatches(SQLTokenTypes.LITERAL_all)) {
+                    }
+                    else if (consumeIfMatches(SQLTokenTypes.LITERAL_distinct)) {
+                        distinct = true;
+                    }
+                    expression = parseExpression();
+                }
+                expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+                return true;
+            }
+            return false;
+        }
     }
 
     private SingleColumn parseColumnReference() {

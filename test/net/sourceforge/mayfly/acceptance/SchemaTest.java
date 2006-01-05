@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.acceptance;
 public class SchemaTest extends SqlTestCase {
 
     public void testHypersonicSyntax() throws Exception {
-        if (dialect instanceof MySqlDialect) {
+        if (dialect.schemasMissing()) {
             return;
         }
         assertEquals(0, execute("create schema mars authorization dba create table foo (x integer)"));
@@ -28,7 +28,7 @@ public class SchemaTest extends SqlTestCase {
     }
     
     public void testTwoSchemasEachHaveTheirOwnTables() throws Exception {
-        if (dialect instanceof MySqlDialect) {
+        if (dialect.schemasMissing()) {
             return;
         }
         assertEquals(0, execute("create schema mars authorization dba create table foo (x integer)"));
@@ -40,10 +40,10 @@ public class SchemaTest extends SqlTestCase {
     }
     
     public void testTwoTablesInCreateSchema() throws Exception {
-        if (dialect instanceof MySqlDialect) {
+        if (dialect.schemasMissing()) {
             return;
         }
-        if (dialect instanceof MayflyDialect) {
+        if (!mayflyMissing()) {
             // I don't know how to get ANTLR to parse this.
             // I'm not sure what ANTLR is complaining about...
             return;
@@ -54,7 +54,7 @@ public class SchemaTest extends SqlTestCase {
     }
     
     public void testSchemaAlreadyExists() throws Exception {
-        if (dialect instanceof MySqlDialect) {
+        if (dialect.schemasMissing()) {
             // Would like to test this case including the IF NOT EXISTS on CREATE DATABASE
             return;
         }
@@ -66,7 +66,7 @@ public class SchemaTest extends SqlTestCase {
     }
     
     public void testSetSchemaIsCaseInsensitive() throws Exception {
-        if (dialect instanceof MySqlDialect) {
+        if (dialect.schemasMissing()) {
             return;
         }
         
@@ -83,7 +83,7 @@ public class SchemaTest extends SqlTestCase {
     }
     
     public void testSchemaNameDotTable() throws Exception {
-        if (dialect instanceof MySqlDialect) {
+        if (dialect.schemasMissing()) {
             return;
         }
         
