@@ -2,12 +2,11 @@ package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
 
-import java.util.*;
-
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
-import net.sourceforge.mayfly.datastore.*;
+
+import java.util.*;
 
 public class ColumnsTest extends TestCase {
     public void testFromColumnNames() throws Exception {
@@ -36,22 +35,6 @@ public class ColumnsTest extends TestCase {
         assertEquals("id", new Columns.ToLowercaseName().transform(new Column("Id")));
     }
 
-    public void testColumnMatching() throws Exception {
-        Column a = new Column(new TableIdentifier("foo"), "a");
-        Column b = new Column(new TableIdentifier("foo"), "b");
-        Column c = new Column(new TableIdentifier("bar"), "c");
-
-        assertTrue(new Columns.ColumnMatching("foo", "a").evaluate(a));
-        assertFalse(new Columns.ColumnMatching("foo", "a").evaluate(b));
-
-        assertTrue(new Columns.ColumnMatching("FoO", "A").evaluate(a));
-
-        assertTrue(new Columns.ColumnMatching("FoO", "b").evaluate(b));
-        assertTrue(new Columns.ColumnMatching("bar", "C").evaluate(c));
-
-        assertFalse(new Columns.ColumnMatching("bar", "C").evaluate(a));
-    }
-    
     public void testLookup() throws Exception {
         Columns columns = new Columns(new ImmutableList(Arrays.asList(
             new Column[] {

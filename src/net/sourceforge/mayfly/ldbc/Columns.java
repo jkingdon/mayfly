@@ -48,10 +48,6 @@ public class Columns extends Aggregate {
         return collect(new ToLowercaseName());
     }
 
-    public Column columnMatching(String tableName, String columnName) {
-        return (Column) findFirst(new ColumnMatching(tableName, columnName));
-    }
-
 
     static class ToName implements Transformer {
         public Object transform(Object from) {
@@ -107,20 +103,4 @@ public class Columns extends Aggregate {
         }
     }
 
-
-    public static class ColumnMatching implements Selector {
-        private String tableName;
-        private String columnName;
-
-        public ColumnMatching(String tableName, String columnName) {
-            this.tableName = tableName;
-            this.columnName = columnName;
-        }
-
-        public boolean evaluate(Object candidate) {
-            Column column = (Column) candidate;
-
-            return column.matches2(tableName, columnName);
-        }
-    }
 }
