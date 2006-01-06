@@ -1,11 +1,13 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.parser;
 
 import junit.framework.*;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
+import net.sourceforge.mayfly.parser.Parser;
 
 import antlr.*;
 

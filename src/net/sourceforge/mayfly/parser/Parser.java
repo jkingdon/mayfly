@@ -1,10 +1,10 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.parser;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.parser.*;
 import net.sourceforge.mayfly.util.*;
 import antlr.*;
 
@@ -140,7 +140,7 @@ public class Parser {
         return new Select(what, from, where, orderBy, limit);
     }
 
-    What parseWhat() {
+    public What parseWhat() {
         if (consumeIfMatches(SQLTokenTypes.ASTERISK)) {
             return new What(Collections.singletonList(new All()));
         }
@@ -156,7 +156,7 @@ public class Parser {
         return what;
     }
 
-    WhatElement parseWhatElement() {
+    public WhatElement parseWhatElement() {
         if (currentTokenType() == SQLTokenTypes.IDENTIFIER
             && ((Token) tokens.get(1)).getType() == SQLTokenTypes.DOT
             && ((Token) tokens.get(2)).getType() == SQLTokenTypes.ASTERISK) {
@@ -284,7 +284,7 @@ public class Parser {
         return expressions;
     }
 
-    Transformer parsePrimary() {
+    public Transformer parsePrimary() {
         AggregateArgumentParser argumentParser = new AggregateArgumentParser();
 
         if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {
@@ -372,7 +372,7 @@ public class Parser {
         }
     }
 
-    From parseFromItems() {
+    public From parseFromItems() {
         From from = new From();
         from.add(parseFromItem());
         

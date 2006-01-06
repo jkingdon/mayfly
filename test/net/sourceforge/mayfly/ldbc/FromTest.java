@@ -2,6 +2,8 @@ package net.sourceforge.mayfly.ldbc;
 
 import junit.framework.*;
 
+import net.sourceforge.mayfly.parser.*;
+
 public class FromTest extends TestCase {
     public void testSimple() throws Exception {
         assertEquals(

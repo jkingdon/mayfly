@@ -8,7 +8,7 @@ import net.sourceforge.mayfly.util.*;
 
 public class LeftJoin extends Join implements FromElement {
 
-    protected LeftJoin(FromElement left, FromElement right, Where condition) {
+    public LeftJoin(FromElement left, FromElement right, Where condition) {
         super(left, right, condition);
     }
 

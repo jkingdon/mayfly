@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.acceptance;
 
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.util.*;
 
 import java.sql.*;
 

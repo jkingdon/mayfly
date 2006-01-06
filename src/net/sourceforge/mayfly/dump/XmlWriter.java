@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.dump;
 
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.util.*;
 
-import java.util.Stack;
+import java.util.*;
 
 public class XmlWriter {
     
