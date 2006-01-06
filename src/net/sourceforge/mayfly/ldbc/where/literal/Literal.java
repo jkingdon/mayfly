@@ -2,11 +2,11 @@ package net.sourceforge.mayfly.ldbc.where.literal;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
 
-public abstract class Literal extends WhatElement implements Transformer {
+public abstract class Literal extends Expression {
 
     public static Literal fromValue(Object value) {
         if (value instanceof Number) {

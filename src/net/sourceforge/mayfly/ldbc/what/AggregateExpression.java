@@ -4,10 +4,11 @@ import java.util.*;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
-public abstract class AggregateExpression extends WhatElement implements Transformer {
+public abstract class AggregateExpression extends Expression {
 
     private final SingleColumn column;
     private final String functionName;
@@ -84,8 +85,4 @@ public abstract class AggregateExpression extends WhatElement implements Transfo
 
     abstract protected Cell pickOne(Cell min, Cell max, Cell count, Cell sum, Cell average);
     
-    public Object transform(Object from) {
-        throw new UnimplementedException();
-    }
-
 }

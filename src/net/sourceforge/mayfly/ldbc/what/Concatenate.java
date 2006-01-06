@@ -2,10 +2,11 @@ package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
-public class Concatenate extends WhatElement {
+public class Concatenate extends Expression {
 
     private final WhatElement left;
     private final WhatElement right;

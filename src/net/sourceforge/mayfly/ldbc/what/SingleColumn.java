@@ -2,10 +2,11 @@ package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
-public class SingleColumn extends WhatElement implements Transformer {
+public class SingleColumn extends Expression {
     private String tableOrAlias;
     private String columnName;
 
