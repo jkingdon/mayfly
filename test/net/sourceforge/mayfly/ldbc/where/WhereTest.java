@@ -12,7 +12,7 @@ public class WhereTest extends TestCase {
     public void testWhere() throws Exception {
         assertEquals(
             new Where(
-                new Eq(new SingleColumn("f", "name"), new QuotedString("'steve'"))
+                new Equal(new SingleColumn("f", "name"), new QuotedString("'steve'"))
             ),
             new Parser("f.name='steve'").parseWhere()
         );
@@ -29,7 +29,7 @@ public class WhereTest extends TestCase {
     }
     
     public void testNull() throws Exception {
-        Where where = new Where(new Eq(new SingleColumn("a"), new MathematicalInt(5)));
+        Where where = new Where(new Equal(new SingleColumn("a"), new MathematicalInt(5)));
         Row fiveRow = new Row(new TupleElement(new Column("a"), new LongCell(5)));
         Row nullRow = new Row(new TupleElement(new Column("a"), NullCell.INSTANCE));
         

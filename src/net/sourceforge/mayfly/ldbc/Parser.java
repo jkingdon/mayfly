@@ -225,23 +225,23 @@ public class Parser {
         Transformer left = parsePrimary();
         if (consumeIfMatches(SQLTokenTypes.EQUAL)) {
             Transformer right = parsePrimary();
-            return new Eq(left, right);
+            return new Equal(left, right);
         }
         else if (consumeIfMatches(SQLTokenTypes.NOT_EQUAL)) {
             Transformer right = parsePrimary();
-            return new Not(new Eq(left, right));
+            return new Not(new Equal(left, right));
         }
         else if (consumeIfMatches(SQLTokenTypes.NOT_EQUAL_2)) {
             Transformer right = parsePrimary();
-            return new Not(new Eq(left, right));
+            return new Not(new Equal(left, right));
         }
         else if (consumeIfMatches(SQLTokenTypes.BIGGER)) {
             Transformer right = parsePrimary();
-            return new Gt(left, right);
+            return new Greater(left, right);
         }
         else if (consumeIfMatches(SQLTokenTypes.SMALLER)) {
             Transformer right = parsePrimary();
-            return new Gt(right, left);
+            return new Greater(right, left);
         }
         else if (consumeIfMatches(SQLTokenTypes.LITERAL_not)) {
             return new Not(parseIn(left));

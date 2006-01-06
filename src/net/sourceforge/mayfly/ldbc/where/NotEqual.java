@@ -3,14 +3,14 @@ package net.sourceforge.mayfly.ldbc.where;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
-public class NotEq {
+public class NotEqual {
 
     public static Not fromNotEqualTree(Tree notEqualTree, TreeConverters treeConverters) {
         L both = notEqualTree.children().convertUsing(treeConverters);
 
         // Is there a reason to do this rather than Not(Eq(l, r)) ?
         // (null handling is the reason... which we don't do yet)
-        return new Not(new Eq((Transformer)both.get(0), (Transformer) both.get(1)));
+        return new Not(new Equal((Transformer)both.get(0), (Transformer) both.get(1)));
     }
 
 }

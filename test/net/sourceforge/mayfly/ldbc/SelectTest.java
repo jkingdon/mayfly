@@ -24,18 +24,18 @@ public class SelectTest extends TestCase {
                 new Where(
                     new And(
                         new And(
-                            new Eq(new SingleColumn("f", "name"), new QuotedString("'steve'")),
+                            new Equal(new SingleColumn("f", "name"), new QuotedString("'steve'")),
                             new Or(
-                                new Eq(new SingleColumn("size"), new MathematicalInt(4)),
-                                new Gt(new MathematicalInt(6), new SingleColumn("size"))
+                                new Equal(new SingleColumn("size"), new MathematicalInt(4)),
+                                new Greater(new MathematicalInt(6), new SingleColumn("size"))
                             )
 
                         ),
                         new Or(
-                            new Eq(new SingleColumn("color"), new QuotedString("'red'")),
+                            new Equal(new SingleColumn("color"), new QuotedString("'red'")),
                             new And(
-                                new Not(new Eq(new SingleColumn("day"), new MathematicalInt(7))),
-                                new Not(new Eq(new SingleColumn("day"), new MathematicalInt(6)))
+                                new Not(new Equal(new SingleColumn("day"), new MathematicalInt(7))),
+                                new Not(new Equal(new SingleColumn("day"), new MathematicalInt(6)))
                             )
 
                         )
@@ -60,7 +60,7 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromTable("foo")),
                 new Where(
-                    new Eq(new SingleColumn("a"), new MathematicalInt(5))
+                    new Equal(new SingleColumn("a"), new MathematicalInt(5))
                 )
             ),
             Select.selectFromSql("select * from foo where a = 5")
@@ -117,7 +117,7 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromTable("foo")),
                 new Where(
-                    new Eq(new SingleColumn("a"), JdbcParameter.INSTANCE)
+                    new Equal(new SingleColumn("a"), JdbcParameter.INSTANCE)
                 )
             ),
             Select.selectFromSql("select ? from foo where a = ?")
@@ -144,18 +144,18 @@ public class SelectTest extends TestCase {
                 new Where(
                     new And(
                         new Or(
-                            new Eq(
+                            new Equal(
                                 new SingleColumn("a"),
                                 new MathematicalInt(6)
                             ),
                             new Not(
-                                new Eq(
+                                new Equal(
                                     new MathematicalInt(7),
                                     new SingleColumn("b")
                                 )
                             )
                         ),
-                        new Gt(
+                        new Greater(
                             new MathematicalInt(8),
                             new SingleColumn("c")
                         )
@@ -219,7 +219,7 @@ public class SelectTest extends TestCase {
                         new FromTable("places"),
                         new FromTable("types"),
                         new Where(
-                            new Eq(new SingleColumn("type"), new SingleColumn("id"))
+                            new Equal(new SingleColumn("type"), new SingleColumn("id"))
                         )
                     )),
                 Where.EMPTY
@@ -240,7 +240,7 @@ public class SelectTest extends TestCase {
                         new FromTable("places"),
                         new FromTable("types"),
                         new Where(
-                            new Eq(new SingleColumn("type"), new SingleColumn("id"))
+                            new Equal(new SingleColumn("type"), new SingleColumn("id"))
                         )
                     )),
                 Where.EMPTY
@@ -262,12 +262,12 @@ public class SelectTest extends TestCase {
                             new FromTable("foo"),
                             new FromTable("bar"),
                             new Where(
-                                new Eq(new SingleColumn("f"), new SingleColumn("b1"))
+                                new Equal(new SingleColumn("f"), new SingleColumn("b1"))
                             )
                         ),
                         new FromTable("quux"),
                         new Where(
-                            new Eq(new SingleColumn("b2"), new SingleColumn("q"))
+                            new Equal(new SingleColumn("b2"), new SingleColumn("q"))
                         )
                     )),
                 Where.EMPTY

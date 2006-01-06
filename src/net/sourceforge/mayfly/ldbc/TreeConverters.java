@@ -43,27 +43,27 @@ public class TreeConverters {
             })
             .register(SQLTokenTypes.EQUAL,         new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return Eq.fromEqualTree(from, converters);
+                                                              return Equal.fromEqualTree(from, converters);
                                                           }
                                                       })
             .register(SQLTokenTypes.NOT_EQUAL,     new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return NotEq.fromNotEqualTree(from, converters);
+                                                              return NotEqual.fromNotEqualTree(from, converters);
                                                           }
                                                       })
             .register(SQLTokenTypes.NOT_EQUAL_2,   new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return NotEq.fromNotEqualTree(from, converters);
+                                                              return NotEqual.fromNotEqualTree(from, converters);
                                                           }
                                                       })
             .register(SQLTokenTypes.BIGGER,   new TreeConverters.Converter() {
                                                           public Object convert(Tree from, TreeConverters converters) {
-                                                              return Gt.fromBiggerTree(from, converters);
+                                                              return Greater.fromBiggerTree(from, converters);
                                                           }
                                                       })
             .register(SQLTokenTypes.SMALLER,   new TreeConverters.Converter() {
                 public Object convert(Tree from, TreeConverters converters) {
-                    return Gt.fromSmallerTree(from, converters);
+                    return Greater.fromSmallerTree(from, converters);
                 }
             })
             .register(SQLTokenTypes.IS_NULL,         new TreeConverters.Converter() {

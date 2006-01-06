@@ -4,15 +4,15 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
-public class Eq extends RowExpression {
+public class Equal extends RowExpression {
 
-    public static Eq fromEqualTree(Tree equalTree, TreeConverters treeConverters) {
+    public static Equal fromEqualTree(Tree equalTree, TreeConverters treeConverters) {
         L both = equalTree.children().convertUsing(treeConverters);
 
-        return new Eq((Transformer)both.get(0), (Transformer) both.get(1));
+        return new Equal((Transformer)both.get(0), (Transformer) both.get(1));
     }
 
-    public Eq(Transformer leftSide, Transformer rightSide) {
+    public Equal(Transformer leftSide, Transformer rightSide) {
         super(leftSide, rightSide);
     }
 
