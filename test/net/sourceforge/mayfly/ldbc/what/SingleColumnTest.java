@@ -13,8 +13,8 @@ public class SingleColumnTest extends TestCase {
                 .appendColumnCellContents("colB", "2")
         );
 
-        assertEquals(new StringCell("1"), new SingleColumn("colA").transform(row));
-        assertEquals(new StringCell("2"), new SingleColumn("colB").transform(row));
+        assertEquals(new StringCell("1"), new SingleColumn("colA").evaluate(row));
+        assertEquals(new StringCell("2"), new SingleColumn("colB").evaluate(row));
     }
 
     public void testProcess_Simple() throws Exception {

@@ -29,16 +29,6 @@ public class TreeConverters {
             .register(SQLTokenTypes.CONDITION,    new TreeConverters.SkipLevelAndContinue());
     }
 
-    public static TreeConverters forOrderBy() {
-        return new TreeConverters()
-            .register(SQLTokenTypes.ORDER_ITEM,   new TreeConverters.Converter() {
-                    public Object convert(Tree from, TreeConverters converters) {
-                        return OrderItem.fromTree(from, converters);
-                    }
-                })
-            ;
-    }
-
     
     private Map typeToConverter = new HashMap();
 

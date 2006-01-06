@@ -28,7 +28,7 @@ public class SingleColumn extends Expression {
     }
 
     public Object transform(Object from) {
-        return evaluate((Row) from);
+        throw new UnimplementedException();
     }
 
     public Tuple process(Tuple originalTuple, M aliasToTableName) {
