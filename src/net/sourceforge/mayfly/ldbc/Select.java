@@ -5,7 +5,6 @@ import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.parser.*;
-import net.sourceforge.mayfly.util.*;
 
 import java.sql.*;
 import java.util.*;
@@ -15,31 +14,7 @@ public class Select extends Command {
     private static final String UPDATE_MESSAGE = "SELECT is only available with query, not update";
 
     public static Select selectFromSql(String sql) {
-        //return selectFromTree(Tree.parse(sql));
         return new Parser(sql).parseSelect();
-    }
-
-    public static Select selectFromTree(Tree selectTree) {
-
-        int[] typesToIgnore = new int[]{SQLTokenTypes.COMMA};
-
-        L converted =
-            selectTree.children().convertUsing(TreeConverters.forSelectTree(), typesToIgnore);
-
-        Where where = (Where) converted.selectSingle(Where.class, Where.EMPTY);
-                    
-        OrderBy orderBy = (OrderBy) converted.selectSingle(OrderBy.class, new OrderBy());
-
-        Limit limit = (Limit) converted.selectSingle(Limit.class, Limit.NONE);
-
-        return
-            new Select(
-                new What(converted.selectObjectsThatAre(WhatElement.class)),
-                new From(converted.selectObjectsThatAre(FromElement.class)),
-                where,
-                orderBy,
-                limit
-            );
     }
 
     private What what;

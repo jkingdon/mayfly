@@ -2,15 +2,7 @@ package net.sourceforge.mayfly.ldbc.where;
 
 import java.util.*;
 
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.util.*;
-
 public class Or extends BooleanExpression {
-
-    public static Or fromOrTree(Tree orTree, TreeConverters converters) {
-        L both = orTree.children().convertUsing(converters);
-        return new Or((BooleanExpression)both.get(0), (BooleanExpression)both.get(1));
-    }
 
     private BooleanExpression leftSide;
     private BooleanExpression rightSide;

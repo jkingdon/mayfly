@@ -171,7 +171,7 @@ public class Parser {
     }
 
     private WhatElement parseExpression() {
-        WhatElement left = (WhatElement) parsePrimary();
+        WhatElement left = parsePrimary();
         if (consumeIfMatches(SQLTokenTypes.VERTBARS)) {
             return new Concatenate(left, parseExpression());
         }
@@ -222,25 +222,25 @@ public class Parser {
             return expression;
         }
 
-        Transformer left = parsePrimary();
+        WhatElement left = parsePrimary();
         if (consumeIfMatches(SQLTokenTypes.EQUAL)) {
-            Transformer right = parsePrimary();
+            WhatElement right = parsePrimary();
             return new Equal(left, right);
         }
         else if (consumeIfMatches(SQLTokenTypes.NOT_EQUAL)) {
-            Transformer right = parsePrimary();
-            return new Not(new Equal(left, right));
+            WhatElement right = parsePrimary();
+            return NotEqual.construct(left, right);
         }
         else if (consumeIfMatches(SQLTokenTypes.NOT_EQUAL_2)) {
-            Transformer right = parsePrimary();
-            return new Not(new Equal(left, right));
+            WhatElement right = parsePrimary();
+            return NotEqual.construct(left, right);
         }
         else if (consumeIfMatches(SQLTokenTypes.BIGGER)) {
-            Transformer right = parsePrimary();
+            WhatElement right = parsePrimary();
             return new Greater(left, right);
         }
         else if (consumeIfMatches(SQLTokenTypes.SMALLER)) {
-            Transformer right = parsePrimary();
+            WhatElement right = parsePrimary();
             return new Greater(right, left);
         }
         else if (consumeIfMatches(SQLTokenTypes.LITERAL_not)) {
@@ -260,12 +260,12 @@ public class Parser {
         }
     }
 
-    private BooleanExpression parseIs(Transformer left) {
+    private BooleanExpression parseIs(WhatElement left) {
         expectAndConsume(SQLTokenTypes.LITERAL_null);
         return new IsNull(left);
     }
 
-    private BooleanExpression parseIn(Transformer left) {
+    private BooleanExpression parseIn(WhatElement left) {
         expectAndConsume(SQLTokenTypes.LITERAL_in);
         expectAndConsume(SQLTokenTypes.OPEN_PAREN);
         List expressions = parseExpressionList();
@@ -284,7 +284,7 @@ public class Parser {
         return expressions;
     }
 
-    public Transformer parsePrimary() {
+    public WhatElement parsePrimary() {
         AggregateArgumentParser argumentParser = new AggregateArgumentParser();
 
         if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {

@@ -1,16 +1,20 @@
 package net.sourceforge.mayfly.ldbc.where;
 
 import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 
 import java.util.*;
 
 abstract public class RowExpression extends BooleanExpression {
 
-    private Transformer leftSide;
-    private Transformer rightSide;
+    /** Could be {@link net.sourceforge.mayfly.evaluation.Expression}
+     *  instead of {@link WhatElement} once we figure out how JdbcParameters
+     *  get substituted.
+     */
+    private WhatElement leftSide;
+    private WhatElement rightSide;
 
-    public RowExpression(Transformer leftSide, Transformer rightSide) {
+    public RowExpression(WhatElement leftSide, WhatElement rightSide) {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
     }
@@ -18,7 +22,7 @@ abstract public class RowExpression extends BooleanExpression {
     public boolean evaluate(Object rowObject) {
         Row row = (Row) rowObject;
 
-        return compare((Cell) leftSide.transform(row), (Cell) rightSide.transform(row));
+        return compare(leftSide.evaluate(row), rightSide.evaluate(row));
     }
 
     abstract protected boolean compare(Cell leftSide, Cell rightSide);

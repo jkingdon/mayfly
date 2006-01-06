@@ -1,16 +1,13 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 
 public class NotEqual {
 
-    public static Not fromNotEqualTree(Tree notEqualTree, TreeConverters treeConverters) {
-        L both = notEqualTree.children().convertUsing(treeConverters);
-
-        // Is there a reason to do this rather than Not(Eq(l, r)) ?
-        // (null handling is the reason... which we don't do yet)
-        return new Not(new Equal((Transformer)both.get(0), (Transformer) both.get(1)));
+    public static BooleanExpression construct(WhatElement left, WhatElement right) {
+        // Not sure we can handle nulls right by doing it this way.
+        // Certainly we aren't dealing with nulls correctly yet.
+        return new Not(new Equal(left, right));
     }
 
 }
