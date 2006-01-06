@@ -149,6 +149,9 @@ published by O'Reilly.
 It has a detailed guide to syntax and semantics, including the SQL2003 standard and
 the differences among the most common SQL implementations.
 
+A more introductory book is <i>The Practical SQL Handbook: Using Structured Query Language</i>,
+by Judith S. Bowman, Sandra L. Emerson, and Marcy Darnovsky (third edition is from 1996).
+
 One good SQL reference/tutorial web site is <a href="http://www.sqlzoo.net/" >SQLzoo</a>.
 
 */

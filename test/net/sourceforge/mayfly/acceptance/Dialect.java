@@ -116,4 +116,8 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean errorIfNotAggregateOrGrouped() {
+        return true;
+    }
+
 }

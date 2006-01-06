@@ -81,5 +81,9 @@ public class MySqlDialect extends Dialect {
     public boolean aggregateDistinctIsForCountOnly() {
         return true;
     }
+    
+    public boolean errorIfNotAggregateOrGrouped() {
+        return false;
+    }
 
 }

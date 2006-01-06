@@ -82,7 +82,7 @@ public abstract class SqlTestCase extends TestCase {
     
     private static void assertResults(String[] rowsAsStrings, ResultSet results, 
         Collection expected, Collection actual) throws SQLException {
-        boolean strings = buildExpected(rowsAsStrings, expected);
+        BitSet strings = buildExpected(rowsAsStrings, expected);
         int columnsToFetch = countColumnsOfFirstRow(expected);
     
         assertEquals(expected, buildActual(results, columnsToFetch, strings, actual));
@@ -99,14 +99,14 @@ public abstract class SqlTestCase extends TestCase {
         }
     }
 
-    private static Collection buildActual(ResultSet results, int columnsToFetch, boolean strings, Collection actual) 
+    private static Collection buildActual(ResultSet results, int columnsToFetch, BitSet strings, Collection actual) 
     throws SQLException {
         while (results.next()) {
             L row = new L();
     
             for (int column = 1; column <= columnsToFetch; ++column) {
                 Object value;
-                if (strings) {
+                if (strings.get(column - 1)) {
                     value = results.getString(column);
                 } else {
                     value = new Integer(results.getInt(column));
@@ -125,22 +125,24 @@ public abstract class SqlTestCase extends TestCase {
         return actual;
     }
 
-    private static boolean buildExpected(String[] rowsAsStrings, Collection expected) {
-        boolean strings = false;
+    private static BitSet buildExpected(String[] rowsAsStrings, Collection expected) {
+        BitSet strings = null;
         for (int i = 0; i < rowsAsStrings.length; i++) {
             String rowString = rowsAsStrings[i];
             String[] cells = rowString.split(",");
             L row = new L();
+            
+            strings = new BitSet(cells.length);
     
             for (int j = 0; j < cells.length; j++) {
                 String cell = cells[j].trim();
                 if (cell.startsWith("'")) {
-                    strings = true;
+                    strings.set(j);
                     row.append(cell.substring(1, cell.length() - 1));
                 } else if (cell.equals("null")) {
                     row.append(null);
                 } else {
-                    strings = false;
+                    strings.clear(j);
                     row.append(new Integer(Integer.parseInt(cell)));
                 }
             }
