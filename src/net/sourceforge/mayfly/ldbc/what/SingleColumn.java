@@ -4,7 +4,6 @@ import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.util.*;
 
 public class SingleColumn extends Expression {
     private String tableOrAlias;
@@ -27,27 +26,6 @@ public class SingleColumn extends Expression {
         throw new MayflyInternalException("shouldn't combine aggregate and column expressions");
     }
 
-    public Object transform(Object from) {
-        throw new UnimplementedException();
-    }
-
-    public Tuple process(Tuple originalTuple, M aliasToTableName) {
-        String tableName =
-            aliasToTableName.containsKeyCaseInsensitive(tableOrAlias) ?
-                (String)aliasToTableName.getCaseInsensitive(tableOrAlias) :
-                tableOrAlias;
-
-        Columns possibleColumns = originalTuple
-                                        .headers()
-                                            .thatAreColumns();
-        Column column =
-            tableName == null ?
-                 possibleColumns.columnFromName(columnName) :
-                 possibleColumns.columnMatching(tableName, columnName);
-
-        return new Tuple(originalTuple.withHeader(column));
-    }
-    
     public String firstColumn() {
         return displayName();
     }

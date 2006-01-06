@@ -8,8 +8,8 @@ import java.util.*;
 
 /**
  * @internal
- * Plays the role of an expression (well, when we're not using
- * {@link net.sourceforge.mayfly.util.Transformer} for that).
+ * Plays the role of an expression (when it is a
+ * {@link net.sourceforge.mayfly.evaluation.Expression}).
  * But also indicates something mentioned in a select clause.
  * 
  * The difference is that SELECT * FROM foo has one
@@ -30,9 +30,6 @@ abstract public class WhatElement extends ValueObject {
 
     abstract public Cell aggregate(Rows rows);
 
-    //TODO: name sucks
-    abstract public Tuple process(Tuple originalTuple, M aliasToTableName);
-    
     public String firstAggregate() {
         return null;
     }

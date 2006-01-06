@@ -1,10 +1,8 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.util.*;
 
 public class Concatenate extends Expression {
 
@@ -32,10 +30,6 @@ public class Concatenate extends Expression {
         return new StringCell(leftCell.asString() + rightCell.asString());
     }
     
-    public Tuple process(Tuple originalTuple, M aliasToTableName) {
-        throw new UnimplementedException();
-    }
-
     public String firstColumn() {
         String firstInLeft = left.firstColumn();
         if (firstInLeft != null) {

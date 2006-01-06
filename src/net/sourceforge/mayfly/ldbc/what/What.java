@@ -72,21 +72,6 @@ public class What extends Aggregate {
         return count;
     }
 
-    public Row applyTo(Row original) {
-        final Tuple originalTuple = original.tuple();
-
-        final TupleBuilder newTuple = new TupleBuilder();
-
-        each(new Each() {
-            public void each(Object element) {
-                WhatElement whatElement = (WhatElement) element;
-                newTuple.appendAll(whatElement.process(originalTuple, new M()));
-            }
-        });
-
-        return new Row(newTuple);
-    }
-
     public void substitute(Iterator jdbcParameters) {
         for (int i = 0; i < elements.size(); ++i) {
             if (elements.get(i) instanceof JdbcParameter) {

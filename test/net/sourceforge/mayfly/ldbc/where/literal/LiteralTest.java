@@ -9,7 +9,7 @@ public class LiteralTest extends TestCase {
     public void testTransform() throws Exception {
         assertEquals(
             new StringCell("foo"),
-            new MyLiteral().transform(new Row(new TupleBuilder()))
+            new MyLiteral().evaluate(new Row(new TupleBuilder()))
         );
     }
 

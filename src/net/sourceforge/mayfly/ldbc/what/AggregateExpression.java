@@ -1,12 +1,10 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import java.util.*;
-
-import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.util.*;
+
+import java.util.*;
 
 public abstract class AggregateExpression extends Expression {
 
@@ -23,10 +21,6 @@ public abstract class AggregateExpression extends Expression {
     public Cell evaluate(Row row) {
         /** This is just for checking; aggregation happens in {@link #aggregate(Rows)}. */
         return column.evaluate(row);
-    }
-
-    public Tuple process(Tuple originalTuple, M aliasToTableName) {
-        throw new UnimplementedException();
     }
 
     public String firstAggregate() {
