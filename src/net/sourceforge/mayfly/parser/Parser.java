@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.parser;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
@@ -131,6 +132,8 @@ public class Parser {
         else {
             where = Where.EMPTY;
         }
+        
+        parseGroupBy();
         
         OrderBy orderBy = parseOrderBy();
         
@@ -439,6 +442,27 @@ public class Parser {
         } else {
             return new FromTable(table);
         }
+    }
+
+    private GroupBy parseGroupBy() {
+        if (consumeIfMatches(SQLTokenTypes.LITERAL_group)) {
+            expectAndConsume(SQLTokenTypes.LITERAL_by);
+            
+            GroupBy groupBy = new GroupBy();
+            groupBy.add(parseGroupItem());
+            
+            while (consumeIfMatches(SQLTokenTypes.COMMA)) {
+                groupBy.add(parseGroupItem());
+            }
+            return groupBy;
+        }
+        else {
+            return new GroupBy();
+        }
+    }
+
+    private GroupItem parseGroupItem() {
+        return new GroupItem(parseColumnReference());
     }
 
     private OrderBy parseOrderBy() {

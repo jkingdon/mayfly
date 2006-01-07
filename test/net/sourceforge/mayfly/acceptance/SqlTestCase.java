@@ -84,8 +84,10 @@ public abstract class SqlTestCase extends TestCase {
         Collection expected, Collection actual) throws SQLException {
         BitSet strings = buildExpected(rowsAsStrings, expected);
         int columnsToFetch = countColumnsOfFirstRow(expected);
-    
-        assertEquals(expected, buildActual(results, columnsToFetch, strings, actual));
+        
+        buildActual(results, columnsToFetch, strings, actual);
+        
+        assertEquals(expected, actual);
     }
 
     private static int countColumnsOfFirstRow(Collection expected) {
@@ -99,7 +101,7 @@ public abstract class SqlTestCase extends TestCase {
         }
     }
 
-    private static Collection buildActual(ResultSet results, int columnsToFetch, BitSet strings, Collection actual) 
+    private static void buildActual(ResultSet results, int columnsToFetch, BitSet strings, Collection actual) 
     throws SQLException {
         while (results.next()) {
             L row = new L();
@@ -122,7 +124,6 @@ public abstract class SqlTestCase extends TestCase {
             actual.add(row);
         }
         results.close();
-        return actual;
     }
 
     private static BitSet buildExpected(String[] rowsAsStrings, Collection expected) {

@@ -11,7 +11,12 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into books(author, title) values ('Dickens', 'Bleak House')");
         execute("insert into books(author, title) values ('Dickens', 'A Tale of Two Cities')");
         
-        assertResultSet(new String[] { " 'Dickens' " }, query("select author from books group by author"));
+        assertResultList(new String[] { " 'Dickens' " }, query("select author from books group by author"));
+        assertResultList(new String[] { " 'Dickens' ", " 'Dickens' " }, query("select author from books"));
+
+        if (!mayflyMissing()) {
+            return;
+        }
         assertResultSet(new String[] { " 'Dickens' " }, query("select author as dude from books group by dude"));
     }
     
@@ -28,6 +33,7 @@ public class GroupByTest extends SqlTestCase {
         // Some databases don't allow an expression, according to 
         // The Practical SQL Handbook; Using Structured Query Language, 2nd edition.
 
+        // TODO: Need assertResultListIgnoreOrder
         assertResultSet(new String[] { " 1747 ", " 1828 " }, 
             query("select birthdate + age from people group by birthdate + age"));
         assertResultSet(new String[] { " 1747 ", " 1828 " }, 
@@ -47,6 +53,7 @@ public class GroupByTest extends SqlTestCase {
         // Some databases don't allow something you aren't selecting for, according to 
         // The Practical SQL Handbook; Using Structured Query Language, 2nd edition.
 
+        // TODO: Need assertResultListIgnoreOrder
         assertResultSet(
             new String[] { " 'Other Title' ", " 'Practical SQL' " },
             query("select title from books group by author, title")
@@ -63,6 +70,7 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into books(author, title) values ('Bowman', 'Other Title')");
         execute("insert into books(author, title) values ('Gang Of Four', 'Design Patterns')");
         
+        // TODO: Need assertResultListIgnoreOrder
         assertResultSet(
             new String[] { " 'Bowman', 2 ", " 'Gang Of Four', 1 " },
             query("select author, count(title) from books group by author")
@@ -79,6 +87,7 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into books(author, title, edition) values ('Bowman', 'Practical SQL', 3)");
         execute("insert into books(author, title, edition) values ('Bowman', 'Other Title', 4)");
         
+        // TODO: Need assertResultListIgnoreOrder
         assertResultSet(
             new String[] {
                 " 'Bowman', 'Practical SQL', 2 ", 
