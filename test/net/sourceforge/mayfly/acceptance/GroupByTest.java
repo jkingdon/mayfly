@@ -13,7 +13,7 @@ public class GroupByTest extends SqlTestCase {
         if (!mayflyMissing()) {
             return;
         }
-        assertResultSet(new String[] { " 'Dickens' " }, query("select author as dude from books group by dude"));
+        assertResultList(new String[] { " 'Dickens' " }, query("select author as dude from books group by dude"));
     }
     
     public void testGroupByExpression() throws Exception {
@@ -28,9 +28,9 @@ public class GroupByTest extends SqlTestCase {
         // Some databases don't allow an expression, according to 
         // The Practical SQL Handbook; Using Structured Query Language, 2nd edition.
 
-        assertResultSet(new String[] { " 1747 " }, 
+        assertResultList(new String[] { " 1747 " }, 
             query("select birthdate + age from people group by birthdate + age"));
-        assertResultSet(new String[] { " 1747 " }, 
+        assertResultList(new String[] { " 1747 " }, 
             query("select birthdate + age as deathdate from people group by deathdate"));
     }
     
