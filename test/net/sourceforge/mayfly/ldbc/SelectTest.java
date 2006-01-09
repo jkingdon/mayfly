@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.ldbc;
 import junit.framework.*;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
@@ -88,9 +89,9 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromTable("foo")),
                 Where.EMPTY,
+                new GroupBy(),
                 new OrderBy()
-                    .add(new SingleColumn("a")),
-                Limit.NONE
+                    .add(new SingleColumn("a")), Limit.NONE
             ),
             Select.selectFromSql("select * from foo order by a")
         );

@@ -23,6 +23,10 @@ public class NullCell extends Cell {
         // JDBC seems to force this on us (null, "", or what?).
         return null;
     }
+    
+    public String displayName() {
+        return "null value";
+    }
 
     public Object asObject() {
         // What are we supposed to return here?

@@ -120,4 +120,16 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean canOrderByExpression() {
+        return false;
+    }
+
+    public boolean canGetValueViaExpressionName() {
+        return false;
+    }
+
+    public boolean allowCountDistinctStar() {
+        return false;
+    }
+
 }

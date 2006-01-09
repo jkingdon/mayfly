@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.evaluation.expression.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
@@ -39,12 +40,16 @@ public class Row extends Aggregate {
         return tuple.cellFor(findColumn(tableOrAlias, column));
     }
     
+    public Cell byPosition(int position) {
+        return tuple.cellFor(new PositionalHeader(position));
+    }
+
     public Column findColumn(String columnName) {
         return findColumn(null, columnName);
     }
 
     public Column findColumn(String tableOrAlias, String columnName) {
-        return Columns.findColumn(tableOrAlias, columnName, tuple.headers().iterator());
+        return tuple.headers().thatAreColumns().columnFromName(tableOrAlias, columnName);
     }
 
     public Columns columns() {

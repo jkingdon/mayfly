@@ -9,6 +9,7 @@ public class ResultTest extends SqlTestCase {
         execute("CREATE TABLE foo (a INTEGER)");
         ResultSet results = query("select a from foo");
         assertFalse(results.next());
+        results.close();
     }
 
     public void testSelectFromBadTable() throws Exception {
@@ -27,6 +28,7 @@ public class ResultTest extends SqlTestCase {
         assertTrue(results.next());
         assertEquals(5, results.getInt("a"));
         assertFalse(results.next());
+        results.close();
     }
     
     public void testAskResultSetForUnqueriedColumn() throws Exception {
@@ -40,6 +42,45 @@ public class ResultTest extends SqlTestCase {
         } catch (SQLException e) {
             assertMessage("no column b", e);
         }
+        results.close();
+    }
+    
+    public void testExpression() throws Exception {
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
+        ResultSet results = query("select a + 4 from foo");
+        assertTrue(results.next());
+        if (dialect.canGetValueViaExpressionName()) {
+            assertEquals(9, results.getInt("a + 4"));
+            try {
+                results.getInt("a+4");
+                fail();
+            } catch (SQLException e) {
+                assertMessage("no column a+4", e);
+            }
+        }
+        else {
+            try {
+                results.getInt("a + 4");
+                fail();
+            } catch (SQLException e) {
+                assertMessage("no column a + 4", e);
+            }
+        }
+        results.close();
+    }
+    
+    public void testAs() throws Exception {
+        if (!mayflyMissing()) {
+            return;
+        }
+
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
+        ResultSet results = query("select a + 4 as total from foo");
+        assertTrue(results.next());
+        assertEquals(9, results.getInt("total"));
+        results.close();
     }
     
     public void testTryToGetResultsBeforeCallingNext() throws Exception {
@@ -180,6 +221,41 @@ public class ResultTest extends SqlTestCase {
         assertResultList(new String[] { "'tricycle'", "'bicycle'", "'car'" },
             query("select name from vehicles order by speed")
         );
+    }
+    
+    public void testOrderByExpression() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo(a, b) values (5, 30)");
+        execute("insert into foo(a, b) values (8, 40)");
+        execute("insert into foo(a, b) values (3, 50)");
+        execute("insert into foo(a, b) values (4, 60)");
+        execute("insert into foo(a, b) values (2, 70)");
+
+        String expression = "select a from foo order by a + b";
+        // So here's the evil part: an integer is not an expression, it is a special case
+        String reference = "select a from foo order by 1, b";
+        String referenceDescending = "select a from foo order by 1 desc, b";
+        // But this one is an expression
+        String constantExpression = "select a from foo order by 1 + 0, b";
+
+        // This one isn't quite so strange; maybe this is worth supporting
+        String referenceToExpression = "select a + b from foo order by 1, b";
+
+        assertResultList(new String[] { "2", "3", "4", "5", "8" }, query(reference));
+        assertResultList(new String[] { "8", "5", "4", "3", "2" }, query(referenceDescending));
+        if (dialect.canOrderByExpression()) {
+            assertResultList(new String[] { "5", "8", "3", "4", "2" }, query(expression));
+            // Evil!  We can at the very least give an error on a constant expression, I hope
+            assertResultList(new String[] { "5", "8", "3", "4", "2" }, query(constantExpression));
+
+            assertResultList(new String[] { "35", "48", "53", "64", "72" }, query(referenceToExpression));
+        }
+        else {
+            expectQueryFailure(expression, "expected end of file but got PLUS");
+            expectQueryFailure(constantExpression, "expected end of file but got PLUS");
+            
+            expectQueryFailure(referenceToExpression, "ORDER BY 1 refers to an expression not a column");
+        }
     }
     
     public void testOrderByWithAlias() throws Exception {

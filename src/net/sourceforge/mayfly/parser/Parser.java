@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.parser;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.evaluation.*;
+import net.sourceforge.mayfly.evaluation.expression.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
@@ -133,14 +134,14 @@ public class Parser {
             where = Where.EMPTY;
         }
         
-        parseGroupBy();
+        GroupBy groupBy = parseGroupBy();
         
         OrderBy orderBy = parseOrderBy();
         
         Limit limit = parseLimit();
 
         expectAndConsume(SQLTokenTypes.EOF);
-        return new Select(what, from, where, orderBy, limit);
+        return new Select(what, from, where, groupBy, orderBy, limit);
     }
 
     public What parseWhat() {
@@ -173,10 +174,44 @@ public class Parser {
         return parseExpression();
     }
 
-    private WhatElement parseExpression() {
+    WhatElement parseExpression() {
+        WhatElement left = parseFactor();
+        while (currentTokenType() == SQLTokenTypes.MINUS
+            || currentTokenType() == SQLTokenTypes.PLUS
+            ) {
+            Token token = consume();
+            if (token.getType() == SQLTokenTypes.MINUS) {
+                left = new Minus(left, parseFactor());
+            }
+            else if (token.getType() == SQLTokenTypes.PLUS) {
+                left = new Plus(left, parseFactor());
+            }
+            else {
+                throw new MayflyInternalException("Didn't expect token " + describeToken(token));
+            }
+        }
+        return left;
+    }
+
+    private WhatElement parseFactor() {
         WhatElement left = parsePrimary();
-        if (consumeIfMatches(SQLTokenTypes.VERTBARS)) {
-            return new Concatenate(left, parseExpression());
+        while (currentTokenType() == SQLTokenTypes.VERTBARS
+            || currentTokenType() == SQLTokenTypes.DIVIDE
+            || currentTokenType() == SQLTokenTypes.ASTERISK
+            ) {
+            Token token = consume();
+            if (token.getType() == SQLTokenTypes.VERTBARS) {
+                left = new Concatenate(left, parsePrimary());
+            }
+            else if (token.getType() == SQLTokenTypes.DIVIDE) {
+                left = new Divide(left, parsePrimary());
+            }
+            else if (token.getType() == SQLTokenTypes.ASTERISK) {
+                left = new Multiply(left, parsePrimary());
+            }
+            else {
+                throw new MayflyInternalException("Didn't expect token " + describeToken(token));
+            }
         }
         return left;
     }
@@ -483,12 +518,28 @@ public class Parser {
     }
 
     private OrderItem parseOrderItem() {
-        SingleColumn column = parseColumnReference();
-        if (consumeIfMatches(SQLTokenTypes.LITERAL_asc)) {
-        } else if (consumeIfMatches(SQLTokenTypes.LITERAL_desc)) {
-            return new OrderItem(column, false);
+        if (currentTokenType() == SQLTokenTypes.NUMBER) {
+            int reference = consumeInteger();
+            boolean ascending = parseAscending();
+            return new ReferenceOrderItem(reference, ascending);
         }
-        return new OrderItem(column, true);
+        else {
+            SingleColumn column = parseColumnReference();
+            boolean ascending = parseAscending();
+            return new ColumnOrderItem(column, ascending);
+        }
+    }
+
+    private boolean parseAscending() {
+        if (consumeIfMatches(SQLTokenTypes.LITERAL_asc)) {
+            return true;
+        }
+        else if (consumeIfMatches(SQLTokenTypes.LITERAL_desc)) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     private Limit parseLimit() {
@@ -579,8 +630,18 @@ public class Parser {
                 describeToken(token)
             );
         }
-        tokens.remove(0);
-        return token;
+        return consume();
+    }
+
+    /**
+     * @internal
+     * Consume the current token.  This is a slightly dangerous operation,
+     * in the sense that it is easy to be careless about whether you are
+     * consuming the token type that you think.  So call {@link #expectAndConsume(int)}
+     * instead where feasible.
+     */
+    private Token consume() {
+        return (Token) tokens.remove(0);
     }
 
     private String describeExpectation(int expectedType) {

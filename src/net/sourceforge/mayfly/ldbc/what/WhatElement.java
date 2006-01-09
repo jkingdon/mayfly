@@ -48,4 +48,12 @@ abstract public class WhatElement extends ValueObject {
         return new What(result);
     }
 
+    public boolean matches(Column column) {
+        return false;
+    }
+
+    public Cell findValue(int zeroBasedColumn, Row row) {
+        return evaluate(row);
+    }
+
 }

@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.parser.*;
@@ -17,20 +18,22 @@ public class Select extends Command {
         return new Parser(sql).parseSelect();
     }
 
-    private What what;
-    private From from;
-    private Where where;
+    private final What what;
+    private final From from;
+    private final Where where;
+    private final GroupBy groupBy;
     private final OrderBy orderBy;
     private final Limit limit;
 
     public Select(What what, From from, Where where) {
-        this(what, from, where, new OrderBy(), Limit.NONE);
+        this(what, from, where, new GroupBy(), new OrderBy(), Limit.NONE);
     }
 
-    public Select(What what, From from, Where where, OrderBy orderBy, Limit limit) {
+    public Select(What what, From from, Where where, GroupBy groupBy, OrderBy orderBy, Limit limit) {
         this.what = what;
         this.from = from;
         this.where = where;
+        this.groupBy = groupBy;
         this.orderBy = orderBy;
         this.limit = limit;
     }
@@ -86,10 +89,10 @@ public class Select extends Command {
         }
 
         Rows afterWhere = (Rows) joinedRows.select(where);
-        if (selected.isAggregate()) {
-            return selected.aggregate(afterWhere);
-        }
-        Rows sorted = orderBy.sort(store, afterWhere);
+
+        Rows afterGrouping = groupBy.group(afterWhere, what, selected);
+
+        Rows sorted = orderBy.sort(store, afterGrouping, what);
         return limit.limit(sorted);
     }
 

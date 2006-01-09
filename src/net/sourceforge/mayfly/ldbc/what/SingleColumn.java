@@ -22,6 +22,10 @@ public class SingleColumn extends Expression {
         return row.cell(tableOrAlias, columnName);
     }
     
+    public Column lookup(Row row) {
+        return row.findColumn(tableOrAlias, columnName);
+    }
+
     public Cell aggregate(Rows rows) {
         throw new MayflyInternalException("shouldn't combine aggregate and column expressions");
     }
@@ -32,6 +36,10 @@ public class SingleColumn extends Expression {
 
     public String displayName() {
         return Column.displayName(tableOrAlias, columnName);
+    }
+
+    public boolean matches(Column column) {
+        return column.matches(tableOrAlias, columnName);
     }
 
 }

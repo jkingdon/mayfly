@@ -60,6 +60,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean canOrderByExpression() {
+        return true;
+    }
+    
     public boolean fromIsOptional() {
         return true;
     }
@@ -84,6 +88,10 @@ public class MySqlDialect extends Dialect {
     
     public boolean errorIfNotAggregateOrGrouped() {
         return false;
+    }
+    
+    public boolean canGetValueViaExpressionName() {
+        return true;
     }
 
 }

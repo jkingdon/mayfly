@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.parser;
 import junit.framework.*;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.evaluation.expression.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
@@ -237,6 +238,76 @@ public class ParserTest extends TestCase {
         Parser parser = new Parser("a || b");
         parser.parseWhatElement();
         assertEquals("", parser.remainingTokens());
+    }
+    
+    public void testExpressionPrecedence() throws Exception {
+        // What about concatenate?  It would seem like it can't be in the
+        // same expression, due to differing types...
+
+        Parser parser = new Parser("a * b + c / e - a");
+        WhatElement expression = parser.parseExpression();
+        assertEquals("", parser.remainingTokens());
+        assertEquals(
+            new Minus(
+                new Plus(
+                    new Multiply(new SingleColumn("a"), new SingleColumn("b")),
+                    new Divide(new SingleColumn("c"), new SingleColumn("e"))
+                ),
+                new SingleColumn("a")
+            ),
+            expression
+        );
+    }
+    
+    public void testDivideAssociativity() throws Exception {
+        Parser parser = new Parser("a / b * c / d");
+        WhatElement expression = parser.parseExpression();
+        assertEquals("", parser.remainingTokens());
+        assertEquals(
+            new Divide(
+                new Multiply(
+                    new Divide(new SingleColumn("a"), new SingleColumn("b")),
+                    new SingleColumn("c")
+                ),
+                new SingleColumn("d")
+            ),
+            expression
+        );
+    }
+
+    public void testMinusAssociativity() throws Exception {
+        Parser parser = new Parser("a-b-c+d");
+        WhatElement expression = parser.parseExpression();
+        assertEquals("", parser.remainingTokens());
+        assertEquals(
+            new Plus(
+                new Minus(
+                    new Minus(new SingleColumn("a"), new SingleColumn("b")),
+                    new SingleColumn("c")
+                ),
+                new SingleColumn("d")
+            ),
+            expression
+        );
+    }
+
+    public void testConcatenateAssociativity() throws Exception {
+        // Not sure it matters if concatenate associates right-to-left or left-to-right.
+        // But we'll pick the same as the other operators...
+
+        Parser parser = new Parser("a || b || c || d");
+        WhatElement expression = parser.parseExpression();
+        assertEquals("", parser.remainingTokens());
+        assertEquals(
+            new Concatenate(
+                new Concatenate(
+                    new Concatenate(new SingleColumn("a"), new SingleColumn("b")),
+                    new SingleColumn("c")
+                ),
+                new SingleColumn("d")
+            ),
+            expression
+        );
     }
 
     public void testAliasOmitted() throws Exception {

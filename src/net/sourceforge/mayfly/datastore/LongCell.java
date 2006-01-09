@@ -24,6 +24,10 @@ public class LongCell extends Cell {
     public String asString() {
         return String.valueOf(value);
     }
+    
+    public String displayName() {
+        return "number " + asString();
+    }
 
     public int compareTo(Cell otherCell) {
         return new Long(value).compareTo(new Long(((LongCell) otherCell).value));

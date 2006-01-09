@@ -17,9 +17,28 @@ public class AggregateTest extends SqlTestCase {
         assertResultSet(new String[] { " 14 " }, query("select sum(x) from foo"));
         assertResultSet(new String[] { " 7 " }, query("select avg(x) from foo"));
     }
+    
+    public void testSelectingResults() throws Exception {
+        execute("create table foo (x integer, y integer)");
+        execute("create table bar (x integer, z integer)");
+        execute("insert into foo(x, y) values (5, 10)");
+        execute("insert into foo(x, y) values (9, 20)");
+        execute("insert into bar(x, z) values (9, 100)");
+        execute("insert into bar(x, z) values (9, 200)");
+        
+        // Just to make it clear what this looks like before aggregation:
+        assertResultSet(new String[] { "9, 9, 20, 100 ", "9, 9, 20, 200" },
+            query("select foo.x, bar.x, y, z from foo inner join bar on foo.x = bar.x")
+        );
+        // And the real test:
+        assertResultSet(new String[] { " 200, 2, 40" }, 
+            query("select max(z), count(foo.x), sum(y) from foo inner join bar on foo.x = bar.x")
+        );
+    }
 
     public void testColumnAndAggregate() throws Exception {
         execute("create table foo (x integer)");
+        // TODO: having a row should not be needed
         execute("insert into foo (x) values (5)");
         
         expectQueryFailure("select x, max(x) from foo", "x is a column but max(x) is an aggregate");
@@ -27,6 +46,21 @@ public class AggregateTest extends SqlTestCase {
         expectQueryFailure("select '#' || x , MAX(X) from foo", "x is a column but MAX(X) is an aggregate");
         expectQueryFailure("select max(x) || 'L', x from foo", "x is a column but max(x) is an aggregate");
         expectQueryFailure("select '#' || max(x) , x from foo", "x is a column but max(x) is an aggregate");
+        expectQueryFailure("select foo.*, min(x) from foo", "foo.x is a column but min(x) is an aggregate");
+    }
+    
+    public void testColumnOperatorAggregate() throws Exception {
+        execute("create table foo (x integer)");
+        // TODO: having a row should not be needed
+        //execute("insert into foo (x) values (5)");
+
+        String sql = "select x + min(x) from foo";
+        if (dialect.expectMayflyBehavior()) {
+            expectQueryFailure(sql, "x is a column but min(x) is an aggregate");
+        }
+        else {
+            assertResultSet(new String[] { " null " }, query(sql));
+        }
     }
     
     public void testColumnAndCountAll() throws Exception {
@@ -111,6 +145,14 @@ public class AggregateTest extends SqlTestCase {
         
         assertResultSet(new String[] { " 3 " }, query("select count(all x) from foo"));
         assertResultSet(new String[] { " 2 " }, query("select count(distinct x) from foo"));
+
+        String distinctStar = "select count(distinct *) from foo";
+        if (dialect.allowCountDistinctStar()) {
+            assertResultSet(new String[] { " 3 " }, query(distinctStar));
+        }
+        else {
+            expectQueryFailure(distinctStar, "expected primary but got ASTERISK");
+        }
     }
 
     public void testAll() throws Exception {
@@ -160,5 +202,33 @@ public class AggregateTest extends SqlTestCase {
         expectQueryFailure("select min(*) from foo", "expected primary but got ASTERISK");
         expectQueryFailure("select max(*) from foo", "expected primary but got ASTERISK");
     }
+
+    public void testStrings() throws Exception {
+        execute("create table foo (x varchar(255), y varchar(255))");
+        execute("insert into foo (x, y) values ('one', 'a')");
+        execute("insert into foo (x, y) values ('one', 'b')");
+        execute("insert into foo (x, y) values ('two', 'a')");
+        
+        assertResultSet(new String[] { " 3 " }, query("select count(*) from foo"));
+        assertResultSet(new String[] { " 3 " }, query("select count(x) from foo"));
+        assertResultSet(new String[] { " 2 " }, query("select count(distinct x) from foo"));
+
+        String sqlForMinimum = "select min(x) from foo";
+        if (mayflyMissing()) {
+            // is this indeed doing a string sort?
+            assertResultSet(new String[] { " 'one' " }, query(sqlForMinimum));
+        }
+        else {
+            expectQueryFailure(sqlForMinimum, "attempt to apply min(x) to string 'one'");
+            expectQueryFailure("select max(x) from foo", "attempt to apply max(x) to string 'one'");
+
+            // what about these? Do the databases coerce the string to a number or something?
+            expectQueryFailure("select sum(x) from foo", "attempt to apply sum(x) to string 'one'");
+            expectQueryFailure("select avg(x) from foo", "attempt to apply avg(x) to string 'one'");
+        }
+    }
+    
+    // TODO: String case with no non-null values:
+    // Should still get the errors based on the column type....
 
 }

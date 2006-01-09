@@ -4,6 +4,7 @@ import java.util.*;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -12,7 +13,7 @@ public class OrderBy extends Aggregate {
     private List elements = new ArrayList();
 
     public OrderBy add(SingleColumn column) {
-        return add(new OrderItem(column, true));
+        return add(new ColumnOrderItem(column, true));
     }
 
     public OrderBy add(OrderItem item) {
@@ -28,7 +29,7 @@ public class OrderBy extends Aggregate {
         return elements.iterator();
     }
 
-    public Rows sort(final DataStore store, Rows rows) {
+    public Rows sort(final DataStore store, Rows rows, final What what) {
         if (isEmpty()) {
             return rows;
         }
@@ -41,7 +42,7 @@ public class OrderBy extends Aggregate {
                 Row second = (Row) o2;
                 for (Iterator iter = elements.iterator(); iter.hasNext();) {
                     OrderItem item = (OrderItem) iter.next();
-                    int comparison = item.compareRows(first, second);
+                    int comparison = item.compareRows(what, first, second);
                     if (comparison != 0) {
                         return comparison;
                     }

@@ -2,6 +2,8 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.*;
 
+import org.apache.commons.lang.*;
+
 public class StringCell extends Cell {
 
     private final String content;
@@ -20,6 +22,10 @@ public class StringCell extends Cell {
 
     public String asString() {
         return content;
+    }
+    
+    public String displayName() {
+        return "string '" + StringEscapeUtils.escapeSql(content) + "'";
     }
 
     public Object asObject() {

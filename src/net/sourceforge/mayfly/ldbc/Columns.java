@@ -70,23 +70,12 @@ public class Columns extends Aggregate {
     }
 
     public Column columnFromName(String columnName) {
-        return findColumn(null, columnName, columns.iterator());
+        return columnFromName(null, columnName);
     }
 
-    public void checkForDuplicates() {
-        Set names = new HashSet();
-        for (Iterator iter = iterator(); iter.hasNext();) {
-            Column column = (Column) iter.next();
-            if (!names.add(column.columnName().toLowerCase())) {
-                throw new MayflyException("duplicate column " + column.columnName());
-            }
-        }
-    }
-
-
-    public static Column findColumn(String tableOrAlias, String columnName, Iterator columnIterator) {
+    public Column columnFromName(String tableOrAlias, String columnName) {
         Column found = null;
-        for (Iterator iter = columnIterator; iter.hasNext(); ) {
+        for (Iterator iter = columns.iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
             if (column.matches(tableOrAlias, columnName)) {
                 if (found != null) {
@@ -100,6 +89,16 @@ public class Columns extends Aggregate {
             throw new MayflyException("no column " + Column.displayName(tableOrAlias, columnName));
         } else {
             return found;
+        }
+    }
+
+    public void checkForDuplicates() {
+        Set names = new HashSet();
+        for (Iterator iter = iterator(); iter.hasNext();) {
+            Column column = (Column) iter.next();
+            if (!names.add(column.columnName().toLowerCase())) {
+                throw new MayflyException("duplicate column " + column.columnName());
+            }
         }
     }
 

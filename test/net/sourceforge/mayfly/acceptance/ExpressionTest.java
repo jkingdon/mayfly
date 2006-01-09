@@ -28,14 +28,30 @@ public class ExpressionTest extends SqlTestCase {
     }
     
     public void testConcat() throws Exception {
-        if (!dialect.verticalBarsMeanConcatenation()) {
-            return;
-        }
-
         execute("create table names (first varchar(255), last varchar(255))");
         execute("insert into names(first, last) values ('John', 'Jones')");
-        ResultSet results = query("select first || ' ' || last from names");
+        ResultSet results;
+        if (dialect.verticalBarsMeanConcatenation()) {
+            results = query("select first || ' ' || last from names");
+        } else {
+            results = query("select concat(first, ' ', last) from names");
+        }
         assertResultSet(new String[] { "'John Jones'" }, results);
+    }
+
+    public void testPlus() throws Exception {
+        execute("create table names (birthyear integer, age integer)");
+        execute("insert into names(birthyear, age) values (1706, 50)");
+        ResultSet results = query("select birthyear + age from names");
+        assertResultSet(new String[] { " 1756 " }, results);
+    }
+
+    public void testMath() throws Exception {
+        execute("create table foo (a integer, b integer, c integer)");
+        execute("insert into foo(a, b, c) values (4, 5, 6)");
+        execute("insert into foo(a, b, c) values (1, 2, 9)");
+        ResultSet results = query("select 2 * a + c / 3 - 1 from foo");
+        assertResultSet(new String[] { " 9 ", " 4 " }, results);
     }
 
 }

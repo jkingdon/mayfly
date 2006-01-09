@@ -36,5 +36,12 @@ public class CellTest extends TestCase {
             assertTrue("expected >0 but was " + comparison, comparison > 0);
         }
     }
+    
+    public void testDisplayName() throws Exception {
+        assertEquals("string 'foo'", new StringCell("foo").displayName());
+        assertEquals("string 'don''t'", new StringCell("don't").displayName());
+        assertEquals("number -5", new LongCell(-5).displayName());
+        assertEquals("null value", NullCell.INSTANCE.displayName());
+    }
 
 }

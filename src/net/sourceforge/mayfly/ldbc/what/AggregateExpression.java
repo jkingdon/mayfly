@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.ldbc.what;
 
+import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
@@ -22,13 +23,25 @@ public abstract class AggregateExpression extends Expression {
         /** This is just for checking; aggregation happens in {@link #aggregate(Rows)}. */
         return column.evaluate(row);
     }
+    
+    public Cell findValue(int zeroBasedColumn, Row row) {
+        return row.byPosition(zeroBasedColumn);
+    }
 
     public String firstAggregate() {
+        return displayName();
+    }
+
+    public String displayName() {
         return functionName + "(" + column.displayName() + ")";
     }
 
     public Cell aggregate(Rows rows) {
         Collection values = findValues(rows);
+        
+        if (!values.isEmpty() && values.iterator().next() instanceof Cell) {
+            return aggregateNonNumeric(values);
+        }
 
         long min = Long.MAX_VALUE;
         long max = Long.MIN_VALUE;
@@ -58,6 +71,11 @@ public abstract class AggregateExpression extends Expression {
         }
     }
 
+    protected Cell aggregateNonNumeric(Collection values) {
+        Cell first = (Cell) values.iterator().next();
+        throw new MayflyException("attempt to apply " + displayName() + " to " + first.displayName());
+    }
+
     private Collection findValues(Rows rows) {
         Collection values;
         if (distinct) {
@@ -70,8 +88,13 @@ public abstract class AggregateExpression extends Expression {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             Cell cell = evaluate(row);
-            if (!(cell instanceof NullCell)) {
+            if (cell instanceof NullCell) {
+            }
+            else if (cell instanceof LongCell) {
                 values.add(new Long(cell.asLong()));
+            }
+            else {
+                values.add(cell);
             }
         }
         return values;

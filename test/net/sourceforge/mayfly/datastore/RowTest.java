@@ -3,6 +3,8 @@ package net.sourceforge.mayfly.datastore;
 import junit.framework.*;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.evaluation.expression.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 
 public class RowTest extends TestCase {
 
@@ -78,6 +80,42 @@ public class RowTest extends TestCase {
         );
 
         assertEquals(expected, row1.plus(row2));
+    }
+    
+    public void testByPosition() throws Exception {
+        Row row = new Row(
+            new TupleBuilder()
+                .append(new Column("x"), new LongCell(5))
+                .append(new PositionalHeader(43), new StringCell("hi"))
+                .append(new Column("y"), new StringCell("Chicago"))
+                .append(new PositionalHeader(7), new LongCell(77))
+        );
+        
+        assertEquals(new StringCell("hi"), row.byPosition(43));
+        assertEquals(new LongCell(77), row.byPosition(7));
+        try {
+            row.byPosition(3);
+            fail();
+        } catch (MayflyException e) {
+            // Would be nice if this was a MayflyInternalException, but I guess
+            // it isn't really important.
+            assertEquals("positional header #3 not found", e.getMessage());
+        }
+    }
+    
+    public void testFindColumn() throws Exception {
+        Row row = new Row(
+            new TupleBuilder()
+                .append(new Column("x"), new LongCell(5))
+                .append(new PositionalHeader(43), new StringCell("hi"))
+                .append(new Column("foo", "z"), new StringCell("Chicago"))
+                .append(new Column("bar", "z"), new StringCell("Chicago"))
+                .append(new Column("y"), new StringCell("Chicago"))
+                .append(new PositionalHeader(7), new LongCell(77))
+        );
+        
+        assertEquals(new Column("y"), row.findColumn("y"));
+        assertEquals(new Column("bar", "z"), row.findColumn("bar", "z"));
     }
 
 }

@@ -12,6 +12,10 @@ public class TupleBuilder {
         return this;
     }
 
+    public TupleBuilder append(CellHeader column, Cell cell) {
+        return append(new TupleElement(column, cell));
+    }
+    
     public TupleBuilder appendAll(Tuple elementsToAdd) {
         elements.addAll(elementsToAdd);
         return this;
@@ -23,7 +27,7 @@ public class TupleBuilder {
     }
 
     public TupleBuilder appendColumnCell(String tableName, String columnName, Cell cell) {
-        return append(new TupleElement(new Column(tableName, columnName), cell));
+        return append(new Column(tableName, columnName), cell);
     }
 
     public TupleBuilder appendColumnCellContents(String columnName, Object cellValue) {
@@ -32,9 +36,9 @@ public class TupleBuilder {
     }
 
     public TupleBuilder appendColumnCell(String columnName, Cell cell) {
-        return append(new TupleElement(new Column(columnName), cell));
+        return append(new Column(columnName), cell);
     }
-    
+
     public Tuple asTuple() {
         return new Tuple(elements.asImmutable());
     }

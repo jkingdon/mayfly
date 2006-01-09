@@ -38,8 +38,17 @@ public class HypersonicDialect extends Dialect {
         return true;
     }
     
+    public boolean canOrderByExpression() {
+        return true;
+    }
+    
     public boolean aggregateAsteriskIsForCountOnly() {
         return false;
+    }
+    
+    public boolean allowCountDistinctStar() {
+        // What count(distinct *) means I don't really know.
+        return true;
     }
 
 }

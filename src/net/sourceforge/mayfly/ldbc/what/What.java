@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.expression.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.util.*;
@@ -11,19 +12,13 @@ import java.util.*;
 public class What extends Aggregate {
 
     private List elements;
-    private final boolean isAggregate;
 
     public What() {
         this(new ArrayList());
     }
 
     public What(List elements) {
-        this(elements, false);
-    }
-
-    public What(List elements, boolean isAggregate) {
         this.elements = elements;
-        this.isAggregate = isAggregate;
     }
 
 
@@ -41,25 +36,12 @@ public class What extends Aggregate {
     }
 
     public What selected(Row dummyRow) {
-        String firstColumn = null;
-        String firstAggregate = null;
-
         L result = new L();
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             WhatElement element = (WhatElement) iter.next();
-            if (firstColumn == null) {
-                firstColumn = element.firstColumn();
-            }
-            if (firstAggregate == null) {
-                firstAggregate = element.firstAggregate();
-            }
-            
-            if (firstColumn != null && firstAggregate != null) {
-                throw new MayflyException(firstColumn + " is a column but " + firstAggregate + " is an aggregate");
-            }
             result.addAll(element.selected(dummyRow));
         }
-        return new What(result, firstAggregate != null);
+        return new What(result);
     }
 
     public int parameterCount() {
@@ -86,23 +68,14 @@ public class What extends Aggregate {
             throw new MayflyException("no column " + oneBasedColumn);
         }
         WhatElement element = (WhatElement) elements.get(zeroBasedColumn);
-        if (isAggregate) {
-            TupleElement tupleElement = (TupleElement) row.element(zeroBasedColumn);
-            return tupleElement.cell();
-        }
-        return element.evaluate(row);
-    }
-
-    public boolean isAggregate() {
-        return isAggregate;
+        return element.findValue(zeroBasedColumn, row);
     }
 
     public Rows aggregate(Rows rows) {
         TupleBuilder builder = new TupleBuilder();
-        Iterator iter = elements.iterator();
-        while (iter.hasNext()) {
-            WhatElement element = (WhatElement) iter.next();
-            builder.append(new TupleElement(new CellHeader() { }, element.aggregate(rows)));
+        for (int i = 0; i < elements.size(); ++i) {
+            WhatElement element = (WhatElement) elements.get(i);
+            builder.append(new PositionalHeader(i), element.aggregate(rows));
         }
         Row resultRow = new Row(builder);
         return new Rows(resultRow);
