@@ -1,7 +1,6 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
 

@@ -1,8 +1,9 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.evaluation.expression;
 
 import java.util.*;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 
 public class Count extends AggregateExpression {
 
@@ -10,7 +11,7 @@ public class Count extends AggregateExpression {
         super(column, functionName, distinct);
     }
 
-    protected Cell pickOne(Cell min, Cell max, Cell count, Cell sum, Cell average) {
+    protected Cell pickOne(Cell minimum, Cell maximum, Cell count, Cell sum, Cell average) {
         return count;
     }
     

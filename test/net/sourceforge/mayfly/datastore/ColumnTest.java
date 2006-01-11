@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.datastore;
 
 import junit.framework.*;
 

@@ -343,11 +343,11 @@ public class Parser {
             throw new MayflyException("To check for null, use IS NULL or IS NOT NULL, not a null literal");
         }
         else if (argumentParser.parse(SQLTokenTypes.LITERAL_max, false)) {
-            return new Max(
+            return new Maximum(
                 (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
         else if (argumentParser.parse(SQLTokenTypes.LITERAL_min, false)) {
-            return new Min(
+            return new Minimum(
                 (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
         else if (argumentParser.parse(SQLTokenTypes.LITERAL_sum, false)) {

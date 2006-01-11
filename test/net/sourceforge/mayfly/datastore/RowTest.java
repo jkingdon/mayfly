@@ -4,7 +4,6 @@ import junit.framework.*;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.evaluation.expression.*;
-import net.sourceforge.mayfly.ldbc.what.*;
 
 public class RowTest extends TestCase {
 

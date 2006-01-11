@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
 
 public class TupleBuilder {

@@ -100,6 +100,6 @@ public abstract class AggregateExpression extends Expression {
         return values;
     }
 
-    abstract protected Cell pickOne(Cell min, Cell max, Cell count, Cell sum, Cell average);
+    abstract protected Cell pickOne(Cell minimum, Cell maximum, Cell count, Cell sum, Cell average);
     
 }

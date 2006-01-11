@@ -3,12 +3,13 @@ package net.sourceforge.mayfly.ldbc;
 import junit.framework.*;
 
 import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
 
 public class ColumnsTest extends TestCase {
+
     public void testFromColumnNames() throws Exception {
         assertEquals(
             new Columns(
@@ -62,8 +63,6 @@ public class ColumnsTest extends TestCase {
         }
         
         assertEquals(new Column("d"), columns.columnFromName("d"));
-
     }
-
 
 }

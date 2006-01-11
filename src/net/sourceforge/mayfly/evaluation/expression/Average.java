@@ -1,6 +1,7 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 
 public class Average extends AggregateExpression {
 
@@ -8,7 +9,7 @@ public class Average extends AggregateExpression {
         super(column, functionName, distinct);
     }
 
-    protected Cell pickOne(Cell min, Cell max, Cell count, Cell sum, Cell average) {
+    protected Cell pickOne(Cell minimum, Cell maximum, Cell count, Cell sum, Cell average) {
         return average;
     }
 

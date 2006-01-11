@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
 import junit.framework.*;
-import net.sourceforge.mayfly.ldbc.what.*;
 
 public class TupleTest extends TestCase {
 

@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.dump;
 
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
 
 import java.io.*;
 import java.util.*;
