@@ -134,7 +134,7 @@ public class Parser {
             where = Where.EMPTY;
         }
         
-        GroupBy groupBy = parseGroupBy();
+        Aggregator groupBy = parseGroupBy();
         
         OrderBy orderBy = parseOrderBy();
         
@@ -479,7 +479,7 @@ public class Parser {
         }
     }
 
-    private GroupBy parseGroupBy() {
+    private Aggregator parseGroupBy() {
         if (consumeIfMatches(SQLTokenTypes.LITERAL_group)) {
             expectAndConsume(SQLTokenTypes.LITERAL_by);
             
@@ -492,7 +492,7 @@ public class Parser {
             return groupBy;
         }
         else {
-            return new GroupBy();
+            return new NoGroupBy();
         }
     }
 

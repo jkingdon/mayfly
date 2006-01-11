@@ -21,15 +21,15 @@ public class Select extends Command {
     private final What what;
     private final From from;
     private final Where where;
-    private final GroupBy groupBy;
+    private final Aggregator groupBy;
     private final OrderBy orderBy;
     private final Limit limit;
 
     public Select(What what, From from, Where where) {
-        this(what, from, where, new GroupBy(), new OrderBy(), Limit.NONE);
+        this(what, from, where, new NoGroupBy(), new OrderBy(), Limit.NONE);
     }
 
-    public Select(What what, From from, Where where, GroupBy groupBy, OrderBy orderBy, Limit limit) {
+    public Select(What what, From from, Where where, Aggregator groupBy, OrderBy orderBy, Limit limit) {
         this.what = what;
         this.from = from;
         this.where = where;

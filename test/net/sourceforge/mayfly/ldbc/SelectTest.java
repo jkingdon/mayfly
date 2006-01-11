@@ -89,7 +89,7 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromTable("foo")),
                 Where.EMPTY,
-                new GroupBy(),
+                new NoGroupBy(),
                 new OrderBy()
                     .add(new SingleColumn("a")), Limit.NONE
             ),
