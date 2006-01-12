@@ -37,6 +37,8 @@ abstract public class WhatElement extends ValueObject {
     public String firstColumn() {
         return null;
     }
+    
+    abstract public String displayName();
 
     protected What selectedFromColumns(Columns columns) {
         L result = new L();

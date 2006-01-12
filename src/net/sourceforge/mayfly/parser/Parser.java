@@ -366,6 +366,11 @@ public class Parser {
                     (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
             }
         }
+        else if (consumeIfMatches(SQLTokenTypes.OPEN_PAREN)) {
+            WhatElement expression = parseExpression();
+            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+            return expression;
+        }
         else {
             throw new ParserException("expected primary but got " + describeToken(currentToken()));
         }

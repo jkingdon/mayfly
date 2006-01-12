@@ -47,6 +47,7 @@ public class AggregateTest extends SqlTestCase {
         expectQueryFailure("select max(x) || 'L', x from foo", "x is a column but max(x) is an aggregate");
         expectQueryFailure("select '#' || max(x) , x from foo", "x is a column but max(x) is an aggregate");
         expectQueryFailure("select foo.*, min(x) from foo", "foo.x is a column but min(x) is an aggregate");
+        expectQueryFailure("select x, max(distinct x) from foo", "x is a column but max(distinct x) is an aggregate");
     }
     
     public void testColumnOperatorAggregate() throws Exception {

@@ -309,6 +309,19 @@ public class ParserTest extends TestCase {
             expression
         );
     }
+    
+    public void testParenthesesInExpression() throws Exception {
+        Parser parser = new Parser("x / (y * z)");
+        WhatElement expression = parser.parseExpression();
+        assertEquals("", parser.remainingTokens());
+        assertEquals(
+            new Divide(
+                new SingleColumn("x"),
+                new Multiply(new SingleColumn("y"), new SingleColumn("z"))
+            ),
+            expression
+        );
+    }
 
     public void testAliasOmitted() throws Exception {
         Parser parser = new Parser("select name from foo");

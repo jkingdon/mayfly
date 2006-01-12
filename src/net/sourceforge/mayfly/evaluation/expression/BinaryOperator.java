@@ -54,5 +54,10 @@ abstract public class BinaryOperator extends Expression {
         return right.firstAggregate();
     }
 
-
+    public String displayName() {
+        // Hard to get precedence and associativity right.
+        // And we probably want to show the users's whitespace anyway(?).
+        return "expression";
+    }
+    
 }

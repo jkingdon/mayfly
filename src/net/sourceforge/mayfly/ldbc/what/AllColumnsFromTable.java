@@ -27,5 +27,9 @@ public class AllColumnsFromTable extends WhatElement {
     public Cell aggregate(Rows rows) {
         throw new MayflyInternalException("should have converted this to SingleColumn objects by now");
     }
+    
+    public String displayName() {
+        return aliasOrTable + ".*";
+    }
 
 }

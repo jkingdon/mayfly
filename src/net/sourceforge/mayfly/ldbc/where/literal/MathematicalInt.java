@@ -22,5 +22,9 @@ public class MathematicalInt extends Literal {
     public Object valueForCellContentComparison() {
         return new Long(value);
     }
+    
+    public String displayName() {
+        return "" + value;
+    }
 
 }

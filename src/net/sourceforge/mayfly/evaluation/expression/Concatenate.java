@@ -1,7 +1,7 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.evaluation.expression.*;
+import net.sourceforge.mayfly.ldbc.what.*;
 
 public class Concatenate extends BinaryOperator {
 

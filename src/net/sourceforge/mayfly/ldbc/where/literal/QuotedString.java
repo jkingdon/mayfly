@@ -26,5 +26,9 @@ public class QuotedString extends Literal {
     protected Cell valueAsCell() {
         return new StringCell(stringWithoutQuotes());
     }
+    
+    public String displayName() {
+        return stringInQuotes;
+    }
 
 }

@@ -33,7 +33,7 @@ public abstract class AggregateExpression extends Expression {
     }
 
     public String displayName() {
-        return functionName + "(" + column.displayName() + ")";
+        return functionName + "(" + (distinct ? "distinct " : "") + column.displayName() + ")";
     }
 
     public Cell aggregate(Rows rows) {

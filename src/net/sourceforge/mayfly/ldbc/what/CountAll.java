@@ -22,6 +22,10 @@ public class CountAll extends Expression {
     }
 
     public String firstAggregate() {
+        return displayName();
+    }
+
+    public String displayName() {
         return functionName + "(*)";
     }
 

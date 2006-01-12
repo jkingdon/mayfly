@@ -85,10 +85,6 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testSelectSomethingNotGrouped() throws Exception {
-        if (!mayflyMissing()) {
-            return;
-        }
-
         execute("create table books (author varchar(255), title varchar(255))");
         execute("insert into books(author, title) values ('Bowman', 'Practical SQL')");
         execute("insert into books(author, title) values ('Bowman', 'Other Title')");

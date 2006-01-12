@@ -63,9 +63,7 @@ public class GroupedRows {
                 builder.append(new PositionalHeader(i), aggregated);
             }
             else {
-                // This message needs to identify which WhatElement caused
-                // the problem, and in general be better worded than this.
-                throw new MayflyException("not the key or an aggregate");
+                throw new MayflyException(element.displayName() + " is not aggregate or mentioned in GROUP BY");
             }
         }
         Row row = new Row(builder);

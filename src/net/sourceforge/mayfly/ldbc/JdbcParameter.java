@@ -18,5 +18,9 @@ public class JdbcParameter extends WhatElement {
     public Cell aggregate(Rows rows) {
         throw new MayflyInternalException("should have substituted jdbc parameters by now");
     }
+    
+    public String displayName() {
+        return "?";
+    }
 
 }

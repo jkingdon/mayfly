@@ -21,5 +21,9 @@ public class All extends WhatElement {
     public Cell aggregate(Rows rows) {
         throw new MayflyInternalException("should have converted this to SingleColumn objects by now");
     }
+    
+    public String displayName() {
+        return "*";
+    }
 
 }

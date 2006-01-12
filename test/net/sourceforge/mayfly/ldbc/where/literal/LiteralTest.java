@@ -23,6 +23,10 @@ public class LiteralTest extends TestCase {
             return new StringCell("foo");
         }
 
+        public String displayName() {
+            throw new UnimplementedException();
+        }
+
     }
 
 }
