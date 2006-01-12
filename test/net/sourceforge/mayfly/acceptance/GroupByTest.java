@@ -35,10 +35,6 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testGroupByNotInSelectList() throws Exception {
-        if (!mayflyMissing()) {
-            return;
-        }
-
         execute("create table books (author varchar(255), title varchar(255), edition integer)");
         execute("insert into books(author, title, edition) values ('Bowman', 'Practical SQL', 2)");
         execute("insert into books(author, title, edition) values ('Bowman', 'Practical SQL', 3)");
@@ -66,10 +62,6 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testMultipleGroupBy() throws Exception {
-        if (!mayflyMissing()) {
-            return;
-        }
-
         execute("create table books (author varchar(255), title varchar(255), edition integer)");
         execute("insert into books(author, title, edition) values ('Bowman', 'Practical SQL', 2)");
         execute("insert into books(author, title, edition) values ('Bowman', 'Practical SQL', 3)");

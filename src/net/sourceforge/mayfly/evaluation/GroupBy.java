@@ -16,26 +16,32 @@ public class GroupBy extends ValueObject implements Aggregator {
     }
 
     public GroupedRows makeGroupedRows(Rows rows) {
-        SingleColumn column = oneColumn();
+        List columns = findColumns(rows);
 
         GroupedRows grouped = new GroupedRows();
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
-            Column foundColumn = column.lookup(row);
-            Cell key = column.evaluate(row);
-            grouped.add(foundColumn, key, row);
+            grouped.add(columns, row);
         }
         return grouped;
     }
 
-    private SingleColumn oneColumn() {
-        if (items.size() != 1) {
-            throw new IllegalStateException("Expected one group by item but got " + items.size());
+    private List findColumns(Rows rows) {
+        if (rows.size() > 0) {
+            Row sampleRow = (Row) rows.iterator().next();
+
+            List columns = new ArrayList();
+            for (Iterator iter = items.iterator(); iter.hasNext();) {
+                GroupItem item = (GroupItem) iter.next();
+                columns.add(item.column().lookup(sampleRow));
+            }
+            return columns;
         }
-        GroupItem groupItem = (GroupItem) items.get(0);
-        return groupItem.column();
+        else {
+            return null;
+        }
     }
-    
+
     public Rows group(Rows rows, What what, What selected) {
         return makeGroupedRows(rows).ungroup(what);
     }
