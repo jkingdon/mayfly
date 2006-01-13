@@ -21,5 +21,9 @@ public class Not extends BooleanExpression {
     public void substitute(Iterator jdbcParameters) {
         operand.substitute(jdbcParameters);
     }
+    
+    public String firstAggregate() {
+        return operand.firstAggregate();
+    }
 
 }

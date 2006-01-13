@@ -56,6 +56,10 @@ public class Select extends Command {
         }
 
         new Rows(dummyRow).select(where);
+        String firstAggregate = where.firstAggregate();
+        if (firstAggregate != null) {
+            throw new MayflyException("aggregate " + firstAggregate + " not valid in WHERE");
+        }
         groupBy.check(dummyRow, what, selected);
 
         orderBy.check(dummyRow);

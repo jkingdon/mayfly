@@ -23,5 +23,9 @@ public class And extends BooleanExpression {
         leftSide.substitute(jdbcParameters);
         rightSide.substitute(jdbcParameters);
     }
+    
+    public String firstAggregate() {
+        return firstAggregate(leftSide, rightSide);
+    }
 
 }

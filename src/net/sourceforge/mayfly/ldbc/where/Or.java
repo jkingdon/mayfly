@@ -25,4 +25,8 @@ public class Or extends BooleanExpression {
         rightSide.substitute(jdbcParameters);
     }
 
+    public String firstAggregate() {
+        return firstAggregate(leftSide, rightSide);
+    }
+
 }

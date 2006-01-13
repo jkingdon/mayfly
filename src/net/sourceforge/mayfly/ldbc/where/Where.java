@@ -24,5 +24,8 @@ public class Where extends BooleanExpression {
         expression.substitute(jdbcParameters);
     }
 
+    public String firstAggregate() {
+        return expression.firstAggregate();
+    }
 
 }

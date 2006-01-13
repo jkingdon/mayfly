@@ -43,5 +43,22 @@ public class In extends BooleanExpression {
             expressions.set(i, substitute((WhatElement) expressions.get(i), jdbcParameters));
         }
     }
+    
+    public String firstAggregate() {
+        String firstInLeft = leftSide.firstAggregate();
+        if (firstInLeft != null) {
+            return firstInLeft;
+        }
+
+        for (int i = 0; i < expressions.size(); ++i) {
+            WhatElement element = (WhatElement) expressions.get(i);
+            String first = element.firstAggregate();
+            if (first != null) {
+                return first;
+            }
+        }
+        
+        return null;
+    }
 
 }

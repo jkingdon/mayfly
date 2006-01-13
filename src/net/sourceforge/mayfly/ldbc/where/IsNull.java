@@ -26,5 +26,9 @@ public class IsNull extends BooleanExpression {
 
     public void substitute(Iterator jdbcParameters) {
     }
+    
+    public String firstAggregate() {
+        return expression.firstAggregate();
+    }
 
 }

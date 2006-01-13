@@ -47,11 +47,7 @@ abstract public class BinaryOperator extends Expression {
     }
 
     public String firstAggregate() {
-        String firstInLeft = left.firstAggregate();
-        if (firstInLeft != null) {
-            return firstInLeft;
-        }
-        return right.firstAggregate();
+        return WhatElement.firstAggregate(left, right);
     }
 
     public String displayName() {

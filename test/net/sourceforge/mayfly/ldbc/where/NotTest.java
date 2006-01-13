@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc.where;
 
 import junit.framework.*;
 
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.parser.*;
@@ -16,8 +17,14 @@ public class NotTest extends TestCase {
     }
     
     public void testEvaluate() throws Exception {
-        assertTrue(new Not(new StringStartsWith("f")).evaluate("bar"));
-        assertFalse(new Not(new StringStartsWith("f")).evaluate("foo"));
+        Row row = new Row(
+            new TupleBuilder()
+                .append(new Column("x"), new StringCell("foo"))
+        );
+        Equal compareWithFoo = new Equal(new SingleColumn("x"), new QuotedString("'foo'"));
+        Equal compareWithXxx = new Equal(new SingleColumn("x"), new QuotedString("'xxx'"));
+        assertTrue(new Not(compareWithXxx).evaluate(row));
+        assertFalse(new Not(compareWithFoo).evaluate(row));
     }
 
 }

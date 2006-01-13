@@ -35,5 +35,9 @@ abstract public class RowExpression extends BooleanExpression {
         leftSide = substitute(leftSide, jdbcParameters);
         rightSide = substitute(rightSide, jdbcParameters);
     }
+    
+    public String firstAggregate() {
+        return WhatElement.firstAggregate(leftSide, rightSide);
+    }
 
 }

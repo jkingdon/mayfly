@@ -97,6 +97,17 @@ public class AggregateTest extends SqlTestCase {
         assertResultSet(new String[] { " 5 " }, query("select max(x) from foo where y = 10"));
     }
 
+    public void testAggregateInWhere() throws Exception {
+        execute("create table foo (x integer, y integer, z integer)");
+        execute("insert into foo (x, y, z) values (5, 10, null)");
+        execute("insert into foo (x, y, z) values (null, 10, null)");
+        execute("insert into foo (x, y, z) values (9, 9, null)");
+        
+        expectQueryFailure("select max(x) from foo where count(y) > 0", "aggregate count(y) not valid in WHERE");
+        expectQueryFailure("select max(x) from foo where count(z) > 0", "aggregate count(z) not valid in WHERE");
+        expectQueryFailure("select x from foo where count(y) > 0", "aggregate count(y) not valid in WHERE");
+    }
+
     public void testNoRows() throws Exception {
         execute("create table foo (x integer)");
         assertResultSet(new String[] { " null " }, query("select max(x) from foo"));
@@ -174,7 +185,8 @@ public class AggregateTest extends SqlTestCase {
 
         checkDistinct(12, "select sum(distinct x) from foo");
 
-        // Minimum/maximum are kind of pointless, but legal it would seem
+        // Specifying distinct for Minimum/maximum is kind of pointless,
+        // but legal it would seem
         checkDistinct(5, "select min(distinct x) from foo");
         checkDistinct(7, "select max(distinct x) from foo");
     }
