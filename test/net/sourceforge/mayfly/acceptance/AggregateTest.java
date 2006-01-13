@@ -38,8 +38,6 @@ public class AggregateTest extends SqlTestCase {
 
     public void testColumnAndAggregate() throws Exception {
         execute("create table foo (x integer)");
-        // TODO: having a row should not be needed
-        execute("insert into foo (x) values (5)");
         
         expectQueryFailure("select x, max(x) from foo", "x is a column but max(x) is an aggregate");
         expectQueryFailure("select X || 'L', Max ( x ) from foo", "X is a column but Max(x) is an aggregate");
@@ -52,8 +50,6 @@ public class AggregateTest extends SqlTestCase {
     
     public void testColumnOperatorAggregate() throws Exception {
         execute("create table foo (x integer)");
-        // TODO: having a row should not be needed
-        //execute("insert into foo (x) values (5)");
 
         String sql = "select x + min(x) from foo";
         if (dialect.expectMayflyBehavior()) {

@@ -38,7 +38,6 @@ public class NoGroupBy extends ValueObject implements Aggregator {
     }
 
     public void check(Row dummyRow, What what, What selected) {
-        // TODO: call isAggregate here.  I guess we have no test for that yet...
     }
     
 }
