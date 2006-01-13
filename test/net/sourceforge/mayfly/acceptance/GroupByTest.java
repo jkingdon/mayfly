@@ -150,16 +150,9 @@ public class GroupByTest extends SqlTestCase {
             new String[] { " null, 2 ", " '', 1", " 'Gang Of Four', 1 "},
             query("select author, count(title) from books group by author order by author")
         );
-        // With count(type), where type is null, gets us 0 (do create the group, but get 0)
-        // With count(*), where type is null, gets us 1 (or whatever the count was)
     }
     
     public void testGroupByInteger() throws Exception {
-        if (!mayflyMissing()) {
-            // ORDER BY doesn't yet do null
-            return;
-        }
-
         execute("create table foo (aKey integer, value integer)");
         execute("insert into foo(aKey, value) values (5, 40)");
         // Null is a separate group from zero or empty string
@@ -173,6 +166,25 @@ public class GroupByTest extends SqlTestCase {
         );
     }
     
+    public void testCountOnKey() throws Exception {
+        // Kind of an obvious combination of GROUP BY and COUNT,
+        // but it was enough for the authors of The Practical SQL Handbook
+        // to mention specifically.
+        execute("create table foo (aKey integer, value integer)");
+        execute("insert into foo(aKey, value) values (null, 30)");
+        execute("insert into foo(aKey, value) values (null, 20)");
+        
+        assertResultList(
+            new String[] { " null, 2 " },
+            query("select aKey, count(*) from foo group by aKey")
+        );
+
+        assertResultList(
+            new String[] { " null, 0 " },
+            query("select aKey, count(aKey) from foo group by aKey")
+        );
+    }
+
     public void testWhereIsAppliedBeforeGroupBy() throws Exception {
         
     }
