@@ -34,6 +34,24 @@ public class GroupByTest extends SqlTestCase {
             query("select birthdate + age as deathdate from people group by deathdate"));
     }
     
+    public void testGroupByExpressionError() throws Exception {
+        if (!mayflyMissing()) {
+            return;
+        }
+
+        execute("create table people (birthdate integer, age integer)");
+        String selectColumnNotGrouped = "select age from people group by birthdate + age";
+        if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression()) {
+            expectQueryFailure(
+                selectColumnNotGrouped, 
+                "age is not aggregate or mentioned in GROUP BY"
+            );
+        }
+        else {
+            assertResultSet(new String[] { }, query(selectColumnNotGrouped));
+        }
+    }
+    
     public void testGroupByNotInSelectList() throws Exception {
         execute("create table books (author varchar(255), title varchar(255), edition integer)");
         execute("insert into books(author, title, edition) values ('Bowman', 'Practical SQL', 2)");
@@ -99,9 +117,18 @@ public class GroupByTest extends SqlTestCase {
         }
     }
     
-    // TODO: the various error checks should also work if there are
-    // no rows
+    public void testSelectSomethingNotGroupedNoRows() throws Exception {
+        execute("create table books (author varchar(255), title varchar(255))");
+        
+        String notAggegateOrGrouped = "select author, title, count(*) from books group by author";
 
+        if (dialect.errorIfNotAggregateOrGrouped()) {
+            expectQueryFailure(notAggegateOrGrouped, "title is not aggregate or mentioned in GROUP BY");
+        } else {
+            assertResultList(new String[] {}, query(notAggegateOrGrouped));
+        }
+    }
+    
     public void testGroupByAggregate() throws Exception {
         // select pub_id, sum(price) from titles group by pub_id, sum(price)
     }

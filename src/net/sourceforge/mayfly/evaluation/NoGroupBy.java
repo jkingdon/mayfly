@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation;
 import java.util.*;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
@@ -34,6 +35,10 @@ public class NoGroupBy extends ValueObject implements Aggregator {
             }
         }
         return firstAggregate != null;
+    }
+
+    public void check(Row dummyRow, What what, What selected) {
+        // TODO: call isAggregate here.  I guess we have no test for that yet...
     }
     
 }

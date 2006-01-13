@@ -120,6 +120,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression() {
+        return errorIfNotAggregateOrGrouped();
+    }
+
     public boolean canOrderByExpression() {
         return false;
     }

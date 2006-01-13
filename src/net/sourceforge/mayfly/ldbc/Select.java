@@ -56,6 +56,8 @@ public class Select extends Command {
         }
 
         new Rows(dummyRow).select(where);
+        groupBy.check(dummyRow, what, selected);
+
         orderBy.check(dummyRow);
         
         if (orderBy.isEmpty() && limit.isSpecified()) {

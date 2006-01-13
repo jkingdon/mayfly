@@ -50,5 +50,9 @@ public class HypersonicDialect extends Dialect {
         // What count(distinct *) means I don't really know.
         return true;
     }
+    
+    public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression() {
+        return false;
+    }
 
 }
