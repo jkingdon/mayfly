@@ -18,14 +18,28 @@ public class CellTest extends TestCase {
     }
     
     public void testCompare() throws Exception {
-        assertEquals(0, new LongCell(6).compareTo(new LongCell(6)));
-        assertEquals(-1, new LongCell(6).compareTo(new LongCell(7)));
+        assertComparesEqual(new LongCell(6), new LongCell(6));
+        assertLessThan(new LongCell(6), new LongCell(7));
         
-        assertEquals(0, new StringCell("foo").compareTo(new StringCell("foo")));
+        assertComparesEqual(new StringCell("foo"), new StringCell("foo"));
         assertLessThan(new StringCell("11"), new StringCell("5"));
+
+        assertComparesEqual(NullCell.INSTANCE, NullCell.INSTANCE);
+        assertLessThan(NullCell.INSTANCE, new StringCell(""));
+        assertLessThan(NullCell.INSTANCE, new LongCell(0));
     }
 
-    private void assertLessThan(StringCell first, StringCell second) {
+    private void assertComparesEqual(Cell first, Cell second) {
+        assertEquals(0, first.compareTo(second));
+        assertEquals(0, second.compareTo(first));
+        
+        // I think the GROUP BY code makes more sense if
+        // compareTo is consistent with equals()
+        assertEquals(first, second);
+        assertEquals(second, first);
+    }
+
+    private void assertLessThan(Cell first, Cell second) {
         {
             int comparison = first.compareTo(second);
             assertTrue("expected <0 but was " + comparison, comparison < 0);

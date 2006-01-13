@@ -33,7 +33,17 @@ public class StringCell extends Cell {
     }
 
     public int compareTo(Cell otherCell) {
-        return content.compareTo(((StringCell) otherCell).content);
+        if (otherCell instanceof StringCell) {
+            return content.compareTo(((StringCell) otherCell).content);
+        }
+        else if (otherCell instanceof NullCell) {
+            return 1;
+        }
+        else {
+            throw new MayflyInternalException(
+                "Attempt to compare a " + this.getClass().getName() + " to a " + otherCell.getClass().getName()
+            );
+        }
     }
 
 }

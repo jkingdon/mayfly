@@ -34,7 +34,7 @@ public class NullCell extends Cell {
     }
 
     public int compareTo(Cell otherCell) {
-        return 0;
+        return otherCell instanceof NullCell ? 0 : -1;
     }
 
 }

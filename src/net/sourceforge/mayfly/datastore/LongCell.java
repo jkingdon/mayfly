@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.*;
+
 
 public class LongCell extends Cell {
 
@@ -30,7 +32,17 @@ public class LongCell extends Cell {
     }
 
     public int compareTo(Cell otherCell) {
-        return new Long(value).compareTo(new Long(((LongCell) otherCell).value));
+        if (otherCell instanceof LongCell) {
+            return new Long(value).compareTo(new Long(((LongCell) otherCell).value));
+        }
+        else if (otherCell instanceof NullCell) {
+            return 1;
+        }
+        else {
+            throw new MayflyInternalException(
+                "Attempt to compare a " + this.getClass().getName() + " to a " + otherCell.getClass().getName()
+            );
+        }
     }
 
 }

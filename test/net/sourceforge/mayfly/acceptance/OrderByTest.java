@@ -41,6 +41,17 @@ public class OrderByTest extends SqlTestCase {
         );
     }
     
+    public void testNullSortsFirst() throws Exception {
+        execute("create table foo (a varchar(255))");
+        execute("insert into foo (a) values ('one')");
+        execute("insert into foo (a) values (null)");
+        execute("insert into foo (a) values ('')");
+        assertResultList(
+            new String[] { " null ", " '' ", " 'one' " },
+            query("select a from foo order by a")
+        );
+    }
+    
     public void testOrderByExpression() throws Exception {
         execute("create table foo (a integer, b integer)");
         execute("insert into foo(a, b) values (5, 30)");
@@ -92,11 +103,9 @@ public class OrderByTest extends SqlTestCase {
             query(baseQuery + " order by child.parent")
         );
         
-        // This one blows up because NullCell doesn't compare to LongCell.
-        // Worry about this later.
-//        assertResultList(new String[] { "'C'", "'B'", "'A'" },
-//            query(baseQuery + " order by parent.id")
-//        );
+        assertResultList(new String[] { "'C'", "'B'", "'A'" },
+            query(baseQuery + " order by parent.id")
+        );
         
     }
     
