@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.util.*;
 
 public abstract class Cell extends ValueObject {
+
     public static Cell fromContents(Object contents) {
         if (contents instanceof Number) {
             Number number = (Number) contents;
@@ -29,6 +30,10 @@ public abstract class Cell extends ValueObject {
     }
 
     abstract public Object asObject();
+    
+    public Object asContents() {
+        return asObject();
+    }
 
     abstract public int compareTo(Cell otherCell);
 

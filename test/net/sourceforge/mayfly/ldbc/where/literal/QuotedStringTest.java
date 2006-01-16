@@ -3,20 +3,12 @@ package net.sourceforge.mayfly.ldbc.where.literal;
 import junit.framework.*;
 
 import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.parser.*;
 
 public class QuotedStringTest extends TestCase {
+
     public void testParse() throws Exception {
-        Tree selectTree = Tree.parse("select * from foo where name='steve'");
-
-        Tree quotedStringTree =
-            selectTree.children()
-                .singleSubtreeOfType(SQLTokenTypes.CONDITION).children()
-                    .singleSubtreeOfType(SQLTokenTypes.EQUAL).children()
-                        .singleSubtreeOfType(SQLTokenTypes.QUOTED_STRING);
-
-        assertEquals(new QuotedString("'steve'"), QuotedString.fromQuotedStringTree(quotedStringTree));
+        assertEquals(new QuotedString("'steve'"), new Parser("'steve'").parsePrimary());
     }
 
     public void testMatchesCell() throws Exception {

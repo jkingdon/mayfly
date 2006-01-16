@@ -80,8 +80,8 @@ public class OrderByTest extends SqlTestCase {
             assertResultList(new String[] { "35", "48", "53", "64", "72" }, query(referenceToExpression));
         }
         else {
-            expectQueryFailure(expression, "expected end of file but got PLUS");
-            expectQueryFailure(constantExpression, "expected end of file but got PLUS");
+            expectQueryFailure(expression, "expected end of file but got '+'");
+            expectQueryFailure(constantExpression, "expected end of file but got '+'");
             
             expectQueryFailure(referenceToExpression, "ORDER BY 1 refers to an expression not a column");
         }

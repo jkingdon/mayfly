@@ -15,7 +15,7 @@ public class Select extends Command {
     private static final String UPDATE_MESSAGE = "SELECT is only available with query, not update";
 
     public static Select selectFromSql(String sql) {
-        return new Parser(sql).parseSelect();
+        return new Parser(sql).parseQuery();
     }
 
     private final What what;

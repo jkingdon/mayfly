@@ -32,7 +32,7 @@ public class NullCell extends Cell {
         // What are we supposed to return here?
         throw new MayflyException("Attempt to read SQL NULL as an object");
     }
-
+    
     public int compareTo(Cell otherCell) {
         return otherCell instanceof NullCell ? 0 : -1;
     }

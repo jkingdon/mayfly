@@ -9,11 +9,6 @@ public class SetSchema extends Command {
 
     private final String name;
 
-    public static SetSchema setSchemaFromTree(Tree tree) {
-        String name = tree.getFirstChild().getText();
-        return new SetSchema(name);
-    }
-
     public SetSchema(String name) {
         this.name = name;
     }

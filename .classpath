@@ -7,8 +7,6 @@
 	<classpathentry kind="lib" sourcepath="src/lib-src/commons-lang-2.1-src.zip" path="src/lib/commons-lang-2.1.jar"/>
 	<classpathentry kind="lib" path="test/lib/junit.jar"/>
 	<classpathentry kind="lib" sourcepath="test/lib-src/hsqldb_1_8_0_2.zip" path="test/lib/hsqldb.jar"/>
-	<classpathentry kind="lib" path="src/lib/antlr-2.7.5.jar"/>
-	<classpathentry kind="lib" path="build/parser/parser.jar"/>
 	<classpathentry kind="lib" path="test/lib/mysql-connector-java-3.1.12-bin.jar"/>
 	<classpathentry kind="lib" sourcepath="test/lib-src/junit-addons-1.4-src.jar" path="test/lib/junit-addons-1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>

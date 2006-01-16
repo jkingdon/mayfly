@@ -159,7 +159,7 @@ public class AggregateTest extends SqlTestCase {
             assertResultSet(new String[] { " 3 " }, query(distinctStar));
         }
         else {
-            expectQueryFailure(distinctStar, "expected primary but got ASTERISK");
+            expectQueryFailure(distinctStar, "expected primary but got '*'");
         }
     }
 
@@ -206,10 +206,10 @@ public class AggregateTest extends SqlTestCase {
             // are any rows, and which function.  None of them seem very useful.
             return;
         }
-        expectQueryFailure("select avg(*) from foo", "expected primary but got ASTERISK");
-        expectQueryFailure("select sum(*) from foo", "expected primary but got ASTERISK");
-        expectQueryFailure("select min(*) from foo", "expected primary but got ASTERISK");
-        expectQueryFailure("select max(*) from foo", "expected primary but got ASTERISK");
+        expectQueryFailure("select avg(*) from foo", "expected primary but got '*'");
+        expectQueryFailure("select sum(*) from foo", "expected primary but got '*'");
+        expectQueryFailure("select min(*) from foo", "expected primary but got '*'");
+        expectQueryFailure("select max(*) from foo", "expected primary but got '*'");
     }
 
     public void testStrings() throws Exception {

@@ -197,7 +197,7 @@ public class WhereTest extends SqlTestCase {
             // Mayfly aims to be pickier than most databases about boolean vs non-boolean
             // If some writes SQL like that they are either making a mistake, or they are
             // being too clever for our tastes.
-            expectQueryFailure(booleanAsLeftSideOfIn, "expected boolean operator but got CLOSE_PAREN");
+            expectQueryFailure(booleanAsLeftSideOfIn, "expected boolean operator but got ')'");
             
             // Is this message clearer?  It would be hard to get it...
 //          expectQueryFailure(booleanAsLeftSideOfIn, "operand of NOT must be a boolean expression");

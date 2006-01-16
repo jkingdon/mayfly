@@ -18,34 +18,13 @@
         <fileset dir="src/lib">
             <include name="**/*.jar"/>
         </fileset>
-        <fileset dir="build/parser">
-            <include name="parser.jar"/>
-        </fileset>
     </path>
 
-    <target name="compile" depends="parser">
+    <target name="compile">
         <mkdir dir="build/classes"/>
         <javac srcdir="src" destdir="build/classes" debug="on">
             <classpath refid="classpath"/>
         </javac>
-    </target>
-
-    <target name="parser">
-        <mkdir dir="build/parser/net/sourceforge/mayfly/parser"/>
-        <java classname="antlr.Tool" fork="true" failonerror="true">
-            <classpath refid="classpath"/>
-            <arg value="-o"/>
-            <arg value="build/parser/net/sourceforge/mayfly/parser"/>
-            <arg value="parser/sql.g"/>
-        </java>
-
-        <!-- All this jar stuff is for eclipse, mainly, because compiler
-            warning setting are per-project, not per-directory -->
-        <mkdir dir="build/parser/classes"/>
-        <javac srcdir="build/parser/net/sourceforge/mayfly/parser" destdir="build/parser/classes">
-            <classpath refid="classpath.lib"/>
-        </javac>
-        <jar jarfile="build/parser/parser.jar" basedir="build/parser/classes"/>
     </target>
 
     <!-- Although we use javadoc syntax for the benefit of tools like Eclipse and IDEA,
@@ -102,7 +81,6 @@
     <target name="jar" depends="compile,test">
         <jar jarfile="build/mayfly-${version}.jar">
             <fileset dir="build/classes"/>
-            <fileset dir="build/parser/classes"/>
         </jar>
     </target>
 

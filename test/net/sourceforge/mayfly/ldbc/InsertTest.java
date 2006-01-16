@@ -16,7 +16,7 @@ public class InsertTest extends TestCase {
                 Arrays.asList(new String[] {"a", "b"}),
                 Arrays.asList(new Object[] {new Long(5), "Value"})
             ),
-            Insert.insertFromTree(Tree.parse("insert into foo (a, b) values (5, 'Value')"))
+            Command.fromSql("insert into foo (a, b) values (5, 'Value')")
         );
     }
     
@@ -27,7 +27,7 @@ public class InsertTest extends TestCase {
                 Collections.singletonList("a"),
                 Collections.singletonList(JdbcParameter.INSTANCE)
             ),
-            Insert.insertFromTree(Tree.parse("insert into foo (a) values (?)"))
+            Command.fromSql("insert into foo (a) values (?)")
         );
     }
     
@@ -55,7 +55,7 @@ public class InsertTest extends TestCase {
                 Arrays.asList(new String[] {"a"}),
                 Arrays.asList(new Object[] {NullCellContent.INSTANCE})
             ),
-            Insert.insertFromTree(Tree.parse("insert into foo (a) values (null)"))
+            Command.fromSql("insert into foo (a) values (null)")
         );
     }
     
@@ -66,7 +66,7 @@ public class InsertTest extends TestCase {
                 null,
                 Arrays.asList(new Object[] {new Long(5)})
             ),
-            Insert.insertFromTree(Tree.parse("insert into foo values (5)"))
+            Command.fromSql("insert into foo values (5)")
         );
     }
     

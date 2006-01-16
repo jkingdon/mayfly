@@ -10,12 +10,10 @@ import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
 import net.sourceforge.mayfly.parser.Parser;
 
-import antlr.*;
-
 public class ParserTest extends TestCase {
     
     public void testEmptyString() throws Exception {
-        expectFailure("", "expected IDENTIFIER but got end of file");
+        expectFailure("", "expected identifier but got end of file");
     }
 
     public void testIdentifier() throws Exception {
@@ -31,7 +29,7 @@ public class ParserTest extends TestCase {
     }
     
     public void testIdentifierDot() throws Exception {
-        expectFailure("foo.", "expected IDENTIFIER but got end of file");
+        expectFailure("foo.", "expected identifier but got end of file");
     }
     
     public void testSchemaDotTable() throws Exception {
@@ -39,7 +37,7 @@ public class ParserTest extends TestCase {
     }
 
     public void testDotIdentifier() throws Exception {
-        expectFailure(".foo", "expected IDENTIFIER but got DOT");
+        expectFailure(".foo", "expected identifier but got '.'");
     }
     
     public void testSchemaDotTableAlias() throws Exception {
@@ -63,7 +61,27 @@ public class ParserTest extends TestCase {
     public void testExtraneousTokensAtEnd() throws Exception {
         Parser parser = new Parser("select * from foo 5");
         try {
-            parser.parseSelect();
+            parser.parse();
+            fail();
+        } catch (MayflyException e) {
+            assertEquals("expected end of file but got 5", e.getMessage());
+        }
+    }
+    
+    public void testExtraneousTokensAtEndForDrop() throws Exception {
+        Parser parser = new Parser("drop table foo (");
+        try {
+            parser.parse();
+            fail();
+        } catch (MayflyException e) {
+            assertEquals("expected end of file but got '('", e.getMessage());
+        }
+    }
+    
+    public void testExtraneousTokensAtEndInQuery() throws Exception {
+        Parser parser = new Parser("select * from foo 5");
+        try {
+            parser.parseQuery();
             fail();
         } catch (MayflyException e) {
             assertEquals("expected end of file but got 5", e.getMessage());
@@ -85,7 +103,7 @@ public class ParserTest extends TestCase {
     public void testCrossJoinWithOn() throws Exception {
         Parser parser = new Parser("select a, b from foo cross join bar on 1 = 1");
         try {
-            parser.parseSelect();
+            parser.parse();
             fail();
         } catch (ParserException e) {
             // In this example, we might say:
@@ -147,16 +165,16 @@ public class ParserTest extends TestCase {
             new Parser("f. = b").parseWhere();
             fail();
         } catch (ParserException e) {
-            assertEquals("expected IDENTIFIER but got EQUAL", e.getMessage());
+            assertEquals("expected identifier but got '='", e.getMessage());
         }
     }
 
     public void testBadTokenAfterIs() throws Exception {
         try {
-            new Parser("a IS BORING").parseWhere();
+            new Parser("a IS BORIng").parseWhere();
             fail();
         } catch (ParserException e) {
-            assertEquals("expected NULL but got BORING", e.getMessage());
+            assertEquals("expected NULL but got BORIng", e.getMessage());
         }
     }
 
@@ -230,7 +248,7 @@ public class ParserTest extends TestCase {
             fail();
         } catch (ParserException e) {
             // Really, primary->expression
-            assertEquals("expected primary but got ASTERISK", e.getMessage());
+            assertEquals("expected primary but got '*'", e.getMessage());
         }
     }
 
@@ -337,7 +355,7 @@ public class ParserTest extends TestCase {
         );
     }
 
-    private void expectFailure(String sql, String expectedMessage) throws ANTLRException {
+    private void expectFailure(String sql, String expectedMessage) {
         try {
             new Parser(sql).parseTableReference();
             fail();

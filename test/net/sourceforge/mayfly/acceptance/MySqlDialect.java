@@ -93,5 +93,9 @@ public class MySqlDialect extends Dialect {
     public boolean canGetValueViaExpressionName() {
         return true;
     }
+    
+    public boolean canQuoteIdentifiers() {
+        return false;
+    }
 
 }

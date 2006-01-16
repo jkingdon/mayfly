@@ -162,6 +162,46 @@ public class ValueTest extends SqlTestCase {
         // So what should Mayfly do?
     }
     
+    public void testExpressionInInsert() throws Exception {
+        execute("create table foo (a varchar(255))");
+
+        String insert;
+        if (dialect.verticalBarsMeanConcatenation()) {
+            insert = "insert into foo(a) values ('cat' || 'e' || 'gory')";
+        }
+        else {
+            insert = "insert into foo(a) values (concat('cat', 'e', 'gory'))";
+        }
+        execute(insert);
+
+        assertResultSet(
+            new String[] { " 'category' " },
+            query("select a from foo")
+        );
+    }
+    
+    public void testNullInExpression() throws Exception {
+        execute("create table foo (a integer)");
+        String insertNullExpression = "insert into foo(a) values (5 + null)";
+        if (dialect.expectMayflyBehavior()) {
+            try {
+                execute(insertNullExpression);
+                fail();
+            } catch (SQLException e) {
+                // Perhaps it is really anal and an overreaction to the sometimes
+                // confusing consequences of the "null propagates up" semantics, but
+                // at least for now, I'm going to insist people say "null" rather than
+                // "5 + null".
+                assertMessage("To insert null, specify a null literal rather than an expression containing one", e);
+            }
+            assertResultSet(new String[] { }, query("select a from foo"));
+        }
+        else {
+            execute(insertNullExpression);
+            assertResultSet(new String[] { " null " }, query("select a from foo"));
+        }
+    }
+    
     public void testInsertSomeColumns() throws Exception {
         execute("create table foo (a integer, b integer)");
         execute("insert into foo (b) values (5)");

@@ -1,17 +1,66 @@
 package net.sourceforge.mayfly.parser;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.evaluation.*;
-import net.sourceforge.mayfly.evaluation.expression.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.ldbc.where.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.util.*;
-import antlr.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.NullCellContent;
+import net.sourceforge.mayfly.evaluation.Aggregator;
+import net.sourceforge.mayfly.evaluation.ColumnOrderItem;
+import net.sourceforge.mayfly.evaluation.GroupBy;
+import net.sourceforge.mayfly.evaluation.GroupItem;
+import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.evaluation.ReferenceOrderItem;
+import net.sourceforge.mayfly.evaluation.expression.Average;
+import net.sourceforge.mayfly.evaluation.expression.Concatenate;
+import net.sourceforge.mayfly.evaluation.expression.Count;
+import net.sourceforge.mayfly.evaluation.expression.Divide;
+import net.sourceforge.mayfly.evaluation.expression.Maximum;
+import net.sourceforge.mayfly.evaluation.expression.Minimum;
+import net.sourceforge.mayfly.evaluation.expression.Minus;
+import net.sourceforge.mayfly.evaluation.expression.Multiply;
+import net.sourceforge.mayfly.evaluation.expression.Plus;
+import net.sourceforge.mayfly.evaluation.expression.Sum;
+import net.sourceforge.mayfly.ldbc.Command;
+import net.sourceforge.mayfly.ldbc.CreateSchema;
+import net.sourceforge.mayfly.ldbc.CreateTable;
+import net.sourceforge.mayfly.ldbc.DropTable;
+import net.sourceforge.mayfly.ldbc.From;
+import net.sourceforge.mayfly.ldbc.FromElement;
+import net.sourceforge.mayfly.ldbc.FromTable;
+import net.sourceforge.mayfly.ldbc.InnerJoin;
+import net.sourceforge.mayfly.ldbc.Insert;
+import net.sourceforge.mayfly.ldbc.InsertTable;
+import net.sourceforge.mayfly.ldbc.JdbcParameter;
+import net.sourceforge.mayfly.ldbc.LeftJoin;
+import net.sourceforge.mayfly.ldbc.Limit;
+import net.sourceforge.mayfly.ldbc.OrderBy;
+import net.sourceforge.mayfly.ldbc.OrderItem;
+import net.sourceforge.mayfly.ldbc.Select;
+import net.sourceforge.mayfly.ldbc.SetSchema;
+import net.sourceforge.mayfly.ldbc.what.All;
+import net.sourceforge.mayfly.ldbc.what.AllColumnsFromTable;
+import net.sourceforge.mayfly.ldbc.what.CountAll;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.ldbc.what.What;
+import net.sourceforge.mayfly.ldbc.what.WhatElement;
+import net.sourceforge.mayfly.ldbc.where.And;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
+import net.sourceforge.mayfly.ldbc.where.Equal;
+import net.sourceforge.mayfly.ldbc.where.Greater;
+import net.sourceforge.mayfly.ldbc.where.In;
+import net.sourceforge.mayfly.ldbc.where.IsNull;
+import net.sourceforge.mayfly.ldbc.where.Not;
+import net.sourceforge.mayfly.ldbc.where.NotEqual;
+import net.sourceforge.mayfly.ldbc.where.Or;
+import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
+import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
+import net.sourceforge.mayfly.util.StringBuilder;
 
-import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 /** @internal
  * Hand-written recursive descent parser.
@@ -24,70 +73,143 @@ import java.util.*;
  */
 public class Parser {
 
-    private static List getAllTokens(String sql) {
-        try {
-            StringReader in = new StringReader(sql);
-            SQLLexer lexer = new SQLLexer(in);
-            List tokens = new ArrayList();
-            while (true) {
-                Token token = lexer.nextToken();
-                tokens.add(token);
-                if (token.getType() == SQLTokenTypes.EOF) {
-                    return tokens;
-                }
-            }
-        } catch (TokenStreamException e) {
-            // Do we want to report the text we were parsing, or line/column numbers?
-            // Is there anything interesting about e other than its message (like its class?)
-            throw new MayflyException(e.getMessage());
-        }
-    }
-
     private List tokens;
 
     public Parser(String sql) {
-        this(getAllTokens(sql));
+        this(new Lexer(sql).tokens());
     }
 
     public Parser(List tokens) {
         this.tokens = tokens;
     }
 
-    public boolean canParse() {
-        return currentTokenType() == SQLTokenTypes.LITERAL_select ||
-            currentTokenType() == SQLTokenTypes.LITERAL_create && 
-                ((Token) tokens.get(1)).getType() == SQLTokenTypes.LITERAL_schema
-        ;
-    }
-    
     public Command parse() {
-        if (currentTokenType() == SQLTokenTypes.LITERAL_select) {
+        Command command = parseCommand();
+        expectAndConsume(TokenType.END_OF_FILE);
+        return command;
+    }
+
+    public Select parseQuery() {
+        Select command = parseSelect();
+        expectAndConsume(TokenType.END_OF_FILE);
+        return command;
+    }
+
+    private Command parseCommand() {
+        if (currentTokenType() == TokenType.KEYWORD_select) {
             return parseSelect();
         }
-        else if (consumeIfMatches(SQLTokenTypes.LITERAL_create)) {
-            if (consumeIfMatches(SQLTokenTypes.LITERAL_schema)) {
+        else if (currentTokenType() == TokenType.KEYWORD_drop) {
+            return parseDrop();
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_create)) {
+            if (consumeIfMatches(TokenType.KEYWORD_schema)) {
                 return parseCreateSchema();
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_table)) {
+                return parseCreateTable();
             }
             else {
                 throw new ParserException("expected create command but got " + describeToken(currentToken()));
             }
+        }
+        else if (currentTokenType() == TokenType.KEYWORD_set) {
+            return parseSetSchema();
+        }
+        else if (currentTokenType() == TokenType.KEYWORD_insert) {
+            return parseInsert();
         }
         else {
             throw new ParserException("expected command but got " + describeToken(currentToken()));
         }
     }
 
+    private Command parseSetSchema() {
+        expectAndConsume(TokenType.KEYWORD_set);
+        expectAndConsume(TokenType.KEYWORD_schema);
+        return new SetSchema(consumeIdentifier());
+    }
+
+    private Command parseInsert() {
+        expectAndConsume(TokenType.KEYWORD_insert);
+        expectAndConsume(TokenType.KEYWORD_into);
+        InsertTable table = parseInsertTable();
+
+        List columnNames = parseColumnNames();
+        
+        List values = parseValueConstructor();
+
+        return new Insert(table, columnNames, values);
+    }
+
+    private List parseColumnNames() {
+        List columnNames;
+        if (consumeIfMatches(TokenType.OPEN_PAREN)) {
+            columnNames = new ArrayList();
+    
+            columnNames.add(consumeIdentifier());
+            while (consumeIfMatches(TokenType.COMMA)) {
+                columnNames.add(consumeIdentifier());
+            }
+            expectAndConsume(TokenType.CLOSE_PAREN);
+        }
+        else {
+            columnNames = null;
+        }
+        return columnNames;
+    }
+
+    private List parseValueConstructor() {
+        expectAndConsume(TokenType.KEYWORD_values);
+
+        List values = new ArrayList();
+        expectAndConsume(TokenType.OPEN_PAREN);
+
+        values.add(parseAndEvaluate());
+        while (consumeIfMatches(TokenType.COMMA)) {
+            values.add(parseAndEvaluate());
+        }
+        expectAndConsume(TokenType.CLOSE_PAREN);
+        return values;
+    }
+
+    private Object parseAndEvaluate() {
+        if (consumeIfMatches(TokenType.KEYWORD_null)) {
+            return NullCellContent.INSTANCE;
+        }
+
+        try {
+            WhatElement expression = parseExpression();
+            if (expression instanceof JdbcParameter) {
+                return JdbcParameter.INSTANCE;
+            }
+            Cell cell = expression.evaluate(null);
+            return cell.asContents();
+        } catch (FoundNullLiteral e) {
+            throw new MayflyException(
+                "To insert null, specify a null literal rather than an expression containing one"
+            );
+        }
+    }
+
+    private Command parseDrop() {
+        expectAndConsume(TokenType.KEYWORD_drop);
+        expectAndConsume(TokenType.KEYWORD_table);
+        String tableName = consumeIdentifier();
+        return new DropTable(tableName);
+    }
+
     private CreateSchema parseCreateSchema() {
         String schemaName = consumeIdentifier();
-        expectAndConsume(SQLTokenTypes.LITERAL_authorization);
+        expectAndConsume(TokenType.KEYWORD_authorization);
         String user = consumeIdentifier();
         if (!user.equalsIgnoreCase("dba")) {
             throw new MayflyException("Can only create specify user dba in create schema but was " + user);
         }
 
         CreateSchema schema = new CreateSchema(schemaName);
-        while (consumeIfMatches(SQLTokenTypes.LITERAL_create)) {
-            expectAndConsume(SQLTokenTypes.LITERAL_table);
+        while (consumeIfMatches(TokenType.KEYWORD_create)) {
+            expectAndConsume(TokenType.KEYWORD_table);
             CreateTable createTable = parseCreateTable();
             schema.add(createTable);
         }
@@ -97,37 +219,37 @@ public class Parser {
     private CreateTable parseCreateTable() {
         String tableName = consumeIdentifier();
         List columnNames = new ArrayList();
-        expectAndConsume(SQLTokenTypes.OPEN_PAREN);
+        expectAndConsume(TokenType.OPEN_PAREN);
 
         columnNames.add(parseColumnDefinition());
-        while (consumeIfMatches(SQLTokenTypes.COMMA)) {
+        while (consumeIfMatches(TokenType.COMMA)) {
             columnNames.add(parseColumnDefinition());
         }
 
-        expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+        expectAndConsume(TokenType.CLOSE_PAREN);
         return new CreateTable(tableName, columnNames);
     }
 
     private String parseColumnDefinition() {
         String name = consumeIdentifier();
-        if (consumeIfMatches(SQLTokenTypes.LITERAL_integer)) {
+        if (consumeIfMatches(TokenType.KEYWORD_integer)) {
         }
-        if (consumeIfMatches(SQLTokenTypes.LITERAL_varchar)) {
-            expectAndConsume(SQLTokenTypes.OPEN_PAREN);
-            expectAndConsume(SQLTokenTypes.NUMBER);
-            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+        if (consumeIfMatches(TokenType.KEYWORD_varchar)) {
+            expectAndConsume(TokenType.OPEN_PAREN);
+            expectAndConsume(TokenType.NUMBER);
+            expectAndConsume(TokenType.CLOSE_PAREN);
         }
         return name;
     }
 
-    public Select parseSelect() {
-        expectAndConsume(SQLTokenTypes.LITERAL_select);
+    Select parseSelect() {
+        expectAndConsume(TokenType.KEYWORD_select);
         What what = parseWhat();
-        expectAndConsume(SQLTokenTypes.LITERAL_from);
+        expectAndConsume(TokenType.KEYWORD_from);
         From from = parseFromItems();
         
         Where where;
-        if (consumeIfMatches(SQLTokenTypes.LITERAL_where)) {
+        if (consumeIfMatches(TokenType.KEYWORD_where)) {
             where = parseWhere();
         }
         else {
@@ -140,20 +262,19 @@ public class Parser {
         
         Limit limit = parseLimit();
 
-        expectAndConsume(SQLTokenTypes.EOF);
         return new Select(what, from, where, groupBy, orderBy, limit);
     }
 
     public What parseWhat() {
-        if (consumeIfMatches(SQLTokenTypes.ASTERISK)) {
+        if (consumeIfMatches(TokenType.ASTERISK)) {
             return new What(Collections.singletonList(new All()));
         }
 
         What what = new What();
         what.add(parseWhatElement());
         
-        while (currentTokenType() == SQLTokenTypes.COMMA) {
-            expectAndConsume(SQLTokenTypes.COMMA);
+        while (currentTokenType() == TokenType.COMMA) {
+            expectAndConsume(TokenType.COMMA);
             what.add(parseWhatElement());
         }
         
@@ -161,13 +282,13 @@ public class Parser {
     }
 
     public WhatElement parseWhatElement() {
-        if (currentTokenType() == SQLTokenTypes.IDENTIFIER
-            && ((Token) tokens.get(1)).getType() == SQLTokenTypes.DOT
-            && ((Token) tokens.get(2)).getType() == SQLTokenTypes.ASTERISK) {
+        if (currentTokenType() == TokenType.IDENTIFIER
+            && ((Token) tokens.get(1)).getType() == TokenType.PERIOD
+            && ((Token) tokens.get(2)).getType() == TokenType.ASTERISK) {
 
             String firstIdentifier = consumeIdentifier();
-            expectAndConsume(SQLTokenTypes.DOT);
-            expectAndConsume(SQLTokenTypes.ASTERISK);
+            expectAndConsume(TokenType.PERIOD);
+            expectAndConsume(TokenType.ASTERISK);
             return new AllColumnsFromTable(firstIdentifier);
         }
         
@@ -176,14 +297,14 @@ public class Parser {
 
     WhatElement parseExpression() {
         WhatElement left = parseFactor();
-        while (currentTokenType() == SQLTokenTypes.MINUS
-            || currentTokenType() == SQLTokenTypes.PLUS
+        while (currentTokenType() == TokenType.MINUS
+            || currentTokenType() == TokenType.PLUS
             ) {
             Token token = consume();
-            if (token.getType() == SQLTokenTypes.MINUS) {
+            if (token.getType() == TokenType.MINUS) {
                 left = new Minus(left, parseFactor());
             }
-            else if (token.getType() == SQLTokenTypes.PLUS) {
+            else if (token.getType() == TokenType.PLUS) {
                 left = new Plus(left, parseFactor());
             }
             else {
@@ -195,18 +316,18 @@ public class Parser {
 
     private WhatElement parseFactor() {
         WhatElement left = parsePrimary();
-        while (currentTokenType() == SQLTokenTypes.VERTBARS
-            || currentTokenType() == SQLTokenTypes.DIVIDE
-            || currentTokenType() == SQLTokenTypes.ASTERISK
+        while (currentTokenType() == TokenType.CONCATENATE
+            || currentTokenType() == TokenType.DIVIDE
+            || currentTokenType() == TokenType.ASTERISK
             ) {
             Token token = consume();
-            if (token.getType() == SQLTokenTypes.VERTBARS) {
+            if (token.getType() == TokenType.CONCATENATE) {
                 left = new Concatenate(left, parsePrimary());
             }
-            else if (token.getType() == SQLTokenTypes.DIVIDE) {
+            else if (token.getType() == TokenType.DIVIDE) {
                 left = new Divide(left, parsePrimary());
             }
-            else if (token.getType() == SQLTokenTypes.ASTERISK) {
+            else if (token.getType() == TokenType.ASTERISK) {
                 left = new Multiply(left, parsePrimary());
             }
             else {
@@ -223,8 +344,8 @@ public class Parser {
     public BooleanExpression parseCondition() {
         BooleanExpression firstTerm = parseBooleanTerm();
         
-        if (currentTokenType() == SQLTokenTypes.LITERAL_or) {
-            expectAndConsume(SQLTokenTypes.LITERAL_or);
+        if (currentTokenType() == TokenType.KEYWORD_or) {
+            expectAndConsume(TokenType.KEYWORD_or);
             BooleanExpression right = parseCondition();
             return new Or(firstTerm, right);
         }
@@ -235,8 +356,8 @@ public class Parser {
     private BooleanExpression parseBooleanTerm() {
         BooleanExpression firstFactor = parseBooleanFactor();
         
-        if (currentTokenType() == SQLTokenTypes.LITERAL_and) {
-            expectAndConsume(SQLTokenTypes.LITERAL_and);
+        if (currentTokenType() == TokenType.KEYWORD_and) {
+            expectAndConsume(TokenType.KEYWORD_and);
             BooleanExpression right = parseBooleanTerm();
             return new And(firstFactor, right);
         }
@@ -249,46 +370,46 @@ public class Parser {
     }
 
     private BooleanExpression parseBooleanPrimary() {
-        if (consumeIfMatches(SQLTokenTypes.LITERAL_not)) {
+        if (consumeIfMatches(TokenType.KEYWORD_not)) {
             BooleanExpression expression = parseBooleanPrimary();
             return new Not(expression);
         }
 
-        if (consumeIfMatches(SQLTokenTypes.OPEN_PAREN)) {
+        if (consumeIfMatches(TokenType.OPEN_PAREN)) {
             BooleanExpression expression = parseCondition();
-            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+            expectAndConsume(TokenType.CLOSE_PAREN);
             return expression;
         }
 
         WhatElement left = parsePrimary();
-        if (consumeIfMatches(SQLTokenTypes.EQUAL)) {
+        if (consumeIfMatches(TokenType.EQUAL)) {
             WhatElement right = parsePrimary();
             return new Equal(left, right);
         }
-        else if (consumeIfMatches(SQLTokenTypes.NOT_EQUAL)) {
+        else if (consumeIfMatches(TokenType.LESS_GREATER)) {
             WhatElement right = parsePrimary();
             return NotEqual.construct(left, right);
         }
-        else if (consumeIfMatches(SQLTokenTypes.NOT_EQUAL_2)) {
+        else if (consumeIfMatches(TokenType.BANG_EQUAL)) {
             WhatElement right = parsePrimary();
             return NotEqual.construct(left, right);
         }
-        else if (consumeIfMatches(SQLTokenTypes.BIGGER)) {
+        else if (consumeIfMatches(TokenType.GREATER)) {
             WhatElement right = parsePrimary();
             return new Greater(left, right);
         }
-        else if (consumeIfMatches(SQLTokenTypes.SMALLER)) {
+        else if (consumeIfMatches(TokenType.LESS)) {
             WhatElement right = parsePrimary();
             return new Greater(right, left);
         }
-        else if (consumeIfMatches(SQLTokenTypes.LITERAL_not)) {
+        else if (consumeIfMatches(TokenType.KEYWORD_not)) {
             return new Not(parseIn(left));
         }
-        else if (currentTokenType() == SQLTokenTypes.LITERAL_in) {
+        else if (currentTokenType() == TokenType.KEYWORD_in) {
             return parseIn(left);
         }
-        else if (consumeIfMatches(SQLTokenTypes.LITERAL_is)) {
-            if (consumeIfMatches(SQLTokenTypes.LITERAL_not)) {
+        else if (consumeIfMatches(TokenType.KEYWORD_is)) {
+            if (consumeIfMatches(TokenType.KEYWORD_not)) {
                 return new Not(parseIs(left));
             }
             return parseIs(left);
@@ -299,15 +420,15 @@ public class Parser {
     }
 
     private BooleanExpression parseIs(WhatElement left) {
-        expectAndConsume(SQLTokenTypes.LITERAL_null);
+        expectAndConsume(TokenType.KEYWORD_null);
         return new IsNull(left);
     }
 
     private BooleanExpression parseIn(WhatElement left) {
-        expectAndConsume(SQLTokenTypes.LITERAL_in);
-        expectAndConsume(SQLTokenTypes.OPEN_PAREN);
+        expectAndConsume(TokenType.KEYWORD_in);
+        expectAndConsume(TokenType.OPEN_PAREN);
         List expressions = parseExpressionList();
-        expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+        expectAndConsume(TokenType.CLOSE_PAREN);
         return new In(left, expressions);
     }
 
@@ -315,7 +436,7 @@ public class Parser {
         List expressions = new ArrayList();
         expressions.add(parsePrimary());
         
-        while (consumeIfMatches(SQLTokenTypes.COMMA)) {
+        while (consumeIfMatches(TokenType.COMMA)) {
             expressions.add(parsePrimary());
         }
         
@@ -325,40 +446,40 @@ public class Parser {
     public WhatElement parsePrimary() {
         AggregateArgumentParser argumentParser = new AggregateArgumentParser();
 
-        if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {
+        if (currentTokenType() == TokenType.IDENTIFIER) {
             return parseColumnReference();
         }
-        else if (currentTokenType() == SQLTokenTypes.NUMBER) {
+        else if (currentTokenType() == TokenType.NUMBER) {
             int number = consumeInteger();
             return new MathematicalInt(number);
         }
-        else if (currentTokenType() == SQLTokenTypes.QUOTED_STRING) {
-            Token literal = expectAndConsume(SQLTokenTypes.QUOTED_STRING);
+        else if (currentTokenType() == TokenType.QUOTED_STRING) {
+            Token literal = expectAndConsume(TokenType.QUOTED_STRING);
             return new QuotedString(literal.getText());
         }
-        else if (consumeIfMatches(SQLTokenTypes.PARAMETER)) {
+        else if (consumeIfMatches(TokenType.PARAMETER)) {
             return JdbcParameter.INSTANCE;
         }
-        else if (consumeIfMatches(SQLTokenTypes.LITERAL_null)) {
-            throw new MayflyException("To check for null, use IS NULL or IS NOT NULL, not a null literal");
+        else if (consumeIfMatches(TokenType.KEYWORD_null)) {
+            throw new FoundNullLiteral();
         }
-        else if (argumentParser.parse(SQLTokenTypes.LITERAL_max, false)) {
+        else if (argumentParser.parse(TokenType.KEYWORD_max, false)) {
             return new Maximum(
                 (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
-        else if (argumentParser.parse(SQLTokenTypes.LITERAL_min, false)) {
+        else if (argumentParser.parse(TokenType.KEYWORD_min, false)) {
             return new Minimum(
                 (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
-        else if (argumentParser.parse(SQLTokenTypes.LITERAL_sum, false)) {
+        else if (argumentParser.parse(TokenType.KEYWORD_sum, false)) {
             return new Sum(
                 (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
-        else if (argumentParser.parse(SQLTokenTypes.LITERAL_avg, false)) {
+        else if (argumentParser.parse(TokenType.KEYWORD_avg, false)) {
             return new Average(
                 (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
         }
-        else if (argumentParser.parse(SQLTokenTypes.LITERAL_count, true)) {
+        else if (argumentParser.parse(TokenType.KEYWORD_count, true)) {
             if (argumentParser.gotAsterisk) {
                 return new CountAll(argumentParser.functionName);
             } else {
@@ -366,9 +487,9 @@ public class Parser {
                     (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
             }
         }
-        else if (consumeIfMatches(SQLTokenTypes.OPEN_PAREN)) {
+        else if (consumeIfMatches(TokenType.OPEN_PAREN)) {
             WhatElement expression = parseExpression();
-            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+            expectAndConsume(TokenType.CLOSE_PAREN);
             return expression;
         }
         else {
@@ -382,22 +503,22 @@ public class Parser {
         boolean gotAsterisk;
         boolean distinct;
 
-        boolean parse(int aggregateTokenType, boolean allowAsterisk) {
+        boolean parse(TokenType aggregateTokenType, boolean allowAsterisk) {
             if (currentTokenType() == aggregateTokenType) {
                 Token max = expectAndConsume(aggregateTokenType);
                 functionName = max.getText();
-                expectAndConsume(SQLTokenTypes.OPEN_PAREN);
-                if (allowAsterisk && consumeIfMatches(SQLTokenTypes.ASTERISK)) {
+                expectAndConsume(TokenType.OPEN_PAREN);
+                if (allowAsterisk && consumeIfMatches(TokenType.ASTERISK)) {
                     gotAsterisk = true;
                 } else {
-                    if (consumeIfMatches(SQLTokenTypes.LITERAL_all)) {
+                    if (consumeIfMatches(TokenType.KEYWORD_all)) {
                     }
-                    else if (consumeIfMatches(SQLTokenTypes.LITERAL_distinct)) {
+                    else if (consumeIfMatches(TokenType.KEYWORD_distinct)) {
                         distinct = true;
                     }
                     expression = parseExpression();
                 }
-                expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+                expectAndConsume(TokenType.CLOSE_PAREN);
                 return true;
             }
             return false;
@@ -406,8 +527,8 @@ public class Parser {
 
     private SingleColumn parseColumnReference() {
         String firstIdentifier = consumeIdentifier();
-        if (currentTokenType() == SQLTokenTypes.DOT) {
-            expectAndConsume(SQLTokenTypes.DOT);
+        if (currentTokenType() == TokenType.PERIOD) {
+            expectAndConsume(TokenType.PERIOD);
             String column = consumeIdentifier();
             return new SingleColumn(firstIdentifier, column);
         } else {
@@ -419,44 +540,44 @@ public class Parser {
         From from = new From();
         from.add(parseFromItem());
         
-        while (currentTokenType() == SQLTokenTypes.COMMA) {
-            expectAndConsume(SQLTokenTypes.COMMA);
+        while (currentTokenType() == TokenType.COMMA) {
+            expectAndConsume(TokenType.COMMA);
             from.add(parseFromItem());
         }
         return from;
     }
 
     private FromElement parseFromItem() {
-        if (consumeIfMatches(SQLTokenTypes.OPEN_PAREN)) {
+        if (consumeIfMatches(TokenType.OPEN_PAREN)) {
             FromElement fromElement = parseFromItem();
-            expectAndConsume(SQLTokenTypes.CLOSE_PAREN);
+            expectAndConsume(TokenType.CLOSE_PAREN);
             return fromElement;
         }
 
         FromElement left = parseTableReference();
         while (true) {
-            if (currentTokenType() == SQLTokenTypes.LITERAL_cross) {
-                expectAndConsume(SQLTokenTypes.LITERAL_cross);
-                expectAndConsume(SQLTokenTypes.LITERAL_join);
+            if (currentTokenType() == TokenType.KEYWORD_cross) {
+                expectAndConsume(TokenType.KEYWORD_cross);
+                expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
                 left = new InnerJoin(left, right, Where.EMPTY);
             }
-            else if (currentTokenType() == SQLTokenTypes.LITERAL_inner) {
-                expectAndConsume(SQLTokenTypes.LITERAL_inner);
-                expectAndConsume(SQLTokenTypes.LITERAL_join);
+            else if (currentTokenType() == TokenType.KEYWORD_inner) {
+                expectAndConsume(TokenType.KEYWORD_inner);
+                expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
-                expectAndConsume(SQLTokenTypes.LITERAL_on);
+                expectAndConsume(TokenType.KEYWORD_on);
                 Where condition = parseWhere();
                 left = new InnerJoin(left, right, condition);
             }
-            else if (currentTokenType() == SQLTokenTypes.LITERAL_left) {
-                expectAndConsume(SQLTokenTypes.LITERAL_left);
-                if (currentTokenType() == SQLTokenTypes.LITERAL_outer) {
-                    expectAndConsume(SQLTokenTypes.LITERAL_outer);
+            else if (currentTokenType() == TokenType.KEYWORD_left) {
+                expectAndConsume(TokenType.KEYWORD_left);
+                if (currentTokenType() == TokenType.KEYWORD_outer) {
+                    expectAndConsume(TokenType.KEYWORD_outer);
                 }
-                expectAndConsume(SQLTokenTypes.LITERAL_join);
+                expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
-                expectAndConsume(SQLTokenTypes.LITERAL_on);
+                expectAndConsume(TokenType.KEYWORD_on);
                 Where condition = parseWhere();
                 left = new LeftJoin(left, right, condition);
             }
@@ -469,29 +590,40 @@ public class Parser {
     public FromTable parseTableReference() {
         String firstIdentifier = consumeIdentifier();
         String table;
-        if (currentTokenType() == SQLTokenTypes.DOT) {
-            expectAndConsume(SQLTokenTypes.DOT);
+        if (currentTokenType() == TokenType.PERIOD) {
+            expectAndConsume(TokenType.PERIOD);
             table = consumeIdentifier();
         } else {
             table = firstIdentifier;
         }
 
-        if (currentTokenType() == SQLTokenTypes.IDENTIFIER) {
+        if (currentTokenType() == TokenType.IDENTIFIER) {
             String alias = consumeIdentifier();
             return new FromTable(table, alias);
         } else {
             return new FromTable(table);
         }
     }
+    
+    public InsertTable parseInsertTable() {
+        String first = consumeIdentifier();
+        if (consumeIfMatches(TokenType.PERIOD)) {
+            String table = consumeIdentifier();
+            return new InsertTable(first, table);
+        }
+        else {
+            return new InsertTable(first);
+        }
+    }
 
     private Aggregator parseGroupBy() {
-        if (consumeIfMatches(SQLTokenTypes.LITERAL_group)) {
-            expectAndConsume(SQLTokenTypes.LITERAL_by);
+        if (consumeIfMatches(TokenType.KEYWORD_group)) {
+            expectAndConsume(TokenType.KEYWORD_by);
             
             GroupBy groupBy = new GroupBy();
             groupBy.add(parseGroupItem());
             
-            while (consumeIfMatches(SQLTokenTypes.COMMA)) {
+            while (consumeIfMatches(TokenType.COMMA)) {
                 groupBy.add(parseGroupItem());
             }
             return groupBy;
@@ -506,13 +638,13 @@ public class Parser {
     }
 
     private OrderBy parseOrderBy() {
-        if (consumeIfMatches(SQLTokenTypes.LITERAL_order)) {
-            expectAndConsume(SQLTokenTypes.LITERAL_by);
+        if (consumeIfMatches(TokenType.KEYWORD_order)) {
+            expectAndConsume(TokenType.KEYWORD_by);
             
             OrderBy orderBy = new OrderBy();
             orderBy.add(parseOrderItem());
             
-            while (consumeIfMatches(SQLTokenTypes.COMMA)) {
+            while (consumeIfMatches(TokenType.COMMA)) {
                 orderBy.add(parseOrderItem());
             }
             return orderBy;
@@ -523,7 +655,7 @@ public class Parser {
     }
 
     private OrderItem parseOrderItem() {
-        if (currentTokenType() == SQLTokenTypes.NUMBER) {
+        if (currentTokenType() == TokenType.NUMBER) {
             int reference = consumeInteger();
             boolean ascending = parseAscending();
             return new ReferenceOrderItem(reference, ascending);
@@ -536,10 +668,10 @@ public class Parser {
     }
 
     private boolean parseAscending() {
-        if (consumeIfMatches(SQLTokenTypes.LITERAL_asc)) {
+        if (consumeIfMatches(TokenType.KEYWORD_asc)) {
             return true;
         }
-        else if (consumeIfMatches(SQLTokenTypes.LITERAL_desc)) {
+        else if (consumeIfMatches(TokenType.KEYWORD_desc)) {
             return false;
         }
         else {
@@ -548,11 +680,11 @@ public class Parser {
     }
 
     private Limit parseLimit() {
-        if (currentTokenType() == SQLTokenTypes.LITERAL_limit) {
-            expectAndConsume(SQLTokenTypes.LITERAL_limit);
+        if (currentTokenType() == TokenType.KEYWORD_limit) {
+            expectAndConsume(TokenType.KEYWORD_limit);
             int count = consumeInteger();
             
-            if (consumeIfMatches(SQLTokenTypes.LITERAL_offset)) {
+            if (consumeIfMatches(TokenType.KEYWORD_offset)) {
                 int offset = consumeInteger();
                 return new Limit(count, offset);
             }
@@ -564,7 +696,7 @@ public class Parser {
         }
     }
 
-    private int currentTokenType() {
+    private TokenType currentTokenType() {
         return currentToken().getType();
     }
 
@@ -578,7 +710,7 @@ public class Parser {
         Iterator iter = tokens.iterator();
         while (iter.hasNext()) {
             Token token = (Token) iter.next();
-            if (token.getType() == SQLTokenTypes.EOF) {
+            if (token.getType() == TokenType.END_OF_FILE) {
                 break;
             }
             if (first) {
@@ -596,10 +728,10 @@ public class Parser {
         Iterator iter = tokens.iterator();
         while (iter.hasNext()) {
             Token token = (Token) iter.next();
-            if (token.getType() == SQLTokenTypes.EOF) {
+            if (token.getType() == TokenType.END_OF_FILE) {
                 break;
             }
-            result.append(Tree.typeName(token.getType()));
+            result.append(token.getType().description());
             result.append(" ");
             result.append(token.getText());
             result.append("\n");
@@ -608,16 +740,16 @@ public class Parser {
     }
 
     private String consumeIdentifier() {
-        Token token = expectAndConsume(SQLTokenTypes.IDENTIFIER);
+        Token token = expectAndConsume(TokenType.IDENTIFIER);
         return token.getText();
     }
 
     private int consumeInteger() {
-        Token number = expectAndConsume(SQLTokenTypes.NUMBER);
+        Token number = expectAndConsume(TokenType.NUMBER);
         return Integer.parseInt(number.getText());
     }
 
-    private boolean consumeIfMatches(int type) {
+    private boolean consumeIfMatches(TokenType type) {
         if (currentTokenType() == type) {
             expectAndConsume(type);
             return true;
@@ -625,7 +757,7 @@ public class Parser {
         return false;
     }
 
-    private Token expectAndConsume(int expectedType) {
+    private Token expectAndConsume(TokenType expectedType) {
         Token token = currentToken();
         if (token.getType() != expectedType) {
             throw new ParserException(
@@ -649,49 +781,21 @@ public class Parser {
         return (Token) tokens.remove(0);
     }
 
-    private String describeExpectation(int expectedType) {
-        String niceTokenTypeName = niceTokenTypeName(expectedType);
-        if (niceTokenTypeName != null) {
-            return niceTokenTypeName;
-        }
-
-        return Tree.typeName(expectedType);
+    private String describeExpectation(TokenType expectedType) {
+        return expectedType.description();
     }
 
     private String describeToken(Token token) {
-        String niceTokenTypeName = niceTokenTypeName(token.getType());
-        if (niceTokenTypeName != null) {
-            return niceTokenTypeName;
-        }
-
-        if (token.getType() == SQLTokenTypes.NUMBER) {
+        TokenType type = token.getType();
+        if (type == TokenType.NUMBER) {
             return token.getText();
         }
-        else if (token.getType() == SQLTokenTypes.IDENTIFIER) {
+        else if (type == TokenType.IDENTIFIER) {
             return token.getText();
         }
         else {
-            return Tree.typeName(token.getType());
+            return type.description();
         }
-    }
-
-    private String niceTokenTypeName(int type) {
-        if (type == SQLTokenTypes.LITERAL_on) {
-            return "ON";
-        }
-        else if (type == SQLTokenTypes.LITERAL_from) {
-            return "FROM";
-        }
-        else if (type == SQLTokenTypes.LITERAL_in) {
-            return "IN";
-        }
-        else if (type == SQLTokenTypes.LITERAL_not) {
-            return "NOT";
-        }
-        else if (type == SQLTokenTypes.LITERAL_null) {
-            return "NULL";
-        }
-        return null;
     }
 
 }

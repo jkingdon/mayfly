@@ -40,9 +40,9 @@ public abstract class Dialect {
     }
 
     /** Should a test look for behavior in which Mayfly intentionally diverges
-     * from what hypersonic does?
+     * from what other databases do.
      * 
-     * (This doesn't make as much sense as the individual tests for specific questions
+     * (In most case it makes more sense to have an individual test for a specific questions
      * like detectsAmbiguousColumns or whatever).  */
     public boolean expectMayflyBehavior() {
         return false;
@@ -134,6 +134,10 @@ public abstract class Dialect {
 
     public boolean allowCountDistinctStar() {
         return false;
+    }
+
+    public boolean canQuoteIdentifiers() {
+        return true;
     }
 
 }
