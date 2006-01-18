@@ -12,11 +12,11 @@ public class OrTest extends TestCase {
     public void testParse() throws Exception {
         assertEquals(
                 new Or(
-                    new Equal(new SingleColumn("name"), new QuotedString("'steve'")),
                     new Or(
-                        new Equal(new SingleColumn("species"), new QuotedString("'homo sapiens'")),
-                        new Equal(new SingleColumn("size"), new MathematicalInt(6))
-                    )
+                        new Equal(new SingleColumn("name"), new QuotedString("'steve'")),
+                        new Equal(new SingleColumn("species"), new QuotedString("'homo sapiens'"))
+                    ),
+                    new Equal(new SingleColumn("size"), new MathematicalInt(6))
                 ),
                 new Parser("name='steve' or species='homo sapiens' or size = 6").parseCondition()
         );

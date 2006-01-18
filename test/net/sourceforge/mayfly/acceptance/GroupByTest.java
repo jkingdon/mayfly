@@ -186,11 +186,46 @@ public class GroupByTest extends SqlTestCase {
     }
 
     public void testWhereIsAppliedBeforeGroupBy() throws Exception {
+        execute("create table foo (x integer, y integer, z integer)");
+        execute("insert into foo(x, y, z) values (1, 10, 200)");
+        execute("insert into foo(x, y, z) values (3, 10, 300)");
+        execute("insert into foo(x, y, z) values (9, 10, 400)");
         
+        assertResultList(new String[] { " 2 " }, query("select avg(x) from foo where z < 400 group by y"));
     }
 
     public void testHavingIsAppliedAfterGroupBy() throws Exception {
+        if (!mayflyMissing()) {
+            return;
+        }
+
+        execute("create table foo (x integer, y integer, z integer)");
+        execute("insert into foo(x, y, z) values (1, 10, 200)");
+        execute("insert into foo(x, y, z) values (3, 10, 300)");
+        execute("insert into foo(x, y, z) values (8, 20, 400)");
+        execute("insert into foo(x, y, z) values (9, 20, 400)");
         
+        String groupByYHavingY = "select avg(x) from foo group by y having y < 20";
+        if (dialect.canApplyHavingToKey()) {
+            assertResultList(new String[] { " 2 " }, query(groupByYHavingY));
+        }
+        else {
+            expectQueryFailure(groupByYHavingY, null);
+        }
+    }
+    
+    public void testHavingIsExpression() throws Exception {
+        if (!mayflyMissing()) {
+            return;
+        }
+
+        execute("create table foo (x integer, y integer, z integer)");
+        execute("insert into foo(x, y, z) values (1, 10, 200)");
+        execute("insert into foo(x, y, z) values (3, 10, 300)");
+        execute("insert into foo(x, y, z) values (7, 20, 400)");
+        execute("insert into foo(x, y, z) values (9, 20, 400)");
+        
+        assertResultList(new String[] { " 2 " }, query("select avg(x) from foo group by y having avg(x) < 5"));
     }
     
     public void testHavingIsDisallowedOnUnaggregated() throws Exception {

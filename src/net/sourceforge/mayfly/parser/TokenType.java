@@ -7,37 +7,33 @@ public class TokenType {
     
     private static Map keywords = new HashMap();
 
-    private static TokenType register(String description) {
-        return new TokenType(description);
-    }
-
     private static TokenType registerKeyword(String lowercaseKeyword) {
         TokenType type = new TokenType(lowercaseKeyword.toUpperCase());
         keywords.put(lowercaseKeyword, type);
         return type;
     }
 
-    public static final TokenType END_OF_FILE = register("end of file");
-    public static final TokenType IDENTIFIER = register("identifier");
-    public static final TokenType QUOTED_STRING = register("string");
-    public static final TokenType NUMBER = register("number");
-    public static final TokenType PERIOD = register("'.'");
-    public static final TokenType COMMA = register("','");
-    public static final TokenType CONCATENATE = register("||");
-    public static final TokenType PLUS = register("'+'");
-    public static final TokenType MINUS = register("'-'");
-    public static final TokenType DIVIDE = register("'/'");
-    public static final TokenType ASTERISK = register("'*'");
-    public static final TokenType OPEN_PAREN = register("'('");
-    public static final TokenType CLOSE_PAREN = register("')'");
-    public static final TokenType PARAMETER = register("'?'");
-    public static final TokenType LESS = register("'<'");
-    public static final TokenType LESS_EQUAL = register("'<='");
-    public static final TokenType GREATER = register("'>'");
-    public static final TokenType GREATER_EQUAL = register("'>='");
-    public static final TokenType EQUAL = register("'='");
-    public static final TokenType LESS_GREATER = register("'<>'");
-    public static final TokenType BANG_EQUAL = register("'!='");
+    public static final TokenType END_OF_FILE = new TokenType("end of file");
+    public static final TokenType IDENTIFIER = new TokenType("identifier");
+    public static final TokenType QUOTED_STRING = new TokenType("string");
+    public static final TokenType NUMBER = new TokenType("number");
+    public static final TokenType PERIOD = new TokenType("'.'");
+    public static final TokenType COMMA = new TokenType("','");
+    public static final TokenType CONCATENATE = new TokenType("||");
+    public static final TokenType PLUS = new TokenType("'+'");
+    public static final TokenType MINUS = new TokenType("'-'");
+    public static final TokenType DIVIDE = new TokenType("'/'");
+    public static final TokenType ASTERISK = new TokenType("'*'");
+    public static final TokenType OPEN_PAREN = new TokenType("'('");
+    public static final TokenType CLOSE_PAREN = new TokenType("')'");
+    public static final TokenType PARAMETER = new TokenType("'?'");
+    public static final TokenType LESS = new TokenType("'<'");
+    public static final TokenType LESS_EQUAL = new TokenType("'<='");
+    public static final TokenType GREATER = new TokenType("'>'");
+    public static final TokenType GREATER_EQUAL = new TokenType("'>='");
+    public static final TokenType EQUAL = new TokenType("'='");
+    public static final TokenType LESS_GREATER = new TokenType("'<>'");
+    public static final TokenType BANG_EQUAL = new TokenType("'!='");
 
     public static final TokenType KEYWORD_all = registerKeyword("all");
     public static final TokenType KEYWORD_and = registerKeyword("and");

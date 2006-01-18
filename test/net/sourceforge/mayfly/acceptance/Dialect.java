@@ -140,4 +140,8 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean canApplyHavingToKey() {
+        return true;
+    }
+
 }

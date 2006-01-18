@@ -90,6 +90,10 @@ public class MySqlDialect extends Dialect {
         return false;
     }
     
+    public boolean canApplyHavingToKey() {
+        return false;
+    }
+    
     public boolean canGetValueViaExpressionName() {
         return true;
     }

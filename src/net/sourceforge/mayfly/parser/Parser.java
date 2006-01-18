@@ -342,27 +342,27 @@ public class Parser {
     }
 
     public BooleanExpression parseCondition() {
-        BooleanExpression firstTerm = parseBooleanTerm();
+        BooleanExpression expression = parseBooleanTerm();
         
-        if (currentTokenType() == TokenType.KEYWORD_or) {
+        while (currentTokenType() == TokenType.KEYWORD_or) {
             expectAndConsume(TokenType.KEYWORD_or);
-            BooleanExpression right = parseCondition();
-            return new Or(firstTerm, right);
+            BooleanExpression right = parseBooleanTerm();
+            expression = new Or(expression, right);
         }
 
-        return firstTerm;
+        return expression;
     }
 
     private BooleanExpression parseBooleanTerm() {
-        BooleanExpression firstFactor = parseBooleanFactor();
+        BooleanExpression expression = parseBooleanFactor();
         
-        if (currentTokenType() == TokenType.KEYWORD_and) {
+        while (currentTokenType() == TokenType.KEYWORD_and) {
             expectAndConsume(TokenType.KEYWORD_and);
-            BooleanExpression right = parseBooleanTerm();
-            return new And(firstFactor, right);
+            BooleanExpression right = parseBooleanFactor();
+            expression = new And(expression, right);
         }
 
-        return firstFactor;
+        return expression;
     }
 
     private BooleanExpression parseBooleanFactor() {
