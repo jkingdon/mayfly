@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.util.*;
 
 import java.util.*;
@@ -10,11 +11,16 @@ import java.util.*;
 public class GroupBy extends ValueObject implements Aggregator {
     
     private List items = new ArrayList();
+    private BooleanExpression having = BooleanExpression.TRUE;
 
     public void add(GroupItem item) {
         items.add(item);
     }
 
+    public void setHaving(BooleanExpression having) {
+        this.having = having;
+    }
+    
     public GroupedRows makeGroupedRows(Rows rows) {
         List columns = findColumns(rows);
 
@@ -43,11 +49,12 @@ public class GroupBy extends ValueObject implements Aggregator {
     }
 
     public Rows group(Rows rows, What what, What selected) {
-        return makeGroupedRows(rows).ungroup(what);
+        Rows resultOfGrouping = makeGroupedRows(rows).ungroup(what);
+        return (Rows) resultOfGrouping.select(having);
     }
     
     public void check(Row dummyRow, What what, What selected) {
         makeGroupedRows(new Rows(dummyRow)).ungroup(what);
     }
-    
+
 }

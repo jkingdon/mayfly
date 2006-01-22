@@ -166,7 +166,7 @@ public class GroupByTest extends SqlTestCase {
         );
     }
     
-    public void testCountOnKey() throws Exception {
+    public void testCountOnNullKey() throws Exception {
         // Kind of an obvious combination of GROUP BY and COUNT,
         // but it was enough for the authors of The Practical SQL Handbook
         // to mention specifically.
@@ -214,7 +214,7 @@ public class GroupByTest extends SqlTestCase {
         }
     }
     
-    public void testHavingIsExpression() throws Exception {
+    public void testHavingIsSelectedExpression() throws Exception {
         if (!mayflyMissing()) {
             return;
         }
@@ -228,9 +228,49 @@ public class GroupByTest extends SqlTestCase {
         assertResultList(new String[] { " 2 " }, query("select avg(x) from foo group by y having avg(x) < 5"));
     }
     
+    public void testHavingIsKeyExpression() throws Exception {
+        if (!mayflyMissing()) {
+            return;
+        }
+
+        execute("create table foo (x integer, y integer, z integer)");
+        execute("insert into foo(x, y, z) values (1, 10, 200)");
+        execute("insert into foo(x, y, z) values (3, 10, 200)");
+        execute("insert into foo(x, y, z) values (8, 20, 400)");
+        execute("insert into foo(x, y, z) values (9, 20, 400)");
+        
+        String groupByYHavingY = "select avg(x) from foo group by y, z having (y + z / 10) < 60";
+        if (dialect.canApplyHavingToKey()) {
+            assertResultList(new String[] { " 2 " }, query(groupByYHavingY));
+        }
+        else {
+            expectQueryFailure(groupByYHavingY, null);
+        }
+    }
+    
     public void testHavingIsDisallowedOnUnaggregated() throws Exception {
-        // select pub-id, avg(price) group by pub_id having price > 5
-        // (price is bogus)
+        if (!mayflyMissing()) {
+            return;
+        }
+
+        execute("create table foo (x integer, y integer)");
+        expectQueryFailure("select avg(x) from foo group by y having x < 5", 
+            "x is not aggregate or mentioned in GROUP BY");
+    }
+    
+    public void testHavingWithoutGroupBy() throws Exception {
+        execute("create table foo (x integer, y integer)");
+        String havingWithoutGroupBy = "select x from foo having x < 5";
+        if (dialect.canHaveHavingWithoutGroupBy()) {
+            assertResultList(new String[] { }, query(havingWithoutGroupBy));
+            
+            execute("insert into foo(x, y) values (3, 17)");
+            execute("insert into foo(x, y) values (7, 26)");
+            assertResultList(new String[] { "3" }, query(havingWithoutGroupBy));
+        }
+        else {
+            expectQueryFailure(havingWithoutGroupBy, "can't specify HAVING without GROUP BY");
+        }
     }
     
     public void testGroupByAndOrderBy() throws Exception {

@@ -10,14 +10,14 @@ public class NotEqualTest extends TestCase {
     public void testParse() throws Exception {
         assertEquals(
                 new Not(new Equal(new SingleColumn("name"), new QuotedString("'steve'"))),
-                new Parser("name <> 'steve'").parseCondition()
+                new Parser("name <> 'steve'").parseCondition().asBoolean()
         );
     }
 
     public void testParse2() throws Exception {
         assertEquals(
                 new Not(new Equal(new SingleColumn("name"), new QuotedString("'steve'"))),
-                new Parser("name != 'steve'").parseCondition()
+                new Parser("name != 'steve'").parseCondition().asBoolean()
         );
     }
 

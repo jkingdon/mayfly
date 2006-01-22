@@ -12,7 +12,7 @@ public class NotTest extends TestCase {
     public void testParse() throws Exception {
         assertEquals(
             new Not(new Equal(new SingleColumn("name"), new QuotedString("'jim'"))),
-            new Parser("not name = 'jim'").parseCondition()
+            new Parser("not name = 'jim'").parseCondition().asBoolean()
         );
     }
     

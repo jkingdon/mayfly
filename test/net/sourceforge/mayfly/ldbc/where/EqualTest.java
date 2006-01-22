@@ -12,7 +12,7 @@ public class EqualTest extends TestCase {
     public void testParse() throws Exception {
         assertEquals(
                 new Equal(new SingleColumn("name"), new QuotedString("'steve'")),
-                new Parser("name='steve'").parseCondition()
+                new Parser("name='steve'").parseCondition().asBoolean()
         );
     }
 

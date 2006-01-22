@@ -201,7 +201,9 @@ public class ParserTest extends TestCase {
             new Parser("f 5").parseWhere();
             fail();
         } catch (ParserException e) {
-            assertEquals("expected boolean operator but got 5", e.getMessage());
+            // This would be a nice message, as would "expected boolean but got f" or some such.
+//            assertEquals("expected boolean operator but got 5", e.getMessage());
+            assertEquals("expected boolean expression but got non-boolean expression", e.getMessage());
         }
     }
     
@@ -217,9 +219,50 @@ public class ParserTest extends TestCase {
         assertEquals("", parser.remainingTokens());
     }
     
+    public void testCondition() throws Exception {
+        Parser parser = new Parser("(y + z / 10) < 60");
+        BooleanExpression condition = parser.parseCondition().asBoolean();
+        assertEquals("", parser.remainingTokens());
+        assertEquals(
+            new Greater(
+                new MathematicalInt(60),
+                new Plus(
+                    new SingleColumn("y"), 
+                    new Divide(
+                        new SingleColumn("z"), 
+                        new MathematicalInt(10)
+                    ))
+            ),
+            condition
+        );
+    }
+    
+    public void testExpectedBooleanGotNonBoolean() throws Exception {
+        Parser parser = new Parser("5 + x");
+        try {
+            parser.parseCondition().asBoolean();
+            fail();
+        } catch (ParserException e) {
+            // Would be really nice to say what is going on with a more specific error message
+//            assertEquals("expected boolean expression but got 5 + x", e.getMessage());
+            assertEquals("expected boolean expression but got non-boolean expression", e.getMessage());
+        }
+    }
+    
+    public void testExpectedNonBooleanGotBoolean() throws Exception {
+        Parser parser = new Parser("5 = x");
+        try {
+            parser.parseCondition().asNonBoolean();
+            fail();
+        } catch (ParserException e) {
+            assertEquals("expected non-boolean expression but got boolean expression", e.getMessage());
+//          assertEquals("expected non-boolean expression but got 5 = x", e.getMessage());
+        }
+    }
+    
     public void testLiteralString() throws Exception {
         Parser parser = new Parser("'hi'");
-        assertEquals(new QuotedString("'hi'"), parser.parsePrimary());
+        assertEquals(new QuotedString("'hi'"), parser.parsePrimary().asNonBoolean());
         assertEquals("", parser.remainingTokens());
     }
     
@@ -263,7 +306,7 @@ public class ParserTest extends TestCase {
         // same expression, due to differing types...
 
         Parser parser = new Parser("a * b + c / e - a");
-        WhatElement expression = parser.parseExpression();
+        WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
         assertEquals(
             new Minus(
@@ -279,7 +322,7 @@ public class ParserTest extends TestCase {
     
     public void testDivideAssociativity() throws Exception {
         Parser parser = new Parser("a / b * c / d");
-        WhatElement expression = parser.parseExpression();
+        WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
         assertEquals(
             new Divide(
@@ -295,7 +338,7 @@ public class ParserTest extends TestCase {
 
     public void testMinusAssociativity() throws Exception {
         Parser parser = new Parser("a-b-c+d");
-        WhatElement expression = parser.parseExpression();
+        WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
         assertEquals(
             new Plus(
@@ -314,7 +357,7 @@ public class ParserTest extends TestCase {
         // But we'll pick the same as the other operators...
 
         Parser parser = new Parser("a || b || c || d");
-        WhatElement expression = parser.parseExpression();
+        WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
         assertEquals(
             new Concatenate(
@@ -330,7 +373,7 @@ public class ParserTest extends TestCase {
     
     public void testParenthesesInExpression() throws Exception {
         Parser parser = new Parser("x / (y * z)");
-        WhatElement expression = parser.parseExpression();
+        WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
         assertEquals(
             new Divide(

@@ -49,6 +49,7 @@ public class TokenType {
     public static final TokenType KEYWORD_drop = registerKeyword("drop");
     public static final TokenType KEYWORD_from = registerKeyword("from");
     public static final TokenType KEYWORD_group = registerKeyword("group");
+    public static final TokenType KEYWORD_having = registerKeyword("having");
     public static final TokenType KEYWORD_in = registerKeyword("in");
     public static final TokenType KEYWORD_inner = registerKeyword("inner");
     public static final TokenType KEYWORD_insert = registerKeyword("insert");

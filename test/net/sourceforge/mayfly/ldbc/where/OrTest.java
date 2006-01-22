@@ -18,7 +18,7 @@ public class OrTest extends TestCase {
                     ),
                     new Equal(new SingleColumn("size"), new MathematicalInt(6))
                 ),
-                new Parser("name='steve' or species='homo sapiens' or size = 6").parseCondition()
+                new Parser("name='steve' or species='homo sapiens' or size = 6").parseCondition().asBoolean()
         );
     }
 

@@ -47,7 +47,7 @@ public abstract class BooleanExpression extends ValueObject implements Selector 
 
     abstract public String firstAggregate();
 
-    public static String firstAggregate(BooleanExpression left, BooleanExpression right) {
+    public String firstAggregate(BooleanExpression left, BooleanExpression right) {
         String firstInLeft = left.firstAggregate();
         if (firstInLeft != null) {
             return firstInLeft;

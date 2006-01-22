@@ -144,4 +144,8 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean canHaveHavingWithoutGroupBy() {
+        return false;
+    }
+
 }

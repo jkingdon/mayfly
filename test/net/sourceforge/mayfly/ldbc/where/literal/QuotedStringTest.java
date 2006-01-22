@@ -8,7 +8,7 @@ import net.sourceforge.mayfly.parser.*;
 public class QuotedStringTest extends TestCase {
 
     public void testParse() throws Exception {
-        assertEquals(new QuotedString("'steve'"), new Parser("'steve'").parsePrimary());
+        assertEquals(new QuotedString("'steve'"), new Parser("'steve'").parsePrimary().asNonBoolean());
     }
 
     public void testMatchesCell() throws Exception {

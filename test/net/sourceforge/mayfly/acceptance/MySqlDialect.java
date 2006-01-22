@@ -94,6 +94,10 @@ public class MySqlDialect extends Dialect {
         return false;
     }
     
+    public boolean canHaveHavingWithoutGroupBy() {
+        return true;
+    }
+
     public boolean canGetValueViaExpressionName() {
         return true;
     }

@@ -12,7 +12,7 @@ public class GreaterTest extends TestCase {
     public void testParse() throws Exception {
         assertEquals(
                 new Greater(new SingleColumn("size"), new MathematicalInt(6)),
-                new Parser("size > 6").parseCondition()
+                new Parser("size > 6").parseCondition().asBoolean()
         );
     }
 

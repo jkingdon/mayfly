@@ -18,7 +18,7 @@ public class InTest extends TestCase {
 	                .append(new MathematicalInt(1))
 	                .append(new MathematicalInt(2))
                 ),
-                new Parser("a in (1, 2)").parseCondition()
+                new Parser("a in (1, 2)").parseCondition().asBoolean()
         );
     }
     

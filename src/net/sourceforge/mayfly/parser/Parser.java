@@ -68,8 +68,6 @@ import java.util.List;
  * mean I just don't understand ANTLR).  It is also nicer to unit test
  * this parser, there is no crazy build.xml junk like with ANTLR, and
  * who knows what other benefits.
- * 
- * The lexer is still the ANTLR one, at least for now.
  */
 public class Parser {
 
@@ -179,7 +177,7 @@ public class Parser {
         }
 
         try {
-            WhatElement expression = parseExpression();
+            WhatElement expression = parseExpression().asNonBoolean();
             if (expression instanceof JdbcParameter) {
                 return JdbcParameter.INSTANCE;
             }
@@ -292,20 +290,20 @@ public class Parser {
             return new AllColumnsFromTable(firstIdentifier);
         }
         
-        return parseExpression();
+        return parseExpression().asNonBoolean();
     }
 
-    WhatElement parseExpression() {
-        WhatElement left = parseFactor();
+    ParserExpression parseExpression() {
+        ParserExpression left = parseFactor();
         while (currentTokenType() == TokenType.MINUS
             || currentTokenType() == TokenType.PLUS
             ) {
             Token token = consume();
             if (token.getType() == TokenType.MINUS) {
-                left = new Minus(left, parseFactor());
+                left = new NonBooleanParserExpression(new Minus(left.asNonBoolean(), parseFactor().asNonBoolean()));
             }
             else if (token.getType() == TokenType.PLUS) {
-                left = new Plus(left, parseFactor());
+                left = new NonBooleanParserExpression(new Plus(left.asNonBoolean(), parseFactor().asNonBoolean()));
             }
             else {
                 throw new MayflyInternalException("Didn't expect token " + describeToken(token));
@@ -314,21 +312,27 @@ public class Parser {
         return left;
     }
 
-    private WhatElement parseFactor() {
-        WhatElement left = parsePrimary();
+    private ParserExpression parseFactor() {
+        ParserExpression left = parsePrimary();
         while (currentTokenType() == TokenType.CONCATENATE
             || currentTokenType() == TokenType.DIVIDE
             || currentTokenType() == TokenType.ASTERISK
             ) {
             Token token = consume();
             if (token.getType() == TokenType.CONCATENATE) {
-                left = new Concatenate(left, parsePrimary());
+                left = new NonBooleanParserExpression(
+                    new Concatenate(left.asNonBoolean(), parsePrimary().asNonBoolean())
+                );
             }
             else if (token.getType() == TokenType.DIVIDE) {
-                left = new Divide(left, parsePrimary());
+                left = new NonBooleanParserExpression(
+                    new Divide(left.asNonBoolean(), parsePrimary().asNonBoolean())
+                );
             }
             else if (token.getType() == TokenType.ASTERISK) {
-                left = new Multiply(left, parsePrimary());
+                left = new NonBooleanParserExpression(
+                    new Multiply(left.asNonBoolean(), parsePrimary().asNonBoolean())
+                );
             }
             else {
                 throw new MayflyInternalException("Didn't expect token " + describeToken(token));
@@ -338,84 +342,78 @@ public class Parser {
     }
 
     public Where parseWhere() {
-        return new Where(parseCondition());
+        return new Where(parseCondition().asBoolean());
     }
 
-    public BooleanExpression parseCondition() {
-        BooleanExpression expression = parseBooleanTerm();
+    public ParserExpression parseCondition() {
+        ParserExpression expression = parseBooleanTerm();
         
         while (currentTokenType() == TokenType.KEYWORD_or) {
             expectAndConsume(TokenType.KEYWORD_or);
-            BooleanExpression right = parseBooleanTerm();
-            expression = new Or(expression, right);
+            BooleanExpression right = parseBooleanTerm().asBoolean();
+            expression = new BooleanParserExpression(new Or(expression.asBoolean(), right));
         }
 
         return expression;
     }
 
-    private BooleanExpression parseBooleanTerm() {
-        BooleanExpression expression = parseBooleanFactor();
+    private ParserExpression parseBooleanTerm() {
+        ParserExpression expression = parseBooleanFactor();
         
         while (currentTokenType() == TokenType.KEYWORD_and) {
             expectAndConsume(TokenType.KEYWORD_and);
-            BooleanExpression right = parseBooleanFactor();
-            expression = new And(expression, right);
+            BooleanExpression right = parseBooleanFactor().asBoolean();
+            expression = new BooleanParserExpression(new And(expression.asBoolean(), right));
         }
 
         return expression;
     }
 
-    private BooleanExpression parseBooleanFactor() {
+    private ParserExpression parseBooleanFactor() {
         return parseBooleanPrimary();
     }
 
-    private BooleanExpression parseBooleanPrimary() {
+    private ParserExpression parseBooleanPrimary() {
         if (consumeIfMatches(TokenType.KEYWORD_not)) {
-            BooleanExpression expression = parseBooleanPrimary();
-            return new Not(expression);
+            BooleanExpression expression = parseBooleanPrimary().asBoolean();
+            return new BooleanParserExpression(new Not(expression));
         }
 
-        if (consumeIfMatches(TokenType.OPEN_PAREN)) {
-            BooleanExpression expression = parseCondition();
-            expectAndConsume(TokenType.CLOSE_PAREN);
-            return expression;
-        }
-
-        WhatElement left = parsePrimary();
+        ParserExpression left = parseExpression();
         if (consumeIfMatches(TokenType.EQUAL)) {
-            WhatElement right = parsePrimary();
-            return new Equal(left, right);
+            WhatElement right = parsePrimary().asNonBoolean();
+            return new BooleanParserExpression(new Equal(left.asNonBoolean(), right));
         }
         else if (consumeIfMatches(TokenType.LESS_GREATER)) {
-            WhatElement right = parsePrimary();
-            return NotEqual.construct(left, right);
+            WhatElement right = parsePrimary().asNonBoolean();
+            return new BooleanParserExpression(NotEqual.construct(left.asNonBoolean(), right));
         }
         else if (consumeIfMatches(TokenType.BANG_EQUAL)) {
-            WhatElement right = parsePrimary();
-            return NotEqual.construct(left, right);
+            WhatElement right = parsePrimary().asNonBoolean();
+            return new BooleanParserExpression(NotEqual.construct(left.asNonBoolean(), right));
         }
         else if (consumeIfMatches(TokenType.GREATER)) {
-            WhatElement right = parsePrimary();
-            return new Greater(left, right);
+            WhatElement right = parsePrimary().asNonBoolean();
+            return new BooleanParserExpression(new Greater(left.asNonBoolean(), right));
         }
         else if (consumeIfMatches(TokenType.LESS)) {
-            WhatElement right = parsePrimary();
-            return new Greater(right, left);
+            WhatElement right = parsePrimary().asNonBoolean();
+            return new BooleanParserExpression(new Greater(right, left.asNonBoolean()));
         }
         else if (consumeIfMatches(TokenType.KEYWORD_not)) {
-            return new Not(parseIn(left));
+            return new BooleanParserExpression(new Not(parseIn(left.asNonBoolean())));
         }
         else if (currentTokenType() == TokenType.KEYWORD_in) {
-            return parseIn(left);
+            return new BooleanParserExpression(parseIn(left.asNonBoolean()));
         }
         else if (consumeIfMatches(TokenType.KEYWORD_is)) {
             if (consumeIfMatches(TokenType.KEYWORD_not)) {
-                return new Not(parseIs(left));
+                return new BooleanParserExpression(new Not(parseIs(left.asNonBoolean())));
             }
-            return parseIs(left);
+            return new BooleanParserExpression(parseIs(left.asNonBoolean()));
         }
         else {
-            throw new ParserException("expected boolean operator but got " + describeToken(currentToken()));
+            return left;
         }
     }
 
@@ -434,61 +432,61 @@ public class Parser {
 
     private List parseExpressionList() {
         List expressions = new ArrayList();
-        expressions.add(parsePrimary());
+        expressions.add(parsePrimary().asNonBoolean());
         
         while (consumeIfMatches(TokenType.COMMA)) {
-            expressions.add(parsePrimary());
+            expressions.add(parsePrimary().asNonBoolean());
         }
         
         return expressions;
     }
 
-    public WhatElement parsePrimary() {
+    public ParserExpression parsePrimary() {
         AggregateArgumentParser argumentParser = new AggregateArgumentParser();
 
         if (currentTokenType() == TokenType.IDENTIFIER) {
-            return parseColumnReference();
+            return new NonBooleanParserExpression(parseColumnReference());
         }
         else if (currentTokenType() == TokenType.NUMBER) {
             int number = consumeInteger();
-            return new MathematicalInt(number);
+            return new NonBooleanParserExpression(new MathematicalInt(number));
         }
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
             Token literal = expectAndConsume(TokenType.QUOTED_STRING);
-            return new QuotedString(literal.getText());
+            return new NonBooleanParserExpression(new QuotedString(literal.getText()));
         }
         else if (consumeIfMatches(TokenType.PARAMETER)) {
-            return JdbcParameter.INSTANCE;
+            return new NonBooleanParserExpression(JdbcParameter.INSTANCE);
         }
         else if (consumeIfMatches(TokenType.KEYWORD_null)) {
             throw new FoundNullLiteral();
         }
         else if (argumentParser.parse(TokenType.KEYWORD_max, false)) {
-            return new Maximum(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
+            return new NonBooleanParserExpression(new Maximum(
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_min, false)) {
-            return new Minimum(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
+            return new NonBooleanParserExpression(new Minimum(
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_sum, false)) {
-            return new Sum(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
+            return new NonBooleanParserExpression(new Sum(
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_avg, false)) {
-            return new Average(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
+            return new NonBooleanParserExpression(new Average(
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_count, true)) {
             if (argumentParser.gotAsterisk) {
-                return new CountAll(argumentParser.functionName);
+                return new NonBooleanParserExpression(new CountAll(argumentParser.functionName));
             } else {
-                return new Count(
-                    (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct);
+                return new NonBooleanParserExpression(new Count(
+                    (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
             }
         }
         else if (consumeIfMatches(TokenType.OPEN_PAREN)) {
-            WhatElement expression = parseExpression();
+            ParserExpression expression = parseCondition();
             expectAndConsume(TokenType.CLOSE_PAREN);
             return expression;
         }
@@ -516,13 +514,57 @@ public class Parser {
                     else if (consumeIfMatches(TokenType.KEYWORD_distinct)) {
                         distinct = true;
                     }
-                    expression = parseExpression();
+                    expression = parseExpression().asNonBoolean();
                 }
                 expectAndConsume(TokenType.CLOSE_PAREN);
                 return true;
             }
             return false;
         }
+    }
+
+    abstract public class ParserExpression {
+
+        abstract public WhatElement asNonBoolean();
+
+        abstract public BooleanExpression asBoolean();
+
+    }
+
+    public class NonBooleanParserExpression extends ParserExpression {
+
+        private final WhatElement expression;
+
+        public NonBooleanParserExpression(WhatElement expression) {
+            this.expression = expression;
+        }
+
+        public BooleanExpression asBoolean() {
+            throw new ParserException("expected boolean expression but got non-boolean expression");
+        }
+
+        public WhatElement asNonBoolean() {
+            return expression;
+        }
+
+    }
+
+    public class BooleanParserExpression extends ParserExpression {
+
+        private final BooleanExpression expression;
+
+        public BooleanParserExpression(BooleanExpression expression) {
+            this.expression = expression;
+        }
+
+        public BooleanExpression asBoolean() {
+            return expression;
+        }
+
+        public WhatElement asNonBoolean() {
+            throw new ParserException("expected non-boolean expression but got boolean expression");
+        }
+
     }
 
     private SingleColumn parseColumnReference() {
@@ -626,9 +668,16 @@ public class Parser {
             while (consumeIfMatches(TokenType.COMMA)) {
                 groupBy.add(parseGroupItem());
             }
+
+            if (consumeIfMatches(TokenType.KEYWORD_having)) {
+                groupBy.setHaving(parseCondition().asBoolean());
+            }
             return groupBy;
         }
         else {
+            if (consumeIfMatches(TokenType.KEYWORD_having)) {
+                throw new ParserException("can't specify HAVING without GROUP BY");
+            }
             return new NoGroupBy();
         }
     }

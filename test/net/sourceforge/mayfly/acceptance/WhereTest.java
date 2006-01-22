@@ -197,9 +197,11 @@ public class WhereTest extends SqlTestCase {
             // Mayfly aims to be pickier than most databases about boolean vs non-boolean
             // If some writes SQL like that they are either making a mistake, or they are
             // being too clever for our tastes.
-            expectQueryFailure(booleanAsLeftSideOfIn, "expected boolean operator but got ')'");
+            expectQueryFailure(booleanAsLeftSideOfIn, "expected boolean expression but got non-boolean expression");
             
-            // Is this message clearer?  It would be hard to get it...
+            // The message should identify what part of the expression is the problem.
+            // For example, "expected boolean expression but got foo.a"
+            // And/or by context, for example:
 //          expectQueryFailure(booleanAsLeftSideOfIn, "operand of NOT must be a boolean expression");
         } else {
             assertResultSet(new String[] { }, query(booleanAsLeftSideOfIn));

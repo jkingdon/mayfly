@@ -11,7 +11,7 @@ public class IsNullTest extends TestCase {
     public void testParse() throws Exception {
         assertEquals(
                 new IsNull(new SingleColumn("name")),
-                new Parser("name is null").parseCondition()
+                new Parser("name is null").parseCondition().asBoolean()
         );
     }
 

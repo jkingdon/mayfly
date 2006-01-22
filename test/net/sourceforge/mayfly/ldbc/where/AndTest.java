@@ -18,7 +18,7 @@ public class AndTest extends TestCase {
                         new Equal(new SingleColumn("size"), new MathematicalInt(6))
                     )
                 ),
-                new Parser("name='steve' and (species='homo sapiens' and size = 6)").parseCondition()
+                new Parser("name='steve' and (species='homo sapiens' and size = 6)").parseCondition().asBoolean()
         );
     }
 
@@ -31,7 +31,7 @@ public class AndTest extends TestCase {
                     ),
                     new Equal(new SingleColumn("size"), new MathematicalInt(6))
                 ),
-                new Parser("name='steve' and species='homo sapiens' and size = 6").parseCondition()
+                new Parser("name='steve' and species='homo sapiens' and size = 6").parseCondition().asBoolean()
         );
     }
 
