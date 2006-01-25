@@ -63,21 +63,28 @@ public class GroupedRows {
         Iterator iter = groups.keySet().iterator();
         while (iter.hasNext()) {
             List keys = (List) iter.next();
-            result = (Rows) result.with(rowForKey(getRows(keys), what));
+            result = (Rows) result.with(rowForKey(keys, getRows(keys), what));
         }
 
         return result;
     }
 
-    private Row rowForKey(Rows rowsForKey, What what) {
-        Row sampleRow = (Row) rowsForKey.iterator().next();
+    private Row rowForKey(List keys, Rows rowsForKey, What what) {
+        Map allKeyValues = allKeyValues(keys);
 
         TupleBuilder builder = new TupleBuilder();
+        addColumnsForWhat(rowsForKey, what, allKeyValues, builder);
+        addColumnsForKeys(allKeyValues, builder);
+        return new Row(builder);
+    }
+
+    private void addColumnsForWhat(Rows rowsForKey, What what, Map allKeyValues, TupleBuilder builder) {
         for (int i = 0; i < what.size(); ++i) {
             WhatElement element = (WhatElement) what.element(i);
             Column found = lookupColumn(element);
             if (found != null) {
-                builder.append(found, sampleRow.cell(found));
+                builder.append(found, (Cell) allKeyValues.get(found));
+                allKeyValues.remove(found);
             }
             else if (element.firstAggregate() != null) {
                 Cell aggregated = element.aggregate(rowsForKey);
@@ -87,7 +94,25 @@ public class GroupedRows {
                 throw new MayflyException(element.displayName() + " is not aggregate or mentioned in GROUP BY");
             }
         }
-        return new Row(builder);
+    }
+
+    private void addColumnsForKeys(Map allKeyValues, TupleBuilder builder) {
+        for (Iterator iter = allKeyValues.entrySet().iterator(); iter.hasNext();) {
+            Map.Entry entry = (Map.Entry) iter.next();
+            builder.append((Column) entry.getKey(), (Cell) entry.getValue());
+        }
+    }
+
+    private Map allKeyValues(List keys) {
+        Map allKeyValues = new LinkedHashMap();
+        if (keyColumns.size() != keys.size()) {
+            throw new MayflyInternalException(
+                "keyColumns has " + keyColumns.size() + " keys but keys has " + keys.size());
+        }
+        for (int i = 0; i < keyColumns.size(); ++i) {
+            allKeyValues.put(keyColumns.get(i), keys.get(i));
+        }
+        return allKeyValues;
     }
 
     private Column lookupColumn(WhatElement element) {

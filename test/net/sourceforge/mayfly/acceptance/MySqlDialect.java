@@ -90,7 +90,7 @@ public class MySqlDialect extends Dialect {
         return false;
     }
     
-    public boolean canApplyHavingToKey() {
+    public boolean columnInHavingMustAlsoBeInSelect() {
         return false;
     }
     

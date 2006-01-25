@@ -195,22 +195,22 @@ public class GroupByTest extends SqlTestCase {
     }
 
     public void testHavingIsAppliedAfterGroupBy() throws Exception {
-        if (!mayflyMissing()) {
-            return;
-        }
-
         execute("create table foo (x integer, y integer, z integer)");
         execute("insert into foo(x, y, z) values (1, 10, 200)");
         execute("insert into foo(x, y, z) values (3, 10, 300)");
         execute("insert into foo(x, y, z) values (8, 20, 400)");
         execute("insert into foo(x, y, z) values (9, 20, 400)");
         
+        // First try a query which is easier than the one which doesn't select y:
+        assertResultList(new String[] { " 2, 10 " },
+            query("select avg(x), y from foo group by y having y < 20"));
+
         String groupByYHavingY = "select avg(x) from foo group by y having y < 20";
-        if (dialect.canApplyHavingToKey()) {
-            assertResultList(new String[] { " 2 " }, query(groupByYHavingY));
+        if (dialect.columnInHavingMustAlsoBeInSelect()) {
+            assertResultList(new String[] { " 2 " }, query(groupByYHavingY));            
         }
         else {
-            expectQueryFailure(groupByYHavingY, null);
+            expectQueryFailure(groupByYHavingY, "no column y");
         }
     }
     
@@ -240,7 +240,7 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into foo(x, y, z) values (9, 20, 400)");
         
         String groupByYHavingY = "select avg(x) from foo group by y, z having (y + z / 10) < 60";
-        if (dialect.canApplyHavingToKey()) {
+        if (dialect.columnInHavingMustAlsoBeInSelect()) {
             assertResultList(new String[] { " 2 " }, query(groupByYHavingY));
         }
         else {

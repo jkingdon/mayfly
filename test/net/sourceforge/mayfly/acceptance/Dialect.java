@@ -140,7 +140,7 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean canApplyHavingToKey() {
+    public boolean columnInHavingMustAlsoBeInSelect() {
         return true;
     }
 
