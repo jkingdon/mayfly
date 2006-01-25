@@ -219,6 +219,60 @@ public class ResultTest extends SqlTestCase {
         }
     }
     
+    public void testLimitWithInadequateOrderBy() throws Exception {
+        execute("create table foo (x integer, y varchar(255))");
+        execute("insert into foo (x, y) values (1, 'a')");
+        execute("insert into foo (x, y) values (1, 'c')");
+        execute("insert into foo (x, y) values (1, 'd')");
+        execute("insert into foo (x, y) values (1, 'b')");
+        execute("insert into foo (x, y) values (2, 'e')");
+        
+        // I guess we should detect this case and give an error.
+        // Under what circumstance?  Making the column in the ORDER BY be
+        // declared UNIQUE seems like too much(?).  Insisting that the actual
+        // data returned have an order which is constrained by the ORDER BY
+        // might be right.
+        // Then again, isn't there a use case where a user interface lets
+        // the user ORDER BY, say, last name.  Do we want to insist that
+        // the SQL actually say something like "ORDER BY lastname, id"
+        // (which probably makes more sense than lettting the database
+        // pick a random order, but might be nit-picky to require)?
+        
+        // Don't know which rows we'll get, but we should get exactly 2 of them.
+        ResultSet results = query("select y from foo order by x limit 2");
+        assertTrue(results.next());
+        assertTrue(results.next());
+        assertFalse(results.next());
+        results.close();
+    }
+    
+    public void testTopNQuery() throws Exception {
+        // Goal here is to get N rows with the lowest values
+        // of x, plus all "ties" (rows with the same value of x as
+        // the last row).
+        
+        // In this example, N == 2 so we end up getting 'a'
+        // 'b' as part of the "N", and 'c' because it is a tie.
+        
+        if (!mayflyMissing()) {
+            // no subselects
+            return;
+        }
+
+        execute("create table foo (x integer, y varchar(255))");
+        execute("insert into foo (x, y) values (1, 'a')");
+        execute("insert into foo (x, y) values (1, 'c')");
+        execute("insert into foo (x, y) values (1, 'b')");
+        execute("insert into foo (x, y) values (2, 'e')");
+
+        // There are other ways to write this query (one involves
+        // the "RANK() OVER" feature from SQL2003), but this one
+        // strikes me as the most sane.
+        assertResultSet(new String[] { " 'a' ", " 'b' ", " 'c' " },
+            query("SELECT y FROM foo WHERE x <= (SELECT x FROM foo ORDER BY x ASC LIMIT 1 OFFSET 1) ")
+        );
+    }
+    
     public void testLimitNoOffset() throws Exception {
         execute("create table foo (a integer)");
         execute("insert into foo (a) values (2)");
