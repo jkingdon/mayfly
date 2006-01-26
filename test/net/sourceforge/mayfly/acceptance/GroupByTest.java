@@ -30,6 +30,10 @@ public class GroupByTest extends SqlTestCase {
 
         assertResultList(new String[] { " 1747 " }, 
             query("select birthdate + age from people group by birthdate + age"));
+
+        assertResultList(new String[] { " 1747 " }, 
+            query("select birthdate + age + 0 from people group by birthdate + age"));
+
         assertResultList(new String[] { " 1747 " }, 
             query("select birthdate + age as deathdate from people group by deathdate"));
     }
@@ -40,15 +44,32 @@ public class GroupByTest extends SqlTestCase {
         }
 
         execute("create table people (birthdate integer, age integer)");
+        
         String selectColumnNotGrouped = "select age from people group by birthdate + age";
+
+        String expressionWhichMakesNoSense = "select birthdate - age from people group by birthdate + age";
+
         if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression()) {
             expectQueryFailure(
                 selectColumnNotGrouped, 
                 "age is not aggregate or mentioned in GROUP BY"
             );
+            expectQueryFailure(expressionWhichMakesNoSense, null);
         }
         else {
+            // This only gets worse if there is data - these databases return
+            // various flavours of garbage.  But for this test, the point is that
+            // they don't throw an exception.
             assertResultSet(new String[] { }, query(selectColumnNotGrouped));
+            assertResultSet(new String[] { }, query(expressionWhichMakesNoSense));
+        }
+
+        String expressionWhichCouldMakeSense = "select birthdate + age + 0 from people group by birthdate + age";
+        if (dialect.expectMayflyBehavior()) {
+            expectQueryFailure(expressionWhichCouldMakeSense, null);
+        }
+        else {
+            assertResultSet(new String[] { }, query(expressionWhichCouldMakeSense));
         }
     }
     
