@@ -266,7 +266,7 @@ public class JoinTest extends SqlTestCase {
 
         // Hypersonic/MySQL say column A is ambiguous
         String ambiguousIfReachesOutOfJoin = "select foo.a, bar.a from foo, bar inner join types on a = type";
-        if (dialect.expectMayflyBehavior()) {
+        if (dialect.onIsRestrictedToJoinsTables()) {
             assertResultSet(
                 new String[] { " 5, 9 " },
                 query(ambiguousIfReachesOutOfJoin)
@@ -287,7 +287,7 @@ public class JoinTest extends SqlTestCase {
         // common practice say? - I think they say it should work ;-()
         String onReachesOutOfJoinedColumnsQuery = 
             "select foo.a, bar.a from bar, foo inner join types on bar.a = type";
-        if (dialect.expectMayflyBehavior()) {
+        if (dialect.onIsRestrictedToJoinsTables()) {
             expectQueryFailure(onReachesOutOfJoinedColumnsQuery, "no column bar.a");
         } else {
             assertResultSet(

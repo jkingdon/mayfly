@@ -26,6 +26,10 @@ public class HypersonicDialect extends Dialect {
         return true;
     }
     
+    public boolean onIsRestrictedToJoinsTables() {
+        return false;
+    }
+    
     public boolean rightHandArgumentToJoinCanBeJoin() {
         return false;
     }
@@ -43,6 +47,8 @@ public class HypersonicDialect extends Dialect {
     }
     
     public boolean aggregateAsteriskIsForCountOnly() {
+        // Hypersonic has a variety of behaviors, depending on whether there
+        // are any rows, and which function.  None of them seem very useful.
         return false;
     }
     
@@ -55,8 +61,16 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
 
+    public boolean disallowColumnAndAggregateInExpression() {
+        return false;
+    }
+    
     public boolean canHaveHavingWithoutGroupBy() {
         return true;
+    }
+    
+    public boolean notRequiresBoolean() {
+        return false;
     }
 
 }

@@ -147,7 +147,9 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into books(author, title) values ('', 'The Pearl')");
         
         assertResultList(
-            new String[] { " null, 2 ", " '', 1", " 'Gang Of Four', 1 "},
+            dialect.nullSortsLower() ?
+                new String[] { " null, 2 ", " '', 1", " 'Gang Of Four', 1 "} :
+                new String[] { " '', 1", " 'Gang Of Four', 1 ", " null, 2 " },
             query("select author, count(title) from books group by author order by author")
         );
     }
@@ -161,7 +163,9 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into foo(aKey, value) values (5, 60)");
 
         assertResultList(
-            new String[] { " null, 20 ", " 0, 30 ", " 5, 50 " },
+            dialect.nullSortsLower() ?
+            new String[] { " null, 20 ", " 0, 30 ", " 5, 50 " } :
+            new String[] { " 0, 30 ", " 5, 50 ", " null, 20 " },
             query("select aKey, avg(value) from foo group by aKey order by aKey")
         );
     }

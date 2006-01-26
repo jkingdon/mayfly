@@ -167,7 +167,8 @@ public class ResultTest extends SqlTestCase {
             }
         } else {
             // Seems to be in the confusing "guess what I might mean" category.
-            assertEquals(5, results.getInt("a"));
+            int result = results.getInt("a");
+            assertTrue("expected 5 or 7 but was " + result, result == 5 || result == 7);
         }
         assertEquals(5, results.getInt(1));
         assertEquals(7, results.getInt(2));
@@ -227,11 +228,12 @@ public class ResultTest extends SqlTestCase {
         execute("insert into foo (x, y) values (1, 'b')");
         execute("insert into foo (x, y) values (2, 'e')");
         
-        // I guess we should detect this case and give an error.
-        // Under what circumstance?  Making the column in the ORDER BY be
-        // declared UNIQUE seems like too much(?).  Insisting that the actual
+        // Perhaps we should detect this case and give an error.
+        // Under what circumstance?  Making each ORDER BY contain one
+        // column which is declared UNIQUE seems like too much(?).
+        // Insisting that the actual
         // data returned have an order which is constrained by the ORDER BY
-        // might be right.
+        // might be right, but depends on a test hitting that case.
         // Then again, isn't there a use case where a user interface lets
         // the user ORDER BY, say, last name.  Do we want to insist that
         // the SQL actually say something like "ORDER BY lastname, id"

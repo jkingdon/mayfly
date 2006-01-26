@@ -21,8 +21,7 @@ public class MySqlDialect extends Dialect {
         SqlTestCase.execute("DROP DATABASE test", connection);
     }
     
-    public boolean backslashMeansSomethingInAString() {
-        // Ugh.  MySQL is incompatible with the rest of the world on this one.
+    public boolean backslashInAStringIsAnEscape() {
         return true;
     }
     
@@ -40,6 +39,10 @@ public class MySqlDialect extends Dialect {
         return false;
     }
 
+    public boolean onIsRestrictedToJoinsTables() {
+        return false;
+    }
+    
     public boolean considerTablesMentionedAfterJoin() {
         return true;
     }
@@ -54,6 +57,10 @@ public class MySqlDialect extends Dialect {
     
     public boolean notBindsMoreTightlyThanIn() {
         return true;
+    }
+
+    public boolean notRequiresBoolean() {
+        return false;
     }
 
     public boolean canHaveLimitWithoutOrderBy() {
@@ -87,6 +94,10 @@ public class MySqlDialect extends Dialect {
     }
     
     public boolean errorIfNotAggregateOrGrouped() {
+        return false;
+    }
+    
+    public boolean disallowColumnAndAggregateInExpression() {
         return false;
     }
     

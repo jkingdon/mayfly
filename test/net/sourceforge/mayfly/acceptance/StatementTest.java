@@ -16,15 +16,17 @@ public class StatementTest extends SqlTestCase {
     }
     
     public void testSyntaxErrorDetectedEarly() throws Exception {
+        String sql = "insert into some place or another";
         if (!dialect.detectsSyntaxErrorsInPrepareStatement()) {
-            return;
+            connection.prepareStatement(sql);
         }
-
-        try {
-            connection.prepareStatement("insert into some place or another");
-            fail();
-        } catch (SQLException e) {
-            assertMessage("expected VALUES but got place", e);
+        else {
+            try {
+                connection.prepareStatement(sql);
+                fail();
+            } catch (SQLException e) {
+                assertMessage("expected VALUES but got place", e);
+            }
         }
     }
     

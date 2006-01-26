@@ -193,8 +193,8 @@ public class WhereTest extends SqlTestCase {
         }
         
         String booleanAsLeftSideOfIn = "select b from foo where (not foo.a) in (1, 3)";
-        if (dialect.expectMayflyBehavior()) {
-            // Mayfly aims to be pickier than most databases about boolean vs non-boolean
+        if (dialect.notRequiresBoolean()) {
+            // Mayfly and Postgres are pickier than some databases about boolean vs non-boolean
             // If some writes SQL like that they are either making a mistake, or they are
             // being too clever for our tastes.
             expectQueryFailure(booleanAsLeftSideOfIn, "expected boolean expression but got non-boolean expression");

@@ -43,17 +43,23 @@ public class DataTypeTest extends SqlTestCase {
     }
     
     public void testBackSlash() throws Exception {
-        if (dialect.backslashMeansSomethingInAString()) {
-            return;
-        }
-
         execute("create table foo (value varchar(255))");
-        execute("insert into foo (value) values ('\\')");
 
-        ResultSet results = query("select value from foo where value = '\\'");
-        assertTrue(results.next());
-        assertEquals("\\", results.getString(1));
-        assertFalse(results.next());
+        String insertSql = "insert into foo (value) values ('\\')";
+        String selectSql = "select value from foo where value = '\\'";
+
+        if (dialect.backslashInAStringIsAnEscape()) {
+            expectExecuteFailure(insertSql, "unterminated string literal");
+            expectExecuteFailure(selectSql, "unterminated string literal");
+        }
+        else {
+            execute(insertSql);
+    
+            ResultSet results = query(selectSql);
+            assertTrue(results.next());
+            assertEquals("\\", results.getString(1));
+            assertFalse(results.next());
+        }
     }
 
     public void testInteger() throws Exception {

@@ -52,7 +52,7 @@ public class AggregateTest extends SqlTestCase {
         execute("create table foo (x integer)");
 
         String sql = "select x + min(x) from foo";
-        if (dialect.expectMayflyBehavior()) {
+        if (dialect.disallowColumnAndAggregateInExpression()) {
             expectQueryFailure(sql, "x is a column but min(x) is an aggregate");
         }
         else {
@@ -202,8 +202,6 @@ public class AggregateTest extends SqlTestCase {
     public void testAsteriskOnlyForCount() throws Exception {
         execute("create table foo (x integer, y integer)");
         if (!dialect.aggregateAsteriskIsForCountOnly()) {
-            // Hypersonic has a variety of behaviors, depending on whether there
-            // are any rows, and which function.  None of them seem very useful.
             return;
         }
         expectQueryFailure("select avg(*) from foo", "expected primary but got '*'");

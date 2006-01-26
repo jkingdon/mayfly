@@ -17,7 +17,8 @@ public class ExpressionTest extends SqlTestCase {
     }
     
     public void testMissingFrom() throws Exception {
-        // Omitting the FROM is a MySQL extension.  It implicitly implies a single row.
+        // Omitting the FROM, for those databases which allow it,
+        // implicitly implies a single row.
         
         String missingFrom = "select 7";
         if (dialect.fromIsOptional()) {

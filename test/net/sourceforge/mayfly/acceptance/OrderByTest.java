@@ -47,7 +47,9 @@ public class OrderByTest extends SqlTestCase {
         execute("insert into foo (a) values (null)");
         execute("insert into foo (a) values ('')");
         assertResultList(
-            new String[] { " null ", " '' ", " 'one' " },
+            dialect.nullSortsLower() ?
+                new String[] { " null ", " '' ", " 'one' " } :
+                new String[] { " '' ", " 'one' ", " null " },
             query("select a from foo order by a")
         );
     }
@@ -103,12 +105,15 @@ public class OrderByTest extends SqlTestCase {
             query(baseQuery + " order by child.parent")
         );
         
-        assertResultList(new String[] { "'C'", "'B'", "'A'" },
+        assertResultList(
+            dialect.nullSortsLower() ? 
+                new String[] { "'C'", "'B'", "'A'" } :
+                new String[] { "'B'", "'A'", "'C'" },
             query(baseQuery + " order by parent.id")
         );
         
     }
-    
+
     public void testOrderBySeveralColumns() throws Exception {
         execute("create table foo (name varchar(255), major integer, minor integer)");
         execute("insert into foo (name, major, minor) values ('E', 8, 2)");

@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" sourcepath="test/lib-src/hsqldb_1_8_0_2.zip" path="test/lib/hsqldb.jar"/>
 	<classpathentry kind="lib" path="test/lib/mysql-connector-java-3.1.12-bin.jar"/>
 	<classpathentry kind="lib" sourcepath="test/lib-src/junit-addons-1.4-src.jar" path="test/lib/junit-addons-1.4.jar"/>
+	<classpathentry kind="lib" path="test/lib/postgresql-8.1-404.jdbc3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

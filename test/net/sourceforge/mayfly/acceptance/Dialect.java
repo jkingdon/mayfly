@@ -25,7 +25,7 @@ public abstract class Dialect {
         }
     }
 
-    public boolean backslashMeansSomethingInAString() {
+    public boolean backslashInAStringIsAnEscape() {
         // For most SQL dialects (including SQL92 I believe), '\' is just a string
         // with one character in it.
         return false;
@@ -146,6 +146,29 @@ public abstract class Dialect {
 
     public boolean canHaveHavingWithoutGroupBy() {
         return false;
+    }
+
+    public boolean nullSortsLower() {
+        // I don't know whether there are arguments pro or con on this.
+        // Different databases seem to disagree, and several make it
+        // configurable somehow.
+        return true;
+    }
+
+    public boolean disallowColumnAndAggregateInExpression() {
+        return true;
+    }
+
+    public boolean onIsRestrictedToJoinsTables() {
+        return true;
+    }
+
+    public boolean notRequiresBoolean() {
+        return true;
+    }
+
+    public boolean numberOfValuesMustMatchNumberOfColumns() {
+        return true;
     }
 
 }

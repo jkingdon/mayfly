@@ -258,14 +258,21 @@ public class ValueTest extends SqlTestCase {
     
     public void testInsertAllColumnsChecksForNumberOfValues() throws Exception {
         execute("create table foo (a integer, b integer)");
-        expectExecuteFailure("insert into foo values (5)",
-            "Too few values.\n" +
-            "Columns and values were:\n" +
-            "a 5\n" +
-            "b (none)\n"
-        );
+        String insertSql = "insert into foo values (5)";
+        if (dialect.numberOfValuesMustMatchNumberOfColumns()) {
+            expectExecuteFailure(insertSql,
+                "Too few values.\n" +
+                "Columns and values were:\n" +
+                "a 5\n" +
+                "b (none)\n"
+            );
+        }
+        else {
+            execute(insertSql);
+            assertResultList(new String[] { " 5, null " }, query("select * from foo"));
+        }
     }
-    
+
     public void testDuplicateColumnName() throws Exception {
         execute("create table foo (Id integer)");
         expectExecuteFailure("insert into foo (Id, Id) values (5, 7)", "duplicate column Id");

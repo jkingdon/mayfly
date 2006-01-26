@@ -13,6 +13,7 @@ public abstract class SqlTestCase extends TestCase {
         new MayflyDialect()
         //new HypersonicDialect()
         //new MySqlDialect()
+        //new PostgresDialect()
         ;
 
     // Turn this on to see a comparison of mayfly exception messages with
@@ -133,7 +134,9 @@ public abstract class SqlTestCase extends TestCase {
             String[] cells = rowString.split(",");
             L row = new L();
             
-            strings = new BitSet(cells.length);
+            if (strings == null) {
+                strings = new BitSet(cells.length);
+            }
     
             for (int j = 0; j < cells.length; j++) {
                 String cell = cells[j].trim();
