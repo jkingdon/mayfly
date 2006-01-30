@@ -56,4 +56,15 @@ abstract public class BinaryOperator extends Expression {
         return "expression";
     }
     
+    public boolean sameExpression(Expression other) {
+        if (getClass().equals(other.getClass())) {
+            BinaryOperator operator = (BinaryOperator) other;
+            return ((Expression)left).sameExpression((Expression) operator.left) &&
+            ((Expression)right).sameExpression((Expression) operator.right);
+        }
+        else {
+            return false;
+        }
+    }
+    
 }

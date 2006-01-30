@@ -1,9 +1,10 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.Expression;
 
 public class QuotedString extends Literal {
-    private String stringInQuotes;
+    private final String stringInQuotes;
 
     public QuotedString(String stringInQuotes) {
         this.stringInQuotes = stringInQuotes;
@@ -24,6 +25,16 @@ public class QuotedString extends Literal {
     
     public String displayName() {
         return stringInQuotes;
+    }
+
+    public boolean sameExpression(Expression other) {
+        if (other instanceof QuotedString) {
+            QuotedString string = (QuotedString) other;
+            return stringInQuotes == string.stringInQuotes;
+        }
+        else {
+            return false;
+        }
     }
 
 }

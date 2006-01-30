@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.Expression;
 
 public class MathematicalInt extends Literal {
 
@@ -20,6 +21,16 @@ public class MathematicalInt extends Literal {
     
     public String displayName() {
         return "" + value;
+    }
+    
+    public boolean sameExpression(Expression other) {
+        if (other instanceof MathematicalInt) {
+            MathematicalInt integer = (MathematicalInt) other;
+            return value == integer.value;
+        }
+        else {
+            return false;
+        }
     }
 
 }

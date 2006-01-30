@@ -14,7 +14,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
     private final String sql;
     private Database database;
     private Vector parameters;
-    private int parameterCount;
+    private final int parameterCount;
 
     JdbcPreparedStatement(String sql, Database database) throws SQLException {
         try {
@@ -89,9 +89,6 @@ public class JdbcPreparedStatement implements PreparedStatement {
             throw new SQLException("Parameter index " + oneBasedParameterIndex + " is out of bounds");
         }
 
-        if (zeroBased >= parameters.size()) {
-            parameters.setSize(zeroBased + 1);
-        }
         parameters.set(zeroBased, value);
     }
 

@@ -1,11 +1,18 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.evaluation.expression.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.parser.*;
+import net.sourceforge.mayfly.evaluation.expression.Concatenate;
+import net.sourceforge.mayfly.evaluation.expression.Count;
+import net.sourceforge.mayfly.evaluation.expression.Divide;
+import net.sourceforge.mayfly.evaluation.expression.Maximum;
+import net.sourceforge.mayfly.evaluation.expression.Minus;
+import net.sourceforge.mayfly.evaluation.expression.Multiply;
+import net.sourceforge.mayfly.evaluation.expression.Plus;
+import net.sourceforge.mayfly.ldbc.JdbcParameter;
+import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
+import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
+import net.sourceforge.mayfly.parser.Parser;
 
 public class WhatElementTest extends TestCase {
 
@@ -72,5 +79,5 @@ public class WhatElementTest extends TestCase {
 //        assertEquals("x + y + z * (w / 4) - y - x / (y * z)", actual);
         assertEquals("expression", actual);
     }
-
+    
 }

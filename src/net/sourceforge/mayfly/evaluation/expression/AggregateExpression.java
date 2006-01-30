@@ -1,9 +1,10 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 
 import java.util.*;
 
@@ -101,5 +102,15 @@ public abstract class AggregateExpression extends Expression {
     }
 
     abstract protected Cell pickOne(Cell minimum, Cell maximum, Cell count, Cell sum, Cell average);
+    
+    public boolean sameExpression(Expression other) {
+        if (getClass().equals(other.getClass())) {
+            AggregateExpression otherExpression = (AggregateExpression) other;
+            return column.sameExpression(otherExpression.column) && distinct == otherExpression.distinct;
+        }
+        else {
+            return false;
+        }
+    }
     
 }

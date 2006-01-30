@@ -32,5 +32,9 @@ public class CountAll extends Expression {
     public Cell aggregate(Rows rows) {
         return new LongCell(rows.size());
     }
+    
+    public boolean sameExpression(Expression other) {
+        return other instanceof CountAll;
+    }
 
 }

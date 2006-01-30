@@ -41,5 +41,25 @@ public class SingleColumn extends Expression {
     public boolean matches(Column column) {
         return column.matches(tableOrAlias, columnName);
     }
+    
+    public boolean sameExpression(Expression other) {
+        if (other instanceof SingleColumn) {
+            SingleColumn column = (SingleColumn) other;
+            return possiblyNullEquals(tableOrAlias, column.tableOrAlias) &&
+                columnName.equalsIgnoreCase(column.columnName);
+        }
+        else {
+            return false;
+        }
+    }
+
+    public static boolean possiblyNullEquals(String one, String two) {
+        if (one == null) {
+            return two == null;
+        }
+        else {
+            return one.equalsIgnoreCase(two);
+        }
+    }
 
 }

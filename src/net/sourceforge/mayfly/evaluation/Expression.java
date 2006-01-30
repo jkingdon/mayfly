@@ -10,4 +10,8 @@ abstract public class Expression extends WhatElement {
 
     abstract public Cell aggregate(Rows rows);
 
+    public boolean sameExpression(Expression other) {
+        return false;
+    }
+
 }
