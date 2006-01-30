@@ -14,4 +14,12 @@ abstract public class Expression extends WhatElement {
         return false;
     }
 
+    public static String firstAggregate(WhatElement left, WhatElement right) {
+        String firstInLeft = left.firstAggregate();
+        if (firstInLeft != null) {
+            return firstInLeft;
+        }
+        return right.firstAggregate();
+    }
+
 }

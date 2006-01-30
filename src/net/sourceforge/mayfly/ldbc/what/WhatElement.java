@@ -58,12 +58,4 @@ abstract public class WhatElement extends ValueObject {
         return evaluate(row);
     }
 
-    public static String firstAggregate(WhatElement left, WhatElement right) {
-        String firstInLeft = left.firstAggregate();
-        if (firstInLeft != null) {
-            return firstInLeft;
-        }
-        return right.firstAggregate();
-    }
-
 }

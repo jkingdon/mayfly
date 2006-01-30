@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc.where;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.ldbc.what.*;
 
 import java.util.*;
@@ -37,7 +38,7 @@ abstract public class RowExpression extends BooleanExpression {
     }
     
     public String firstAggregate() {
-        return WhatElement.firstAggregate(leftSide, rightSide);
+        return Expression.firstAggregate(leftSide, rightSide);
     }
 
 }

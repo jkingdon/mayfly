@@ -47,7 +47,7 @@ abstract public class BinaryOperator extends Expression {
     }
 
     public String firstAggregate() {
-        return WhatElement.firstAggregate(left, right);
+        return Expression.firstAggregate(left, right);
     }
 
     public String displayName() {
