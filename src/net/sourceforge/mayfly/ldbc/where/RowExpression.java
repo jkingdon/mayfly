@@ -3,18 +3,13 @@ package net.sourceforge.mayfly.ldbc.where;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.ldbc.what.WhatElement;
 
 abstract public class RowExpression extends BooleanExpression {
 
-    /** Could be {@link net.sourceforge.mayfly.evaluation.Expression}
-     *  instead of {@link WhatElement} once we figure out how JdbcParameters
-     *  get substituted.
-     */
-    private WhatElement leftSide;
-    private WhatElement rightSide;
+    private Expression leftSide;
+    private Expression rightSide;
 
-    public RowExpression(WhatElement leftSide, WhatElement rightSide) {
+    public RowExpression(Expression leftSide, Expression rightSide) {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
     }

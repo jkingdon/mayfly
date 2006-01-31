@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -22,13 +23,9 @@ import java.util.*;
  */
 abstract public class WhatElement extends ValueObject {
 
-    public What selected(Row dummyRow) {
-        return new What(Collections.singletonList(this));
+    public Selected selected(Row dummyRow) {
+        return new Selected(Collections.singletonList(this));
     }
-
-    abstract public Cell evaluate(Row row);
-
-    abstract public Cell aggregate(Rows rows);
 
     public String firstAggregate() {
         return null;
@@ -40,22 +37,18 @@ abstract public class WhatElement extends ValueObject {
     
     abstract public String displayName();
 
-    protected What selectedFromColumns(Columns columns) {
-        L result = new L();
+    protected Selected selectedFromColumns(Columns columns) {
+        Selected result = new Selected();
         Iterator iter = columns.iterator();
         while (iter.hasNext()) {
             Column column = (Column) iter.next();
             result.add(new SingleColumn(column.tableOrAlias(), column.columnName()));
         }
-        return new What(result);
+        return result;
     }
 
     public boolean matches(Column column) {
         return false;
-    }
-
-    public Cell findValue(int zeroBasedColumn, Row row) {
-        return evaluate(row);
     }
 
 }

@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
@@ -48,12 +49,12 @@ public class GroupBy extends ValueObject implements Aggregator {
         }
     }
 
-    public Rows group(Rows rows, What what, What selected) {
+    public Rows group(Rows rows, What what, Selected selected) {
         Rows resultOfGrouping = makeGroupedRows(rows).ungroup(what);
         return (Rows) resultOfGrouping.select(having);
     }
     
-    public void check(Row dummyRow, What what, What selected) {
+    public void check(Row dummyRow, What what) {
         makeGroupedRows(new Rows(dummyRow)).ungroup(what);
     }
 

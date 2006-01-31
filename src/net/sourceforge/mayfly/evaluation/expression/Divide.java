@@ -1,11 +1,12 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.evaluation.Expression;
 
 public class Divide extends BinaryOperator {
 
-    public Divide(WhatElement left, WhatElement right) {
+    public Divide(Expression left, Expression right) {
         super(left, right);
     }
 

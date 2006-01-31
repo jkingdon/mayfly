@@ -1,17 +1,19 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.ldbc.where.literal.Literal;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 public class In extends BooleanExpression {
 
-    private WhatElement leftSide;
+    private Expression leftSide;
 	private List expressions;
 
-    public In(WhatElement leftSide, List expressions) {
+    public In(Expression leftSide, List expressions) {
 		this.leftSide = leftSide;
 		this.expressions = expressions;
     }
@@ -36,7 +38,7 @@ public class In extends BooleanExpression {
         }
 
         for (int i = 0; i < expressions.size(); ++i) {
-            WhatElement element = (WhatElement) expressions.get(i);
+            Expression element = (Expression) expressions.get(i);
             String first = element.firstAggregate();
             if (first != null) {
                 return first;

@@ -10,16 +10,18 @@ abstract public class Expression extends WhatElement {
 
     abstract public Cell aggregate(Rows rows);
 
-    public boolean sameExpression(Expression other) {
-        return false;
-    }
+    abstract public boolean sameExpression(Expression other);
 
-    public static String firstAggregate(WhatElement left, WhatElement right) {
+    public static String firstAggregate(Expression left, Expression right) {
         String firstInLeft = left.firstAggregate();
         if (firstInLeft != null) {
             return firstInLeft;
         }
         return right.firstAggregate();
+    }
+
+    public Cell findValue(int zeroBasedColumn, Row row) {
+        return evaluate(row);
     }
 
 }

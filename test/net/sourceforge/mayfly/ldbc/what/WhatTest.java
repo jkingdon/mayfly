@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.ldbc.what;
 
 import junit.framework.*;
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
 
 public class WhatTest extends TestCase {
@@ -18,7 +19,7 @@ public class WhatTest extends TestCase {
             .append(new TupleElement(new Column("foo", "y"), NullCell.INSTANCE))
         );
         
-        What expected = new What()
+        Selected expected = new Selected()
             .add(new SingleColumn("a")) // Or "bar", "a"
             .add(new SingleColumn("foo", "x"))
             .add(new SingleColumn("foo", "y"))
@@ -29,7 +30,7 @@ public class WhatTest extends TestCase {
     
     public void testSelectedDegenerateCase() throws Exception {
         What original = new What().add(new MathematicalInt(7));
-        What expected = new What().add(new MathematicalInt(7));
+        Selected expected = new Selected().add(new MathematicalInt(7));
         assertEquals(expected, original.selected(null));
     }
     
@@ -43,7 +44,7 @@ public class WhatTest extends TestCase {
             .append(new TupleElement(new Column("foo", "y"), NullCell.INSTANCE))
         );
         
-        What expected = new What()
+        Selected expected = new Selected()
             .add(new SingleColumn("bar", "a"))
             .add(new SingleColumn("bar", "b"))
             .add(new SingleColumn("foo", "x"))

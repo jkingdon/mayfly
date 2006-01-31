@@ -1,11 +1,11 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.evaluation.Expression;
 
 public class Greater extends RowExpression {
 
-    public Greater(WhatElement leftSide, WhatElement rightSide) {
+    public Greater(Expression leftSide, Expression rightSide) {
         super(leftSide, rightSide);
     }
 

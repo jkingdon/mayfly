@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.what.All;
 import net.sourceforge.mayfly.ldbc.what.AllColumnsFromTable;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
@@ -224,7 +225,7 @@ public class SelectTest extends TestCase {
     }
 
     private Rows query(DataStore store, String sql) {
-        return Select.selectFromSql(sql).query(store, DataStore.ANONYMOUS_SCHEMA_NAME, new What());
+        return Select.selectFromSql(sql).query(store, DataStore.ANONYMOUS_SCHEMA_NAME, new Selected());
     }
 
     public void testSmallerJoin() throws Exception {

@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCellContent;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.ColumnOrderItem;
+import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupBy;
 import net.sourceforge.mayfly.evaluation.GroupItem;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
@@ -182,7 +183,7 @@ public class Parser {
         }
 
         try {
-            WhatElement expression = parseExpression().asNonBoolean();
+            Expression expression = parseExpression().asNonBoolean();
             Cell cell = expression.evaluate(null);
             return cell.asContents();
         } catch (FoundNullLiteral e) {
@@ -383,23 +384,23 @@ public class Parser {
 
         ParserExpression left = parseExpression();
         if (consumeIfMatches(TokenType.EQUAL)) {
-            WhatElement right = parsePrimary().asNonBoolean();
+            Expression right = parsePrimary().asNonBoolean();
             return new BooleanParserExpression(new Equal(left.asNonBoolean(), right));
         }
         else if (consumeIfMatches(TokenType.LESS_GREATER)) {
-            WhatElement right = parsePrimary().asNonBoolean();
+            Expression right = parsePrimary().asNonBoolean();
             return new BooleanParserExpression(NotEqual.construct(left.asNonBoolean(), right));
         }
         else if (consumeIfMatches(TokenType.BANG_EQUAL)) {
-            WhatElement right = parsePrimary().asNonBoolean();
+            Expression right = parsePrimary().asNonBoolean();
             return new BooleanParserExpression(NotEqual.construct(left.asNonBoolean(), right));
         }
         else if (consumeIfMatches(TokenType.GREATER)) {
-            WhatElement right = parsePrimary().asNonBoolean();
+            Expression right = parsePrimary().asNonBoolean();
             return new BooleanParserExpression(new Greater(left.asNonBoolean(), right));
         }
         else if (consumeIfMatches(TokenType.LESS)) {
-            WhatElement right = parsePrimary().asNonBoolean();
+            Expression right = parsePrimary().asNonBoolean();
             return new BooleanParserExpression(new Greater(right, left.asNonBoolean()));
         }
         else if (consumeIfMatches(TokenType.KEYWORD_not)) {
@@ -419,12 +420,12 @@ public class Parser {
         }
     }
 
-    private BooleanExpression parseIs(WhatElement left) {
+    private BooleanExpression parseIs(Expression left) {
         expectAndConsume(TokenType.KEYWORD_null);
         return new IsNull(left);
     }
 
-    private BooleanExpression parseIn(WhatElement left) {
+    private BooleanExpression parseIn(Expression left) {
         expectAndConsume(TokenType.KEYWORD_in);
         expectAndConsume(TokenType.OPEN_PAREN);
         List expressions = parseExpressionList();
@@ -504,7 +505,7 @@ public class Parser {
     }
 
     class AggregateArgumentParser {
-        WhatElement expression;
+        Expression expression;
         String functionName;
         boolean gotAsterisk;
         boolean distinct;
@@ -533,7 +534,7 @@ public class Parser {
 
     abstract public class ParserExpression {
 
-        abstract public WhatElement asNonBoolean();
+        abstract public Expression asNonBoolean();
 
         abstract public BooleanExpression asBoolean();
 
@@ -541,9 +542,9 @@ public class Parser {
 
     public class NonBooleanParserExpression extends ParserExpression {
 
-        private final WhatElement expression;
+        private final Expression expression;
 
-        public NonBooleanParserExpression(WhatElement expression) {
+        public NonBooleanParserExpression(Expression expression) {
             this.expression = expression;
         }
 
@@ -551,7 +552,7 @@ public class Parser {
             throw new ParserException("expected boolean expression but got non-boolean expression");
         }
 
-        public WhatElement asNonBoolean() {
+        public Expression asNonBoolean() {
             return expression;
         }
 
@@ -569,7 +570,7 @@ public class Parser {
             return expression;
         }
 
-        public WhatElement asNonBoolean() {
+        public Expression asNonBoolean() {
             throw new ParserException("expected non-boolean expression but got boolean expression");
         }
 

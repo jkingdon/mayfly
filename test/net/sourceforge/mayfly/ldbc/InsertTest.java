@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.datastore.NullCellContent;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 public class InsertTest extends TestCase {
     

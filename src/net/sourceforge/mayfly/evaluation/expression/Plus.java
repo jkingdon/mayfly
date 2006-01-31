@@ -1,11 +1,12 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.evaluation.Expression;
 
 public class Plus extends BinaryOperator {
 
-    public Plus(WhatElement left, WhatElement right) {
+    public Plus(Expression left, Expression right) {
         super(left, right);
     }
 

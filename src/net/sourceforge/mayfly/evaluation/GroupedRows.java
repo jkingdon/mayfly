@@ -87,7 +87,8 @@ public class GroupedRows {
                 allKeyValues.remove(found);
             }
             else if (element.firstAggregate() != null) {
-                Cell aggregated = element.aggregate(rowsForKey);
+                Expression expression = (Expression) element;
+                Cell aggregated = expression.aggregate(rowsForKey);
                 builder.append(new PositionalHeader(i), aggregated);
             }
             else {

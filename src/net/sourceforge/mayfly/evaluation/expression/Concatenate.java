@@ -1,11 +1,12 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.StringCell;
+import net.sourceforge.mayfly.evaluation.Expression;
 
 public class Concatenate extends BinaryOperator {
 
-    public Concatenate(WhatElement left, WhatElement right) {
+    public Concatenate(Expression left, Expression right) {
         super(left, right);
     }
 

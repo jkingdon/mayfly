@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.ldbc;
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.evaluation.*;
+import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.ldbc.where.*;
 import net.sourceforge.mayfly.parser.*;
@@ -48,14 +49,14 @@ public class Select extends Command {
 
     public ResultSet select(final DataStore store, String currentSchema) {
         Row dummyRow = dummyRow(store, currentSchema);
-        What selected = what.selected(dummyRow);
+        Selected selected = what.selected(dummyRow);
         check(store, selected, dummyRow);
         return new MayflyResultSet(selected, query(store, currentSchema, selected));
     }
 
-    private void check(final DataStore store, What selected, Row dummyRow) {
+    private void check(final DataStore store, Selected selected, Row dummyRow) {
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
-            WhatElement element = (WhatElement) iter.next();
+            Expression element = (Expression) iter.next();
             element.evaluate(dummyRow);
         }
 
@@ -64,7 +65,7 @@ public class Select extends Command {
         if (firstAggregate != null) {
             throw new MayflyException("aggregate " + firstAggregate + " not valid in WHERE");
         }
-        groupBy.check(dummyRow, what, selected);
+        groupBy.check(dummyRow, what);
 
         orderBy.check(dummyRow);
         
@@ -88,7 +89,7 @@ public class Select extends Command {
         return (Row) joinedRows.element(0);
     }
 
-    Rows query(DataStore store, String currentSchema, What selected) {
+    Rows query(DataStore store, String currentSchema, Selected selected) {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();

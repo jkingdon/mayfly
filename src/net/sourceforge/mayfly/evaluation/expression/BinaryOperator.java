@@ -1,16 +1,16 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.evaluation.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.ldbc.Rows;
 
 abstract public class BinaryOperator extends Expression {
 
-    private final WhatElement left;
-    private final WhatElement right;
+    private final Expression left;
+    private final Expression right;
 
-    public BinaryOperator(WhatElement left, WhatElement right) {
+    public BinaryOperator(Expression left, Expression right) {
         this.left = left;
         this.right = right;
     }
@@ -59,8 +59,7 @@ abstract public class BinaryOperator extends Expression {
     public boolean sameExpression(Expression other) {
         if (getClass().equals(other.getClass())) {
             BinaryOperator operator = (BinaryOperator) other;
-            return ((Expression)left).sameExpression((Expression) operator.left) &&
-            ((Expression)right).sameExpression((Expression) operator.right);
+            return left.sameExpression(operator.left) && right.sameExpression(operator.right);
         }
         else {
             return false;

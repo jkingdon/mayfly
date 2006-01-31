@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.what.Selected;
+import net.sourceforge.mayfly.ldbc.Columns;
 
 public class AllColumnsFromTable extends WhatElement {
 
@@ -16,18 +16,10 @@ public class AllColumnsFromTable extends WhatElement {
         return dummyRow.columnsForTable(aliasOrTable);
     }
     
-    public What selected(Row dummyRow) {
+    public Selected selected(Row dummyRow) {
         return selectedFromColumns(columns(dummyRow));
     }
 
-    public Cell evaluate(Row row) {
-        throw new MayflyInternalException("should have converted this to SingleColumn objects by now");
-    }
-    
-    public Cell aggregate(Rows rows) {
-        throw new MayflyInternalException("should have converted this to SingleColumn objects by now");
-    }
-    
     public String displayName() {
         return aliasOrTable + ".*";
     }

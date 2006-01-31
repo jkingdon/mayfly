@@ -1,21 +1,24 @@
 package net.sourceforge.mayfly;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.what.Selected;
+import net.sourceforge.mayfly.ldbc.Rows;
 
-import java.sql.*;
+import java.sql.SQLException;
 
 public final class MayflyResultSet extends ResultSetStub {
     private int pos = -1;
     private boolean wasNull = false;
 
     private final Rows rows;
-    private final What what;
+    private final Selected selected;
 
-    public MayflyResultSet(What what, Rows rows) {
+    public MayflyResultSet(Selected selected, Rows rows) {
         super();
-        this.what = what;
+        this.selected = selected;
         this.rows = rows;
     }
 
@@ -70,7 +73,7 @@ public final class MayflyResultSet extends ResultSetStub {
 
     private Cell cellFromIndex(int oneBasedColumn) throws SQLException {
         try {
-            Cell cell = what.evaluate(oneBasedColumn, currentRow());
+            Cell cell = selected.evaluate(oneBasedColumn, currentRow());
             wasNull = cell instanceof NullCell;
             return cell;
         } catch (MayflyException e) {

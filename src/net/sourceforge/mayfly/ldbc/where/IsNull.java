@@ -3,13 +3,13 @@ package net.sourceforge.mayfly.ldbc.where;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.ldbc.what.WhatElement;
+import net.sourceforge.mayfly.evaluation.Expression;
 
 public class IsNull extends BooleanExpression {
 
-    private final WhatElement expression;
+    private final Expression expression;
 
-    public IsNull(WhatElement expression) {
+    public IsNull(Expression expression) {
         this.expression = expression;
     }
 
