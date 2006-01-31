@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import java.util.*;
 
 public class Or extends BooleanExpression {
 
@@ -14,15 +13,6 @@ public class Or extends BooleanExpression {
 
     public boolean evaluate(Object row) {
         return leftSide.evaluate(row) || rightSide.evaluate(row);
-    }
-
-    public int parameterCount() {
-        return leftSide.parameterCount() + rightSide.parameterCount();
-    }
-
-    public void substitute(Iterator jdbcParameters) {
-        leftSide.substitute(jdbcParameters);
-        rightSide.substitute(jdbcParameters);
     }
 
     public String firstAggregate() {

@@ -12,9 +12,16 @@ public abstract class Command extends ValueObject {
         return new Parser(sql).parse();
     }
 
-    abstract public void substitute(Collection jdbcParameters);
+    public static Command fromTokens(List tokens) {
+        return new Parser(tokens).parse();
+    }
 
-    abstract public int parameterCount();
+    final public void substitute(Collection jdbcParameters) {
+    }
+
+    final public int parameterCount() {
+        return 0;
+    }
     
     abstract public DataStore update(DataStore store, String schema);
 

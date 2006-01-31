@@ -18,6 +18,10 @@ public class Select extends Command {
         return new Parser(sql).parseQuery();
     }
 
+    public static Select selectFromTokens(List tokens) {
+        return new Parser(tokens).parseQuery();
+    }
+
     private final What what;
     private final From from;
     private final Where where;
@@ -100,16 +104,6 @@ public class Select extends Command {
 
         Rows sorted = orderBy.sort(store, afterGrouping, what);
         return limit.limit(sorted);
-    }
-
-    public void substitute(Collection jdbcParameters) {
-        Iterator iter = jdbcParameters.iterator();
-        what.substitute(iter);
-        where.substitute(iter);
-    }
-
-    public int parameterCount() {
-        return what.parameterCount() + where.parameterCount();
     }
 
     public DataStore update(DataStore store, String schema) {

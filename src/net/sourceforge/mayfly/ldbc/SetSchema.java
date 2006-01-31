@@ -1,9 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
-
-import java.util.*;
+import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.datastore.DataStore;
 
 public class SetSchema extends Command {
 
@@ -11,14 +9,6 @@ public class SetSchema extends Command {
 
     public SetSchema(String name) {
         this.name = name;
-    }
-
-    public void substitute(Collection jdbcParameters) {
-        throw new UnimplementedException();
-    }
-
-    public int parameterCount() {
-        throw new UnimplementedException();
     }
 
     public DataStore update(DataStore store, String schema) {

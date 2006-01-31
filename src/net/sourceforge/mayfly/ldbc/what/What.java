@@ -1,13 +1,18 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.evaluation.expression.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
+import net.sourceforge.mayfly.ldbc.Rows;
+import net.sourceforge.mayfly.util.Aggregate;
+import net.sourceforge.mayfly.util.Iterable;
+import net.sourceforge.mayfly.util.L;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class What extends Aggregate {
 
@@ -42,24 +47,6 @@ public class What extends Aggregate {
             result.addAll(element.selected(dummyRow));
         }
         return new What(result);
-    }
-
-    public int parameterCount() {
-        int count = 0;
-        for (int i = 0; i < elements.size(); ++i) {
-            if (elements.get(i) instanceof JdbcParameter) {
-                ++count;
-            }
-        }
-        return count;
-    }
-
-    public void substitute(Iterator jdbcParameters) {
-        for (int i = 0; i < elements.size(); ++i) {
-            if (elements.get(i) instanceof JdbcParameter) {
-                elements.set(i, Literal.fromValue(jdbcParameters.next()));
-            }
-        }
     }
 
     public Cell evaluate(int oneBasedColumn, Row row) {

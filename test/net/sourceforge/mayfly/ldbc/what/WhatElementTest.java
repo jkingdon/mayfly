@@ -9,7 +9,6 @@ import net.sourceforge.mayfly.evaluation.expression.Maximum;
 import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
-import net.sourceforge.mayfly.ldbc.JdbcParameter;
 import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
 import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
@@ -19,7 +18,6 @@ public class WhatElementTest extends TestCase {
     public void testDisplayNameNonExpressions() {
         assertEquals("*", new All().displayName());
         assertEquals("foo.*", new AllColumnsFromTable("foo").displayName());
-        assertEquals("?", JdbcParameter.INSTANCE.displayName());
     }
     
     public void testDisplayNameBasicExpressions() throws Exception {

@@ -1,9 +1,9 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.what.*;
-
-import java.util.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.ldbc.what.WhatElement;
 
 public class IsNull extends BooleanExpression {
 
@@ -11,7 +11,6 @@ public class IsNull extends BooleanExpression {
 
     public IsNull(WhatElement expression) {
         this.expression = expression;
-        
     }
 
     public boolean evaluate(Object rowObject) {
@@ -20,13 +19,6 @@ public class IsNull extends BooleanExpression {
         return cell instanceof NullCell;
     }
 
-    public int parameterCount() {
-        return 0;
-    }
-
-    public void substitute(Iterator jdbcParameters) {
-    }
-    
     public String firstAggregate() {
         return expression.firstAggregate();
     }

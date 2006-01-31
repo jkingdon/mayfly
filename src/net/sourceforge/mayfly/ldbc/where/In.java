@@ -29,21 +29,6 @@ public class In extends BooleanExpression {
 		return false;
 	}
 
-    public int parameterCount() {
-        int listCount = 0;
-        for (int i = 0; i < expressions.size(); ++i) {
-            listCount += parameterCount((WhatElement) expressions.get(i));
-        }
-        return parameterCount(leftSide) + listCount;
-    }
-
-    public void substitute(Iterator jdbcParameters) {
-        leftSide = substitute(leftSide, jdbcParameters);
-        for (int i = 0; i < expressions.size(); ++i) {
-            expressions.set(i, substitute((WhatElement) expressions.get(i), jdbcParameters));
-        }
-    }
-    
     public String firstAggregate() {
         String firstInLeft = leftSide.firstAggregate();
         if (firstInLeft != null) {

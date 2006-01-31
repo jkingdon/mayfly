@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import java.util.*;
 
 public class Not extends BooleanExpression {
 
@@ -14,14 +13,6 @@ public class Not extends BooleanExpression {
         return !operand.evaluate(row);
     }
 
-    public int parameterCount() {
-        return operand.parameterCount();
-    }
-
-    public void substitute(Iterator jdbcParameters) {
-        operand.substitute(jdbcParameters);
-    }
-    
     public String firstAggregate() {
         return operand.firstAggregate();
     }

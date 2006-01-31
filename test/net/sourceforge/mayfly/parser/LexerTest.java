@@ -367,8 +367,11 @@ public class LexerTest extends TestCase {
     }
     
     private void check(TokenType[] expectedTypes, String[] expectedTexts, String input) {
+        check(expectedTypes, expectedTexts, lex(input));
+    }
+
+    public static void check(TokenType[] expectedTypes, String[] expectedTexts, List actual) {
         assertEquals(expectedTexts.length, expectedTypes.length);
-        List actual = lex(input);
         List actualTexts = new ArrayList(actual.size());
         List actualTypes = new ArrayList(actual.size());
         for (int i = 0; i < actual.size(); ++i) {

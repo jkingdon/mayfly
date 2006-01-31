@@ -20,18 +20,6 @@ public class Insert extends Command {
         return table.tableName();
     }
 
-    public void substitute(Collection jdbcParameters) {
-        substitute(jdbcParameters.iterator());
-    }
-
-    private void substitute(Iterator jdbcParameters) {
-        for (int i = 0; i < values.size(); ++i) {
-            if (values.get(i) instanceof JdbcParameter) {
-                values.set(i, jdbcParameters.next());
-            }
-        }
-    }
-
     public DataStore update(DataStore store, String currentSchema) {
         if (columns == null) {
             return store.addRow(schemaToUse(currentSchema), table(), values);
@@ -48,14 +36,4 @@ public class Insert extends Command {
         return 1;
     }
     
-    public int parameterCount() {
-        int count = 0;
-        for (int i = 0; i < values.size(); ++i) {
-            if (values.get(i) instanceof JdbcParameter) {
-                ++count;
-            }
-        }
-        return count;
-    }
-
 }

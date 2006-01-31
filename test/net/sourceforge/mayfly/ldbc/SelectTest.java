@@ -1,15 +1,25 @@
 package net.sourceforge.mayfly.ldbc;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.evaluation.*;
-import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.ldbc.where.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.util.*;
-
-import java.sql.*;
+import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.Schema;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.ldbc.what.All;
+import net.sourceforge.mayfly.ldbc.what.AllColumnsFromTable;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.ldbc.what.What;
+import net.sourceforge.mayfly.ldbc.where.And;
+import net.sourceforge.mayfly.ldbc.where.Equal;
+import net.sourceforge.mayfly.ldbc.where.Greater;
+import net.sourceforge.mayfly.ldbc.where.Not;
+import net.sourceforge.mayfly.ldbc.where.Or;
+import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
+import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
+import net.sourceforge.mayfly.util.L;
 
 public class SelectTest extends TestCase {
 
@@ -108,91 +118,6 @@ public class SelectTest extends TestCase {
             ),
             Select.selectFromSql("select 5 from foo")
         );
-    }
-
-    public void testParseJdbcParameter() throws Exception {
-        assertEquals(
-            new Select(
-                new What()
-                    .add(JdbcParameter.INSTANCE),
-                new From()
-                    .add(new FromTable("foo")),
-                new Where(
-                    new Equal(new SingleColumn("a"), JdbcParameter.INSTANCE)
-                )
-            ),
-            Select.selectFromSql("select ? from foo where a = ?")
-        );
-    }
-
-    public void testParameterCount() throws Exception {
-        checkParameterCount(2, "select ? from foo where a = ?");
-        checkParameterCount(3, "select a from foo where (? = b or ? != c) and a > ?");
-        checkParameterCount(2, "select a from foo where ? IN (1, ?, 5)");
-    }
-
-    private void checkParameterCount(int expected, String sql) throws SQLException {
-        assertEquals(expected, Select.selectFromSql(sql).parameterCount());
-    }
-
-    public void testSubstituteMultipleValues() throws Exception {
-        assertEquals(
-            new Select(
-                new What()
-                    .add(new MathematicalInt(5)),
-                new From()
-                    .add(new FromTable("foo")),
-                new Where(
-                    new And(
-                        new Or(
-                            new Equal(
-                                new SingleColumn("a"),
-                                new MathematicalInt(6)
-                            ),
-                            new Not(
-                                new Equal(
-                                    new MathematicalInt(7),
-                                    new SingleColumn("b")
-                                )
-                            )
-                        ),
-                        new Greater(
-                            new MathematicalInt(8),
-                            new SingleColumn("c")
-                        )
-                    )
-                )
-            ),
-            substitute("select ? from foo where (a = ? or ? != b) and c < ?")
-        );
-    }
-
-    public void testSubstituteIn() throws Exception {
-        assertEquals(
-            new Select(
-                new What()
-                    .add(new SingleColumn("a")),
-                new From()
-                    .add(new FromTable("foo")),
-                new Where(
-                    new In(
-                        new MathematicalInt(5),
-                        L.fromArray(new Object[] {
-                            new MathematicalInt(6),
-                            new MathematicalInt(3),
-                            new MathematicalInt(7)
-                        })
-                    )
-                )
-            ),
-            substitute("select a from foo where ? in (?, 3, ?)")
-        );
-    }
-
-    private Command substitute(String sql) throws SQLException {
-        Command command = Command.fromSql(sql);
-        command.substitute(L.fromArray(new int[] { 5, 6, 7, 8 }));
-        return command;
     }
 
     // Some versions of ldbc reserved X, but seemingly not the grammar

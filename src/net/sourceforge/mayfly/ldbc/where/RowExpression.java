@@ -1,10 +1,9 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.ldbc.what.*;
-
-import java.util.*;
+import net.sourceforge.mayfly.ldbc.what.WhatElement;
 
 abstract public class RowExpression extends BooleanExpression {
 
@@ -28,15 +27,6 @@ abstract public class RowExpression extends BooleanExpression {
 
     abstract protected boolean compare(Cell leftSide, Cell rightSide);
 
-    public int parameterCount() {
-        return parameterCount(leftSide) + parameterCount(rightSide);
-    }
-
-    public void substitute(Iterator jdbcParameters) {
-        leftSide = substitute(leftSide, jdbcParameters);
-        rightSide = substitute(rightSide, jdbcParameters);
-    }
-    
     public String firstAggregate() {
         return Expression.firstAggregate(leftSide, rightSide);
     }

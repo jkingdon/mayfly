@@ -56,6 +56,27 @@ public class StatementTest extends SqlTestCase {
         results.close();
     }
     
+    public void testStringInSelect() throws Exception {
+        execute("create table foo (s VARCHAR(80))");
+        execute("insert into foo (s) values ('can''t')");
+        
+        PreparedStatement prepared = connection.prepareStatement("select s from foo where s = ?");
+        prepared.setString(1, "can't");
+        ResultSet results = prepared.executeQuery();
+
+        assertTrue(results.next());
+        assertEquals("can't", results.getString(1));
+        assertFalse(results.next());
+        results.close();
+
+        prepared.close();
+    }
+    
+    public void testParameterInNonPreparedStatement() throws Exception {
+        execute("create table foo (x integer)");
+        expectExecuteFailure("insert into foo(x) values (?)", "Attempt to specify '?' outside a prepared statement");
+    }
+    
     public void testBadSetIntCalls() throws Exception {
         execute("create table Foo (B Integer, a integer)");
 

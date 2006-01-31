@@ -2,6 +2,9 @@ package net.sourceforge.mayfly.jdbc;
 
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.parser.Lexer;
+import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.parser.Substitutor;
 
 import java.io.*;
 import java.math.*;
@@ -21,7 +24,11 @@ public class JdbcPreparedStatement implements PreparedStatement {
             this.sql = sql;
             this.database = database;
             this.parameters = new Vector();
-            parameterCount = Command.fromSql(sql).parameterCount();
+
+            List tokens = new Lexer(sql).tokens();
+            parameterCount = Substitutor.parameterCount(tokens);
+            new Parser(tokens, true).parse();
+
             parameters.setSize(parameterCount);
         } catch (MayflyException e) {
             throw e.asSqlException();
@@ -30,8 +37,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public ResultSet executeQuery() throws SQLException {
         try {
-            Select select = Select.selectFromSql(sql);
-            substitute(select);
+            Select select = Select.selectFromTokens(substitutedTokens());
             return database.query(select);
         } catch (MayflyException e) {
             throw e.asSqlException();
@@ -40,22 +46,22 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public int executeUpdate() throws SQLException {
         try {
-            Command command = Command.fromSql(sql);
-            substitute(command);
+            Command command = Command.fromTokens(substitutedTokens());
             return database.executeUpdate(command);
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
     }
 
-    private void substitute(Command command) throws SQLException {
+    private List substitutedTokens() throws SQLException {
         for (int i = 0; i < parameterCount; ++i) {
             if (parameters.get(i) == null) {
                 int oneBased = i + 1;
                 throw new MayflyException("Parameter " + oneBased + " missing");
             }
         }
-        command.substitute(parameters);
+        
+        return Substitutor.substitute(new Lexer(sql).tokens(), parameters);
     }
 
     public void setNull(int parameterIndex, int sqlType) throws SQLException {

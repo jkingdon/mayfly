@@ -1,10 +1,10 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Schema;
+import net.sourceforge.mayfly.util.L;
 
-import java.util.*;
+import java.util.Iterator;
 
 public class CreateSchema extends Command {
 
@@ -18,14 +18,6 @@ public class CreateSchema extends Command {
 
     public void add(CreateTable command) {
         createTableCommands.add(command);
-    }
-
-    public void substitute(Collection jdbcParameters) {
-        throw new UnimplementedException();
-    }
-
-    public int parameterCount() {
-        throw new UnimplementedException();
     }
 
     public DataStore update(DataStore store, String currentSchema) {

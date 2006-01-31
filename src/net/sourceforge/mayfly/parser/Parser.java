@@ -30,7 +30,6 @@ import net.sourceforge.mayfly.ldbc.FromTable;
 import net.sourceforge.mayfly.ldbc.InnerJoin;
 import net.sourceforge.mayfly.ldbc.Insert;
 import net.sourceforge.mayfly.ldbc.InsertTable;
-import net.sourceforge.mayfly.ldbc.JdbcParameter;
 import net.sourceforge.mayfly.ldbc.LeftJoin;
 import net.sourceforge.mayfly.ldbc.Limit;
 import net.sourceforge.mayfly.ldbc.OrderBy;
@@ -72,13 +71,19 @@ import java.util.List;
 public class Parser {
 
     private List tokens;
+    private final boolean allowParameters;
 
     public Parser(String sql) {
         this(new Lexer(sql).tokens());
     }
 
     public Parser(List tokens) {
+        this(tokens, false);
+    }
+    
+    public Parser(List tokens, boolean allowParameters) {
         this.tokens = tokens;
+        this.allowParameters = allowParameters;
     }
 
     public Command parse() {
@@ -178,9 +183,6 @@ public class Parser {
 
         try {
             WhatElement expression = parseExpression().asNonBoolean();
-            if (expression instanceof JdbcParameter) {
-                return JdbcParameter.INSTANCE;
-            }
             Cell cell = expression.evaluate(null);
             return cell.asContents();
         } catch (FoundNullLiteral e) {
@@ -456,7 +458,13 @@ public class Parser {
             return new NonBooleanParserExpression(new QuotedString(literal.getText()));
         }
         else if (consumeIfMatches(TokenType.PARAMETER)) {
-            return new NonBooleanParserExpression(JdbcParameter.INSTANCE);
+            if (allowParameters) {
+                // We are just doing a syntax check.
+                return new NonBooleanParserExpression(new MathematicalInt(0));
+            }
+            else {
+                throw new MayflyException("Attempt to specify '?' outside a prepared statement");
+            }
         }
         else if (consumeIfMatches(TokenType.KEYWORD_null)) {
             throw new FoundNullLiteral();

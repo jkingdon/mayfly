@@ -22,9 +22,6 @@ public class CreateTable extends Command {
         return columnNames;
     }
 
-    public void substitute(Collection jdbcParameters) {
-    }
-
     public DataStore update(DataStore store, String schema) {
         Schema oldSchema = store.schema(schema);
         Schema updatedSchema = update(oldSchema);
@@ -36,10 +33,6 @@ public class CreateTable extends Command {
     }
 
     public int rowsAffected() {
-        return 0;
-    }
-
-    public int parameterCount() {
         return 0;
     }
 

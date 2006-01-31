@@ -1,11 +1,11 @@
 package net.sourceforge.mayfly.ldbc;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.datastore.NullCellContent;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class InsertTest extends TestCase {
     
@@ -17,34 +17,6 @@ public class InsertTest extends TestCase {
                 Arrays.asList(new Object[] {new Long(5), "Value"})
             ),
             Command.fromSql("insert into foo (a, b) values (5, 'Value')")
-        );
-    }
-    
-    public void testParseJdbcParameter() throws Exception {
-        assertEquals(
-            new Insert(
-                new InsertTable("foo"),
-                Collections.singletonList("a"),
-                Collections.singletonList(JdbcParameter.INSTANCE)
-            ),
-            Command.fromSql("insert into foo (a) values (?)")
-        );
-    }
-    
-    public void testSubstitute() throws Exception {
-        Insert insert = new Insert(
-            new InsertTable("foo"),
-            Collections.singletonList("a"),
-            new L().append(JdbcParameter.INSTANCE)
-        );
-        insert.substitute(Collections.singletonList(new Long(77)));
-        assertEquals(
-            new Insert(
-                new InsertTable("foo"),
-                Collections.singletonList("a"),
-                Collections.singletonList(new Long(77))
-            ),
-            insert
         );
     }
     
