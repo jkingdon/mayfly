@@ -28,6 +28,14 @@ public class ExpressionTest extends SqlTestCase {
         }
     }
     
+    public void xtestDual() throws Exception {
+        // In MySQL, this works from the command line mysql client
+        // but here I get "No tables used".  Strangeness in JDBC driver?
+        assertResultSet(new String[] { " 7 " }, query("select 7 from dual"));
+        // This one gives "No tables used" even from the command line.
+        assertResultSet(new String[] { " 'X' " }, query("select * from dual"));
+    }
+    
     public void testConcat() throws Exception {
         execute("create table names (first varchar(255), last varchar(255))");
         execute("insert into names(first, last) values ('John', 'Jones')");
