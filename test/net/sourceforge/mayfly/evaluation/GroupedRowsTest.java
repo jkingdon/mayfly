@@ -6,6 +6,7 @@ import java.util.*;
 
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.evaluation.expression.*;
+import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 import net.sourceforge.mayfly.util.*;
@@ -37,7 +38,7 @@ public class GroupedRowsTest extends TestCase {
             )
         );
         
-        Rows rows = groupedRows.ungroup(new What(ImmutableList.singleton(new SingleColumn("player"))));
+        Rows rows = groupedRows.ungroup(new Selected(ImmutableList.singleton(new SingleColumn("player"))));
         
         Rows expected = new Rows(
             new ImmutableList()
@@ -90,7 +91,7 @@ public class GroupedRowsTest extends TestCase {
         );
         
         Rows rows = groupedRows.ungroup(
-            new What(Arrays.asList(new WhatElement[] {
+            new Selected(Arrays.asList(new WhatElement[] {
                 new SingleColumn("player"),
                 new SingleColumn("year"),
                 new Average(new SingleColumn("score"), "avg", false)

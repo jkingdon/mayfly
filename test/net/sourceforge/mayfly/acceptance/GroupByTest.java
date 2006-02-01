@@ -152,10 +152,16 @@ public class GroupByTest extends SqlTestCase {
     
     public void testGroupByAggregate() throws Exception {
         // select pub_id, sum(price) from titles group by pub_id, sum(price)
+        if (!mayflyMissing()) {
+            return;
+        }
     }
     
     public void testGroupByAggregateViaAlias() throws Exception {
         // select pub_id, sum(price) as total from titles group by pub_id, total
+        if (!mayflyMissing()) {
+            return;
+        }
     }
     
     public void testGroupByNull() throws Exception {
@@ -300,6 +306,45 @@ public class GroupByTest extends SqlTestCase {
     
     public void testGroupByAndOrderBy() throws Exception {
         // For example, select type, avg(price) order by avg(price)
+        if (!mayflyMissing()) {
+            return;
+        }
     }
 
+    public void testGroupByAndAsterisk() throws Exception {
+        execute("create table books (author varchar(255), title varchar(255))");
+        execute("insert into books(author, title) values ('Bowman', 'Practical SQL')");
+        execute("insert into books(author, title) values ('Bowman', 'Other Title')");
+        execute("insert into books(author, title) values ('Gang Of Four', 'Design Patterns')");
+        
+        assertResultList(
+            new String[] {
+                " 'Bowman', 'Other Title' ", 
+                " 'Bowman', 'Practical SQL' ", 
+                " 'Gang Of Four', 'Design Patterns' "
+            },
+            query("select books.* from books group by author, title order by author, title")
+        );
+
+        assertResultList(
+            new String[] {
+                " 'Bowman', 'Other Title' ", 
+                " 'Bowman', 'Practical SQL' ", 
+                " 'Gang Of Four', 'Design Patterns' "
+            },
+            query("select * from books group by author, title order by author, title")
+        );
+        
+        String selectAll = "select * from books group by author";
+        String selectAllFromTable = "select books.* from books group by author";
+        if (dialect.errorIfNotAggregateOrGrouped()) {
+            expectQueryFailure(selectAll, "books.title is not aggregate or mentioned in GROUP BY");
+            expectQueryFailure(selectAllFromTable, "books.title is not aggregate or mentioned in GROUP BY");
+        }
+        else {
+            assertResultSet(new String[] { " 'Bowman' ", " 'Gang Of Four' " }, query(selectAll));
+            assertResultSet(new String[] { " 'Bowman' ", " 'Gang Of Four' " }, query(selectAllFromTable));
+        }
+    }
+    
 }

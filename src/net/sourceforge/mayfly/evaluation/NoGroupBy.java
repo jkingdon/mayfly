@@ -38,7 +38,7 @@ public class NoGroupBy extends ValueObject implements Aggregator {
         return firstAggregate != null;
     }
 
-    public void check(Row dummyRow, What what) {
+    public void check(Row dummyRow, Selected selected) {
     }
     
 }

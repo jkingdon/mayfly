@@ -50,12 +50,12 @@ public class GroupBy extends ValueObject implements Aggregator {
     }
 
     public Rows group(Rows rows, What what, Selected selected) {
-        Rows resultOfGrouping = makeGroupedRows(rows).ungroup(what);
+        Rows resultOfGrouping = makeGroupedRows(rows).ungroup(selected);
         return (Rows) resultOfGrouping.select(having);
     }
     
-    public void check(Row dummyRow, What what) {
-        makeGroupedRows(new Rows(dummyRow)).ungroup(what);
+    public void check(Row dummyRow, Selected selected) {
+        makeGroupedRows(new Rows(dummyRow)).ungroup(selected);
     }
 
 }

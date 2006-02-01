@@ -41,7 +41,7 @@ public class OrderByTest extends SqlTestCase {
         );
     }
     
-    public void testNullSortsFirst() throws Exception {
+    public void testNullSortOrder() throws Exception {
         execute("create table foo (a varchar(255))");
         execute("insert into foo (a) values ('one')");
         execute("insert into foo (a) values (null)");
@@ -86,6 +86,55 @@ public class OrderByTest extends SqlTestCase {
             expectQueryFailure(constantExpression, "expected end of file but got '+'");
             
             expectQueryFailure(referenceToExpression, "ORDER BY 1 refers to an expression not a column");
+        }
+    }
+    
+    public void testOrderByNumericReference() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo(a, b) values (5, 30)");
+        execute("insert into foo(a, b) values (8, 40)");
+        execute("insert into foo(a, b) values (3, 50)");
+        execute("insert into foo(a, b) values (4, 60)");
+        execute("insert into foo(a, b) values (2, 70)");
+
+        assertResultList(new String[] { "2", "3", "4", "5", "8" }, query("select a from foo order by 1"));
+        assertResultList(new String[] { "8", "5", "4", "3", "2" }, query("select a from foo order by 1 desc"));
+        expectQueryFailure("select a from foo order by 0", "ORDER BY 0 must be in range 1 to 1");
+
+        // Does negative mean something?
+        //        expectQueryFailure("select a from foo order by -1", "ORDER BY -1 must be in range 1 to 1");
+        //expectQueryFailure("select a from foo order by -1", "expected identifier but got '-'");
+
+        expectQueryFailure("select a from foo order by 2", "ORDER BY 2 must be in range 1 to 1");
+    }
+    
+    public void testOrderByNumericReferenceWithAsterisks() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo(a, b) values (5, 30)");
+        execute("insert into foo(a, b) values (8, 40)");
+        execute("insert into foo(a, b) values (3, 50)");
+        execute("insert into foo(a, b) values (4, 60)");
+        execute("insert into foo(a, b) values (2, 70)");
+
+        String orderByB = "select foo.*, a from foo order by 2";
+        String orderBySecondA = "select foo.*, a from foo order by 3";
+
+        assertResultList(new String[] { "2", "3", "4", "5", "8" }, query("select a, foo.* from foo order by 1"));
+        String orderBySecondA2 = "select a, foo.* from foo order by 2";
+
+        if (dialect.expectMayflyBehavior()) {
+            // Currently, mayfly is written so the numbers refer to the position
+            // in the select clause before foo.* is expanded.  That seems questionable,
+            // in that mayfly seems to be the only database tested which does that.
+            // 
+            assertResultList(new String[] { "2", "3", "4", "5", "8" }, query(orderByB));
+            expectQueryFailure(orderBySecondA, "ORDER BY 3 must be in range 1 to 2");
+            expectQueryFailure(orderBySecondA2, "ORDER BY 2 refers to an expression not a column");
+        }
+        else {
+            assertResultList(new String[] { "5", "8", "3", "4", "2" }, query(orderByB));
+            assertResultList(new String[] { "2", "3", "4", "5", "8" }, query(orderBySecondA));
+            assertResultList(new String[] { "2", "3", "4", "5", "8" }, query(orderBySecondA2));
         }
     }
     

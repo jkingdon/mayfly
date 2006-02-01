@@ -5,6 +5,7 @@ import java.util.*;
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.evaluation.expression.*;
+import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.ldbc.what.*;
 
@@ -57,42 +58,44 @@ public class GroupedRows {
         return (Rows) groups.get(keys);
     }
 
-    public Rows ungroup(What what) {
+    public Rows ungroup(Selected selected) {
         Rows result = new Rows();
 
         Iterator iter = groups.keySet().iterator();
         while (iter.hasNext()) {
             List keys = (List) iter.next();
-            result = (Rows) result.with(rowForKey(keys, getRows(keys), what));
+            result = (Rows) result.with(rowForKey(keys, getRows(keys), selected));
         }
 
         return result;
     }
 
-    private Row rowForKey(List keys, Rows rowsForKey, What what) {
+    private Row rowForKey(List keys, Rows rowsForKey, Selected selected) {
         Map allKeyValues = allKeyValues(keys);
 
         TupleBuilder builder = new TupleBuilder();
-        addColumnsForWhat(rowsForKey, what, allKeyValues, builder);
+        addColumnsForWhat(rowsForKey, selected, allKeyValues, builder);
         addColumnsForKeys(allKeyValues, builder);
         return new Row(builder);
     }
 
-    private void addColumnsForWhat(Rows rowsForKey, What what, Map allKeyValues, TupleBuilder builder) {
-        for (int i = 0; i < what.size(); ++i) {
-            WhatElement element = (WhatElement) what.element(i);
-            Column found = lookupColumn(element);
+    private void addColumnsForWhat(Rows rowsForKey, Selected selected, Map allKeyValues, TupleBuilder builder) {
+        for (int i = 0; i < selected.size(); ++i) {
+            Expression expression = selected.element(i);
+            Column found = lookupColumn(expression);
             if (found != null) {
+                /** Hmm.  Is there any reason we want to add these here
+                  * rather than just let {@link #addColumnsForKeys(Map, TupleBuilder)} do it?
+                  */
                 builder.append(found, (Cell) allKeyValues.get(found));
                 allKeyValues.remove(found);
             }
-            else if (element.firstAggregate() != null) {
-                Expression expression = (Expression) element;
+            else if (expression.firstAggregate() != null) {
                 Cell aggregated = expression.aggregate(rowsForKey);
                 builder.append(new PositionalHeader(i), aggregated);
             }
             else {
-                throw new MayflyException(element.displayName() + " is not aggregate or mentioned in GROUP BY");
+                throw new MayflyException(expression.displayName() + " is not aggregate or mentioned in GROUP BY");
             }
         }
     }

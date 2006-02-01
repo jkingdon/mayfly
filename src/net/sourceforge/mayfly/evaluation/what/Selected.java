@@ -55,4 +55,12 @@ public class Selected extends ValueObject implements Iterable {
         return new Rows(resultRow);
     }
 
+    public int size() {
+        return expressions.size();
+    }
+
+    public Expression element(int index) {
+        return (Expression) expressions.get(index);
+    }
+
 }

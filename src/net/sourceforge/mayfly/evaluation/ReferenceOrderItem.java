@@ -15,7 +15,14 @@ public class ReferenceOrderItem extends OrderItem {
     }
 
     protected int compareAscending(final What what, Row first, Row second) {
-        WhatElement whatElement = (WhatElement) what.element(reference - 1);
+        int zeroBasedColumn = reference - 1;
+
+        int size = what.size();
+        if (zeroBasedColumn < 0 || zeroBasedColumn >= size) {
+            throw new MayflyException("ORDER BY " + reference + " must be in range 1 to " + size);
+        }
+
+        WhatElement whatElement = (WhatElement) what.element(zeroBasedColumn);
         if (whatElement instanceof SingleColumn) {
             return ColumnOrderItem.compare(first, second, (SingleColumn) whatElement);
         }

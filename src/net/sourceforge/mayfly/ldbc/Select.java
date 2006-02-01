@@ -65,7 +65,7 @@ public class Select extends Command {
         if (firstAggregate != null) {
             throw new MayflyException("aggregate " + firstAggregate + " not valid in WHERE");
         }
-        groupBy.check(dummyRow, what);
+        groupBy.check(dummyRow, selected);
 
         orderBy.check(dummyRow);
         
