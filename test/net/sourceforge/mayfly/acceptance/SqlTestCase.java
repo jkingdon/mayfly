@@ -14,6 +14,7 @@ public abstract class SqlTestCase extends TestCase {
         //new HypersonicDialect()
         //new MySqlDialect()
         //new PostgresDialect()
+        //new DerbyDialect()
         ;
 
     // Turn this on to see a comparison of mayfly exception messages with

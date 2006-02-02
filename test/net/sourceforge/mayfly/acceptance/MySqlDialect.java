@@ -113,6 +113,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean disallowNullsInExpressions() {
+        return false;
+    }
+
     public boolean canQuoteIdentifiers() {
         return false;
     }

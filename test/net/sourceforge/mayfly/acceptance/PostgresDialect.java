@@ -38,11 +38,11 @@ public class PostgresDialect extends Dialect {
         Connection teardownConnection = DriverManager.getConnection("jdbc:postgresql:", "mayflytest", "mayflytest");
         // The connection.close() above is needed for this to work, but
         // doesn't complete immediately.  So we need the retries.
-        executeWithRetries(teardownConnection, "DROP DATABASE test");
+        executeWithRetries("DROP DATABASE test", teardownConnection);
         teardownConnection.close();
     }
     
-    private void executeWithRetries(Connection connection, String sql) throws Exception {
+    private void executeWithRetries(String sql, Connection connection) throws Exception {
         int tries = 0;
         while (true) {
             try {
@@ -103,6 +103,10 @@ public class PostgresDialect extends Dialect {
     }
     
     public boolean numberOfValuesMustMatchNumberOfColumns() {
+        return false;
+    }
+
+    public boolean disallowNullsInExpressions() {
         return false;
     }
 

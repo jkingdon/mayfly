@@ -171,4 +171,8 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean disallowNullsInExpressions() {
+        return true;
+    }
+
 }

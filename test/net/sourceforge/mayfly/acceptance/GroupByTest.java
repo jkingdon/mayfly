@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.acceptance;
 
+
 public class GroupByTest extends SqlTestCase {
     
     public void testGroupByActsLikeDistinct() throws Exception {

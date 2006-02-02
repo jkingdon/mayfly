@@ -126,7 +126,7 @@ public class ValueTest extends SqlTestCase {
 
     private void checkWrongWayToLookForNull() throws SQLException {
         String wrongWayToLookForNull = "select a from foo where a = null";
-        if (dialect.expectMayflyBehavior()) {
+        if (dialect.disallowNullsInExpressions()) {
             expectQueryFailure(wrongWayToLookForNull, 
                 "To check for null, use IS NULL or IS NOT NULL, not a null literal"
             );
@@ -183,7 +183,7 @@ public class ValueTest extends SqlTestCase {
     public void testNullInExpression() throws Exception {
         execute("create table foo (a integer)");
         String insertNullExpression = "insert into foo(a) values (5 + null)";
-        if (dialect.expectMayflyBehavior()) {
+        if (dialect.disallowNullsInExpressions()) {
             try {
                 execute(insertNullExpression);
                 fail();

@@ -72,5 +72,9 @@ public class HypersonicDialect extends Dialect {
     public boolean notRequiresBoolean() {
         return false;
     }
+    
+    public boolean disallowNullsInExpressions() {
+        return false;
+    }
 
 }
