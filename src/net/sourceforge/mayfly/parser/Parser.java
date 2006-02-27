@@ -692,7 +692,7 @@ public class Parser {
     }
 
     private GroupItem parseGroupItem() {
-        return new GroupItem(parseColumnReference());
+        return new GroupItem(parseExpression().asNonBoolean());
     }
 
     private OrderBy parseOrderBy() {

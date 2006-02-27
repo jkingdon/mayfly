@@ -1,44 +1,49 @@
 package net.sourceforge.mayfly.evaluation;
 
-import java.util.*;
-
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.evaluation.expression.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.Rows;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GroupedRows {
     
-    Map/*<List<Cell>, Rows>*/ groups = new LinkedHashMap();
-    List/*<Column>*/ keyColumns = null;
+    private Map/*<List<Cell>, Rows>*/ groups = new LinkedHashMap();
+    private List/*<Column>*/ keyColumns = null;
+    //private GroupByKeys keys;
 
     public int groupCount() {
         return groups.size();
     }
 
-    public void add(Column key, Row row) {
-        add(Collections.singletonList(key), row);
+    public void add(GroupByKeys keys, Row row) {
+        addRowToGroup(keys.evaluate(row), row);
+        //this.keys = keys;
+        this.keyColumns = keys.columns(row);
     }
 
-    public void add(List keyColumns, Row row) {
-        List keyCells = new ArrayList();
-        for (int i = 0; i < keyColumns.size(); ++i) {
-            keyCells.add(row.cell((Column) keyColumns.get(i)));
-        }
-
+    private void addRowToGroup(List groupCells, Row row) {
         Rows start;
-        if (groups.containsKey(keyCells)) {
-            start = (Rows) groups.get(keyCells);
+        if (groups.containsKey(groupCells)) {
+            start = (Rows) groups.get(groupCells);
         }
         else {
             start = new Rows();
         }
         
         Rows modified = (Rows) start.with(row);
-        groups.put(keyCells, modified);
-        this.keyColumns = keyColumns;
+        groups.put(groupCells, modified);
     }
 
     public Iterator keyIterator() {
@@ -74,21 +79,17 @@ public class GroupedRows {
         Map allKeyValues = allKeyValues(keys);
 
         TupleBuilder builder = new TupleBuilder();
-        addColumnsForWhat(rowsForKey, selected, allKeyValues, builder);
+        addColumnsForWhat(rowsForKey, selected, builder);
         addColumnsForKeys(allKeyValues, builder);
         return new Row(builder);
     }
 
-    private void addColumnsForWhat(Rows rowsForKey, Selected selected, Map allKeyValues, TupleBuilder builder) {
+    private void addColumnsForWhat(Rows rowsForKey, Selected selected, TupleBuilder builder) {
         for (int i = 0; i < selected.size(); ++i) {
             Expression expression = selected.element(i);
             Column found = lookupColumn(expression);
             if (found != null) {
-                /** Hmm.  Is there any reason we want to add these here
-                  * rather than just let {@link #addColumnsForKeys(Map, TupleBuilder)} do it?
-                  */
-                builder.append(found, (Cell) allKeyValues.get(found));
-                allKeyValues.remove(found);
+                /** Just let {@link #addColumnsForKeys(Map, TupleBuilder)} add it. */
             }
             else if (expression.firstAggregate() != null) {
                 Cell aggregated = expression.aggregate(rowsForKey);
@@ -119,7 +120,7 @@ public class GroupedRows {
         return allKeyValues;
     }
 
-    private Column lookupColumn(WhatElement element) {
+    private Column lookupColumn(Expression element) {
         for (Iterator iter = keyColumns.iterator(); iter.hasNext();) {
             Column candidate = (Column) iter.next();
             if (element.matches(candidate)) {

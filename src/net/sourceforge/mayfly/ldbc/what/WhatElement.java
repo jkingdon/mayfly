@@ -9,17 +9,13 @@ import java.util.*;
 
 /**
  * @internal
- * Plays the role of an expression (when it is a
- * {@link net.sourceforge.mayfly.evaluation.Expression}).
- * But also indicates something mentioned in a select clause.
- * 
- * The difference is that SELECT * FROM foo has one
- * WhatElement in the sense of "something mentioned in a
- * select clause", but has several in the sense of "expression".
- * The former is converted to the latter by {@link net.sourceforge.mayfly.ldbc.what.What#selected(Row)}.
- * 
- * It is possible we should separate these two roles; I suspect
- * it would clean up the aggregation code, for example.
+ * Something mention in a select clause (*, table.*, or expression).
+ * It is possible that the expression case should be handled by having
+ * a subclass which wraps
+ * an expression, rather than having {@link net.sourceforge.mayfly.evaluation.Expression}
+ * inherit from us.  Then the distinction between {@link net.sourceforge.mayfly.evaluation.what.Selected}
+ * and {@link net.sourceforge.mayfly.ldbc.what.What} would carry down
+ * to here.
  */
 abstract public class WhatElement extends ValueObject {
 
@@ -27,14 +23,6 @@ abstract public class WhatElement extends ValueObject {
         return new Selected(Collections.singletonList(this));
     }
 
-    public String firstAggregate() {
-        return null;
-    }
-
-    public String firstColumn() {
-        return null;
-    }
-    
     abstract public String displayName();
 
     protected Selected selectedFromColumns(Columns columns) {
@@ -45,10 +33,6 @@ abstract public class WhatElement extends ValueObject {
             result.add(new SingleColumn(column.tableOrAlias(), column.columnName()));
         }
         return result;
-    }
-
-    public boolean matches(Column column) {
-        return false;
     }
 
 }

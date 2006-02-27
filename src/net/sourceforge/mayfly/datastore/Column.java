@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.*;
 import net.sourceforge.mayfly.util.*;
 
-
 public class Column extends ValueObject implements CellHeader {
     private final String tableOrAlias;
     private final String columnName;
