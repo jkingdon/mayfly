@@ -11,7 +11,6 @@ import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.Rows;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,47 +18,44 @@ import java.util.Map;
 
 public class GroupedRows {
     
-    private Map/*<List<Cell>, Rows>*/ groups = new LinkedHashMap();
+    private Map groups = new LinkedHashMap();
     private List/*<Column>*/ keyColumns = null;
-    //private GroupByKeys keys;
+    private GroupByKeys keys;
 
     public int groupCount() {
         return groups.size();
     }
 
     public void add(GroupByKeys keys, Row row) {
-        addRowToGroup(keys.evaluate(row), row);
-        //this.keys = keys;
+        GroupByCells cells = keys.evaluate(row);
+        addRowToGroup(cells, row);
+        this.keys = keys;
         this.keyColumns = keys.columns(row);
     }
 
-    private void addRowToGroup(List groupCells, Row row) {
+    private void addRowToGroup(GroupByCells keys, Row row) {
         Rows start;
-        if (groups.containsKey(groupCells)) {
-            start = (Rows) groups.get(groupCells);
+        if (groups.containsKey(keys)) {
+            start = (Rows) groups.get(keys);
         }
         else {
             start = new Rows();
         }
         
         Rows modified = (Rows) start.with(row);
-        groups.put(groupCells, modified);
+        groups.put(keys, modified);
     }
 
-    public Iterator keyIterator() {
-        List singleKeys = new ArrayList();
+    public Iterator iteratorForFirstKeys() {
+        List firstKeys = new ArrayList();
         for (Iterator iter = groups.keySet().iterator(); iter.hasNext();) {
-            List keys = (List) iter.next();
-            singleKeys.add(keys.get(0));
+            GroupByCells keys = (GroupByCells) iter.next();
+            firstKeys.add(keys.firstKey());
         }
-        return singleKeys.iterator();
+        return firstKeys.iterator();
     }
 
-    public Rows getRows(Cell key) {
-        return (Rows) groups.get(Collections.singletonList(key));
-    }
-
-    public Rows getRows(List/*<Cell>*/ keys) {
+    public Rows getRows(GroupByCells keys) {
         return (Rows) groups.get(keys);
     }
 
@@ -68,19 +64,17 @@ public class GroupedRows {
 
         Iterator iter = groups.keySet().iterator();
         while (iter.hasNext()) {
-            List keys = (List) iter.next();
+            GroupByCells keys = (GroupByCells) iter.next();
             result = (Rows) result.with(rowForKey(keys, getRows(keys), selected));
         }
 
         return result;
     }
 
-    private Row rowForKey(List keys, Rows rowsForKey, Selected selected) {
-        Map allKeyValues = allKeyValues(keys);
-
+    private Row rowForKey(GroupByCells cells, Rows rowsForKey, Selected selected) {
         TupleBuilder builder = new TupleBuilder();
         addColumnsForWhat(rowsForKey, selected, builder);
-        addColumnsForKeys(allKeyValues, builder);
+        addColumnsForKeys(cells, builder);
         return new Row(builder);
     }
 
@@ -88,6 +82,10 @@ public class GroupedRows {
         for (int i = 0; i < selected.size(); ++i) {
             Expression expression = selected.element(i);
             Column found = lookupColumn(expression);
+            // Almost right.  But notion of sameness still needs some work in terms of
+            // col vs tab.col
+//            if (keys.containsExpresion(expression)) {
+
             if (found != null) {
                 /** Just let {@link #addColumnsForKeys(Map, TupleBuilder)} add it. */
             }
@@ -101,23 +99,14 @@ public class GroupedRows {
         }
     }
 
-    private void addColumnsForKeys(Map allKeyValues, TupleBuilder builder) {
-        for (Iterator iter = allKeyValues.entrySet().iterator(); iter.hasNext();) {
-            Map.Entry entry = (Map.Entry) iter.next();
-            builder.append((Column) entry.getKey(), (Cell) entry.getValue());
-        }
-    }
-
-    private Map allKeyValues(List keys) {
-        Map allKeyValues = new LinkedHashMap();
-        if (keyColumns.size() != keys.size()) {
+    private void addColumnsForKeys(GroupByCells cells, TupleBuilder builder) {
+        if (keys.keyCount() != cells.size()) {
             throw new MayflyInternalException(
-                "keyColumns has " + keyColumns.size() + " keys but keys has " + keys.size());
+                "have " + keyColumns.size() + " columns but " + cells.size() + " values");
         }
-        for (int i = 0; i < keyColumns.size(); ++i) {
-            allKeyValues.put(keyColumns.get(i), keys.get(i));
+        for (int i = 0; i < cells.size(); ++i) {
+            builder.append((Column) keyColumns.get(i), cells.get(i));
         }
-        return allKeyValues;
     }
 
     private Column lookupColumn(Expression element) {

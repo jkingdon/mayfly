@@ -15,26 +15,36 @@ public class GroupByKeys extends ValueObject {
         items.add(key);
     }
 
-    public Iterator itemIterator() {
-        return items.iterator();
-    }
-
     List columns(Row row) {
         List columns = new ArrayList();
-        for (Iterator iter = itemIterator(); iter.hasNext();) {
+        for (Iterator iter = items.iterator(); iter.hasNext();) {
             GroupItem item = (GroupItem) iter.next();
             columns.add(item.column().lookup(row));
         }
         return columns;
     }
 
-    public List evaluate(Row row) {
-        List keyCells = new ArrayList();
-        for (Iterator iter = itemIterator(); iter.hasNext();) {
+    public GroupByCells evaluate(Row row) {
+        GroupByCells keyCells = new GroupByCells();
+        for (Iterator iter = items.iterator(); iter.hasNext();) {
             GroupItem item = (GroupItem) iter.next();
             keyCells.add(item.expression().evaluate(row));
         }
         return keyCells;
+    }
+
+    public int keyCount() {
+        return items.size();
+    }
+
+    public boolean containsExpresion(Expression target) {
+        for (Iterator iter = items.iterator(); iter.hasNext();) {
+            GroupItem item = (GroupItem) iter.next();
+            if (target.sameExpression(item.expression())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

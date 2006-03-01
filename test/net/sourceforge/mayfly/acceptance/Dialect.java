@@ -175,4 +175,8 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean canGetValueViaExpression() {
+        return false;
+    }
+
 }

@@ -52,12 +52,6 @@ public class ResultTest extends SqlTestCase {
         assertTrue(results.next());
         if (dialect.canGetValueViaExpressionName()) {
             assertEquals(9, results.getInt("a + 4"));
-            try {
-                results.getInt("a+4");
-                fail();
-            } catch (SQLException e) {
-                assertMessage("no column a+4", e);
-            }
         }
         else {
             try {
@@ -65,6 +59,25 @@ public class ResultTest extends SqlTestCase {
                 fail();
             } catch (SQLException e) {
                 assertMessage("no column a + 4", e);
+            }
+        }
+        results.close();
+    }
+    
+    public void testExpressionWithDifferentWhitespace() throws Exception {
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
+        ResultSet results = query("select a + 4 from foo");
+        assertTrue(results.next());
+        if (dialect.canGetValueViaExpression()) {
+            assertEquals(9, results.getInt("a+4"));
+        }
+        else {
+            try {
+                results.getInt("a+4");
+                fail();
+            } catch (SQLException e) {
+                assertMessage("no column a+4", e);
             }
         }
         results.close();

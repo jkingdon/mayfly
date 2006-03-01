@@ -33,12 +33,12 @@ public class GroupByTest extends TestCase {
         GroupedRows grouped = groupBy.makeGroupedRows(rows);
         assertEquals(2, grouped.groupCount());
 
-        Iterator iterator = grouped.keyIterator();
+        Iterator iterator = grouped.iteratorForFirstKeys();
         assertEquals(new LongCell(7), iterator.next());
         assertEquals(new LongCell(8), iterator.next());
         assertFalse(iterator.hasNext());
         
-        Rows sevenActual = grouped.getRows(new LongCell(7));
+        Rows sevenActual = grouped.getRows(new GroupByCells(new LongCell(7)));
         Rows sevenExpected = new Rows(
             new ImmutableList()
                 .with(new Row(new TupleBuilder()
@@ -52,7 +52,7 @@ public class GroupByTest extends TestCase {
         );
         assertEquals(sevenExpected, sevenActual);
 
-        Rows eightActual = grouped.getRows(new LongCell(8));
+        Rows eightActual = grouped.getRows(new GroupByCells(new LongCell(8)));
         Rows eightExpected = new Rows(
             new ImmutableList()
                 .with(new Row(new TupleBuilder()
@@ -89,13 +89,13 @@ public class GroupByTest extends TestCase {
         GroupedRows grouped = groupBy.makeGroupedRows(rows);
         assertEquals(3, grouped.groupCount());
 
-        Iterator iterator = grouped.keyIterator();
+        Iterator iterator = grouped.iteratorForFirstKeys();
         assertEquals(new LongCell(7), iterator.next());
         assertEquals(new LongCell(7), iterator.next());
         assertEquals(new LongCell(8), iterator.next());
         assertFalse(iterator.hasNext());
         
-        Rows seven50Actual = grouped.getRows(Arrays.asList(new LongCell[] { new LongCell(7), new LongCell(50) }));
+        Rows seven50Actual = grouped.getRows(new GroupByCells(new LongCell(7), new LongCell(50)));
         Rows seven50Expected = new Rows(
             new ImmutableList()
                 .with(new Row(new TupleBuilder()
@@ -106,7 +106,7 @@ public class GroupByTest extends TestCase {
         );
         assertEquals(seven50Expected, seven50Actual);
 
-        Rows seven51Actual = grouped.getRows(Arrays.asList(new LongCell[] { new LongCell(7), new LongCell(51) }));
+        Rows seven51Actual = grouped.getRows(new GroupByCells(new LongCell(7), new LongCell(51)));
         Rows seven51Expected = new Rows(
             new ImmutableList()
                 .with(new Row(new TupleBuilder()

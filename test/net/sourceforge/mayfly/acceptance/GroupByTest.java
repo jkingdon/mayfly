@@ -326,6 +326,9 @@ public class GroupByTest extends SqlTestCase {
             },
             query("select books.* from books group by author, title order by author, title")
         );
+        // select f.* from foo f, foo g group by f.a order by f.a => OK
+        // select avg(g.a) from foo f, foo g group by f.a order by f.a => OK
+        // select g.* from foo f, foo g group by f.a order by f.a => g.a isn't aggregate or mentioned
 
         assertResultList(
             new String[] {
