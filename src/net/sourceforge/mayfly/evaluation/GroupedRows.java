@@ -84,7 +84,7 @@ public class GroupedRows {
             Column found = lookupColumn(expression);
             // Almost right.  But notion of sameness still needs some work in terms of
             // col vs tab.col
-//            if (keys.containsExpresion(expression)) {
+            //if (keys.containsExpresion(expression)) {
 
             if (found != null) {
                 /** Just let {@link #addColumnsForKeys(Map, TupleBuilder)} add it. */

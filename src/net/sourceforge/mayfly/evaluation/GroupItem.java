@@ -1,13 +1,15 @@
 package net.sourceforge.mayfly.evaluation;
 
+import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.util.ValueObject;
 
-public class GroupItem {
+public class GroupItem extends ValueObject {
 
     private final Expression expression;
 
-    public GroupItem(Expression column) {
-        this.expression = column;
+    public GroupItem(Expression expression) {
+        this.expression = expression;
     }
 
     public SingleColumn column() {
@@ -16,6 +18,10 @@ public class GroupItem {
     
     public Expression expression() {
         return expression;
+    }
+
+    public void resolve(Row row) {
+        expression.resolve(row);
     }
 
 }

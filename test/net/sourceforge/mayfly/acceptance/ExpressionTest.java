@@ -62,5 +62,5 @@ public class ExpressionTest extends SqlTestCase {
         ResultSet results = query("select 2 * a + c / 3 - 1 from foo");
         assertResultSet(new String[] { " 9 ", " 4 " }, results);
     }
-
+    
 }

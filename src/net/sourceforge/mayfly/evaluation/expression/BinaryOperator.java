@@ -66,4 +66,9 @@ abstract public class BinaryOperator extends Expression {
         }
     }
     
+    public void resolve(Row row) {
+        left.resolve(row);
+        right.resolve(row);
+    }
+    
 }

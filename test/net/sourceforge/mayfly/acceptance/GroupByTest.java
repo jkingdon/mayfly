@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.sql.ResultSet;
+
 
 public class GroupByTest extends SqlTestCase {
     
@@ -18,7 +20,7 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testGroupByExpression() throws Exception {
-        if (!mayflyMissing()) {
+        if (groupByExpressionMissing()) {
             return;
         }
 
@@ -38,9 +40,13 @@ public class GroupByTest extends SqlTestCase {
         assertResultList(new String[] { " 1747 " }, 
             query("select birthdate + age as deathdate from people group by deathdate"));
     }
+
+    private boolean groupByExpressionMissing() {
+        return !mayflyMissing();
+    }
     
     public void testGroupByExpressionError() throws Exception {
-        if (!mayflyMissing()) {
+        if (groupByExpressionMissing()) {
             return;
         }
 
@@ -326,9 +332,6 @@ public class GroupByTest extends SqlTestCase {
             },
             query("select books.* from books group by author, title order by author, title")
         );
-        // select f.* from foo f, foo g group by f.a order by f.a => OK
-        // select avg(g.a) from foo f, foo g group by f.a order by f.a => OK
-        // select g.* from foo f, foo g group by f.a order by f.a => g.a isn't aggregate or mentioned
 
         assertResultList(
             new String[] {
@@ -351,4 +354,68 @@ public class GroupByTest extends SqlTestCase {
         }
     }
     
+    public void testSelectClauseAndAliases() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo(a) values(6)");
+        execute("insert into foo(a) values(10)");
+        
+        String selectOk = "select f.*, avg(g.a) from foo f, foo g group by f.a order by f.a";
+        String notAggregateOrGrouped = "select g.* from foo f, foo g group by f.a order by f.a";
+        
+        // Just for illustration:
+        assertResultSet(new String[] {
+            "6, 6",
+            "6, 10",
+            "10, 6",
+            "10, 10"
+        }, query("select f.*, g.* from foo f, foo g")
+        );
+        
+        assertResultSet(new String[] {
+            "6, 8",
+            "10, 8"
+        }, query(selectOk)
+        );
+
+        if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression()) {
+            expectQueryFailure(notAggregateOrGrouped, "g.a is not aggregate or mentioned in GROUP BY");
+        }
+        else {
+            // Probably 6, 6 or 10, 10.  Doesn't really matter which bogus answer.
+            ResultSet results = query(notAggregateOrGrouped);
+            results.close();
+        }
+    }
+    
+    public void testAliasesAndHaving() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo(a) values(6)");
+        execute("insert into foo(a) values(10)");
+        
+        String selectOk = "select f.*, avg(g.a) from foo f, foo g group by f.a having f.a < 10 order by f.a";
+        
+        assertResultSet(new String[] {
+            "6, 8",
+        }, query(selectOk)
+        );
+    }
+
+    public void testAliasesAndExpression() throws Exception {
+        if (groupByExpressionMissing()) {
+            return;
+        }
+
+        execute("create table foo (a integer)");
+        execute("insert into foo(a) values(6)");
+        execute("insert into foo(a) values(10)");
+        
+        String selectOk = "select 5+f.a, avg(g.a) from foo f, foo g group by 5 + f.a";
+        
+        assertResultSet(new String[] {
+            "11, 8",
+            "15, 8",
+        }, query(selectOk)
+        );
+    }
+
 }

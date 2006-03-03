@@ -61,5 +61,15 @@ public class SingleColumn extends Expression {
             return one.equalsIgnoreCase(two);
         }
     }
+    
+    public void resolve(Row row) {
+        if (tableOrAlias == null) {
+            Column column = lookup(row);
+            if (column.tableOrAlias() == null) {
+                throw new NullPointerException();
+            }
+            tableOrAlias = column.tableOrAlias();
+        }
+    }
 
 }

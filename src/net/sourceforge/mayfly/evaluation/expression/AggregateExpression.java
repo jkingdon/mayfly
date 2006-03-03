@@ -113,4 +113,8 @@ public abstract class AggregateExpression extends Expression {
         }
     }
     
+    public void resolve(Row row) {
+        column.resolve(row);
+    }
+    
 }

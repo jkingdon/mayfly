@@ -296,7 +296,7 @@ public class Parser {
         return parseExpression().asNonBoolean();
     }
 
-    ParserExpression parseExpression() {
+    public ParserExpression parseExpression() {
         ParserExpression left = parseFactor();
         while (currentTokenType() == TokenType.MINUS
             || currentTokenType() == TokenType.PLUS

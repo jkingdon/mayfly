@@ -47,4 +47,11 @@ public class GroupByKeys extends ValueObject {
         return false;
     }
 
+    public void resolve(Row row) {
+        for (Iterator iter = items.iterator(); iter.hasNext();) {
+            GroupItem item = (GroupItem) iter.next();
+            item.resolve(row);
+        }
+    }
+
 }
