@@ -19,9 +19,7 @@ import java.util.*;
  */
 abstract public class WhatElement extends ValueObject {
 
-    public Selected selected(Row dummyRow) {
-        return new Selected(Collections.singletonList(this));
-    }
+    abstract public Selected selected(Row dummyRow);
 
     abstract public String displayName();
 

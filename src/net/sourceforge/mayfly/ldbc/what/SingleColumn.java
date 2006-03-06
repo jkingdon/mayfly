@@ -6,8 +6,9 @@ import net.sourceforge.mayfly.evaluation.*;
 import net.sourceforge.mayfly.ldbc.*;
 
 public class SingleColumn extends Expression {
+    private final String originalTableOrAlias;
     private String tableOrAlias;
-    private String columnName;
+    private final String columnName;
 
     public SingleColumn(String columnName) {
         this(null, columnName);
@@ -15,6 +16,7 @@ public class SingleColumn extends Expression {
 
     public SingleColumn(String tableOrAlias, String columnName) {
         this.tableOrAlias = tableOrAlias;
+        this.originalTableOrAlias = tableOrAlias;
         this.columnName = columnName;
     }
 
@@ -35,7 +37,7 @@ public class SingleColumn extends Expression {
     }
 
     public String displayName() {
-        return Column.displayName(tableOrAlias, columnName);
+        return Column.displayName(originalTableOrAlias, columnName);
     }
 
     public boolean matches(Column column) {
@@ -70,6 +72,14 @@ public class SingleColumn extends Expression {
             }
             tableOrAlias = column.tableOrAlias();
         }
+    }
+
+    public String tableOrAlias() {
+        return tableOrAlias;
+    }
+
+    public String columnName() {
+        return columnName;
     }
 
 }

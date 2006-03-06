@@ -71,4 +71,12 @@ abstract public class BinaryOperator extends Expression {
         right.resolve(row);
     }
     
+    public Expression left() {
+        return left;
+    }
+    
+    public Expression right() {
+        return right;
+    }
+    
 }

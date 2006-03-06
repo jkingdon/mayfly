@@ -74,19 +74,14 @@ public class GroupedRows {
     private Row rowForKey(GroupByCells cells, Rows rowsForKey, Selected selected) {
         TupleBuilder builder = new TupleBuilder();
         addColumnsForWhat(rowsForKey, selected, builder);
-        addColumnsForKeys(cells, builder);
+        addColumnsForKeys(cells, selected, builder);
         return new Row(builder);
     }
 
     private void addColumnsForWhat(Rows rowsForKey, Selected selected, TupleBuilder builder) {
         for (int i = 0; i < selected.size(); ++i) {
             Expression expression = selected.element(i);
-            Column found = lookupColumn(expression);
-            // Almost right.  But notion of sameness still needs some work in terms of
-            // col vs tab.col
-            //if (keys.containsExpresion(expression)) {
-
-            if (found != null) {
+            if (keys.containsExpresion(expression)) {
                 /** Just let {@link #addColumnsForKeys(Map, TupleBuilder)} add it. */
             }
             else if (expression.firstAggregate() != null) {
@@ -99,7 +94,7 @@ public class GroupedRows {
         }
     }
 
-    private void addColumnsForKeys(GroupByCells cells, TupleBuilder builder) {
+    private void addColumnsForKeys(GroupByCells cells, Selected selected, TupleBuilder builder) {
         if (keys.keyCount() != cells.size()) {
             throw new MayflyInternalException(
                 "have " + keyColumns.size() + " columns but " + cells.size() + " values");
@@ -109,14 +104,9 @@ public class GroupedRows {
         }
     }
 
-    private Column lookupColumn(Expression element) {
-        for (Iterator iter = keyColumns.iterator(); iter.hasNext();) {
-            Column candidate = (Column) iter.next();
-            if (element.matches(candidate)) {
-                return candidate;
-            }
-        }
-        return null;
-    }
+//    private CellHeader makePositionalHeader(Selected selected, int keyIndex) {
+//        Expression expression = keys.get(keyIndex).expression();
+//        return new ExpressionHeader(expression);
+//    }
 
 }

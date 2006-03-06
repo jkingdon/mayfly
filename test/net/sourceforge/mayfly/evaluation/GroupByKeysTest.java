@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class GroupByKeysTest extends TestCase {
     
@@ -17,9 +18,13 @@ public class GroupByKeysTest extends TestCase {
         Row row = new Row(new TupleBuilder().appendColumnCell("foo", "a", NullCell.INSTANCE));
         keys.resolve(row);
         
-        GroupByKeys expected = new GroupByKeys();
-        expected.add(new GroupItem(new Concatenate(new SingleColumn("foo", "a"), new QuotedString("'abc'"))));
-        assertEquals(expected, keys);
+        assertEquals(1, keys.size());
+        Expression expression = keys.get(0).expression();
+        Concatenate concatenate = (Concatenate) expression;
+        SingleColumn column = (SingleColumn) concatenate.left();
+        MayflyAssert.assertColumn("foo", "a", column);
+        QuotedString string = (QuotedString) concatenate.right();
+        assertEquals(new QuotedString("'abc'"), string);
     }
     
     // TODO: max(a) aggregateexpression

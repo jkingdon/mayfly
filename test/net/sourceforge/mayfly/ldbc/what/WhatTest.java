@@ -4,6 +4,7 @@ import junit.framework.*;
 import net.sourceforge.mayfly.datastore.*;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.where.literal.*;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class WhatTest extends TestCase {
 
@@ -18,14 +19,13 @@ public class WhatTest extends TestCase {
             .append(new TupleElement(new Column("foo", "x"), NullCell.INSTANCE))
             .append(new TupleElement(new Column("foo", "y"), NullCell.INSTANCE))
         );
+        Selected selected = original.selected(dummyRow);
         
-        Selected expected = new Selected()
-            .add(new SingleColumn("a")) // Or "bar", "a"
-            .add(new SingleColumn("foo", "x"))
-            .add(new SingleColumn("foo", "y"))
-            .add(new SingleColumn("bar", "b"));
-
-        assertEquals(expected, original.selected(dummyRow));
+        assertEquals(4, selected.size());
+        MayflyAssert.assertColumn("bar", "a", (SingleColumn) selected.element(0)); // Or null, "a"
+        MayflyAssert.assertColumn("foo", "x", (SingleColumn) selected.element(1));
+        MayflyAssert.assertColumn("foo", "y", (SingleColumn) selected.element(2));
+        MayflyAssert.assertColumn("bar", "b", (SingleColumn) selected.element(3));
     }
     
     public void testSelectedDegenerateCase() throws Exception {

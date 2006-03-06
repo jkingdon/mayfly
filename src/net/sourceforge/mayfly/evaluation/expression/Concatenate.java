@@ -13,5 +13,5 @@ public class Concatenate extends BinaryOperator {
     protected Cell combine(Cell leftCell, Cell rightCell) {
         return new StringCell(leftCell.asString() + rightCell.asString());
     }
-    
+
 }

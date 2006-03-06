@@ -54,4 +54,12 @@ public class GroupByKeys extends ValueObject {
         }
     }
 
+    public int size() {
+        return items.size();
+    }
+
+    public GroupItem get(int index) {
+        return (GroupItem) items.get(index);
+    }
+
 }
