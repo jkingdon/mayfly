@@ -120,6 +120,14 @@ public class GroupByTest extends SqlTestCase {
             },
             query("select author, title, count(*) from books group by author, title order by title")
         );
+
+        assertResultList(
+            new String[] {
+                " 'Bowman', 'Other Title', 1 ",
+                " 'Bowman', 'Practical SQL', 2 ", 
+            },
+            query("select author, title, count(author) from books group by author, title order by title")
+        );
     }
     
     public void testSelectSomethingNotGrouped() throws Exception {
