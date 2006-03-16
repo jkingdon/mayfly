@@ -120,5 +120,9 @@ public class MySqlDialect extends Dialect {
     public boolean canQuoteIdentifiers() {
         return false;
     }
+    
+    public boolean allowMultipleNullsInUniqueColumn() {
+        return true;
+    }
 
 }

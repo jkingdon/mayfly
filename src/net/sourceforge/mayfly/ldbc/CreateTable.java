@@ -1,25 +1,28 @@
 package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.*;
 
 public class CreateTable extends Command {
 
     private String table;
-    private List columnNames;
+    private Columns columns;
+    private List primaryKeyElements = new ArrayList();
 
     public CreateTable(String table, List columnNames) {
         this.table = table;
-        this.columnNames = columnNames;
+        this.columns = Columns.fromColumnNames(table, columnNames);
+    }
+
+    public CreateTable(String table) {
+        this(table, new ArrayList());
     }
 
     public String table() {
         return table;
-    }
-
-    public List columnNames() {
-        return columnNames;
     }
 
     public DataStore update(DataStore store, String schema) {
@@ -28,12 +31,31 @@ public class CreateTable extends Command {
         return store.replace(schema, updatedSchema);
     }
 
-    public Schema update(Schema anonymousSchema) {
-        return anonymousSchema.createTable(table(), columnNames());
+    public Schema update(Schema schema) {
+        PrimaryKey constraints = primaryKey();
+        return schema.createTable(table(), columns, constraints);
+    }
+
+    private PrimaryKey primaryKey() {
+        List keyElements = new ArrayList();
+        for (Iterator iter = primaryKeyElements.iterator(); iter.hasNext();) {
+            String columnName = (String) iter.next();
+            Column column = columns.columnFromName(columnName);
+            keyElements.add(column);
+        }
+        return new PrimaryKey(new Columns(new ImmutableList(keyElements)));
     }
 
     public int rowsAffected() {
         return 0;
+    }
+
+    public void addColumn(Column column) {
+        columns = (Columns) columns.with(column);
+    }
+
+    public void addPrimaryKeyElement(String columnName) {
+        primaryKeyElements.add(columnName);
     }
 
 }

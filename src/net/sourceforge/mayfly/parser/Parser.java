@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.parser;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.NullCellContent;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.ColumnOrderItem;
@@ -151,10 +152,9 @@ public class Parser {
         if (consumeIfMatches(TokenType.OPEN_PAREN)) {
             columnNames = new ArrayList();
     
-            columnNames.add(consumeIdentifier());
-            while (consumeIfMatches(TokenType.COMMA)) {
+            do {
                 columnNames.add(consumeIdentifier());
-            }
+            } while (consumeIfMatches(TokenType.COMMA));
             expectAndConsume(TokenType.CLOSE_PAREN);
         }
         else {
@@ -169,10 +169,9 @@ public class Parser {
         List values = new ArrayList();
         expectAndConsume(TokenType.OPEN_PAREN);
 
-        values.add(parseAndEvaluate());
-        while (consumeIfMatches(TokenType.COMMA)) {
+        do {
             values.add(parseAndEvaluate());
-        }
+        } while (consumeIfMatches(TokenType.COMMA));
         expectAndConsume(TokenType.CLOSE_PAREN);
         return values;
     }
@@ -219,28 +218,49 @@ public class Parser {
 
     private CreateTable parseCreateTable() {
         String tableName = consumeIdentifier();
-        List columnNames = new ArrayList();
+        CreateTable table = new CreateTable(tableName);
         expectAndConsume(TokenType.OPEN_PAREN);
 
-        columnNames.add(parseColumnDefinition());
-        while (consumeIfMatches(TokenType.COMMA)) {
-            columnNames.add(parseColumnDefinition());
-        }
+        do {
+            parseTableElement(table);
+        } while (consumeIfMatches(TokenType.COMMA));
 
         expectAndConsume(TokenType.CLOSE_PAREN);
-        return new CreateTable(tableName, columnNames);
+        return table;
     }
 
-    private String parseColumnDefinition() {
+    private void parseTableElement(CreateTable table) {
+        if (currentTokenType() == TokenType.IDENTIFIER) {
+            table.addColumn(parseColumnDefinition(table));
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_primary)) {
+            expectAndConsume(TokenType.KEYWORD_key);
+            expectAndConsume(TokenType.OPEN_PAREN);
+            do {
+                table.addPrimaryKeyElement(consumeIdentifier());
+            } while (consumeIfMatches(TokenType.COMMA));
+            expectAndConsume(TokenType.CLOSE_PAREN);
+        }
+        else {
+            throw new ParserException("expected column or table constraint but got " + describeToken(currentToken()));
+        }
+    }
+
+    private Column parseColumnDefinition(CreateTable table) {
         String name = consumeIdentifier();
         if (consumeIfMatches(TokenType.KEYWORD_integer)) {
         }
-        if (consumeIfMatches(TokenType.KEYWORD_varchar)) {
+        else if (consumeIfMatches(TokenType.KEYWORD_varchar)) {
             expectAndConsume(TokenType.OPEN_PAREN);
             expectAndConsume(TokenType.NUMBER);
             expectAndConsume(TokenType.CLOSE_PAREN);
         }
-        return name;
+
+        if (consumeIfMatches(TokenType.KEYWORD_primary)) {
+            expectAndConsume(TokenType.KEYWORD_key);
+            table.addPrimaryKeyElement(name);
+        }
+        return new Column(table.table(), name);
     }
 
     Select parseSelect() {
@@ -272,12 +292,10 @@ public class Parser {
         }
 
         What what = new What();
-        what.add(parseWhatElement());
         
-        while (currentTokenType() == TokenType.COMMA) {
-            expectAndConsume(TokenType.COMMA);
+        do {
             what.add(parseWhatElement());
-        }
+        } while (consumeIfMatches(TokenType.COMMA));
         
         return what;
     }
@@ -435,12 +453,9 @@ public class Parser {
 
     private List parseExpressionList() {
         List expressions = new ArrayList();
-        expressions.add(parsePrimary().asNonBoolean());
-        
-        while (consumeIfMatches(TokenType.COMMA)) {
+        do {
             expressions.add(parsePrimary().asNonBoolean());
-        }
-        
+        } while (consumeIfMatches(TokenType.COMMA));
         return expressions;
     }
 
@@ -589,12 +604,9 @@ public class Parser {
 
     public From parseFromItems() {
         From from = new From();
-        from.add(parseFromItem());
-        
-        while (currentTokenType() == TokenType.COMMA) {
-            expectAndConsume(TokenType.COMMA);
+        do {
             from.add(parseFromItem());
-        }
+        } while (consumeIfMatches(TokenType.COMMA));
         return from;
     }
 
@@ -672,11 +684,9 @@ public class Parser {
             expectAndConsume(TokenType.KEYWORD_by);
             
             GroupBy groupBy = new GroupBy();
-            groupBy.add(parseGroupItem());
-            
-            while (consumeIfMatches(TokenType.COMMA)) {
+            do {
                 groupBy.add(parseGroupItem());
-            }
+            } while (consumeIfMatches(TokenType.COMMA));
 
             if (consumeIfMatches(TokenType.KEYWORD_having)) {
                 groupBy.setHaving(parseCondition().asBoolean());
@@ -700,11 +710,9 @@ public class Parser {
             expectAndConsume(TokenType.KEYWORD_by);
             
             OrderBy orderBy = new OrderBy();
-            orderBy.add(parseOrderItem());
-            
-            while (consumeIfMatches(TokenType.COMMA)) {
+            do {
                 orderBy.add(parseOrderItem());
-            }
+            } while (consumeIfMatches(TokenType.COMMA));
             return orderBy;
         }
         else {

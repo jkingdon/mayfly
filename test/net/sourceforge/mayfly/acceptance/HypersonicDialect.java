@@ -77,4 +77,12 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
 
+    protected boolean constraintCanHaveForwardReference() {
+        return false;
+    }
+    
+    public boolean allowUniqueAsPartOfColumnDeclaration() {
+        return false;
+    }
+
 }

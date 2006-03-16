@@ -19,9 +19,27 @@ public abstract class Dialect {
         // But we would like to see that databases fail for the same
         // reasons.  So we provide the ability to manually inspect
         // the messages side by side.
+
         if (SqlTestCase.SHOW_MESSAGES) {
             System.out.print("Mayfly message would be " + expectedMessage + "\n");
             System.out.print("Actual message was " + exception.getMessage() + "\n\n");
+        }
+        else if (SqlTestCase.SHOW_STACK_TRACES) {
+            System.out.print("Mayfly message would be " + expectedMessage + "\n");
+            System.out.print("Actual exception was:\n");
+            printException(exception);
+            System.out.print("\n\n");
+        }
+    }
+
+    private void printException(SQLException exception) {
+        exception.printStackTrace(System.out);
+        System.out.print("SQL state was: " + exception.getSQLState() + "\n");
+        System.out.print("Vendor code was: " + exception.getErrorCode() + "\n");
+        if (exception.getNextException() != null) {
+            // Is it really true that next exceptions are not related to
+            // causes?  Or is that just an artifact of libgcj 4.0.2?
+            printException(exception.getNextException());
         }
     }
 
@@ -177,6 +195,25 @@ public abstract class Dialect {
 
     public boolean canGetValueViaExpression() {
         return false;
+    }
+
+    protected boolean constraintCanHaveForwardReference() {
+        return true;
+    }
+
+    public boolean uniqueColumnMayBeNullable() {
+        return true;
+    }
+    
+    public boolean allowMultipleNullsInUniqueColumn() {
+        // This corresponds to the GROUP BY model in which all rows
+        // with null go in a single group.  It isn't clear whether this
+        // is the best way to treat null or not.
+        return false;
+    }
+
+    public boolean allowUniqueAsPartOfColumnDeclaration() {
+        return true;
     }
 
 }

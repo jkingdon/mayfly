@@ -16,13 +16,6 @@ public abstract class Command extends ValueObject {
         return new Parser(tokens).parse();
     }
 
-    final public void substitute(Collection jdbcParameters) {
-    }
-
-    final public int parameterCount() {
-        return 0;
-    }
-    
     abstract public DataStore update(DataStore store, String schema);
 
     abstract public int rowsAffected();

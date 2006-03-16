@@ -109,5 +109,9 @@ public class PostgresDialect extends Dialect {
     public boolean disallowNullsInExpressions() {
         return false;
     }
+    
+    public boolean allowMultipleNullsInUniqueColumn() {
+        return true;
+    }
 
 }

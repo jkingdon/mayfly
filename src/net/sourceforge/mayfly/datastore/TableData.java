@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -10,12 +11,14 @@ public class TableData {
 
     private final Columns columns;
     private final Rows rows;
+    private final PrimaryKey constraints;
 
-    public TableData(Columns columns) {
-        this(columns, new Rows());
+    public TableData(Columns columns, PrimaryKey constraints) {
+        this(columns, constraints, new Rows());
     }
     
-    private TableData(Columns columns, Rows rows) {
+    private TableData(Columns columns, PrimaryKey constraints, Rows rows) {
+        this.constraints = constraints;
         columns.checkForDuplicates();
         this.columns = columns;
         this.rows = rows;
@@ -55,8 +58,9 @@ public class TableData {
             }
         }
         Row newRow = new Row(tuple);
+        constraints.check(rows, newRow);
 
-        return new TableData(columns, (Rows) rows.with(newRow));
+        return new TableData(columns, constraints, (Rows) rows.with(newRow));
     }
 
     private String describeNamesAndValues(Columns columns, List values) {

@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 import net.sourceforge.mayfly.ldbc.*;
 import net.sourceforge.mayfly.util.*;
 
@@ -19,7 +20,11 @@ public class Schema {
     }
 
     public Schema createTable(String table, List columnNames) {
-        return new Schema(tables.with(table, new TableData(Columns.fromColumnNames(table, columnNames))));
+        return createTable(table, Columns.fromColumnNames(table, columnNames), new PrimaryKey());
+    }
+
+    public Schema createTable(String table, Columns columns, PrimaryKey constraints) {
+        return new Schema(tables.with(table, new TableData(columns, constraints)));
     }
 
     public Schema dropTable(String table) {

@@ -57,6 +57,7 @@ public class TokenType {
     public static final TokenType KEYWORD_into = registerKeyword("into");
     public static final TokenType KEYWORD_is = registerKeyword("is");
     public static final TokenType KEYWORD_join = registerKeyword("join");
+    public static final TokenType KEYWORD_key = registerKeyword("key");
     public static final TokenType KEYWORD_left = registerKeyword("left");
     public static final TokenType KEYWORD_limit = registerKeyword("limit");
     public static final TokenType KEYWORD_max = registerKeyword("max");
@@ -68,6 +69,7 @@ public class TokenType {
     public static final TokenType KEYWORD_or = registerKeyword("or");
     public static final TokenType KEYWORD_order = registerKeyword("order");
     public static final TokenType KEYWORD_outer = registerKeyword("outer");
+    public static final TokenType KEYWORD_primary = registerKeyword("primary");
     public static final TokenType KEYWORD_schema = registerKeyword("schema");
     public static final TokenType KEYWORD_select = registerKeyword("select");
     public static final TokenType KEYWORD_set = registerKeyword("set");

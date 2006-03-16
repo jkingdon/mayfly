@@ -38,5 +38,9 @@ public class DerbyDialect extends Dialect {
         } catch (SQLException derbyThrowsThisToMeanItShutDown) {
         }
     }
+    
+    public boolean uniqueColumnMayBeNullable() {
+        return false;
+    }
 
 }

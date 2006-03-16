@@ -238,6 +238,7 @@ public class LexerTest extends TestCase {
                 TokenType.KEYWORD_or,
                 TokenType.KEYWORD_order,
                 TokenType.KEYWORD_outer,
+                TokenType.KEYWORD_primary,
                 TokenType.KEYWORD_schema,
                 TokenType.KEYWORD_select,
                 TokenType.KEYWORD_set,
@@ -281,6 +282,7 @@ public class LexerTest extends TestCase {
                 "OR",
                 "ORDER",
                 "OUTER",
+                "PRIMARY",
                 "SCHEMA",
                 "SELECT",
                 "SET",
@@ -294,7 +296,14 @@ public class LexerTest extends TestCase {
             "ALL AND ASC AUTHORIZATION AVG BY COUNT CREATE CROSS DESC " +
             "DISTINCT DROP FROM GROUP IN INNER INSERT INTEGER INTO " +
             "IS JOIN LEFT LIMIT MAX MIN NOT NULL OFFSET ON OR ORDER " +
-            "OUTER SCHEMA SELECT SET SUM TABLE VALUES VARCHAR WHERE"
+            "OUTER PRIMARY SCHEMA SELECT SET SUM TABLE VALUES VARCHAR WHERE"
+        );
+    }
+    
+    public void testKeywordsAreCaseInsensitive() throws Exception {
+        check(new TokenType[] { TokenType.KEYWORD_all, TokenType.END_OF_FILE },
+            new String[] { "aLL", null },
+            "aLL"
         );
     }
 
@@ -371,7 +380,7 @@ public class LexerTest extends TestCase {
     }
 
     public static void check(TokenType[] expectedTypes, String[] expectedTexts, List actual) {
-        assertEquals(expectedTexts.length, expectedTypes.length);
+        assertEquals("test setup problem with expectations", expectedTexts.length, expectedTypes.length);
         List actualTexts = new ArrayList(actual.size());
         List actualTypes = new ArrayList(actual.size());
         for (int i = 0; i < actual.size(); ++i) {
