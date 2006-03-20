@@ -64,7 +64,6 @@ public class TokenType {
     public static final TokenType KEYWORD_min = registerKeyword("min");
     public static final TokenType KEYWORD_not = registerKeyword("not");
     public static final TokenType KEYWORD_null = registerKeyword("null");
-    public static final TokenType KEYWORD_offset = registerKeyword("offset");
     public static final TokenType KEYWORD_on = registerKeyword("on");
     public static final TokenType KEYWORD_or = registerKeyword("or");
     public static final TokenType KEYWORD_order = registerKeyword("order");

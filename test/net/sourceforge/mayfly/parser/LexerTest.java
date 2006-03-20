@@ -233,7 +233,6 @@ public class LexerTest extends TestCase {
                 TokenType.KEYWORD_min,
                 TokenType.KEYWORD_not,
                 TokenType.KEYWORD_null,
-                TokenType.KEYWORD_offset,
                 TokenType.KEYWORD_on,
                 TokenType.KEYWORD_or,
                 TokenType.KEYWORD_order,
@@ -277,7 +276,6 @@ public class LexerTest extends TestCase {
                 "MIN",
                 "NOT",
                 "NULL",
-                "OFFSET",
                 "ON",
                 "OR",
                 "ORDER",
@@ -295,7 +293,7 @@ public class LexerTest extends TestCase {
             },
             "ALL AND ASC AUTHORIZATION AVG BY COUNT CREATE CROSS DESC " +
             "DISTINCT DROP FROM GROUP IN INNER INSERT INTEGER INTO " +
-            "IS JOIN LEFT LIMIT MAX MIN NOT NULL OFFSET ON OR ORDER " +
+            "IS JOIN LEFT LIMIT MAX MIN NOT NULL ON OR ORDER " +
             "OUTER PRIMARY SCHEMA SELECT SET SUM TABLE VALUES VARCHAR WHERE"
         );
     }

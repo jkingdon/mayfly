@@ -750,7 +750,7 @@ public class Parser {
             expectAndConsume(TokenType.KEYWORD_limit);
             int count = consumeInteger();
             
-            if (consumeIfMatches(TokenType.KEYWORD_offset)) {
+            if (consumeNonReservedWordIfMatches("offset")) {
                 int offset = consumeInteger();
                 return new Limit(count, offset);
             }
@@ -821,6 +821,20 @@ public class Parser {
             return true;
         }
         return false;
+    }
+    
+    private boolean consumeNonReservedWordIfMatches(String word) {
+        if (currentTokenType() != TokenType.IDENTIFIER) {
+            return false;
+        }
+
+        String currentText = currentToken().getText();
+        if (word.equalsIgnoreCase(currentText)) {
+            expectAndConsume(TokenType.IDENTIFIER);
+            return true;
+        }
+        
+        throw new ParserException("expected " + word + " but got " + currentText);
     }
 
     private Token expectAndConsume(TokenType expectedType) {

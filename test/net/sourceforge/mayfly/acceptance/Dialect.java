@@ -49,6 +49,13 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean offsetIsReservedWord() {
+        // LIMIT needs/wants to be a reserved word, but there is no
+        // particular need for OFFSET to be (unless just for symmetry
+        // with LIMIT or something).
+        return false;
+    }
+
     public boolean tableNamesMightBeCaseSensitive() {
         return false;
     }
@@ -63,6 +70,10 @@ public abstract class Dialect {
      * (In most case it makes more sense to have an individual test for a specific questions
      * like detectsAmbiguousColumns or whatever).  */
     public boolean expectMayflyBehavior() {
+        return false;
+    }
+
+    public boolean updateMissing() {
         return false;
     }
 
@@ -213,6 +224,10 @@ public abstract class Dialect {
     }
 
     public boolean allowUniqueAsPartOfColumnDeclaration() {
+        return true;
+    }
+
+    public boolean haveUpdateDefault() {
         return true;
     }
 

@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.acceptance;
 
 public class SyntaxTest extends SqlTestCase {
     
-    // Should we have a SyntaxException which subclasses SQLException?
+    // Should mayfly have a SyntaxException which subclasses SQLException?
 
     public void testBadCommand() throws Exception {
         expectExecuteFailure("PICK NOSE", "expected command but got PICK");
@@ -43,6 +43,55 @@ public class SyntaxTest extends SqlTestCase {
         assertResultSet(new String[] { " 5 " } , query("select x from FOO"));
         assertResultSet(new String[] { " 5 " } , query("select Foo.x from foo"));
         assertResultSet(new String[] { " 5 " } , query("select x from foo where FOO.x = 5"));
+    }
+    
+    public void testNonReservedWords() throws Exception {
+        String[] nonReserved = new String[] {
+            // I believe this list originates from the SQL92 standard
+            "ADA",
+            "C", "CATALOG_NAME",
+            "CHARACTER_SET_CATALOG", "CHARACTER_SET_NAME",
+            "CHARACTER_SET_SCHEMA", "CLASS_ORIGIN", "COBOL", "COLLATION_CATALOG",
+            "COLLATION_NAME", "COLLATION_SCHEMA", "COLUMN_NAME", "COMMAND_FUNCTION",
+            "COMMITTED",
+            "CONDITION_NUMBER", "CONNECTION_NAME", "CONSTRAINT_CATALOG", "CONSTRAINT_NAME",
+            "CONSTRAINT_SCHEMA", "CURSOR_NAME",
+            "DATA", "DATETIME_INTERVAL_CODE",
+            "DATETIME_INTERVAL_PRECISION", "DYNAMIC_FUNCTION",
+            "FORTRAN",
+            "LENGTH",
+            "MESSAGE_LENGTH", "MESSAGE_OCTET_LENGTH", "MESSAGE_TEXT", "MORE", "MUMPS",
+            "NAME", "NULLABLE", "NUMBER",
+            "PASCAL", "PLI",
+            "REPEATABLE", "RETURNED_LENGTH", "RETURNED_OCTET_LENGTH", "RETURNED_SQLSTATE",
+            "ROW_COUNT",
+            "SCALE", "SCHEMA_NAME", "SERIALIZABLE", "SERVER_NAME", "SUBCLASS_ORIGIN",
+            "TABLE_NAME", "TYPE",
+            "UNCOMMITTED", "UNNAMED"
+        };
+        for (int i = 0; i < nonReserved.length; i++) {
+            assertNotReserved(nonReserved[i]);
+        }
+        if (dialect.offsetIsReservedWord()) {
+            assertReserved("offset");
+        }
+        else {
+            assertNotReserved("offset");
+        }
+    }
+
+    private void assertNotReserved(String identifier) throws Exception {
+        execute("create table foo (" + identifier + " integer)");
+        execute("drop table foo");
+    }
+
+    private void assertReserved(String identifier) throws Exception {
+        expectExecuteFailure("create table foo (" + identifier + " integer)", "syntax error");
+    }
+    
+    public void testWrongIdentifierForNonReserved() throws Exception {
+        execute("create table foo (x integer)");
+        expectExecuteFailure("select x from foo limit 10 ofset 20", "expected offset but got ofset");
     }
 
 }

@@ -39,7 +39,7 @@ public class PrimaryKeyTest extends SqlTestCase {
     }
 
     public void testUpdate() throws Exception {
-        if (!mayflyMissing()) {
+        if (dialect.updateMissing()) {
             return;
         }
         execute("create table foo (x integer, primary key(x))");

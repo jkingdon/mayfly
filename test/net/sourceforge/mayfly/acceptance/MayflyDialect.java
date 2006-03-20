@@ -29,5 +29,9 @@ public class MayflyDialect extends Dialect {
     public boolean expectMayflyBehavior() {
         return true;
     }
+    
+    public boolean updateMissing() {
+        return true;
+    }
 
 }

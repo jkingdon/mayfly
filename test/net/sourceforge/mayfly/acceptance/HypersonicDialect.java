@@ -84,5 +84,9 @@ public class HypersonicDialect extends Dialect {
     public boolean allowUniqueAsPartOfColumnDeclaration() {
         return false;
     }
+    
+    public boolean haveUpdateDefault() {
+        return false;
+    }
 
 }

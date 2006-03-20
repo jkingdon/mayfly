@@ -21,7 +21,9 @@ public abstract class SqlTestCase extends TestCase {
     // the current database's messages.
     static final boolean SHOW_MESSAGES = false;
 
-    /** Like {@link #SHOW_MESSAGES} but the whole stack trace (in case a database
+    /**
+     * @internal
+     * Like {@link #SHOW_MESSAGES} but the whole stack trace (in case a database
      * includes vital information other than in the message, which doesn't
      * usually seem to be the case).
      * Enable this or {@link #SHOW_MESSAGES} but not both.

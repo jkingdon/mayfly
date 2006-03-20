@@ -68,6 +68,10 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    public boolean offsetIsReservedWord() {
+        return true;
+    }
+    
     public boolean canOrderByExpression() {
         return true;
     }
