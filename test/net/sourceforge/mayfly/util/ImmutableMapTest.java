@@ -1,8 +1,10 @@
 package net.sourceforge.mayfly.util;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class ImmutableMapTest extends TestCase {
     

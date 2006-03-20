@@ -1,9 +1,10 @@
 package net.sourceforge.mayfly.parser;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.util.StringBuilder;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Lexer {
 

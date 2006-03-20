@@ -1,5 +1,5 @@
 package net.sourceforge.mayfly;
-import java.sql.*;
+import java.sql.SQLException;
 
 /**
  * @internal

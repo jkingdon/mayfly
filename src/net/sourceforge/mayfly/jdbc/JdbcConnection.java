@@ -1,9 +1,17 @@
 package net.sourceforge.mayfly.jdbc;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.Database;
+import net.sourceforge.mayfly.UnimplementedException;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Savepoint;
+import java.sql.Statement;
+import java.util.Map;
 
 public class JdbcConnection implements Connection {
 

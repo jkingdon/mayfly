@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.Statement;
 
 /**
  * There is a question of whether our JDBC metadata should somehow be

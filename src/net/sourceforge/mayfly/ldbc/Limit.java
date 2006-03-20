@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 public class Limit {
 

@@ -1,9 +1,12 @@
 package net.sourceforge.mayfly.util;
 
-import junit.framework.*;
-import net.sourceforge.mayfly.*;
+import junit.framework.TestCase;
 
-import java.util.*;
+import net.sourceforge.mayfly.MayflyException;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class AggregateTest extends TestCase {
     public void testSelect() throws Exception {

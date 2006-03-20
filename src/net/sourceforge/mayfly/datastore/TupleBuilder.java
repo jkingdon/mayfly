@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.util.L;
 
 public class TupleBuilder {
     

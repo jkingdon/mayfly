@@ -1,9 +1,10 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
-import java.util.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import java.util.Collection;
 
 public class Count extends AggregateExpression {
 

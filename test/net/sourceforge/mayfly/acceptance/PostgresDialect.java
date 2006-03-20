@@ -1,6 +1,8 @@
 package net.sourceforge.mayfly.acceptance;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * To make this work:

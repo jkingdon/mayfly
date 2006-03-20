@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
-import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 
 public class MathematicalInt extends Literal {

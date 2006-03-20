@@ -1,12 +1,15 @@
 package net.sourceforge.mayfly;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.acceptance.*;
-import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.acceptance.SqlTestCase;
+import net.sourceforge.mayfly.datastore.DataStore;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class DatabaseTest extends TestCase {
 

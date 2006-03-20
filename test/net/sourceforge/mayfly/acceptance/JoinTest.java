@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.acceptance;
 
-import java.sql.*;
+import java.sql.ResultSet;
 
 public class JoinTest extends SqlTestCase {
 

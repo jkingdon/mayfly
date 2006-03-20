@@ -1,9 +1,9 @@
 package net.sourceforge.mayfly.datastore;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.evaluation.expression.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 
 public class RowTest extends TestCase {
 

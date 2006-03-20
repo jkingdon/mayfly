@@ -2,8 +2,6 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.evaluation.expression.Maximum;
-import net.sourceforge.mayfly.evaluation.expression.Minimum;
 import net.sourceforge.mayfly.ldbc.what.CountAll;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 

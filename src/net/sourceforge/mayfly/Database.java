@@ -1,11 +1,17 @@
 package net.sourceforge.mayfly;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.jdbc.*;
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.TableData;
+import net.sourceforge.mayfly.jdbc.JdbcConnection;
+import net.sourceforge.mayfly.ldbc.Command;
+import net.sourceforge.mayfly.ldbc.Select;
+import net.sourceforge.mayfly.ldbc.SetSchema;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A Database contains a set of tables, but can be managed as easily as

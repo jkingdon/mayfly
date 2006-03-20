@@ -1,10 +1,10 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.parser.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.ValueObject;
 
-import java.util.*;
+import java.util.List;
 
 public abstract class Command extends ValueObject {
 

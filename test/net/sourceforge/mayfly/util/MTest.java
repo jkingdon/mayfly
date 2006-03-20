@@ -2,7 +2,8 @@ package net.sourceforge.mayfly.util;
 
 import junit.framework.TestCase;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MTest extends TestCase {
     public void testEntry() throws Exception {

@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.ldbc;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 
 public class OrderByTest extends TestCase {
 

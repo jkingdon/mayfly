@@ -1,9 +1,14 @@
 package net.sourceforge.mayfly;
 
-import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.datastore.DataStore;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.DriverPropertyInfo;
+import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Properties;
 
 /**
  * JDBC Driver for Mayfly.

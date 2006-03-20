@@ -1,11 +1,16 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.ldbc.Columns;
+import net.sourceforge.mayfly.ldbc.Rows;
+import net.sourceforge.mayfly.util.L;
+import net.sourceforge.mayfly.util.M;
+import net.sourceforge.mayfly.util.StringBuilder;
+import net.sourceforge.mayfly.util.Transformer;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
 
 public class TableData {
 

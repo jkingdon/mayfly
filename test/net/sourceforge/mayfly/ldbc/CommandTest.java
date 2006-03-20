@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.ldbc;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import java.util.*;
+import java.util.Collections;
 
 public class CommandTest extends TestCase {
 

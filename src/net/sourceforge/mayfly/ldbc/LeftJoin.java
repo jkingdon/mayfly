@@ -1,10 +1,11 @@
 package net.sourceforge.mayfly.ldbc;
 
-import java.util.*;
+import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.util.L;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.where.*;
-import net.sourceforge.mayfly.util.*;
+import java.util.Iterator;
 
 public class LeftJoin extends Join implements FromElement {
 

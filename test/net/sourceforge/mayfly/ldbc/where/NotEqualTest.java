@@ -1,10 +1,10 @@
 package net.sourceforge.mayfly.ldbc.where;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.parser.*;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
+import net.sourceforge.mayfly.parser.Parser;
 
 public class NotEqualTest extends TestCase {
     public void testParse() throws Exception {

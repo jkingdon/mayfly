@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public abstract class Dialect {
 

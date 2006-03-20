@@ -1,11 +1,16 @@
 package net.sourceforge.mayfly;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.acceptance.*;
-import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.acceptance.SqlTestCase;
+import net.sourceforge.mayfly.datastore.DataStore;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class JdbcTest extends TestCase {
     

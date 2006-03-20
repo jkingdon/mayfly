@@ -1,7 +1,7 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public class GroupItem extends ValueObject {

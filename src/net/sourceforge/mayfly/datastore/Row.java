@@ -1,10 +1,12 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.evaluation.expression.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
+import net.sourceforge.mayfly.ldbc.Columns;
+import net.sourceforge.mayfly.util.Aggregate;
+import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.Iterable;
 
-import java.util.*;
+import java.util.Iterator;
 
 public class Row extends Aggregate {
 

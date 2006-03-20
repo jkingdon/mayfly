@@ -1,10 +1,17 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.util.Aggregate;
+import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.Iterable;
+import net.sourceforge.mayfly.util.L;
+import net.sourceforge.mayfly.util.Transformer;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class Columns extends Aggregate {
     public static Columns fromColumnNames(final String tableName, List columnNameStrings) {

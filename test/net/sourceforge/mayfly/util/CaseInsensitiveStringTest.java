@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.util;
 
-import junit.framework.*;
+import junit.framework.TestCase;
+import junitx.extensions.EqualsHashCodeTestCase;
 
 public class CaseInsensitiveStringTest extends TestCase {
 

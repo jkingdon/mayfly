@@ -1,16 +1,34 @@
 package net.sourceforge.mayfly.jdbc;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.Database;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.ldbc.Command;
+import net.sourceforge.mayfly.ldbc.Select;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.parser.Substitutor;
 
-import java.io.*;
-import java.math.*;
-import java.net.*;
-import java.sql.*;
-import java.util.*;
+import java.io.InputStream;
+import java.io.Reader;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.sql.Array;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Connection;
+import java.sql.ParameterMetaData;
+import java.sql.PreparedStatement;
+import java.sql.Ref;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Vector;
 
 public class JdbcPreparedStatement implements PreparedStatement {
 

@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.parser;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.MayflyException;
 
 public class ParserException extends MayflyException {
 

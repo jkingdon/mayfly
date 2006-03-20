@@ -1,8 +1,9 @@
 package net.sourceforge.mayfly.util;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 
 public class ImmutableListTest extends TestCase {
     

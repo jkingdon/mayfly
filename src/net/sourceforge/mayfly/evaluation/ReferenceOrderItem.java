@@ -1,9 +1,11 @@
 package net.sourceforge.mayfly.evaluation;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.ldbc.OrderItem;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.ldbc.what.What;
+import net.sourceforge.mayfly.ldbc.what.WhatElement;
 
 public class ReferenceOrderItem extends OrderItem {
 

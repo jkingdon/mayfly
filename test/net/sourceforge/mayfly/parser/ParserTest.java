@@ -1,14 +1,24 @@
 package net.sourceforge.mayfly.parser;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.evaluation.expression.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.ldbc.where.*;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
-import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.evaluation.expression.Concatenate;
+import net.sourceforge.mayfly.evaluation.expression.Divide;
+import net.sourceforge.mayfly.evaluation.expression.Minus;
+import net.sourceforge.mayfly.evaluation.expression.Multiply;
+import net.sourceforge.mayfly.evaluation.expression.Plus;
+import net.sourceforge.mayfly.ldbc.From;
+import net.sourceforge.mayfly.ldbc.FromTable;
+import net.sourceforge.mayfly.ldbc.Select;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.ldbc.what.What;
+import net.sourceforge.mayfly.ldbc.what.WhatElement;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
+import net.sourceforge.mayfly.ldbc.where.Greater;
+import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
+import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 
 public class ParserTest extends TestCase {
     

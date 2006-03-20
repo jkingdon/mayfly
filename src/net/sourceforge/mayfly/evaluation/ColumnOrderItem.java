@@ -1,8 +1,10 @@
 package net.sourceforge.mayfly.evaluation;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.ldbc.OrderItem;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.ldbc.what.What;
 
 public class ColumnOrderItem extends OrderItem {
 

@@ -1,11 +1,17 @@
 package net.sourceforge.mayfly.util;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.MayflyInternalException;
 
-import org.apache.commons.collections.*;
-import org.apache.commons.lang.*;
+import org.apache.commons.collections.IteratorUtils;
+import org.apache.commons.lang.ArrayUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 public class L extends Aggregate implements List {
     private List delegate;

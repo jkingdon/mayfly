@@ -1,7 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.util.ValueObject;
 
 public abstract class Cell extends ValueObject {
 

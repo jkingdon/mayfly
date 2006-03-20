@@ -1,10 +1,11 @@
 package net.sourceforge.mayfly.dump;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import java.io.*;
+import net.sourceforge.mayfly.Database;
 
-import net.sourceforge.mayfly.*;
+import java.io.IOException;
+import java.io.StringWriter;
 
 public class DumperTest extends TestCase {
     

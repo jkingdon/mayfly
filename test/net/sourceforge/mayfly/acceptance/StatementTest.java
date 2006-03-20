@@ -1,6 +1,9 @@
 package net.sourceforge.mayfly.acceptance;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class StatementTest extends SqlTestCase {
 

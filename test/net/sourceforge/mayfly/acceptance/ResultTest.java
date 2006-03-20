@@ -1,7 +1,10 @@
 package net.sourceforge.mayfly.acceptance;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ResultTest extends SqlTestCase {
     

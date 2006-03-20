@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.util.ValueObject;
 
 public class TupleElement extends ValueObject {
     private final CellHeader header;

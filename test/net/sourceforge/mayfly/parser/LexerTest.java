@@ -1,10 +1,12 @@
 package net.sourceforge.mayfly.parser;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class LexerTest extends TestCase {
     

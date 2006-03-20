@@ -1,13 +1,13 @@
 package net.sourceforge.mayfly.evaluation;
 
-import java.util.*;
-
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.ldbc.Rows;
+import net.sourceforge.mayfly.ldbc.what.What;
+import net.sourceforge.mayfly.util.ValueObject;
+
+import java.util.Iterator;
 
 public class NoGroupBy extends ValueObject implements Aggregator {
 

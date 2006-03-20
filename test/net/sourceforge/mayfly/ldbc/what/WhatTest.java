@@ -1,9 +1,14 @@
 package net.sourceforge.mayfly.ldbc.what;
 
-import junit.framework.*;
-import net.sourceforge.mayfly.datastore.*;
+import junit.framework.TestCase;
+
+import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.where.literal.*;
+import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class WhatTest extends TestCase {

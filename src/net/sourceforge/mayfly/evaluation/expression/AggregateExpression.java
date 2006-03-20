@@ -1,12 +1,18 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.evaluation.*;
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.ldbc.Rows;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 
 public abstract class AggregateExpression extends Expression {
 

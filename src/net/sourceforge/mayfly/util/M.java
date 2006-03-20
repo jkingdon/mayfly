@@ -1,8 +1,13 @@
 package net.sourceforge.mayfly.util;
 
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.ldbc.Each;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class M extends Aggregate implements Map {
 

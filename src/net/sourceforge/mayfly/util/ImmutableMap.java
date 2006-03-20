@@ -1,6 +1,10 @@
 package net.sourceforge.mayfly.util;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class ImmutableMap extends ValueObject implements Map {
 

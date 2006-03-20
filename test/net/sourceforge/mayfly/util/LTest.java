@@ -2,7 +2,9 @@ package net.sourceforge.mayfly.util;
 
 import junit.framework.TestCase;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class LTest extends TestCase {
     public void testAdd() throws Exception {

@@ -1,8 +1,14 @@
 package net.sourceforge.mayfly.jdbc;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.Database;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.UnimplementedException;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Statement;
 
 public class JdbcStatement implements Statement {
 

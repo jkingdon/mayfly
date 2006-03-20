@@ -1,12 +1,17 @@
 package net.sourceforge.mayfly.util;
 
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.*;
-import org.apache.commons.collections.*;
-import org.apache.commons.lang.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.ldbc.Each;
 
-import java.util.*;
-import java.text.*;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.ArrayUtils;
+
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 abstract public class Aggregate extends ValueObject implements Iterable {
     private String messageIfNotFound = "{0} not found";

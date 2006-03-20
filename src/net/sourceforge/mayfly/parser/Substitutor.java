@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.parser;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import net.sourceforge.mayfly.MayflyInternalException;
+
+import org.apache.commons.lang.StringEscapeUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;

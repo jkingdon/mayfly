@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
 public class ColumnTest extends TestCase {
 

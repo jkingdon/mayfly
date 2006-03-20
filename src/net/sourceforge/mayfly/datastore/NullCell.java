@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.MayflyException;
 
 public class NullCell extends Cell {
     

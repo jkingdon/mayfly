@@ -1,8 +1,9 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.evaluation.*;
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.ldbc.Rows;
 
 public abstract class Literal extends Expression {
 

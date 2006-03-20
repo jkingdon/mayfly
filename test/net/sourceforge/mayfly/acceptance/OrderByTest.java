@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class OrderByTest extends SqlTestCase {
 

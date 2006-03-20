@@ -1,10 +1,14 @@
 package net.sourceforge.mayfly.dump;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.*;
+import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.TableData;
+import net.sourceforge.mayfly.ldbc.Columns;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Iterator;
 
 public class Dumper {
 

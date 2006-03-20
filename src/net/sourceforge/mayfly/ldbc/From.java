@@ -1,8 +1,12 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.util.Aggregate;
+import net.sourceforge.mayfly.util.Iterable;
+import net.sourceforge.mayfly.util.L;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class From extends Aggregate {
 

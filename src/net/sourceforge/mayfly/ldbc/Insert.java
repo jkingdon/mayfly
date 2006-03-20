@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.datastore.*;
+import net.sourceforge.mayfly.datastore.DataStore;
 
-import java.util.*;
+import java.util.List;
 
 public class Insert extends Command {
 

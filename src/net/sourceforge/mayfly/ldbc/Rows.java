@@ -1,9 +1,12 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.util.Aggregate;
+import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.Iterable;
+import net.sourceforge.mayfly.util.L;
 
-import java.util.*;
+import java.util.Iterator;
 
 public class Rows extends Aggregate {
     private final ImmutableList rows;

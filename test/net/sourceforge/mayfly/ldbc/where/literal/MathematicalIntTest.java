@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.ldbc.where.literal;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.parser.*;
+import net.sourceforge.mayfly.parser.Parser;
 
 public class MathematicalIntTest extends TestCase {
 

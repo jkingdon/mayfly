@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.ldbc;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.parser.*;
+import net.sourceforge.mayfly.parser.Parser;
 
 public class FromTest extends TestCase {
     public void testSimple() throws Exception {

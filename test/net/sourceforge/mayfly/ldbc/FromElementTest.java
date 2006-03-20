@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.ldbc;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
 public class FromElementTest extends TestCase {
     public void testFromTree() throws Exception {

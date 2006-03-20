@@ -1,15 +1,21 @@
 package net.sourceforge.mayfly.evaluation;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import java.util.*;
-
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.evaluation.expression.*;
+import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.StringCell;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.expression.Average;
+import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.ldbc.Rows;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.ldbc.what.WhatElement;
+import net.sourceforge.mayfly.util.ImmutableList;
+
+import java.util.Arrays;
 
 public class GroupedRowsTest extends TestCase {
     

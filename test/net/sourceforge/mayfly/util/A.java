@@ -1,7 +1,9 @@
 package net.sourceforge.mayfly.util;
 
-import junit.framework.*;
-import net.sourceforge.mayfly.*;
+import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
+
+import net.sourceforge.mayfly.MayflyException;
 
 public class A {
     public static void assertEquals(Object expected, Object actual) {

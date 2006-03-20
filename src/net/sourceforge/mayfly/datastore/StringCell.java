@@ -1,8 +1,9 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 
-import org.apache.commons.lang.*;
+import org.apache.commons.lang.StringEscapeUtils;
 
 public class StringCell extends Cell {
 

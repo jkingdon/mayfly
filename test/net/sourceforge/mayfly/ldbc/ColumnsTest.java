@@ -1,12 +1,13 @@
 package net.sourceforge.mayfly.ldbc;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.L;
 
-import java.util.*;
+import java.util.Arrays;
 
 public class ColumnsTest extends TestCase {
 

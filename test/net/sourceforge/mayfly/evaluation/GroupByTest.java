@@ -1,13 +1,15 @@
 package net.sourceforge.mayfly.evaluation;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
-import java.util.*;
+import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.ldbc.Rows;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.util.ImmutableList;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.*;
-import net.sourceforge.mayfly.ldbc.what.*;
-import net.sourceforge.mayfly.util.*;
+import java.util.Iterator;
 
 public class GroupByTest extends TestCase {
     

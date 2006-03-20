@@ -1,7 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
-import net.sourceforge.mayfly.datastore.*;
-import net.sourceforge.mayfly.ldbc.where.*;
+import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.ldbc.where.Where;
 
 public class InnerJoin extends Join implements FromElement {
 

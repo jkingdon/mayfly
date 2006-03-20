@@ -1,10 +1,11 @@
 package net.sourceforge.mayfly.acceptance;
 
-import junit.framework.*;
+import junit.framework.Assert;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.Database;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public class MayflyDialect extends Dialect {
 

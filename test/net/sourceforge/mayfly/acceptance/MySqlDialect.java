@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
 
 /**
  * To make this work, install MySQL (the server), start it up on localhost,

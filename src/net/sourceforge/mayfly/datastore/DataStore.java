@@ -1,9 +1,14 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.*;
-import net.sourceforge.mayfly.util.*;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
+import net.sourceforge.mayfly.util.ImmutableMap;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A data store is an immutable object containing data

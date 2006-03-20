@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.*;
+import net.sourceforge.mayfly.MayflyInternalException;
 
 
 public class LongCell extends Cell {
