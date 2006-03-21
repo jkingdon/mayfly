@@ -16,7 +16,7 @@ public abstract class Command extends ValueObject {
         return new Parser(tokens).parse();
     }
 
-    abstract public DataStore update(DataStore store, String schema);
+    abstract public DataStore update(DataStore store, String currentSchema);
 
     abstract public int rowsAffected();
 

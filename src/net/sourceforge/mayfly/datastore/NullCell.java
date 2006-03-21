@@ -33,6 +33,14 @@ public class NullCell extends Cell {
         throw new MayflyException("Attempt to read SQL NULL as an object");
     }
     
+    public Object asContents() {
+        /**
+         * This can probably go away if {@link net.sourceforge.mayfly.parser.Parser#parseAndEvaluate()}
+         * returns a {@link Cell} rather than cell contents.
+         */
+        return NullCellContent.INSTANCE;
+    }
+    
     public int compareTo(Cell otherCell) {
         return otherCell instanceof NullCell ? 0 : -1;
     }

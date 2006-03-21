@@ -31,8 +31,4 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
-    public boolean updateMissing() {
-        return true;
-    }
-
 }

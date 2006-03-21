@@ -2,8 +2,11 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
+import net.sourceforge.mayfly.evaluation.command.SetClause;
+import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.ldbc.Columns;
 import net.sourceforge.mayfly.ldbc.Rows;
+import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.M;
 import net.sourceforge.mayfly.util.StringBuilder;
@@ -66,6 +69,32 @@ public class TableData {
         constraints.check(rows, newRow);
 
         return new TableData(columns, constraints, (Rows) rows.with(newRow));
+    }
+
+    public UpdateTable update(List setClauses, Where where) {
+        Rows newRows = new Rows();
+        int rowsAffected = 0;
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            
+            if (where.evaluate(row)) {
+                TupleMapper mapper = new TupleMapper(row.tuple());
+                for (Iterator iterator = setClauses.iterator(); iterator.hasNext();) {
+                    SetClause setClause = (SetClause) iterator.next();
+                    Cell cell = setClause.value().evaluate(row);
+                    mapper.put(findColumn(setClause.column()), cell);
+                }
+                Row newRow = new Row(mapper.asTuple());
+                constraints.check(newRows, newRow);
+                newRows = (Rows) newRows.with(newRow);
+                ++rowsAffected;
+            }
+            else {
+                newRows = (Rows) newRows.with(row);
+            }
+
+        }
+        return new UpdateTable(new TableData(columns, constraints, newRows), rowsAffected);
     }
 
     private String describeNamesAndValues(Columns columns, List values) {

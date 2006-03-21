@@ -31,6 +31,26 @@ public class UpdateTest extends SqlTestCase {
         assertResultSet(new String[] { " null " }, query("select a from foo"));
     }
     
+    public void testCaseInsensitive() throws Exception {
+        if (dialect.updateMissing()) {
+            return;
+        }
+        execute("create table foo (a integer)");
+        execute("insert into foo(a) values (7)");
+        assertEquals(1, execute("update foo set A = 8"));
+        assertResultSet(new String[] { " 8 " }, query("select a from foo"));
+    }
+    
+    public void testBadColumnName() throws Exception {
+        if (dialect.updateMissing()) {
+            return;
+        }
+        execute("create table foo (a integer)");
+        execute("insert into foo(a) values (7)");
+        expectExecuteFailure("update foo set b = 8", "no column b");
+        assertResultSet(new String[] { " 7 " }, query("select a from foo"));
+    }
+    
     public void testExpression() throws Exception {
         if (dialect.updateMissing()) {
             return;
@@ -56,7 +76,7 @@ public class UpdateTest extends SqlTestCase {
     }
     
     public void testDefault() throws Exception {
-        if (dialect.updateMissing()) {
+        if (!mayflyMissing()) {
             return;
         }
         execute("create table foo (a integer default 5)");

@@ -2,6 +2,9 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
+import net.sourceforge.mayfly.evaluation.command.UpdateStore;
+import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableMap;
 
@@ -104,6 +107,11 @@ public class DataStore {
             }
         }
         return names;
+    }
+
+    public UpdateStore update(String schema, String table, List setClauses, Where where) {
+        UpdateSchema result = schema(schema).update(table, setClauses, where);
+        return new UpdateStore(replace(schema, result.schema()), result.rowsAffected());
     }
 
 }

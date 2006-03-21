@@ -181,7 +181,7 @@ public class ValueTest extends SqlTestCase {
         );
     }
     
-    public void testNullInExpression() throws Exception {
+    public void testNullInInsertExpression() throws Exception {
         execute("create table foo (a integer)");
         String insertNullExpression = "insert into foo(a) values (5 + null)";
         if (dialect.disallowNullsInExpressions()) {
@@ -193,12 +193,30 @@ public class ValueTest extends SqlTestCase {
                 // confusing consequences of the "null propagates up" semantics, but
                 // at least for now, I'm going to insist people say "null" rather than
                 // "5 + null".
-                assertMessage("To insert null, specify a null literal rather than an expression containing one", e);
+                assertMessage("Specify a null literal rather than an expression containing one", e);
             }
             assertResultSet(new String[] { }, query("select a from foo"));
         }
         else {
             execute(insertNullExpression);
+            assertResultSet(new String[] { " null " }, query("select a from foo"));
+        }
+    }
+    
+    public void testNullInUpdateExpression() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo(a) values(10)");
+        String nullExpression = "update foo set a = 5 + null";
+        if (dialect.disallowNullsInExpressions()) {
+            // Perhaps it is really anal and an overreaction to the sometimes
+            // confusing consequences of the "null propagates up" semantics, but
+            // at least for now, I'm going to insist people say "null" rather than
+            // "5 + null".
+            expectExecuteFailure(nullExpression, "Specify a null literal rather than an expression containing one");
+            assertResultSet(new String[] { " 10 " }, query("select a from foo"));
+        }
+        else {
+            execute(nullExpression);
             assertResultSet(new String[] { " null " }, query("select a from foo"));
         }
     }

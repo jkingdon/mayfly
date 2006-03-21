@@ -74,6 +74,7 @@ public class TokenType {
     public static final TokenType KEYWORD_set = registerKeyword("set");
     public static final TokenType KEYWORD_sum = registerKeyword("sum");
     public static final TokenType KEYWORD_table = registerKeyword("table");
+    public static final TokenType KEYWORD_update = registerKeyword("update");
     public static final TokenType KEYWORD_values = registerKeyword("values");
     public static final TokenType KEYWORD_varchar = registerKeyword("varchar");
     public static final TokenType KEYWORD_where = registerKeyword("where");

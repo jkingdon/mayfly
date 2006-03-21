@@ -4,7 +4,6 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
-import net.sourceforge.mayfly.datastore.NullCellContent;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.ColumnOrderItem;
 import net.sourceforge.mayfly.evaluation.Expression;
@@ -12,6 +11,8 @@ import net.sourceforge.mayfly.evaluation.GroupBy;
 import net.sourceforge.mayfly.evaluation.GroupItem;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.ReferenceOrderItem;
+import net.sourceforge.mayfly.evaluation.command.SetClause;
+import net.sourceforge.mayfly.evaluation.command.Update;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Count;
@@ -20,6 +21,7 @@ import net.sourceforge.mayfly.evaluation.expression.Maximum;
 import net.sourceforge.mayfly.evaluation.expression.Minimum;
 import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
+import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.Sum;
 import net.sourceforge.mayfly.ldbc.Command;
@@ -124,6 +126,9 @@ public class Parser {
         else if (currentTokenType() == TokenType.KEYWORD_insert) {
             return parseInsert();
         }
+        else if (currentTokenType() == TokenType.KEYWORD_update) {
+            return parseUpdate();
+        }
         else {
             throw new ParserException("expected command but got " + describeToken(currentToken()));
         }
@@ -145,6 +150,30 @@ public class Parser {
         List values = parseValueConstructor();
 
         return new Insert(table, columnNames, values);
+    }
+
+    private Command parseUpdate() {
+        expectAndConsume(TokenType.KEYWORD_update);
+        InsertTable table = parseInsertTable();
+        expectAndConsume(TokenType.KEYWORD_set);
+        List setClauses = parseSetClauseList();
+        Where where = parseOptionalWhere();
+        return new Update(table, setClauses, where);
+    }
+
+    private List parseSetClauseList() {
+        List clauses = new ArrayList();
+        do {
+            clauses.add(parseSetClause());
+        } while (consumeIfMatches(TokenType.COMMA));
+        return clauses;
+    }
+
+    private SetClause parseSetClause() {
+        String column = consumeIdentifier();
+        expectAndConsume(TokenType.EQUAL);
+        Expression value = parseExpressionOrNull();
+        return new SetClause(column, value);
     }
 
     private List parseColumnNames() {
@@ -177,18 +206,21 @@ public class Parser {
     }
 
     private Object parseAndEvaluate() {
-        if (consumeIfMatches(TokenType.KEYWORD_null)) {
-            return NullCellContent.INSTANCE;
-        }
+        Expression expression = parseExpressionOrNull();
+        Cell cell = expression.evaluate(null);
+        return cell.asContents();
+    }
 
-        try {
-            Expression expression = parseExpression().asNonBoolean();
-            Cell cell = expression.evaluate(null);
-            return cell.asContents();
-        } catch (FoundNullLiteral e) {
-            throw new MayflyException(
-                "To insert null, specify a null literal rather than an expression containing one"
-            );
+    private Expression parseExpressionOrNull() {
+        if (consumeIfMatches(TokenType.KEYWORD_null)) {
+            return new NullExpression();
+        }
+        else {
+            try {
+                return parseExpression().asNonBoolean();
+            } catch (FoundNullLiteral e) {
+                throw new MayflyException("Specify a null literal rather than an expression containing one");
+            }
         }
     }
 
@@ -269,13 +301,7 @@ public class Parser {
         expectAndConsume(TokenType.KEYWORD_from);
         From from = parseFromItems();
         
-        Where where;
-        if (consumeIfMatches(TokenType.KEYWORD_where)) {
-            where = parseWhere();
-        }
-        else {
-            where = Where.EMPTY;
-        }
+        Where where = parseOptionalWhere();
         
         Aggregator groupBy = parseGroupBy();
         
@@ -284,6 +310,15 @@ public class Parser {
         Limit limit = parseLimit();
 
         return new Select(what, from, where, groupBy, orderBy, limit);
+    }
+
+    private Where parseOptionalWhere() {
+        if (consumeIfMatches(TokenType.KEYWORD_where)) {
+            return parseWhere();
+        }
+        else {
+            return Where.EMPTY;
+        }
     }
 
     public What parseWhat() {
