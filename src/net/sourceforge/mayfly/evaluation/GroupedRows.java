@@ -5,10 +5,10 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.Rows;
 
 import java.util.ArrayList;
 import java.util.Iterator;

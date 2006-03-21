@@ -1,10 +1,10 @@
 package net.sourceforge.mayfly.dump;
 
 import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
-import net.sourceforge.mayfly.ldbc.Columns;
 
 import java.io.IOException;
 import java.io.Writer;

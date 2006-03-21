@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.ldbc;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.ColumnOrderItem;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.ldbc.what.What;

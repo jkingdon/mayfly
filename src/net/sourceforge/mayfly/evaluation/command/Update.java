@@ -3,8 +3,6 @@ package net.sourceforge.mayfly.evaluation.command;
 import java.util.List;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.ldbc.Command;
-import net.sourceforge.mayfly.ldbc.InsertTable;
 import net.sourceforge.mayfly.ldbc.where.Where;
 
 public class Update extends Command {

@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Rows;
 
 public interface FromElement {
 

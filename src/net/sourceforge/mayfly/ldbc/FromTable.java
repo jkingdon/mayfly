@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.ldbc;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.util.L;

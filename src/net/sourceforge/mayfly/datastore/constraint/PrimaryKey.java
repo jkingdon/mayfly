@@ -3,10 +3,10 @@ package net.sourceforge.mayfly.datastore.constraint;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.ldbc.Columns;
-import net.sourceforge.mayfly.ldbc.Rows;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.StringBuilder;
 

@@ -1,7 +1,6 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.Iterable;

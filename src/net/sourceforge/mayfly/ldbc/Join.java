@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.ldbc;
 
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.ValueObject;
 

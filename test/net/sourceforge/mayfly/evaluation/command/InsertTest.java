@@ -1,8 +1,11 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.evaluation.command;
 
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.NullCellContent;
+import net.sourceforge.mayfly.evaluation.command.Command;
+import net.sourceforge.mayfly.evaluation.command.Insert;
+import net.sourceforge.mayfly.evaluation.command.InsertTable;
 
 import java.util.Arrays;
 

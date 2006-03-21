@@ -1,9 +1,9 @@
 package net.sourceforge.mayfly.ldbc.what;
 
 import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.Columns;
 import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.Iterator;

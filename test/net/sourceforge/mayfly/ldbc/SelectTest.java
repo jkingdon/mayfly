@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;

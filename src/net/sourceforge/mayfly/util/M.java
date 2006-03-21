@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.util;
 
-import net.sourceforge.mayfly.ldbc.Each;
 
 import java.util.Collection;
 import java.util.Iterator;

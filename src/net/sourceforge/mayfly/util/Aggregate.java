@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.util;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.ldbc.Each;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.ArrayUtils;

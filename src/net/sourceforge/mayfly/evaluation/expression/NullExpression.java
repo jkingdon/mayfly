@@ -3,8 +3,8 @@ package net.sourceforge.mayfly.evaluation.expression;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.ldbc.Rows;
 
 public class NullExpression extends Expression {
 

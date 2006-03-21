@@ -3,10 +3,10 @@ package net.sourceforge.mayfly.evaluation.what;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
-import net.sourceforge.mayfly.ldbc.Rows;
 import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.ValueObject;
 

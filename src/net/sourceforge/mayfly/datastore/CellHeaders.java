@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.ldbc.Columns;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.L;

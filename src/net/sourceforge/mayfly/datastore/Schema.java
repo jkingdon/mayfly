@@ -4,7 +4,6 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
-import net.sourceforge.mayfly.ldbc.Columns;
 import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.ImmutableMap;
 

@@ -4,8 +4,8 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.ldbc.Rows;
 
 public class SingleColumn extends Expression {
     private final String originalTableOrAlias;
