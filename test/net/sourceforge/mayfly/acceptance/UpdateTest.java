@@ -3,18 +3,12 @@ package net.sourceforge.mayfly.acceptance;
 public class UpdateTest extends SqlTestCase {
     
     public void testNoRows() throws Exception {
-        if (dialect.updateMissing()) {
-            return;
-        }
         execute("create table foo (a integer)");
         assertEquals(0, execute("update foo set a = 5"));
         assertResultSet(new String[] { }, query("select a from foo"));
     }
     
     public void testTwoColumns() throws Exception {
-        if (dialect.updateMissing()) {
-            return;
-        }
         execute("create table foo (a integer, b integer)");
         execute("insert into foo(a) values (null)");
         assertEquals(1, execute("update foo set b = 6, a = 5"));
@@ -22,9 +16,6 @@ public class UpdateTest extends SqlTestCase {
     }
     
     public void testSetNull() throws Exception {
-        if (dialect.updateMissing()) {
-            return;
-        }
         execute("create table foo (a integer)");
         execute("insert into foo(a) values (7)");
         assertEquals(1, execute("update foo set a = null"));
@@ -32,9 +23,6 @@ public class UpdateTest extends SqlTestCase {
     }
     
     public void testCaseInsensitive() throws Exception {
-        if (dialect.updateMissing()) {
-            return;
-        }
         execute("create table foo (a integer)");
         execute("insert into foo(a) values (7)");
         assertEquals(1, execute("update foo set A = 8"));
@@ -42,9 +30,6 @@ public class UpdateTest extends SqlTestCase {
     }
     
     public void testBadColumnName() throws Exception {
-        if (dialect.updateMissing()) {
-            return;
-        }
         execute("create table foo (a integer)");
         execute("insert into foo(a) values (7)");
         expectExecuteFailure("update foo set b = 8", "no column b");
@@ -52,9 +37,6 @@ public class UpdateTest extends SqlTestCase {
     }
     
     public void testExpression() throws Exception {
-        if (dialect.updateMissing()) {
-            return;
-        }
         execute("create table foo (a integer, offset_value integer)");
         execute("insert into foo(a, offset_value) values (2, 1000)");
         execute("insert into foo(a, offset_value) values (3, 2000)");
@@ -64,9 +46,6 @@ public class UpdateTest extends SqlTestCase {
     }
     
     public void testWhere() throws Exception {
-        if (dialect.updateMissing()) {
-            return;
-        }
         execute("create table foo (a integer, b varchar(255), c integer)");
         execute("insert into foo(a, b, c) values (1, 'set-me', 10)");
         execute("insert into foo(a, b, c) values (2, 'do-not-set-me', 20)");

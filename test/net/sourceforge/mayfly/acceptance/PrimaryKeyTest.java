@@ -39,9 +39,6 @@ public class PrimaryKeyTest extends SqlTestCase {
     }
 
     public void testUpdate() throws Exception {
-        if (dialect.updateMissing()) {
-            return;
-        }
         execute("create table foo (x integer, primary key(x))");
         execute("insert into foo(x) values(5)");
         execute("insert into foo(x) values(7)");

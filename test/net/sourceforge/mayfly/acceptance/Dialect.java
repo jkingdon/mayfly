@@ -74,10 +74,6 @@ public abstract class Dialect {
         return false;
     }
 
-    public boolean updateMissing() {
-        return false;
-    }
-
     public boolean crossJoinRequiresOn() {
         return false;
     }
