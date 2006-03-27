@@ -25,9 +25,7 @@ public class DerbyDialect extends Dialect {
             return DriverManager.getConnection("jdbc:derby:test;create=true");
         }
         else {
-            Connection connection = DriverManager.getConnection("jdbc:derby:test");
-            // delete old databases/tables/whatever
-            return connection;
+            return DriverManager.getConnection("jdbc:derby:test");
         }
     }
 
@@ -39,7 +37,60 @@ public class DerbyDialect extends Dialect {
         }
     }
     
+    public boolean crossJoinCanHaveOn() {
+        return true;
+    }
+
+    public boolean crossJoinRequiresOn() {
+        return true;
+    }
+    
+    public boolean onIsRestrictedToJoinsTables() {
+        return false;
+    }
+    
+    boolean onCanMentionOutsideTable() {
+        return false;
+    }
+    
     public boolean uniqueColumnMayBeNullable() {
+        return false;
+    }
+    
+    public boolean canCreateSchemaAndTablesInSameStatement() {
+        return false;
+    }
+    
+    public boolean authorizationAllowedInCreateSchema() {
+        return false;
+    }
+    
+    public boolean isReservedWord(String word) {
+        return "first".equals(word)
+            || "last".equals(word);
+    }
+    
+    public boolean canConcatenateStringAndInteger() {
+        return false;
+    }
+    
+    public boolean canGroupByExpression() {
+        return false;
+    }
+    
+    public boolean canGroupByColumnAlias() {
+        return false;
+    }
+
+    public boolean canOrderByExpression() {
+        return true;
+    }
+
+    public boolean nullSortsLower() {
+        return false;
+    }    
+
+    public boolean haveLimit() {
         return false;
     }
 

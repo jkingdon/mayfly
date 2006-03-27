@@ -209,7 +209,7 @@ public class WhereTest extends SqlTestCase {
     }
 
     public void testInWithSubselect() throws Exception {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             // Needs fixing in LDBC grammar.
             return;
         }

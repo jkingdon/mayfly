@@ -40,10 +40,10 @@ public class AggregateTest extends SqlTestCase {
         execute("create table foo (x integer)");
         
         expectQueryFailure("select x, max(x) from foo", "x is a column but max(x) is an aggregate");
-        expectQueryFailure("select X || 'L', Max ( x ) from foo", "X is a column but Max(x) is an aggregate");
-        expectQueryFailure("select '#' || x , MAX(X) from foo", "x is a column but MAX(X) is an aggregate");
-        expectQueryFailure("select max(x) || 'L', x from foo", "x is a column but max(x) is an aggregate");
-        expectQueryFailure("select '#' || max(x) , x from foo", "x is a column but max(x) is an aggregate");
+        expectQueryFailure("select X + 1, Max ( x ) from foo", "X is a column but Max(x) is an aggregate");
+        expectQueryFailure("select 5 + x , MAX(X) from foo", "x is a column but MAX(X) is an aggregate");
+        expectQueryFailure("select max(x) + 4, x from foo", "x is a column but max(x) is an aggregate");
+        expectQueryFailure("select 3 + max(x) , x from foo", "x is a column but max(x) is an aggregate");
         expectQueryFailure("select foo.*, min(x) from foo", "foo.x is a column but min(x) is an aggregate");
         expectQueryFailure("select x, max(distinct x) from foo", "x is a column but max(distinct x) is an aggregate");
     }
@@ -137,11 +137,7 @@ public class AggregateTest extends SqlTestCase {
         execute("create table foo (x integer)");
         execute("insert into foo (x) values (5)");
         
-        if (dialect.verticalBarsMeanConcatenation()) {
-            assertResultSet(new String[] { " 'L5' " }, query("select 'L' || max(x) from foo"));
-        } else {
-            assertResultSet(new String[] { " 6 " }, query("select 1 + max(x) from foo"));
-        }
+         assertResultSet(new String[] { " 6 " }, query("select 1 + max(x) from foo"));
         expectQueryFailure("select 'L' || max(y) from foo", "no column y");
     }
 
@@ -221,7 +217,7 @@ public class AggregateTest extends SqlTestCase {
         assertResultSet(new String[] { " 2 " }, query("select count(distinct x) from foo"));
 
         String sqlForMinimum = "select min(x) from foo";
-        if (mayflyMissing()) {
+        if (dialect.wishThisWereTrue()) {
             // is this indeed doing a string sort?
             assertResultSet(new String[] { " 'one' " }, query(sqlForMinimum));
         }

@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
+import net.sourceforge.mayfly.util.StringBuilder;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -50,7 +52,15 @@ public abstract class Dialect {
         return false;
     }
 
-    public boolean offsetIsReservedWord() {
+    public boolean isReservedWord(String word) {
+        // War on reserved words: they can make it quite a pain to
+        // port SQL from one implementation to another.  Mayfly's
+        // rule of thumb: Don't put big kluges in the parser to
+        // avoid a reserved word, but make words non-reserved
+        // where feasible.
+        
+        // A few specific cases:
+
         // LIMIT needs/wants to be a reserved word, but there is no
         // particular need for OFFSET to be (unless just for symmetry
         // with LIMIT or something).
@@ -65,7 +75,9 @@ public abstract class Dialect {
         return true;
     }
 
-    /** Should a test look for behavior in which Mayfly intentionally diverges
+    /** 
+     * @internal
+     * Should a test look for behavior in which Mayfly intentionally diverges
      * from what other databases do.
      * 
      * (In most case it makes more sense to have an individual test for a specific questions
@@ -74,6 +86,16 @@ public abstract class Dialect {
         return false;
     }
 
+    /**
+     * @internal
+     * This is how we mark things where Mayfly doesn't yet implement the behavior
+     * which is desired for Mayfly.  So for non-Mayfly databases, there is no 
+     * "wish" to be marked.
+     */
+    boolean wishThisWereTrue() {
+        return true;
+    }
+    
     public boolean crossJoinRequiresOn() {
         return false;
     }
@@ -90,10 +112,18 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean onIsRestrictedToJoinsTables() {
+        return true;
+    }
+
     public boolean considerTablesMentionedAfterJoin() {
         return false;
     }
     
+    boolean onCanMentionOutsideTable() {
+        return !onIsRestrictedToJoinsTables();
+    }
+
     public boolean detectsSyntaxErrorsInPrepareStatement() {
         return true;
     }
@@ -112,6 +142,12 @@ public abstract class Dialect {
 
     public boolean orderByCountsAsWhat() {
         return false;
+    }
+
+    public boolean haveLimit() {
+        // Interestingly enough, the majority of my test databases
+        // do have this, in a more or less compatible fashion.
+        return true;
     }
 
     public boolean canHaveLimitWithoutOrderBy() {
@@ -134,6 +170,29 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean canCreateSchemaAndTablesInSameStatement() {
+        // Not sure how clean/useful/popular this is.
+        return true;
+    }
+    
+    public boolean authorizationAllowedInCreateSchema() {
+        return true;
+    }
+
+    public boolean authorizationRequiredInCreateSchema() {
+        return false;
+    }
+
+    public String createEmptySchemaCommand(String name) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("create schema ");
+        sql.append(name);
+        if (authorizationRequiredInCreateSchema()) {
+            sql.append(" authorization dba");
+        }
+        return sql.toString();
+    }
+
     public boolean aggregateDistinctIsForCountOnly() {
         return false;
     }
@@ -148,6 +207,14 @@ public abstract class Dialect {
 
     public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression() {
         return errorIfNotAggregateOrGrouped();
+    }
+
+    public boolean canGroupByExpression() {
+        return true;
+    }
+
+    public boolean canGroupByColumnAlias() {
+        return true;
     }
 
     public boolean canOrderByExpression() {
@@ -185,15 +252,18 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean onIsRestrictedToJoinsTables() {
-        return true;
-    }
-
     public boolean notRequiresBoolean() {
         return true;
     }
 
     public boolean numberOfValuesMustMatchNumberOfColumns() {
+        return true;
+    }
+
+    public boolean canConcatenateStringAndInteger() {
+        // Most databases seem to allow this.  I'm sure there
+        // are larger issues/tradeoffs here (like "do what I
+        // mean" versus avoiding surprises).
         return true;
     }
 

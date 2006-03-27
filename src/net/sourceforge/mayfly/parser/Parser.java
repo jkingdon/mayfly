@@ -233,10 +233,11 @@ public class Parser {
 
     private CreateSchema parseCreateSchema() {
         String schemaName = consumeIdentifier();
-        expectAndConsume(TokenType.KEYWORD_authorization);
-        String user = consumeIdentifier();
-        if (!user.equalsIgnoreCase("dba")) {
-            throw new MayflyException("Can only create specify user dba in create schema but was " + user);
+        if (consumeIfMatches(TokenType.KEYWORD_authorization)) {
+            String user = consumeIdentifier();
+            if (!user.equalsIgnoreCase("dba")) {
+                throw new MayflyException("Can only specify user dba in create schema but was " + user);
+            }
         }
 
         CreateSchema schema = new CreateSchema(schemaName);

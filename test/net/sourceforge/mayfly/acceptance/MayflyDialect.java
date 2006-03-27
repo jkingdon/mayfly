@@ -31,4 +31,21 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    public boolean canGroupByExpression() {
+        return wishThisWereTrue();
+    }
+    
+    public boolean canGroupByColumnAlias() {
+        // We don't implement column aliases yet.
+        return wishThisWereTrue();
+    }
+
+    /**
+     * @internal
+     * Stuff to work on.
+     */
+    boolean wishThisWereTrue() {
+        return false;
+    }
+    
 }

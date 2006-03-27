@@ -298,7 +298,7 @@ public class ValueTest extends SqlTestCase {
     }
     
     public void testNegativeNumber() throws Exception {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return;
         }
 
@@ -318,7 +318,7 @@ public class ValueTest extends SqlTestCase {
         assertTrue(results.next());
         assertEquals(5, results.getInt("x"));
         assertEquals("5", results.getString("x"));
-        if (mayflyMissing()) {
+        if (dialect.wishThisWereTrue()) {
             assertEquals(5.0, results.getDouble("x"), 0.00001);
         }
         assertFalse(results.next());

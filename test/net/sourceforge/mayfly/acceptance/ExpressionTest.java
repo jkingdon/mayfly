@@ -37,15 +37,33 @@ public class ExpressionTest extends SqlTestCase {
     }
     
     public void testConcat() throws Exception {
-        execute("create table names (first varchar(255), last varchar(255))");
-        execute("insert into names(first, last) values ('John', 'Jones')");
+        execute("create table names (first_name varchar(255), last_name varchar(255))");
+        execute("insert into names(first_name, last_name) values ('John', 'Jones')");
         ResultSet results;
         if (dialect.verticalBarsMeanConcatenation()) {
-            results = query("select first || ' ' || last from names");
+            results = query("select first_name || ' ' || last_name from names");
         } else {
-            results = query("select concat(first, ' ', last) from names");
+            results = query("select concat(first_name, ' ', last_name) from names");
         }
         assertResultSet(new String[] { "'John Jones'" }, results);
+    }
+
+    public void testConcatenateStringAndInteger() throws Exception {
+        execute("create table foo (x integer)");
+        execute("insert into foo (x) values (5)");
+        
+        String sql;
+        if (dialect.verticalBarsMeanConcatenation()) {
+            sql = "select 'L' || x from foo";
+        } else {
+            sql = "select concat('L', x) from foo";
+        }
+
+        if (dialect.canConcatenateStringAndInteger()) {
+            assertResultSet(new String[] { " 'L5' " }, query(sql));
+        } else {
+            expectQueryFailure(sql, "cannot convert integer to string");
+        }
     }
 
     public void testPlus() throws Exception {

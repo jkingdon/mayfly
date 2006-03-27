@@ -42,7 +42,7 @@ public class UniqueColumnTest extends SqlTestCase {
     }
     
     public void testUpdate() throws Exception {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             // no updates
             return;
         }
@@ -71,7 +71,7 @@ public class UniqueColumnTest extends SqlTestCase {
     }
     
     public void testCombineWithNotNull() throws Exception {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             // no unique constraints
             return;
         }
@@ -82,7 +82,7 @@ public class UniqueColumnTest extends SqlTestCase {
     }
 
     private boolean createTable(String sql) throws SQLException {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return false;
         }
 

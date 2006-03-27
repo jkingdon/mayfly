@@ -54,12 +54,6 @@ public abstract class SqlTestCase extends TestCase {
         connection.close();
     }
     
-    protected boolean mayflyMissing() {
-        /** Should we test for behaviors which we plan to implement in Mayfly,
-         * but which aren't implemented yet?  */
-        return !(dialect instanceof MayflyDialect);
-    }
-
     protected int execute(String sql) throws SQLException {
         return execute(sql, connection);
     }
@@ -198,4 +192,9 @@ public abstract class SqlTestCase extends TestCase {
         }
     }
     
+    public void createEmptySchema(String name) throws SQLException {
+        assertEquals(0, execute(dialect.createEmptySchemaCommand(name)));
+        assertEquals(0, execute("set schema " + name));
+    }
+
 }

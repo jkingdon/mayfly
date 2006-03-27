@@ -162,7 +162,7 @@ public class JoinTest extends SqlTestCase {
     }
 
     public void testCrossJoin() throws Exception {
-        // Hypersonic, and to a certain extent MySQL, treat CROSS JOIN as being
+        // Hypersonic, Derby, and to a certain extent MySQL, treat CROSS JOIN as being
         // just like INNER JOIN.  Mayfly, Oracle, and Postgres hew more closely
         // to the SQL standard: INNER JOIN must have ON and CROSS JOIN cannot have ON.
 
@@ -275,7 +275,7 @@ public class JoinTest extends SqlTestCase {
             expectQueryFailure(ambiguousIfReachesOutOfJoin, "ambiguous column a");
         }
 
-        // Hypersonic-friendly variant of above case
+        // Portable variant of above case
         assertResultSet(
             new String[] { " 5, 9 " },
             query("select foo.a, bar.a from foo, bar inner join types on bar.a = type")
@@ -287,13 +287,14 @@ public class JoinTest extends SqlTestCase {
         // common practice say? - I think they say it should work ;-()
         String onReachesOutOfJoinedColumnsQuery = 
             "select foo.a, bar.a from bar, foo inner join types on bar.a = type";
-        if (dialect.onIsRestrictedToJoinsTables()) {
-            expectQueryFailure(onReachesOutOfJoinedColumnsQuery, "no column bar.a");
-        } else {
+        if (dialect.onCanMentionOutsideTable()) {
             assertResultSet(
                 new String[] { " 5, 9 " },
                 query(onReachesOutOfJoinedColumnsQuery)
             );
+        }
+        else {
+            expectQueryFailure(onReachesOutOfJoinedColumnsQuery, "no column bar.a");
         }
 
         String ambiguousIfOneConsidersTablesMentionedAfterJoin =
@@ -309,7 +310,7 @@ public class JoinTest extends SqlTestCase {
         // Next would be the case just like that but where the ON explicitly says "foo.a"
 
     }
-    
+
     public void testNestedJoins() throws Exception {
         execute("create table foo (f integer, name varchar(80))");
         execute("create table bar (b1 integer, b2 integer)");

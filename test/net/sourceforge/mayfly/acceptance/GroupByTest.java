@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.acceptance;
 
 import java.sql.ResultSet;
 
-
 public class GroupByTest extends SqlTestCase {
     
     public void testGroupByActsLikeDistinct() throws Exception {
@@ -13,26 +12,23 @@ public class GroupByTest extends SqlTestCase {
         assertResultList(new String[] { " 'Dickens' " }, query("select author from books group by author"));
         assertResultList(new String[] { " 'Dickens' ", " 'Dickens' " }, query("select author from books"));
 
-        if (!mayflyMissing()) {
+        if (!dialect.canGroupByColumnAlias()) {
             return;
         }
         assertResultList(new String[] { " 'Dickens' " }, query("select author as dude from books group by dude"));
     }
     
     public void testGroupByExpression() throws Exception {
-        if (groupByExpressionMissing()) {
-            return;
-        }
-
         execute("create table people (birthdate integer, age integer)");
         execute("insert into people(birthdate, age) values (1704, 43)");
         execute("insert into people(birthdate, age) values (1714, 33)");
         
-        // Some databases don't allow an expression, according to 
-        // The Practical SQL Handbook; Using Structured Query Language, 2nd edition.
-
-        assertResultList(new String[] { " 1747 " }, 
-            query("select birthdate + age from people group by birthdate + age"));
+        String sql = "select birthdate + age from people group by birthdate + age";
+        if (groupByExpressionMissing()) {
+            expectQueryFailure(sql, "GROUP BY expression (as opposed to column) is not implemented");
+            return;
+        }
+        assertResultList(new String[] { " 1747 " }, query(sql));
 
         assertResultList(new String[] { " 1747 " }, 
             query("select birthdate + age + 0 from people group by birthdate + age"));
@@ -42,7 +38,7 @@ public class GroupByTest extends SqlTestCase {
     }
 
     private boolean groupByExpressionMissing() {
-        return !mayflyMissing();
+        return !dialect.canGroupByExpression();
     }
     
     public void testGroupByExpressionError() throws Exception {
@@ -167,14 +163,14 @@ public class GroupByTest extends SqlTestCase {
     
     public void testGroupByAggregate() throws Exception {
         // select pub_id, sum(price) from titles group by pub_id, sum(price)
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return;
         }
     }
     
     public void testGroupByAggregateViaAlias() throws Exception {
         // select pub_id, sum(price) as total from titles group by pub_id, total
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return;
         }
     }
@@ -261,7 +257,7 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testHavingIsSelectedExpression() throws Exception {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return;
         }
 
@@ -275,7 +271,7 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testHavingIsKeyExpression() throws Exception {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return;
         }
 
@@ -295,7 +291,7 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testHavingIsDisallowedOnUnaggregated() throws Exception {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return;
         }
 
@@ -321,7 +317,7 @@ public class GroupByTest extends SqlTestCase {
     
     public void testGroupByAndOrderBy() throws Exception {
         // For example, select type, avg(price) order by avg(price)
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return;
         }
     }

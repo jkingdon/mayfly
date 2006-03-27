@@ -35,6 +35,10 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
+    public boolean authorizationRequiredInCreateSchema() {
+        return true;
+    }
+
     public boolean requiresAllParameters() {
         return false;
     }

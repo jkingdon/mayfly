@@ -55,7 +55,7 @@ public class UpdateTest extends SqlTestCase {
     }
     
     public void testDefault() throws Exception {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return;
         }
         execute("create table foo (a integer default 5)");

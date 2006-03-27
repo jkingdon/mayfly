@@ -87,7 +87,7 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testAs() throws Exception {
-        if (!mayflyMissing()) {
+        if (!dialect.wishThisWereTrue()) {
             return;
         }
 
@@ -204,6 +204,10 @@ public class ResultTest extends SqlTestCase {
     
 
     public void testLimitWithOffset() throws Exception {
+        if (!dialect.haveLimit()) {
+            return;
+        }
+
         execute("create table foo (a integer)");
         execute("insert into foo (a) values (1)");
         execute("insert into foo (a) values (8)");
@@ -237,6 +241,10 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testLimitWithInadequateOrderBy() throws Exception {
+        if (!dialect.haveLimit()) {
+            return;
+        }
+
         execute("create table foo (x integer, y varchar(255))");
         execute("insert into foo (x, y) values (1, 'a')");
         execute("insert into foo (x, y) values (1, 'c')");
@@ -272,7 +280,11 @@ public class ResultTest extends SqlTestCase {
         // In this example, N == 2 so we end up getting 'a'
         // 'b' as part of the "N", and 'c' because it is a tie.
         
-        if (!mayflyMissing()) {
+        if (!dialect.haveLimit()) {
+            return;
+        }
+
+        if (!dialect.wishThisWereTrue()) {
             // no subselects
             return;
         }
@@ -284,8 +296,8 @@ public class ResultTest extends SqlTestCase {
         execute("insert into foo (x, y) values (2, 'e')");
 
         // There are other ways to write this query (one involves
-        // the "RANK() OVER" feature from SQL2003), but this one
-        // strikes me as the most sane.
+        // the "RANK() OVER" feature from SQL2003), but this
+        // looks like a pretty sane one.
         assertResultSet(new String[] { " 'a' ", " 'b' ", " 'c' " },
             query("SELECT y FROM foo WHERE x <= (SELECT x FROM foo ORDER BY x ASC LIMIT 1 OFFSET 1) ")
         );
@@ -296,7 +308,12 @@ public class ResultTest extends SqlTestCase {
         execute("insert into foo (a) values (2)");
         execute("insert into foo (a) values (1)");
 
-        assertResultList(new String[] {"1"}, query("select a from foo order by a limit 1"));
+        String sql = "select a from foo order by a limit 1";
+        if (!dialect.haveLimit()) {
+            expectQueryFailure(sql, "expected end of file but got limit");
+            return;
+        }
+        assertResultList(new String[] {"1"}, query(sql));
         assertResultList(new String[] {"1", "2"}, query("select a from foo order by a limit 2"));
         assertResultList(new String[] {"1", "2"}, query("select a from foo order by a limit 3"));
     }

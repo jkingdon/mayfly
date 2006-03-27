@@ -70,8 +70,8 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
-    public boolean offsetIsReservedWord() {
-        return true;
+    public boolean isReservedWord(String word) {
+        return "offset".equals(word);
     }
     
     public boolean canOrderByExpression() {

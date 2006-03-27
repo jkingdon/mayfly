@@ -72,11 +72,22 @@ public class SyntaxTest extends SqlTestCase {
         for (int i = 0; i < nonReserved.length; i++) {
             assertNotReserved(nonReserved[i]);
         }
-        if (dialect.offsetIsReservedWord()) {
-            assertReserved("offset");
+        checkReserved("offset");
+        
+        // Hypersonic pseudo-user for CREATE SCHEMA
+        assertNotReserved("dba");
+        
+        // Derby reserved words (the manual has a longer list)
+        checkReserved("first");
+        checkReserved("last");
+    }
+
+    private void checkReserved(String word) throws Exception {
+        if (dialect.isReservedWord(word)) {
+            assertReserved(word);
         }
         else {
-            assertNotReserved("offset");
+            assertNotReserved(word);
         }
     }
 
@@ -85,8 +96,8 @@ public class SyntaxTest extends SqlTestCase {
         execute("drop table foo");
     }
 
-    private void assertReserved(String identifier) throws Exception {
-        expectExecuteFailure("create table foo (" + identifier + " integer)", "syntax error");
+    private void assertReserved(String keyword) throws Exception {
+        expectExecuteFailure("create table foo (" + keyword + " integer)", "syntax error");
     }
     
     public void testWrongIdentifierForNonReserved() throws Exception {
