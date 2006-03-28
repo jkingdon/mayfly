@@ -1,7 +1,8 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.evaluation.from;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.parser.Parser;
 
 public class FromTest extends TestCase {

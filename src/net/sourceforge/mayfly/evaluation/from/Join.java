@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Rows;

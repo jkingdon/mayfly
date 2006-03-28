@@ -4,7 +4,7 @@ import net.sourceforge.mayfly.Database;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.evaluation.command.Command;
-import net.sourceforge.mayfly.ldbc.Select;
+import net.sourceforge.mayfly.evaluation.select.Select;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.parser.Substitutor;

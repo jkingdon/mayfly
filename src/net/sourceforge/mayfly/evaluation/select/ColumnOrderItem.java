@@ -1,8 +1,7 @@
-package net.sourceforge.mayfly.evaluation;
+package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.ldbc.OrderItem;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.ldbc.what.What;
 

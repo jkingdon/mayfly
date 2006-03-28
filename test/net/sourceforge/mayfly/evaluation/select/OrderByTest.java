@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.evaluation.select;
 
 import junit.framework.TestCase;
 

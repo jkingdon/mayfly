@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.Iterable;

@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc;
+package net.sourceforge.mayfly.evaluation.select;
 
 import junit.framework.TestCase;
 
@@ -8,6 +8,10 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.evaluation.from.From;
+import net.sourceforge.mayfly.evaluation.from.FromTable;
+import net.sourceforge.mayfly.evaluation.from.InnerJoin;
+import net.sourceforge.mayfly.evaluation.from.LeftJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.what.All;
 import net.sourceforge.mayfly.ldbc.what.AllColumnsFromTable;

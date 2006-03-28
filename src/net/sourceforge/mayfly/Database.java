@@ -4,8 +4,8 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
+import net.sourceforge.mayfly.evaluation.select.Select;
 import net.sourceforge.mayfly.jdbc.JdbcConnection;
-import net.sourceforge.mayfly.ldbc.Select;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
