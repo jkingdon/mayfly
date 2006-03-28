@@ -81,6 +81,10 @@ public class HypersonicDialect extends Dialect {
     public boolean disallowNullsInExpressions() {
         return false;
     }
+    
+    public boolean quotedIdentifiersAreCaseSensitive() {
+        return true;
+    }
 
     protected boolean constraintCanHaveForwardReference() {
         return false;

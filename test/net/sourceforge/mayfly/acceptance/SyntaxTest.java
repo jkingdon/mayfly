@@ -33,6 +33,19 @@ public class SyntaxTest extends SqlTestCase {
         }
     }
     
+    public void testQuotedIdentifiersCaseSensitive() throws Exception {
+        // The unquoted one is to be taken as the same as quoted "FOO"
+        String createTableSql = "create table foo (foo integer, \"Foo\" integer, \"foo\" integer)";
+        if (dialect.canQuoteIdentifiers() && dialect.quotedIdentifiersAreCaseSensitive()) {
+            execute(createTableSql);
+            execute("insert into foo (\"Foo\", \"foo\", \"FOO\") values (3, 5, 7)");
+            assertResultSet(new String[] { "5, 3, 7" }, query("select \"foo\", \"Foo\", foo from foo"));
+        }
+        else {
+            expectExecuteFailure(createTableSql, "duplicate column Foo");
+        }
+    }
+    
     public void testTableNamesCaseInsensitive() throws Exception {
         if (dialect.tableNamesMightBeCaseSensitive()) {
             return;

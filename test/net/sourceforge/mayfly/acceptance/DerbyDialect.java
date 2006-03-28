@@ -70,6 +70,10 @@ public class DerbyDialect extends Dialect {
             || "last".equals(word);
     }
     
+    public boolean quotedIdentifiersAreCaseSensitive() {
+        return true;
+    }
+    
     public boolean canConcatenateStringAndInteger() {
         return false;
     }
