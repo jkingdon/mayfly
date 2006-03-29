@@ -13,6 +13,10 @@ public class MayflyDialect extends Dialect {
 
     public Connection openConnection() throws Exception {
         database = new Database();
+        return openAdditionalConnection();
+    }
+
+    public Connection openAdditionalConnection() throws SQLException {
         return database.openConnection();
     }
 

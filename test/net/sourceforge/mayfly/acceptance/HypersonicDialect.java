@@ -2,11 +2,16 @@ package net.sourceforge.mayfly.acceptance;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class HypersonicDialect extends Dialect {
 
     public Connection openConnection() throws Exception {
         Class.forName("org.hsqldb.jdbcDriver");
+        return openAdditionalConnection();
+    }
+
+    public Connection openAdditionalConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:hsqldb:mem:SqlTestCase");
     }
 

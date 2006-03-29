@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.jdbc;
 
 import net.sourceforge.mayfly.Database;
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.datastore.DataStore;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -16,9 +17,11 @@ import java.util.Map;
 public class JdbcConnection implements Connection {
 
     private Database database;
+    private boolean autoCommit = true;
+    private DataStore rollbackPoint;
 
     /**
-     * Should only be called diretly from within Mayfly.  External callers should call
+     * Should only be called directly from within Mayfly.  External callers should call
      * {@link Database.openConnection()} or {@link DriverManager.getConnection(String)}.
      */
     public JdbcConnection(Database database) {
@@ -42,19 +45,30 @@ public class JdbcConnection implements Connection {
     }
 
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        throw new UnimplementedException();
+        this.autoCommit  = autoCommit;
+        startTransaction();
+    }
+
+    private void startTransaction() {
+        rollbackPoint = database.dataStore();
     }
 
     public boolean getAutoCommit() throws SQLException {
-        throw new UnimplementedException();
+        return autoCommit;
     }
 
     public void commit() throws SQLException {
-        throw new UnimplementedException();
+        startTransaction();
     }
 
     public void rollback() throws SQLException {
-        throw new UnimplementedException();
+        if (autoCommit) {
+            return;
+        }
+        if (rollbackPoint == null) {
+            throw new NullPointerException();
+        }
+        database.setDataStore(rollbackPoint);
     }
 
     public void close() throws SQLException {

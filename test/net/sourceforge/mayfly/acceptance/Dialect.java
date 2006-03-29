@@ -8,6 +8,7 @@ import java.sql.SQLException;
 public abstract class Dialect {
 
     abstract public Connection openConnection() throws Exception;
+    abstract public Connection openAdditionalConnection() throws Exception;
 
     public void assertTableCount(int expected) {
         // Could probably do this with JDBC metadata or database-specific tricks.
@@ -303,6 +304,10 @@ public abstract class Dialect {
         // Perhaps a bit tricky to get this true, and still have
         // messages case-preserving in general.
         return false;
+    }
+
+    public boolean haveTransactions() {
+        return true;
     }
 
 }

@@ -25,8 +25,12 @@ public class DerbyDialect extends Dialect {
             return DriverManager.getConnection("jdbc:derby:test;create=true");
         }
         else {
-            return DriverManager.getConnection("jdbc:derby:test");
+            return openAdditionalConnection();
         }
+    }
+
+    public Connection openAdditionalConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:derby:test");
     }
 
     public void shutdown(Connection connection) throws Exception {

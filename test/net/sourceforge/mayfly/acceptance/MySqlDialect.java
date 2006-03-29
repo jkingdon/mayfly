@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.acceptance;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * To make this work, install MySQL (the server), start it up on localhost,
@@ -15,11 +16,16 @@ public class MySqlDialect extends Dialect {
         SqlTestCase.execute("CREATE DATABASE test", bootstrapConnection);
         bootstrapConnection.close();
 
+        return openAdditionalConnection();
+    }
+
+    public Connection openAdditionalConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:mysql://localhost/test");
     }
 
     public void shutdown(Connection connection) throws Exception {
         SqlTestCase.execute("DROP DATABASE test", connection);
+        connection.close();
     }
     
     public boolean backslashInAStringIsAnEscape() {
@@ -124,6 +130,13 @@ public class MySqlDialect extends Dialect {
     
     public boolean allowMultipleNullsInUniqueColumn() {
         return true;
+    }
+    
+    public boolean haveTransactions() {
+        // If we could make sure we were using InnoDB, this
+        // perhaps could be true.  At least for now, don't
+        // worry about trying to make sure we have & use InnoDB.
+        return false;
     }
 
 }

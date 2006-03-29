@@ -205,4 +205,15 @@ public class Database {
         return dataStore;
     }
 
+    /**
+     * @internal
+     * Only intended for use within Mayfly.
+     * The idea is that public callers call
+     * {@link #Database(DataStore)}.  Is this
+     * a sound idea?
+     */
+    public void setDataStore(DataStore store) {
+        dataStore = store;
+    }
+
 }

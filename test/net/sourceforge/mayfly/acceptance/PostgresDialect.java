@@ -31,6 +31,10 @@ public class PostgresDialect extends Dialect {
         SqlTestCase.execute("CREATE DATABASE test", bootstrapConnection);
         bootstrapConnection.close();
 
+        return openAdditionalConnection();
+    }
+
+    public Connection openAdditionalConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:postgresql:test", "mayflytest", "mayflytest");
     }
 
