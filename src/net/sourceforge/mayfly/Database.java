@@ -56,7 +56,7 @@ public class Database {
      * another {@link Database} object.
      */
     public Database(DataStore store) {
-        dataStore = store;
+        setDataStore(store);
         currentSchema = DataStore.ANONYMOUS_SCHEMA_NAME;
     }
 
@@ -213,6 +213,9 @@ public class Database {
      * a sound idea?
      */
     public void setDataStore(DataStore store) {
+        if (store == null) {
+            throw new NullPointerException("Attempt to set data store to null");
+        }
         dataStore = store;
     }
 

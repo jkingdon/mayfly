@@ -65,9 +65,6 @@ public class JdbcConnection implements Connection {
         if (autoCommit) {
             return;
         }
-        if (rollbackPoint == null) {
-            throw new NullPointerException();
-        }
         database.setDataStore(rollbackPoint);
     }
 
