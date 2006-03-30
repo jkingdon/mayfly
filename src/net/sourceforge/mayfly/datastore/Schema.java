@@ -28,7 +28,15 @@ public class Schema {
     }
 
     public Schema createTable(String table, Columns columns, PrimaryKey constraints) {
+        assertNoTable(table);
         return new Schema(tables.with(table, new TableData(columns, constraints)));
+    }
+
+    private void assertNoTable(String table) {
+        String existingTable = lookUpTableOrNull(table);
+        if (existingTable != null) {
+            throw new MayflyException("table " + existingTable + " already exists");
+        }
     }
 
     public Schema dropTable(String table) {
@@ -43,13 +51,23 @@ public class Schema {
     }
 
     private String lookUpTable(String target) {
+        String canonicalName = lookUpTableOrNull(target);
+        if (canonicalName == null) {
+            throw new MayflyException("no table " + target);
+        }
+        else {
+            return canonicalName;
+        }
+    }
+
+    private String lookUpTableOrNull(String target) {
         for (Iterator iter = tables.keySet().iterator(); iter.hasNext(); ) {
             String canonicalTable = (String) iter.next();
             if (canonicalTable.equalsIgnoreCase(target)) {
                 return canonicalTable;
             }
         }
-        throw new MayflyException("no table " + target);
+        return null;
     }
 
     public Set tables() {

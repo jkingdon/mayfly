@@ -26,8 +26,8 @@ import java.util.Set;
  * 
  * public void tearDown() throws Exception {
  * &nbsp;&nbsp;&nbsp;&nbsp;// Nulling variables can hurt performance in general, but 
- * &nbsp;&nbsp;&nbsp;&nbsp;// might be helpful here because JUnit keeps objects around
- * &nbsp;&nbsp;&nbsp;&nbsp;// until the end of a test run.
+ * &nbsp;&nbsp;&nbsp;&nbsp;// might be helpful here because JUnit keeps test case
+ * &nbsp;&nbsp;&nbsp;&nbsp;// objects around until the end of a test run.
  * &nbsp;&nbsp;&nbsp;&nbsp;database = null;
  * }
  * 
@@ -64,7 +64,14 @@ public class Database {
      * Execute an SQL command which does not return results.
      * This is similar to the JDBC java.sql.Statement#executeUpdate(java.lang.String)
      * but is more convenient if you have a Database instance around.
+     * 
      * @return Number of rows changed.
+     * @internal
+     * The following should be true, but isn't yet.
+     * See {@link net.sourceforge.mayfly.acceptance.SchemaTest#testCurrentSchemaIsPerConnection()}.
+     * Any per-connection settings (for example the current schema as set by
+     * SET SCHEMA) are not shared with any previous or subsequent calls to
+     * this method.
      */
     public int execute(String sql) throws SQLException {
         try {

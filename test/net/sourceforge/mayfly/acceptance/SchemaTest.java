@@ -1,5 +1,8 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 public class SchemaTest extends SqlTestCase {
 
     public void testWithAuthorizationKeyword() throws Exception {
@@ -158,6 +161,39 @@ public class SchemaTest extends SqlTestCase {
         if (dialect.wishThisWereTrue()) {
             assertResultSet(new String[] { " 7 " }, query("select x from mars.foo"));
             assertResultSet(new String[] { " 7 " }, query("select foo.x from mars.foo"));
+        }
+    }
+    
+    public void testCurrentSchemaIsPerConnection() throws Exception {
+        if (dialect.schemasMissing()) {
+            return;
+        }
+        execute(dialect.createEmptySchemaCommand("mars"));
+        execute(dialect.createEmptySchemaCommand("venus"));
+        
+        Connection connection2 = dialect.openAdditionalConnection();
+        execute("set schema mars", connection);
+        execute("set schema venus", connection2);
+        execute("create table foo(x integer)", connection);
+        String sql = "create table foo(y integer)";
+        if (dialect.wishThisWereTrue()) {
+            execute(sql, connection2);
+            execute("set schema venus", connection);
+            execute("set schema mars", connection2);
+            execute("insert into foo(y) values(77)", connection);
+            execute("insert into foo(x) values(5)", connection2);
+        }
+        else {
+            /**
+             * When this is fixed, update javadoc at
+             * {@link net.sourceforge.mayfly.Database#execute(String)}.
+             */
+            try {
+                execute(sql, connection2);
+                fail();
+            } catch (SQLException expected) {
+                assertMessage("table foo already exists", expected);
+            }
         }
     }
     
