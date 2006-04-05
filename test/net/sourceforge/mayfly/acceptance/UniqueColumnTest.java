@@ -42,9 +42,6 @@ public class UniqueColumnTest extends SqlTestCase {
     }
     
     public void testUpdate() throws Exception {
-        if (!haveUniqueConstraints()) {
-            return;
-        }
         if (!createTable("create table foo (x integer, unique(x))")) {
             return;
         }
@@ -70,10 +67,6 @@ public class UniqueColumnTest extends SqlTestCase {
     }
     
     public void testCombineWithNotNull() throws Exception {
-        if (!haveUniqueConstraints()) {
-            return;
-        }
-
         execute("create table foo (x integer not null, unique(x))");
         execute("insert into foo(x) values(5)");
         expectExecuteFailure("insert into foo(x) values(5)", "unique column x already has a value 5");
@@ -99,10 +92,6 @@ public class UniqueColumnTest extends SqlTestCase {
     }
 
     private boolean createTable(String sql) throws SQLException {
-        if (!haveUniqueConstraints()) {
-            return false;
-        }
-
         if (dialect.uniqueColumnMayBeNullable()) {
             execute(sql);
             return true;
@@ -111,10 +100,6 @@ public class UniqueColumnTest extends SqlTestCase {
             expectExecuteFailure(sql, "unique column allows null values");
             return false;
         }
-    }
-    
-    private boolean haveUniqueConstraints() {
-        return true || dialect.wishThisWereTrue();
     }
     
 }
