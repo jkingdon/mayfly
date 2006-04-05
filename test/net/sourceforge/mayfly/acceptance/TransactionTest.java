@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.acceptance;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class TransactionTest extends SqlTestCase {
     
@@ -32,10 +33,10 @@ public class TransactionTest extends SqlTestCase {
     }
     
     public void testRollback() throws Exception {
-        // Still need to deal with MySQL, Postgres and Derby
         if (!dialect.haveTransactions()) {
             return;
         }
+        connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
         execute("create table foo (x integer)");
         connection.setAutoCommit(false);
@@ -66,13 +67,6 @@ public class TransactionTest extends SqlTestCase {
         assertResultSet(new String[] { " 5 ", " 7 " }, query("select x from foo"));
     }
     
-    private void cleanUpForDerby() throws SQLException {
-        // Derby needs this before the close.
-        // At some point, think about whether we should test for
-        // whether that is needed.
-        connection.setAutoCommit(true);
-    }
-    
     // Need to deal with whether SET SCHEMA is transactional (see Derby docs)
     
     // setAutoCommit(true) with a transaction in progress
@@ -80,7 +74,74 @@ public class TransactionTest extends SqlTestCase {
     // commit or rollback with a result set, prepared statement, etc open
     // (this is mentioned in Derby docs, I think)
     
-    // two connections - uncommitted insert seen/not-seen by other
+    public void testUncommittedInsert() throws Exception {
+        if (!dialect.haveTransactions() || dialect.willWaitForWriterToCommit()) {
+            return;
+        }
+        connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+        
+        execute("create table foo (x integer)");
+        Connection writingConnection = dialect.openAdditionalConnection();
+        writingConnection.setAutoCommit(false);
+        execute("insert into foo (x) values (5)", writingConnection);
+        
+        if (dialect.willReadUncommitted()) {
+            assertResultSet(new String[] { "5" }, query("select x from foo"));
+        }
+        else {
+            assertResultSet(new String[] { }, query("select x from foo"));
+            assertResultSet(new String[] { "5" }, "select x from foo", writingConnection);
+        }
+        writingConnection.commit();
+        assertResultSet(new String[] { "5" }, query("select x from foo"));
+
+        writingConnection.close();
+    }
+
+    public void testUncommittedUpdate() throws Exception {
+        if (!dialect.haveTransactions() || dialect.willWaitForWriterToCommit()) {
+            return;
+        }
+        connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
+        
+        execute("create table foo (x integer)");
+        execute("insert into foo (x) values (5)");
+
+        Connection writingConnection = dialect.openAdditionalConnection();
+        writingConnection.setAutoCommit(false);
+        execute("update foo set x = 8 where x = 5", writingConnection);
+        
+        if (dialect.willReadUncommitted()) {
+            assertResultSet(new String[] { "8" }, query("select x from foo"));
+        }
+        else {
+            assertResultSet(new String[] { "5" }, query("select x from foo"));
+            assertResultSet(new String[] { "8" }, "select x from foo", writingConnection);
+        }
+        writingConnection.commit();
+        assertResultSet(new String[] { "8" }, query("select x from foo"));
+
+        writingConnection.close();
+    }
+    
+    public void testTwoWriters() throws Exception {
+        execute("create table foo (x integer)");
+        
+        Connection connection2 = dialect.openAdditionalConnection();
+
+        connection.setAutoCommit(false);
+        connection2.setAutoCommit(false);
+        execute("insert into foo (x) values (5)");
+        execute("insert into foo (x) values (7)", connection2);
+        
+        connection.commit();
+        connection2.commit();
+        
+        assertResultSet(new String[] { "5", "7" }, query ("select x from foo"));
+        cleanUpForDerby();
+        connection2.close();
+    }
+
     // two connections - uncommitted update seen/not-seen by other
     // uncommitted create table seen/not-seen by other
     // uncommitted create schema seen/not-seen by other
@@ -98,5 +159,31 @@ public class TransactionTest extends SqlTestCase {
      * So is the insert seen/not-seen
      * ("phantom read" property)
      */
+    
+    // Multiple writes -- see hypersonic documentation for whether we
+    // give an exception when two transactions commit a change to the
+    // same row.
+    
+    // Conflict/merge situation - we have two commits (or a commit and
+    // a rollback).  One is an ALTER TABLE; one is an update to a row in that table.
+    // Hypersonic documentation discusses this.
 
+    public static void assertResultSet(String[] expectedRows, String sql, Connection connection)
+    throws SQLException {
+        Statement myStatement = connection.createStatement();
+        assertResultSet(expectedRows, myStatement.executeQuery(sql));
+        myStatement.close();
+    }
+
+    private void cleanUpForDerby() throws SQLException {
+        // Derby needs this before the close.
+        //
+        // I suspect the real Derby requirement is that after doing a
+        // read with auto-commit false, one needs to commit or rollback
+        // the transaction before closing.  That seems like something
+        // worth considering, writing tests for, and reading the Derby
+        // documentation.
+        connection.setAutoCommit(true);
+    }
+    
 }

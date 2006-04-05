@@ -1,7 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
+import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.ldbc.where.Where;
@@ -17,13 +17,13 @@ public class TableData {
 
     private final Columns columns;
     private final Rows rows;
-    private final PrimaryKey constraints;
+    private final Constraints constraints;
 
-    public TableData(Columns columns, PrimaryKey constraints) {
+    public TableData(Columns columns, Constraints constraints) {
         this(columns, constraints, new Rows());
     }
     
-    private TableData(Columns columns, PrimaryKey constraints, Rows rows) {
+    private TableData(Columns columns, Constraints constraints, Rows rows) {
         this.constraints = constraints;
         columns.checkForDuplicates();
         this.columns = columns;

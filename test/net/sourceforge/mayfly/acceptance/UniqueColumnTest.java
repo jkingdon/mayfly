@@ -42,8 +42,7 @@ public class UniqueColumnTest extends SqlTestCase {
     }
     
     public void testUpdate() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            // no updates
+        if (!haveUniqueConstraints()) {
             return;
         }
         if (!createTable("create table foo (x integer, unique(x))")) {
@@ -53,7 +52,7 @@ public class UniqueColumnTest extends SqlTestCase {
         execute("insert into foo(x) values(7)");
         expectExecuteFailure("update foo set x = 5 where x = 7", "unique column x already has a value 5");
     }
-    
+
     public void testAsPartOfDeclaration() throws Exception {
         String partOfColumnDeclaration = "create table foo (x integer unique)";
         if (dialect.allowUniqueAsPartOfColumnDeclaration()) {
@@ -71,8 +70,7 @@ public class UniqueColumnTest extends SqlTestCase {
     }
     
     public void testCombineWithNotNull() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            // no unique constraints
+        if (!haveUniqueConstraints()) {
             return;
         }
 
@@ -80,9 +78,28 @@ public class UniqueColumnTest extends SqlTestCase {
         execute("insert into foo(x) values(5)");
         expectExecuteFailure("insert into foo(x) values(5)", "unique column x already has a value 5");
     }
+    
+    public void testMultipleConstraints() throws Exception {
+        /** Must be after DEFAULT but constraints can be in any order
+            Not that UNIQUE and PRIMARY KEY together on a column make much semantic sense,
+            which is why we aren't testing it here.
+            See {@link net.sourceforge.mayfly.parser.ParserTest#testMultipleConstraints()}.
+         */
+
+        execute("create table three (x integer, y integer not null, z integer not null," +
+            " unique(y), primary key(x), unique(z))");
+        
+        execute("insert into three(x, y, z) values (0, 10, 100)");
+        expectExecuteFailure("insert into three(x, y, z) values (null, 11, 101)", 
+            "primary key x cannot be null");
+        expectExecuteFailure("insert into three(x, y, z) values (2, 10, 102)", 
+            "unique column y already has a value 10");
+        expectExecuteFailure("insert into three(x, y, z) values (3, 13, 100)", 
+            "unique column z already has a value 100");
+    }
 
     private boolean createTable(String sql) throws SQLException {
-        if (!dialect.wishThisWereTrue()) {
+        if (!haveUniqueConstraints()) {
             return false;
         }
 
@@ -94,6 +111,10 @@ public class UniqueColumnTest extends SqlTestCase {
             expectExecuteFailure(sql, "unique column allows null values");
             return false;
         }
+    }
+    
+    private boolean haveUniqueConstraints() {
+        return true || dialect.wishThisWereTrue();
     }
     
 }

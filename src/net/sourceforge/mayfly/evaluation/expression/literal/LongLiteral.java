@@ -1,14 +1,15 @@
-package net.sourceforge.mayfly.ldbc.where.literal;
+package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.ldbc.where.literal.Literal;
 
-public class MathematicalInt extends Literal {
+public class LongLiteral extends Literal {
 
-    private final int value;
+    private final long value;
 
-    public MathematicalInt(int value) {
+    public LongLiteral(long value) {
         this.value = value;
     }
 
@@ -25,8 +26,12 @@ public class MathematicalInt extends Literal {
     }
     
     public boolean sameExpression(Expression other) {
-        if (other instanceof MathematicalInt) {
-            MathematicalInt integer = (MathematicalInt) other;
+        // Since the choice of IntegerLiteral versus LongLiteral
+        // is based just on what range the value is in, saying
+        // we are only equal to an expression of our
+        // own class works.
+        if (other instanceof LongLiteral) {
+            LongLiteral integer = (LongLiteral) other;
             return value == integer.value;
         }
         else {

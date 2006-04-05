@@ -5,6 +5,8 @@ import net.sourceforge.mayfly.MayflyInternalException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
+import java.sql.SQLException;
+
 public class StringCell extends Cell {
 
     private final String content;
@@ -13,8 +15,16 @@ public class StringCell extends Cell {
         this.content = content;
     }
 
-    public int asInt() {
-        throw new MayflyException("Attempt to read string " + content + " as an int");
+    public byte asByte() throws SQLException {
+        throw new SQLException("Attempt to read string " + content + " as a byte");
+    }
+
+    public short asShort() throws SQLException {
+        throw new SQLException("Attempt to read string " + content + " as a short");
+    }
+
+    public int asInt() throws SQLException {
+        throw new SQLException("Attempt to read string " + content + " as an int");
     }
 
     public long asLong() {

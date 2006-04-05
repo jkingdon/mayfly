@@ -19,7 +19,7 @@ import java.util.List;
 
 public class OrderBy extends Aggregate {
 
-    private List elements = new ArrayList();
+    List elements = new ArrayList();
 
     public OrderBy add(SingleColumn column) {
         return add(new ColumnOrderItem(column, true));

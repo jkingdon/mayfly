@@ -6,8 +6,8 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
-import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
 import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
 
@@ -19,7 +19,7 @@ public class AndTest extends TestCase {
                     new Equal(new SingleColumn("name"), new QuotedString("'steve'")),
                     new And(
                         new Equal(new SingleColumn("species"), new QuotedString("'homo sapiens'")),
-                        new Equal(new SingleColumn("size"), new MathematicalInt(6))
+                        new Equal(new SingleColumn("size"), new IntegerLiteral(6))
                     )
                 ),
                 new Parser("name='steve' and (species='homo sapiens' and size = 6)").parseCondition().asBoolean()
@@ -33,7 +33,7 @@ public class AndTest extends TestCase {
                         new Equal(new SingleColumn("name"), new QuotedString("'steve'")),
                         new Equal(new SingleColumn("species"), new QuotedString("'homo sapiens'"))
                     ),
-                    new Equal(new SingleColumn("size"), new MathematicalInt(6))
+                    new Equal(new SingleColumn("size"), new IntegerLiteral(6))
                 ),
                 new Parser("name='steve' and species='homo sapiens' and size = 6").parseCondition().asBoolean()
         );

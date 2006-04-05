@@ -90,6 +90,10 @@ public class HypersonicDialect extends Dialect {
     public boolean quotedIdentifiersAreCaseSensitive() {
         return true;
     }
+    
+    public boolean isReservedWord(String word) {
+        return word.equalsIgnoreCase("if");
+    }
 
     protected boolean constraintCanHaveForwardReference() {
         return false;
@@ -100,6 +104,14 @@ public class HypersonicDialect extends Dialect {
     }
     
     public boolean haveUpdateDefault() {
+        return false;
+    }
+    
+    public boolean willReadUncommitted() {
+        return true;
+    }
+    
+    public boolean haveTextType() {
         return false;
     }
 

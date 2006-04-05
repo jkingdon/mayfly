@@ -7,8 +7,8 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.datastore.TupleElement;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class WhatTest extends TestCase {
@@ -34,8 +34,8 @@ public class WhatTest extends TestCase {
     }
     
     public void testSelectedDegenerateCase() throws Exception {
-        What original = new What().add(new MathematicalInt(7));
-        Selected expected = new Selected().add(new MathematicalInt(7));
+        What original = new What().add(new IntegerLiteral(7));
+        Selected expected = new Selected().add(new IntegerLiteral(7));
         assertEquals(expected, original.selected(null));
     }
     

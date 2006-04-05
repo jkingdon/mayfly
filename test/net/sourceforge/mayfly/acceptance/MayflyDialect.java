@@ -35,12 +35,41 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    public boolean isReservedWord(String word) {
+        // Although some databases don't reserve IF, all that have IF EXISTS
+        // in their DROP TABLE do.  The parsing of DROP TABLE seems pretty
+        // problematic if IF is not reserved, and furthermore it is the
+        // kind of word that people probably aren't in the habit of trying
+        // to use in identifiers, just because it is reserved in so many
+        // other languages.
+        return word.equalsIgnoreCase("if");
+    }
+    
     public boolean canGroupByExpression() {
         return wishThisWereTrue();
     }
     
     public boolean canGroupByColumnAlias() {
         // We don't implement column aliases yet.
+        return wishThisWereTrue();
+    }
+    
+    public boolean willReadUncommitted() {
+        /** It isn't clear that there is any way to just
+           dip our toes into this water.  It seems like
+           we need to maintain a log of changes to the database
+           in the various connections, and then be able
+           to apply those logs at commit time.
+           {@link TransactionTest#testTwoWriters()}
+         */
+        return !wishThisWereTrue();
+    }
+    
+    public boolean haveTransactions() {
+        /**
+         * {@link net.sourceforge.mayfly.MayflyConnection#rollback()}
+         * is not implemented.
+         */
         return wishThisWereTrue();
     }
 

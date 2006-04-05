@@ -70,8 +70,8 @@ public class DerbyDialect extends Dialect {
     }
     
     public boolean isReservedWord(String word) {
-        return "first".equals(word)
-            || "last".equals(word);
+        return "first".equalsIgnoreCase(word)
+            || "last".equalsIgnoreCase(word);
     }
     
     public boolean quotedIdentifiersAreCaseSensitive() {
@@ -99,6 +99,31 @@ public class DerbyDialect extends Dialect {
     }    
 
     public boolean haveLimit() {
+        return false;
+    }
+    
+    public boolean willWaitForWriterToCommit() {
+        /* If we are in a situation where we another
+           connection has written data but not committed,
+           Derby will just wait.  It will eventually time
+           out if we wait long enough.
+         */
+        return true;
+    }
+    
+    public boolean haveTinyint() {
+        return false;
+    }
+    
+    public boolean haveTextType() {
+        return false;
+    }
+
+    public boolean haveDropTableFooIfExists() {
+        return false;
+    }
+
+    public boolean haveDropTableIfExistsFoo() {
         return false;
     }
 

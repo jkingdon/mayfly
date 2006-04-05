@@ -8,8 +8,8 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
-import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
 import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
 
@@ -35,7 +35,7 @@ public class WhereTest extends TestCase {
     }
     
     public void testNull() throws Exception {
-        Where where = new Where(new Equal(new SingleColumn("a"), new MathematicalInt(5)));
+        Where where = new Where(new Equal(new SingleColumn("a"), new IntegerLiteral(5)));
         Row fiveRow = new Row(new TupleElement(new Column("a"), new LongCell(5)));
         Row nullRow = new Row(new TupleElement(new Column("a"), NullCell.INSTANCE));
         

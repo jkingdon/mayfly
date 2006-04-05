@@ -9,7 +9,7 @@ import net.sourceforge.mayfly.evaluation.expression.Maximum;
 import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
-import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
 
@@ -24,7 +24,7 @@ public class WhatElementTest extends TestCase {
         assertEquals("foo.x", new SingleColumn("foo", "x").displayName());
         assertEquals("x", new SingleColumn("x").displayName());
 
-        assertEquals("3", new MathematicalInt(3).displayName());
+        assertEquals("3", new IntegerLiteral(3).displayName());
         assertEquals("'don''t'", new QuotedString("'don''t'").displayName());
     }
     

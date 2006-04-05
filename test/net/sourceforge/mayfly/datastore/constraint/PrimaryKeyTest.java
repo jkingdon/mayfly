@@ -17,7 +17,7 @@ public class PrimaryKeyTest extends TestCase {
         values.add(new LongCell(7));
         values.add(new StringCell("foo"));
 
-        assertEquals("null,7,foo", new PrimaryKey().describeValues(values));
+        assertEquals("null,7,foo", NotNullOrUnique.describeValues(values));
     }
 
 }

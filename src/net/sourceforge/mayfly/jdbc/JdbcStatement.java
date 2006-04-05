@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.jdbc;
 
-import net.sourceforge.mayfly.Database;
-import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyConnection;
 import net.sourceforge.mayfly.UnimplementedException;
 
 import java.sql.Connection;
@@ -12,22 +11,18 @@ import java.sql.Statement;
 
 public class JdbcStatement implements Statement {
 
-    private final Database database;
+    private final MayflyConnection mayflyConnection;
 
-    public JdbcStatement(Database database) {
-        this.database = database;
+    public JdbcStatement(MayflyConnection mayflyConnection) {
+        this.mayflyConnection = mayflyConnection;
     }
 
     public ResultSet executeQuery(String sql) throws SQLException {
-        try {
-            return database.query(sql);
-        } catch (MayflyException e) {
-            throw e.asSqlException();
-        }
+        return mayflyConnection.query(sql);
     }
 
     public int executeUpdate(String sql) throws SQLException {
-        return database.execute(sql);
+        return mayflyConnection.execute(sql);
     }
 
     public void close() throws SQLException {

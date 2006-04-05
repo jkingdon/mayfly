@@ -191,7 +191,7 @@ abstract public class Aggregate extends ValueObject implements Iterable {
         return createNew(joinResult);
     }
 
-    private static void mustBeAggregateType(Object element) {
+    static void mustBeAggregateType(Object element) {
         if (!(element instanceof Aggregate)) {
             throw new RuntimeException("this only works when the elements are themselves Aggregates.\n" +
                                        "  Element type was: " + element.getClass().getName());

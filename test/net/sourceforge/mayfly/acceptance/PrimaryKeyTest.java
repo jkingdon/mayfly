@@ -52,4 +52,16 @@ public class PrimaryKeyTest extends SqlTestCase {
         expectExecuteFailure("insert into foo(x) values(5)", "primary key x already has a value 5");
     }
     
+    public void testTwoPrimaryKeys() throws Exception {
+        expectExecuteFailure(
+            "create table foo (x integer primary key, y integer, primary key(y))",
+            "attempt to define more than one primary key for table foo");
+    }
+    
+    public void testNotNull() throws Exception {
+        // Not a primary key, but related enough to put in the same test file
+        execute("create table foo (x integer not null)");
+        expectExecuteFailure("insert into foo(x) values(null)", "column x cannot be null");
+    }
+    
 }

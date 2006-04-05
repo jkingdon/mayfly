@@ -269,6 +269,10 @@ public abstract class Dialect {
     }
 
     public boolean disallowNullsInExpressions() {
+        // If this is true, insist people say "null" rather than
+        // "5 + null".  This may reduce confusion over the
+        // "null propagates up" semantics (or might just delay
+        // the time when people discover them :-)).
         return true;
     }
 
@@ -285,7 +289,7 @@ public abstract class Dialect {
     }
     
     public boolean allowMultipleNullsInUniqueColumn() {
-        // This corresponds to the GROUP BY model in which all rows
+        // False is analogous to the GROUP BY model in which all rows
         // with null go in a single group.  It isn't clear whether this
         // is the best way to treat null or not.
         return false;
@@ -307,6 +311,46 @@ public abstract class Dialect {
     }
 
     public boolean haveTransactions() {
+        /**
+         * @internal
+         * Should we be testing {@link Connection#getTransactionIsolation()}
+         * and {@link Connection#setTransactionIsolation(int)} ?
+         * Need to do more testing, but the issue is whether most/any
+         * databases will indicate what they can do, or change their
+         * behavior based on this setting.  In a case like MySQL,
+         * transaction capability is per-table, for one thing. 
+         * 
+         * Anyway, for now we set the isolation level appropriate for
+         * each test, but in terms of figuring out what the database
+         * can do, we have methods here.
+         */
+        
+        return true;
+    }
+
+    public boolean willReadUncommitted() {
+        return false;
+    }
+
+    public boolean willWaitForWriterToCommit() {
+        return false;
+    }
+
+    public boolean haveTinyint() {
+        return true;
+    }
+
+    public boolean haveTextType() {
+        return true;
+    }
+
+    /** Is there a command DROP TABLE name IF EXISTS (with IF EXISTS after the name)? */
+    public boolean haveDropTableFooIfExists() {
+        return true;
+    }
+
+    /** Is there a command DROP TABLE IF EXISTS name (with IF EXISTS before the name)? */
+    public boolean haveDropTableIfExistsFoo() {
         return true;
     }
 

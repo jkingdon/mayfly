@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.jdbc;
 
 import net.sourceforge.mayfly.Database;
+import net.sourceforge.mayfly.MayflyConnection;
 import net.sourceforge.mayfly.UnimplementedException;
-import net.sourceforge.mayfly.datastore.DataStore;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -16,24 +16,22 @@ import java.util.Map;
 
 public class JdbcConnection implements Connection {
 
-    private Database database;
-    private boolean autoCommit = true;
-    private DataStore rollbackPoint;
+    private MayflyConnection mayflyConnection;
 
     /**
      * Should only be called directly from within Mayfly.  External callers should call
      * {@link Database.openConnection()} or {@link DriverManager.getConnection(String)}.
      */
     public JdbcConnection(Database database) {
-        this.database = database;
+        this.mayflyConnection = new MayflyConnection(database);
     }
 
     public Statement createStatement() throws SQLException {
-        return new JdbcStatement(database);
+        return new JdbcStatement(mayflyConnection);
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
-        return new JdbcPreparedStatement(sql, database);
+        return new JdbcPreparedStatement(sql, mayflyConnection);
     }
 
     public CallableStatement prepareCall(String sql) throws SQLException {
@@ -45,27 +43,19 @@ public class JdbcConnection implements Connection {
     }
 
     public void setAutoCommit(boolean autoCommit) throws SQLException {
-        this.autoCommit  = autoCommit;
-        startTransaction();
-    }
-
-    private void startTransaction() {
-        rollbackPoint = database.dataStore();
+        mayflyConnection.setAutoCommit(autoCommit);
     }
 
     public boolean getAutoCommit() throws SQLException {
-        return autoCommit;
+        return mayflyConnection.getAutoCommit();
     }
 
     public void commit() throws SQLException {
-        startTransaction();
+        mayflyConnection.commit();
     }
 
     public void rollback() throws SQLException {
-        if (autoCommit) {
-            return;
-        }
-        database.setDataStore(rollbackPoint);
+        mayflyConnection.rollback();
     }
 
     public void close() throws SQLException {
@@ -96,7 +86,7 @@ public class JdbcConnection implements Connection {
     }
 
     public void setTransactionIsolation(int level) throws SQLException {
-        throw new UnimplementedException();
+        // Not sure what we should do with this.
     }
 
     public int getTransactionIsolation() throws SQLException {

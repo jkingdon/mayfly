@@ -9,6 +9,16 @@ public class NullCell extends Cell {
     private NullCell() {
     }
 
+    public byte asByte() {
+        // JDBC seems to force this on us.
+        return 0;
+    }
+
+    public short asShort() {
+        // JDBC seems to force this on us.
+        return 0;
+    }
+
     public int asInt() {
         // JDBC seems to force this on us.
         return 0;
@@ -43,6 +53,10 @@ public class NullCell extends Cell {
     
     public int compareTo(Cell otherCell) {
         return otherCell instanceof NullCell ? 0 : -1;
+    }
+
+    public boolean sqlEquals(Cell otherCell) {
+        return false;
     }
 
 }

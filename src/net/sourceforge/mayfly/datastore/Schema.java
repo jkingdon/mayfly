@@ -1,7 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
+import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.ldbc.where.Where;
@@ -24,10 +24,10 @@ public class Schema {
     }
 
     public Schema createTable(String table, List columnNames) {
-        return createTable(table, Columns.fromColumnNames(table, columnNames), new PrimaryKey());
+        return createTable(table, Columns.fromColumnNames(table, columnNames), new Constraints());
     }
 
-    public Schema createTable(String table, Columns columns, PrimaryKey constraints) {
+    public Schema createTable(String table, Columns columns, Constraints constraints) {
         assertNoTable(table);
         return new Schema(tables.with(table, new TableData(columns, constraints)));
     }
@@ -37,6 +37,10 @@ public class Schema {
         if (existingTable != null) {
             throw new MayflyException("table " + existingTable + " already exists");
         }
+    }
+
+    public boolean hasTable(String table) {
+        return lookUpTableOrNull(table) != null;
     }
 
     public Schema dropTable(String table) {

@@ -47,9 +47,11 @@ public class TokenType {
     public static final TokenType KEYWORD_desc = registerKeyword("desc");
     public static final TokenType KEYWORD_distinct = registerKeyword("distinct");
     public static final TokenType KEYWORD_drop = registerKeyword("drop");
+    public static final TokenType KEYWORD_exists = registerKeyword("exists");
     public static final TokenType KEYWORD_from = registerKeyword("from");
     public static final TokenType KEYWORD_group = registerKeyword("group");
     public static final TokenType KEYWORD_having = registerKeyword("having");
+    public static final TokenType KEYWORD_if = registerKeyword("if");
     public static final TokenType KEYWORD_in = registerKeyword("in");
     public static final TokenType KEYWORD_inner = registerKeyword("inner");
     public static final TokenType KEYWORD_insert = registerKeyword("insert");
@@ -72,8 +74,10 @@ public class TokenType {
     public static final TokenType KEYWORD_schema = registerKeyword("schema");
     public static final TokenType KEYWORD_select = registerKeyword("select");
     public static final TokenType KEYWORD_set = registerKeyword("set");
+    public static final TokenType KEYWORD_smallint = registerKeyword("smallint");
     public static final TokenType KEYWORD_sum = registerKeyword("sum");
     public static final TokenType KEYWORD_table = registerKeyword("table");
+    public static final TokenType KEYWORD_unique = registerKeyword("unique");
     public static final TokenType KEYWORD_update = registerKeyword("update");
     public static final TokenType KEYWORD_values = registerKeyword("values");
     public static final TokenType KEYWORD_varchar = registerKeyword("varchar");

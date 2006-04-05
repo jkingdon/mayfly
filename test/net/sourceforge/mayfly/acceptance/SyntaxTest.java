@@ -93,6 +93,9 @@ public class SyntaxTest extends SqlTestCase {
         // Derby reserved words (the manual has a longer list)
         checkReserved("first");
         checkReserved("last");
+
+        // Part of DROP TABLE foo IF EXISTS in Mayfly, Hypersonic, and MySQL
+        checkReserved("if");
     }
 
     private void checkReserved(String word) throws Exception {
@@ -110,7 +113,8 @@ public class SyntaxTest extends SqlTestCase {
     }
 
     private void assertReserved(String keyword) throws Exception {
-        expectExecuteFailure("create table foo (" + keyword + " integer)", "syntax error");
+        expectExecuteFailure("create table foo (" + keyword + " integer)",
+            "expected column or table constraint but got " + keyword.toUpperCase());
     }
     
     public void testWrongIdentifierForNonReserved() throws Exception {

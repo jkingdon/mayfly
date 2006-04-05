@@ -10,7 +10,7 @@ public class Equal extends RowExpression {
     }
 
     protected boolean compare(Cell leftSide, Cell rightSide) {
-        return leftSide.equals(rightSide);
+        return leftSide.sqlEquals(rightSide);
     }
 
 }

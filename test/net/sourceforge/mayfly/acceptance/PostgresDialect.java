@@ -75,7 +75,7 @@ public class PostgresDialect extends Dialect {
     }
     
     public boolean isReservedWord(String word) {
-        return "offset".equals(word);
+        return "offset".equalsIgnoreCase(word);
     }
     
     public boolean canOrderByExpression() {
@@ -122,6 +122,18 @@ public class PostgresDialect extends Dialect {
     
     public boolean allowMultipleNullsInUniqueColumn() {
         return true;
+    }
+    
+    public boolean haveTinyint() {
+        return false;
+    }
+    
+    public boolean haveDropTableFooIfExists() {
+        return false;
+    }
+
+    public boolean haveDropTableIfExistsFoo() {
+        return false;
     }
 
 }

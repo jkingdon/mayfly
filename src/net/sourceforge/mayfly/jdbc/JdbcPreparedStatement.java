@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.jdbc;
 
-import net.sourceforge.mayfly.Database;
+import net.sourceforge.mayfly.MayflyConnection;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.evaluation.command.Command;
@@ -32,15 +32,17 @@ import java.util.Vector;
 
 public class JdbcPreparedStatement implements PreparedStatement {
 
+    private final MayflyConnection mayflyConnection;
+
     private final String sql;
-    private Database database;
     private Vector parameters;
     private final int parameterCount;
 
-    JdbcPreparedStatement(String sql, Database database) throws SQLException {
+    JdbcPreparedStatement(String sql, MayflyConnection mayflyConnection) throws SQLException {
+        this.mayflyConnection = mayflyConnection;
+
         try {
             this.sql = sql;
-            this.database = database;
             this.parameters = new Vector();
 
             List tokens = new Lexer(sql).tokens();
@@ -56,7 +58,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
     public ResultSet executeQuery() throws SQLException {
         try {
             Select select = Select.selectFromTokens(substitutedTokens());
-            return database.query(select);
+            return mayflyConnection.query(select);
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
@@ -65,7 +67,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
     public int executeUpdate() throws SQLException {
         try {
             Command command = Command.fromTokens(substitutedTokens());
-            return database.executeUpdate(command);
+            return mayflyConnection.executeUpdate(command);
         } catch (MayflyException e) {
             throw e.asSqlException();
         }

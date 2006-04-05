@@ -6,7 +6,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.parser.Parser;
 
 public class SingleColumnTest extends TestCase {
@@ -31,7 +31,7 @@ public class SingleColumnTest extends TestCase {
 
         assertFalse(new SingleColumn("x").sameExpression(one));
         
-        assertFalse(new SingleColumn("x").sameExpression(new MathematicalInt(5)));
+        assertFalse(new SingleColumn("x").sameExpression(new IntegerLiteral(5)));
         
         assertFalse(one.sameExpression(new SingleColumn("foo", "y")));
      }

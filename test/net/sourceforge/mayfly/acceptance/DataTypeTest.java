@@ -1,14 +1,11 @@
 package net.sourceforge.mayfly.acceptance;
 
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 
 public class DataTypeTest extends SqlTestCase {
 
-    public void testTypes() throws Exception {
-        execute("create table foo (a integer, b varchar(5))");
-    }
-    
     public void testStrings() throws Exception {
         execute("create table foo (color varchar(80), size varchar(80))");
         execute("insert into foo (color, size) values ('red', 'medium')");
@@ -61,7 +58,29 @@ public class DataTypeTest extends SqlTestCase {
             assertFalse(results.next());
         }
     }
+    
+    public void testTextType() throws Exception {
+        checkType(dialect.haveTextType(), "text", "'some text'");
+    }
 
+    public void testTinyint() throws Exception {
+        checkType(dialect.haveTinyint(), "tinyint", "127");
+    }
+
+    public void testSmallint() throws Exception {
+        checkType(true, "smallint", "32767");
+    }
+
+    // Here's a small sample of other types we don't test for yet:
+    // INT (synonym for INTEGER), CHARACTER VARYING (synonym for VARCHAR)
+    //NUMERIC and DECIMAL
+    //REAL, FLOAT, DOUBLE - precision can be given in binary digits (24 or 53, typically)
+    // BIT and BIT VARYING; BOOLEAN
+    // SERIAL and BIGSERIAL (postgres for auto-increment)
+    // DATE, TIME, TIMESTAMP
+    // TIME WITH TIME ZONE is questionable (see postgres docs)
+    // BLOB/CLOB
+    
     public void testInteger() throws Exception {
         execute("create table foo (waist integer, inseam integer)");
         execute("insert into foo (waist, inseam) values (30, 32)");
@@ -83,6 +102,72 @@ public class DataTypeTest extends SqlTestCase {
             assertEquals(32, ((Number) results.getObject("inseam")).intValue());
             assertFalse(results.next());
             results.close();
+        }
+    }
+    
+    public void testLongDoesNotFit() throws Exception {
+        execute("create table foo (x bigint)");
+        // larger than 2^32
+        execute("insert into foo(x) values (222111333444)");
+
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+
+        assertEquals(222111333444L, results.getLong(1));
+
+        try {
+            results.getInt(1);
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage("Value 222111333444 does not fit in an int", e);
+        }
+
+        try {
+            results.getShort(1);
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage("Value 222111333444 does not fit in a short", e);
+        }
+
+        try {
+            results.getByte(1);
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage("Value 222111333444 does not fit in a byte", e);
+        }
+
+        assertFalse(results.next());
+        results.close();
+    }
+
+    public void testLongWouldFit() throws Exception {
+        execute("create table foo (x bigint)");
+        execute("insert into foo(x) values (42)");
+
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+
+        assertEquals(42L, results.getLong(1));
+        assertEquals(42, results.getInt(1));
+        assertEquals((short)42, results.getShort(1));
+        assertEquals((byte)42, results.getByte(1));
+
+        assertFalse(results.next());
+        results.close();
+    }
+
+    private void checkType(boolean expectType, String typeName, String sampleValue) throws SQLException {
+        String sql = "create table foo (a " + typeName + ")";
+        if (expectType) {
+            execute(sql);
+            execute("insert into foo(a) values(" + sampleValue + ")");
+            assertResultSet(new String[] { sampleValue }, query("select a from foo"));
+        }
+        else {
+            expectExecuteFailure(sql, "expected data type but got " + typeName);
         }
     }
 

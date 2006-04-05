@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
@@ -23,7 +24,6 @@ import net.sourceforge.mayfly.ldbc.where.Greater;
 import net.sourceforge.mayfly.ldbc.where.Not;
 import net.sourceforge.mayfly.ldbc.where.Or;
 import net.sourceforge.mayfly.ldbc.where.Where;
-import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
 import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 import net.sourceforge.mayfly.util.L;
 
@@ -43,16 +43,16 @@ public class SelectTest extends TestCase {
                         new And(
                             new Equal(new SingleColumn("f", "name"), new QuotedString("'steve'")),
                             new Or(
-                                new Equal(new SingleColumn("size"), new MathematicalInt(4)),
-                                new Greater(new MathematicalInt(6), new SingleColumn("size"))
+                                new Equal(new SingleColumn("size"), new IntegerLiteral(4)),
+                                new Greater(new IntegerLiteral(6), new SingleColumn("size"))
                             )
 
                         ),
                         new Or(
                             new Equal(new SingleColumn("color"), new QuotedString("'red'")),
                             new And(
-                                new Not(new Equal(new SingleColumn("day"), new MathematicalInt(7))),
-                                new Not(new Equal(new SingleColumn("day"), new MathematicalInt(6)))
+                                new Not(new Equal(new SingleColumn("day"), new IntegerLiteral(7))),
+                                new Not(new Equal(new SingleColumn("day"), new IntegerLiteral(6)))
                             )
 
                         )
@@ -77,7 +77,7 @@ public class SelectTest extends TestCase {
                 new From()
                     .add(new FromTable("foo")),
                 new Where(
-                    new Equal(new SingleColumn("a"), new MathematicalInt(5))
+                    new Equal(new SingleColumn("a"), new IntegerLiteral(5))
                 )
             ),
             Select.selectFromSql("select * from foo where a = 5")
@@ -117,7 +117,7 @@ public class SelectTest extends TestCase {
         assertEquals(
             new Select(
                 new What()
-                    .add(new MathematicalInt(5)),
+                    .add(new IntegerLiteral(5)),
                 new From()
                     .add(new FromTable("foo")),
                 Where.EMPTY

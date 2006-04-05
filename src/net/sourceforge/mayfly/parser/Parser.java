@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.parser;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.evaluation.Aggregator;
@@ -29,6 +30,8 @@ import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.Sum;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.expression.literal.LongLiteral;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
@@ -56,10 +59,11 @@ import net.sourceforge.mayfly.ldbc.where.Not;
 import net.sourceforge.mayfly.ldbc.where.NotEqual;
 import net.sourceforge.mayfly.ldbc.where.Or;
 import net.sourceforge.mayfly.ldbc.where.Where;
-import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
+import net.sourceforge.mayfly.ldbc.where.literal.Literal;
 import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 import net.sourceforge.mayfly.util.StringBuilder;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -145,7 +149,7 @@ public class Parser {
         expectAndConsume(TokenType.KEYWORD_into);
         InsertTable table = parseInsertTable();
 
-        List columnNames = parseColumnNames();
+        List columnNames = parseOptionalColumnNames();
         
         List values = parseValueConstructor();
 
@@ -176,19 +180,24 @@ public class Parser {
         return new SetClause(column, value);
     }
 
-    private List parseColumnNames() {
-        List columnNames;
-        if (consumeIfMatches(TokenType.OPEN_PAREN)) {
-            columnNames = new ArrayList();
-    
-            do {
-                columnNames.add(consumeIdentifier());
-            } while (consumeIfMatches(TokenType.COMMA));
-            expectAndConsume(TokenType.CLOSE_PAREN);
+    private List parseOptionalColumnNames() {
+        if (currentTokenType() == TokenType.OPEN_PAREN) {
+            return parseColumnNames();
         }
         else {
-            columnNames = null;
+            return null;
         }
+    }
+
+    private List parseColumnNames() {
+        expectAndConsume(TokenType.OPEN_PAREN);
+
+        List columnNames = new ArrayList();
+        do {
+            columnNames.add(consumeIdentifier());
+        } while (consumeIfMatches(TokenType.COMMA));
+
+        expectAndConsume(TokenType.CLOSE_PAREN);
         return columnNames;
     }
 
@@ -227,8 +236,18 @@ public class Parser {
     private Command parseDrop() {
         expectAndConsume(TokenType.KEYWORD_drop);
         expectAndConsume(TokenType.KEYWORD_table);
+        
+        boolean ifExists = false;
+        if (consumeIfMatches(TokenType.KEYWORD_if)) {
+            expectAndConsume(TokenType.KEYWORD_exists);
+            ifExists = true;
+        }
         String tableName = consumeIdentifier();
-        return new DropTable(tableName);
+        if (consumeIfMatches(TokenType.KEYWORD_if)) {
+            expectAndConsume(TokenType.KEYWORD_exists);
+            ifExists = true;
+        }
+        return new DropTable(tableName, ifExists);
     }
 
     private CreateSchema parseCreateSchema() {
@@ -268,32 +287,71 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_primary)) {
             expectAndConsume(TokenType.KEYWORD_key);
-            expectAndConsume(TokenType.OPEN_PAREN);
-            do {
-                table.addPrimaryKeyElement(consumeIdentifier());
-            } while (consumeIfMatches(TokenType.COMMA));
-            expectAndConsume(TokenType.CLOSE_PAREN);
+            table.setPrimaryKey(parseColumnNames());
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
+            table.addUniqueConstraint(parseColumnNames());
         }
         else {
             throw new ParserException("expected column or table constraint but got " + describeToken(currentToken()));
         }
     }
 
-    private Column parseColumnDefinition(CreateTable table) {
+    Column parseColumnDefinition(CreateTable table) {
         String name = consumeIdentifier();
+        parseDataType();
+
+        parseColumnConstraints(table, name);
+
+        return new Column(table.table(), name);
+    }
+
+    private void parseColumnConstraints(CreateTable table, String column) {
+        while (true) {
+            if (consumeIfMatches(TokenType.KEYWORD_primary)) {
+                expectAndConsume(TokenType.KEYWORD_key);
+                table.setPrimaryKey(Collections.singletonList(column));
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
+                table.addUniqueConstraint(Collections.singletonList(column));
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_not)) {
+                expectAndConsume(TokenType.KEYWORD_null);
+                table.addNotNullConstraint(column);
+            }
+            else {
+                break;
+            }
+        }
+    }
+
+    private void parseDataType() {
         if (consumeIfMatches(TokenType.KEYWORD_integer)) {
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_smallint)) {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_varchar)) {
             expectAndConsume(TokenType.OPEN_PAREN);
             expectAndConsume(TokenType.NUMBER);
             expectAndConsume(TokenType.CLOSE_PAREN);
         }
-
-        if (consumeIfMatches(TokenType.KEYWORD_primary)) {
-            expectAndConsume(TokenType.KEYWORD_key);
-            table.addPrimaryKeyElement(name);
+        else if (currentTokenType() == TokenType.IDENTIFIER) {
+            // These shouldn't be reserved if they are not in the
+            // SQL standard, seems like.
+            String currentText = consumeIdentifier();
+            if (currentText.equalsIgnoreCase("tinyint")) {
+            }
+            else if (currentText.equalsIgnoreCase("bigint")) {
+            }
+            else if (currentText.equalsIgnoreCase("text")) {
+            }
+            else {
+                throw new ParserException("expected data type but got " + currentText);
+            }
         }
-        return new Column(table.table(), name);
+        else {
+            throw new ParserException("expected data type but got " + describeToken(currentToken()));
+        }
     }
 
     Select parseSelect() {
@@ -502,8 +560,8 @@ public class Parser {
             return new NonBooleanParserExpression(parseColumnReference());
         }
         else if (currentTokenType() == TokenType.NUMBER) {
-            int number = consumeInteger();
-            return new NonBooleanParserExpression(new MathematicalInt(number));
+            Number number = consumeNumber();
+            return new NonBooleanParserExpression(makeLiteral(number));
         }
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
             Token literal = expectAndConsume(TokenType.QUOTED_STRING);
@@ -512,7 +570,7 @@ public class Parser {
         else if (consumeIfMatches(TokenType.PARAMETER)) {
             if (allowParameters) {
                 // We are just doing a syntax check.
-                return new NonBooleanParserExpression(new MathematicalInt(0));
+                return new NonBooleanParserExpression(new IntegerLiteral(0));
             }
             else {
                 throw new MayflyException("Attempt to specify '?' outside a prepared statement");
@@ -552,6 +610,18 @@ public class Parser {
         }
         else {
             throw new ParserException("expected primary but got " + describeToken(currentToken()));
+        }
+    }
+
+    private Literal makeLiteral(Number number) {
+        if (number instanceof Integer) {
+            return new IntegerLiteral(number.intValue());
+        }
+        else if (number instanceof Long) {
+            return new LongLiteral(number.longValue());
+        }
+        else {
+            throw new UnimplementedException("don't yet handle big integers");
         }
     }
 
@@ -798,7 +868,7 @@ public class Parser {
         }
     }
 
-    private TokenType currentTokenType() {
+    TokenType currentTokenType() {
         return currentToken().getType();
     }
 
@@ -846,12 +916,37 @@ public class Parser {
         return token.getText();
     }
 
-    private int consumeInteger() {
-        Token number = expectAndConsume(TokenType.NUMBER);
-        return Integer.parseInt(number.getText());
+    int consumeInteger() {
+        Number number = consumeNumber();
+        if (number instanceof Integer) {
+            return number.intValue();
+        }
+        else {
+            throw new ParserException(number.toString() + " is out of range");
+        }
     }
 
-    private boolean consumeIfMatches(TokenType type) {
+    private Number consumeNumber() {
+        Token number = expectAndConsume(TokenType.NUMBER);
+        String text = number.getText();
+
+        try {
+            return new Integer(text);
+        }
+        catch (NumberFormatException e) {
+            // Out of range.  Most (all?) other cases are prevented in the lexer.
+        }
+
+        try {
+            return new Long(text);
+        }
+        catch (NumberFormatException e) {
+        }
+
+        return new BigInteger(text);
+    }
+
+    boolean consumeIfMatches(TokenType type) {
         if (currentTokenType() == type) {
             expectAndConsume(type);
             return true;
@@ -873,7 +968,7 @@ public class Parser {
         throw new ParserException("expected " + word + " but got " + currentText);
     }
 
-    private Token expectAndConsume(TokenType expectedType) {
+    Token expectAndConsume(TokenType expectedType) {
         Token token = currentToken();
         if (token.getType() != expectedType) {
             throw new ParserException(

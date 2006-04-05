@@ -43,5 +43,13 @@ public class ImmutableListTest extends TestCase {
         assertEquals("a", addToNonEmpty.get(0));
         assertEquals("b", addToNonEmpty.get(1));
     }
+    
+    public void testFromAggregate() throws Exception {
+        Strings source = new Strings("a", "b");
+        ImmutableList list = ImmutableList.fromIterable(source);
+        assertEquals(2, list.size());
+        assertEquals("a", list.get(0));
+        assertEquals("b", list.get(1));
+    }
 
 }

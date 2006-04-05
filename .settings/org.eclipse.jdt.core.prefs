@@ -1,4 +1,4 @@
-#Wed Jan 04 17:19:51 PST 2006
+#Sat Apr 01 22:05:29 GMT+05:30 2006
 org.eclipse.jdt.core.compiler.problem.unusedDeclaredThrownExceptionWhenOverriding=disabled
 org.eclipse.jdt.core.formatter.insert_space_after_at_in_annotation_type_declaration=do not insert
 org.eclipse.jdt.core.formatter.keep_empty_array_initializer_on_one_line=false
@@ -6,7 +6,7 @@ org.eclipse.jdt.core.formatter.insert_space_after_comma_in_enum_declarations=ins
 org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_catch=insert
 org.eclipse.jdt.core.formatter.insert_space_after_colon_in_conditional=insert
 org.eclipse.jdt.core.formatter.indent_body_declarations_compare_to_enum_declaration_header=true
-org.eclipse.jdt.core.compiler.problem.staticAccessReceiver=ignore
+org.eclipse.jdt.core.compiler.problem.staticAccessReceiver=warning
 org.eclipse.jdt.core.formatter.insert_space_before_opening_paren_in_method_declaration=do not insert
 org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_if=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_comma_in_enum_declarations=do not insert
@@ -45,7 +45,7 @@ org.eclipse.jdt.core.formatter.insert_space_before_opening_brace_in_anonymous_ty
 org.eclipse.jdt.core.formatter.insert_space_before_closing_paren_in_for=do not insert
 org.eclipse.jdt.core.formatter.insert_space_after_at_in_annotation=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_closing_paren_in_if=do not insert
-org.eclipse.jdt.core.compiler.problem.syntheticAccessEmulation=ignore
+org.eclipse.jdt.core.compiler.problem.syntheticAccessEmulation=warning
 org.eclipse.jdt.core.formatter.insert_space_after_comma_in_method_invocation_arguments=insert
 org.eclipse.jdt.core.formatter.alignment_for_arguments_in_explicit_constructor_call=16
 org.eclipse.jdt.core.formatter.number_of_empty_lines_to_preserve=1

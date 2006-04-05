@@ -1,10 +1,7 @@
 package net.sourceforge.mayfly;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.evaluation.command.Command;
-import net.sourceforge.mayfly.evaluation.command.SetSchema;
-import net.sourceforge.mayfly.evaluation.select.Select;
 import net.sourceforge.mayfly.jdbc.JdbcConnection;
 
 import java.sql.Connection;
@@ -37,11 +34,23 @@ import java.util.Set;
  * &nbsp;&nbsp;&nbsp;&nbsp;connection.close();
  * }
  * </pre>
+ * 
+ * <p>In the above example, we first call {@link #openConnection()}
+ * and then perform all operations via that connection.  There are
+ * also a variety of methods to operate on the database directly
+ * (for example, {@link #execute(String)}.
+ * These are basically convenience methods; most/all of these operations
+ * can also be done via connections.  These methods take per-connection settings 
+ * (for example the current schema as set by
+ * SET SCHEMA, or the auto-commit flag) from a <i>default connection</i>;
+ * that is they are shared with other calls which use the default connection,
+ * but not with connections opened explicitly (for example
+ * via {@link #openConnection()}).
  */
 public class Database {
 
     private DataStore dataStore;
-    private String currentSchema;
+    private final MayflyConnection defaultConnection;
 
     /**
      * Create an empty database (one with no tables).
@@ -57,7 +66,7 @@ public class Database {
      */
     public Database(DataStore store) {
         setDataStore(store);
-        currentSchema = DataStore.ANONYMOUS_SCHEMA_NAME;
+        defaultConnection = new MayflyConnection(this);
     }
 
     /**
@@ -66,34 +75,16 @@ public class Database {
      * but is more convenient if you have a Database instance around.
      * 
      * @return Number of rows changed.
-     * @internal
-     * The following should be true, but isn't yet.
-     * See {@link net.sourceforge.mayfly.acceptance.SchemaTest#testCurrentSchemaIsPerConnection()}.
-     * Any per-connection settings (for example the current schema as set by
-     * SET SCHEMA) are not shared with any previous or subsequent calls to
-     * this method.
      */
     public int execute(String sql) throws SQLException {
-        try {
-            Command command = Command.fromSql(sql);
-            return executeUpdate(command);
-        } catch (MayflyException e) {
-            throw e.asSqlException();
-        }
+        return defaultConnection.execute(sql);
     }
 
     /**
      * @internal
      * Only intended for use within Mayfly.
      */
-    public int executeUpdate(Command command) {
-        if (command instanceof SetSchema) {
-            SetSchema setSchema = (SetSchema) command;
-            String proposed = setSchema.name();
-            dataStore.schema(proposed);
-            currentSchema = proposed;
-            return setSchema.rowsAffected();
-        }
+    public int executeUpdate(Command command, String currentSchema) {
         dataStore = command.update(dataStore, currentSchema);
         return command.rowsAffected();
     }
@@ -103,34 +94,21 @@ public class Database {
      * This is similar to the JDBC java.sql.Statement#executeQuery(java.lang.String)
      * but is more convenient if you have a Database instance around.
      */
-    public ResultSet query(String command) throws SQLException {
-        try {
-            Select select = Select.selectFromSql(command);
-            return select.select(dataStore, currentSchema);
-        } catch (MayflyException e) {
-            throw e.asSqlException();
-        }
+    public ResultSet query(String sql) throws SQLException {
+        return defaultConnection.query(sql);
     }
     
-    /**
-     * @internal
-     * Only intended for use within Mayfly.
-     */
-    public ResultSet query(Select select) {
-        return select.select(dataStore, currentSchema);
-    }
-
     /**
      * <p>Return table names.  The returned list only includes tables
      * which you have explicitly created; there are no tables here
      * which are for Mayfly's own use.</p>
      * 
      * <p>If a future version of Mayfly implements this functionality in
-     * java.sql.DatabaseMetaData, this method may go away or become
-     * a convenience method.</p>
+     * java.sql.DatabaseMetaData, this method is likely to remain, as
+     * being more convenient than DatabaseMetaData.</p>
      */
     public Set tables() {
-        return dataStore.tables(currentSchema);
+        return defaultConnection.tables();
     }
 
     /**
@@ -139,8 +117,8 @@ public class Database {
      * included in the returned list, but will always exist.</p>
      * 
      * <p>If a future version of Mayfly implements this functionality in
-     * java.sql.DatabaseMetaData, this method may go away or become
-     * a convenience method.</p>
+     * java.sql.DatabaseMetaData, this method is likely to remain, as
+     * being more convenient than DatabaseMetaData.</p>
      */
     public Set schemas() {
         return dataStore.schemas();
@@ -154,8 +132,7 @@ public class Database {
      * some kind of convenience method.</p>
      */
     public List columnNames(String tableName) throws SQLException {
-        TableData tableData = dataStore.table(currentSchema, tableName);
-        return tableData.columnNames();
+        return defaultConnection.columnNames(tableName);
     }
 
     /**
@@ -163,12 +140,11 @@ public class Database {
      * 
      * This is a convenience method.  Your production code will almost
      * surely be counting rows (if it needs to at all) via
-     * java.sql.ResultSet (or the SQL COUNT, once Mayfly implements it).
+     * java.sql.ResultSet (or the SQL COUNT expression).
      * But this method may be convenient in tests.
      */
     public int rowCount(String tableName) throws SQLException {
-        TableData tableData = dataStore.table(currentSchema, tableName);
-        return tableData.rowCount();
+        return defaultConnection.rowCount(tableName);
     }
 
     /**
@@ -216,8 +192,15 @@ public class Database {
      * @internal
      * Only intended for use within Mayfly.
      * The idea is that public callers call
-     * {@link #Database(DataStore)}.  Is this
-     * a sound idea?
+     * {@link #Database(DataStore)}.
+     * 
+     * The idea of setting the datastore is a
+     * dangerous one - what if someone else has changed
+     * the database in the meantime?  Are we supposed
+     * to detect a conflict?  Or merge the changes?
+     * 
+     * So, yes, {@link #Database(DataStore)} is a
+     * more sensible interface.
      */
     public void setDataStore(DataStore store) {
         if (store == null) {

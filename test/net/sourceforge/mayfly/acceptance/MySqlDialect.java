@@ -32,6 +32,18 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean canQuoteIdentifiers() {
+        return false;
+    }
+    
+    public boolean isReservedWord(String word) {
+        return word.equalsIgnoreCase("if");
+    }
+
+    public boolean verticalBarsMeanConcatenation() {
+        return false;
+    }
+    
     public boolean tableNamesMightBeCaseSensitive() {
         // Whether table names are case sensitive in MySQL depends on whether
         // file names are.
@@ -82,10 +94,6 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
-    public boolean verticalBarsMeanConcatenation() {
-        return false;
-    }
-    
     public boolean maySpecifyTableDotColumnToJdbc() {
         return true;
     }
@@ -124,10 +132,6 @@ public class MySqlDialect extends Dialect {
         return false;
     }
 
-    public boolean canQuoteIdentifiers() {
-        return false;
-    }
-    
     public boolean allowMultipleNullsInUniqueColumn() {
         return true;
     }
@@ -136,6 +140,10 @@ public class MySqlDialect extends Dialect {
         // If we could make sure we were using InnoDB, this
         // perhaps could be true.  At least for now, don't
         // worry about trying to make sure we have & use InnoDB.
+        return false;
+    }
+
+    public boolean haveDropTableFooIfExists() {
         return false;
     }
 

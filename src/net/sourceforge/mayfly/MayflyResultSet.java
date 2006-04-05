@@ -31,12 +31,44 @@ public final class MayflyResultSet extends ResultSetStub {
         }
     }
 
+    public byte getByte(String columnName) throws SQLException {
+        return cellFromName(columnName).asByte();
+    }
+
+    public byte getByte(int oneBasedColumn) throws SQLException {
+        return cellFromIndex(oneBasedColumn).asByte();
+    }
+
+    public short getShort(String columnName) throws SQLException {
+        return cellFromName(columnName).asShort();
+    }
+
+    public short getShort(int oneBasedColumn) throws SQLException {
+        return cellFromIndex(oneBasedColumn).asShort();
+    }
+
     public int getInt(String columnName) throws SQLException {
         return cellFromName(columnName).asInt();
     }
 
     public int getInt(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asInt();
+    }
+
+    public long getLong(String columnName) throws SQLException {
+        try {
+            return cellFromName(columnName).asLong();
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
+    }
+
+    public long getLong(int oneBasedColumn) throws SQLException {
+        try {
+            return cellFromIndex(oneBasedColumn).asLong();
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
 
     public String getString(String columnName) throws SQLException {

@@ -350,4 +350,21 @@ public class JoinTest extends SqlTestCase {
         );
     }
     
+    public void testJoinOnNull() throws Exception {
+        // This case is mentioned in the documentation for
+        // hypersonic 1.8.x.
+        execute("create table foo (a integer, b integer)");
+        execute("create table bar (b integer, c integer)");
+        execute("insert into foo (a, b) values (1, 10)");
+        execute("insert into bar (b, c) values (10, 100)");
+
+        execute("insert into foo (a, b) values (2, null)");
+        execute("insert into bar (b, c) values (null, 200)");
+        
+        assertResultSet(
+            new String[] { "1, 100" },
+            query("select a, c from foo inner join bar on foo.b = bar.b")
+        );
+    }
+    
 }

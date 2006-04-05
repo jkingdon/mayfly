@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
+import java.sql.SQLException;
+
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.util.ValueObject;
 
@@ -19,7 +21,11 @@ public abstract class Cell extends ValueObject {
         }
     }
 
-    abstract public int asInt();
+    abstract public byte asByte() throws SQLException;
+
+    abstract public short asShort() throws SQLException;
+    
+    abstract public int asInt() throws SQLException;
 
     abstract public long asLong();
 
@@ -36,6 +42,10 @@ public abstract class Cell extends ValueObject {
     }
 
     abstract public int compareTo(Cell otherCell);
+
+    public boolean sqlEquals(Cell otherCell) {
+        return compareTo(otherCell) == 0;
+    }
 
     abstract public String displayName();
 

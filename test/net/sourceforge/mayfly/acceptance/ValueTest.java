@@ -5,10 +5,6 @@ import java.sql.SQLException;
 
 public class ValueTest extends SqlTestCase {
 
-    public void testDropNonexisting() throws Exception {
-        expectExecuteFailure("DROP TABLE FOO", "no table FOO");
-    }
-
     public void testInsertWithBadColumnName() throws Exception {
         execute("CREATE TABLE FOO (A integer)");
         expectExecuteFailure("INSERT INTO FOO (b) values (5)", "no column b");
@@ -185,16 +181,8 @@ public class ValueTest extends SqlTestCase {
         execute("create table foo (a integer)");
         String insertNullExpression = "insert into foo(a) values (5 + null)";
         if (dialect.disallowNullsInExpressions()) {
-            try {
-                execute(insertNullExpression);
-                fail();
-            } catch (SQLException e) {
-                // Perhaps it is really anal and an overreaction to the sometimes
-                // confusing consequences of the "null propagates up" semantics, but
-                // at least for now, I'm going to insist people say "null" rather than
-                // "5 + null".
-                assertMessage("Specify a null literal rather than an expression containing one", e);
-            }
+            expectExecuteFailure(insertNullExpression, 
+                "Specify a null literal rather than an expression containing one");
             assertResultSet(new String[] { }, query("select a from foo"));
         }
         else {
@@ -208,11 +196,8 @@ public class ValueTest extends SqlTestCase {
         execute("insert into foo(a) values(10)");
         String nullExpression = "update foo set a = 5 + null";
         if (dialect.disallowNullsInExpressions()) {
-            // Perhaps it is really anal and an overreaction to the sometimes
-            // confusing consequences of the "null propagates up" semantics, but
-            // at least for now, I'm going to insist people say "null" rather than
-            // "5 + null".
-            expectExecuteFailure(nullExpression, "Specify a null literal rather than an expression containing one");
+            expectExecuteFailure(nullExpression, 
+                "Specify a null literal rather than an expression containing one");
             assertResultSet(new String[] { " 10 " }, query("select a from foo"));
         }
         else {

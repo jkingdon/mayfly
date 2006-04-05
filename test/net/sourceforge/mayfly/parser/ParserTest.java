@@ -3,11 +3,13 @@ package net.sourceforge.mayfly.parser;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.evaluation.command.CreateTable;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Divide;
 import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.evaluation.select.Select;
@@ -17,7 +19,6 @@ import net.sourceforge.mayfly.ldbc.what.WhatElement;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.ldbc.where.Greater;
 import net.sourceforge.mayfly.ldbc.where.Where;
-import net.sourceforge.mayfly.ldbc.where.literal.MathematicalInt;
 import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 
 public class ParserTest extends TestCase {
@@ -235,12 +236,12 @@ public class ParserTest extends TestCase {
         assertEquals("", parser.remainingTokens());
         assertEquals(
             new Greater(
-                new MathematicalInt(60),
+                new IntegerLiteral(60),
                 new Plus(
                     new SingleColumn("y"), 
                     new Divide(
                         new SingleColumn("z"), 
-                        new MathematicalInt(10)
+                        new IntegerLiteral(10)
                     ))
             ),
             condition
@@ -406,6 +407,28 @@ public class ParserTest extends TestCase {
             ),
             parser.parseSelect()
         );
+    }
+    
+    public void testConsumeInteger() throws Exception {
+        assertEquals(23, new Parser("23").consumeInteger());
+        assertEquals(2147483647, new Parser("2147483647").consumeInteger());
+        try {
+            new Parser("2147483648").consumeInteger();
+            fail();
+        }
+        catch (ParserException e) {
+            // Might be nice to show the context.  Kind of a bigger problem
+            // (how do we show context on "expected foo got bar"?).
+            assertEquals("2147483648 is out of range", e.getMessage());
+        }
+    }
+    
+    public void testMultipleConstraints() throws Exception {
+        // UNIQUE and PRIMARY KEY together don't make much sense.
+        // The rule here is that constraints must be after DEFAULT
+        // but can be in any order.
+        new Parser("x integer unique primary key").parseColumnDefinition(new CreateTable("foo"));
+        new Parser("x integer primary key unique").parseColumnDefinition(new CreateTable("foo"));
     }
 
     private void expectFailure(String sql, String expectedMessage) {
