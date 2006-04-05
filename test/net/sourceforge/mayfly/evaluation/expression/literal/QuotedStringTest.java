@@ -1,8 +1,9 @@
-package net.sourceforge.mayfly.ldbc.where.literal;
+package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.StringCell;
+import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
 
 public class QuotedStringTest extends TestCase {

@@ -2,8 +2,8 @@ package net.sourceforge.mayfly.ldbc.where;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
-import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
 
 public class NotEqualTest extends TestCase {

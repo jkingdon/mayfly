@@ -4,8 +4,8 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
-import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 
 public class BinaryOperatorTest extends TestCase {
     

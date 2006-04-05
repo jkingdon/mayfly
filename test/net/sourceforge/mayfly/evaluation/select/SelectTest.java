@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
@@ -24,7 +25,6 @@ import net.sourceforge.mayfly.ldbc.where.Greater;
 import net.sourceforge.mayfly.ldbc.where.Not;
 import net.sourceforge.mayfly.ldbc.where.Or;
 import net.sourceforge.mayfly.ldbc.where.Where;
-import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 import net.sourceforge.mayfly.util.L;
 
 public class SelectTest extends TestCase {

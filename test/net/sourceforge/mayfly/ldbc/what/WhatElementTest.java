@@ -10,7 +10,7 @@ import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
-import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
+import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
 
 public class WhatElementTest extends TestCase {

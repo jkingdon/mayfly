@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc.where.literal;
+package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import junit.framework.TestCase;
 
@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 
 public class LiteralTest extends TestCase {
 

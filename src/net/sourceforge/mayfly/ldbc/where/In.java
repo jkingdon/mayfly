@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.ldbc.where;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.ldbc.where.literal.Literal;
+import net.sourceforge.mayfly.evaluation.expression.literal.Literal;
 
 import java.util.Iterator;
 import java.util.List;

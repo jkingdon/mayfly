@@ -31,7 +31,9 @@ import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.Sum;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.expression.literal.Literal;
 import net.sourceforge.mayfly.evaluation.expression.literal.LongLiteral;
+import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
@@ -59,8 +61,6 @@ import net.sourceforge.mayfly.ldbc.where.Not;
 import net.sourceforge.mayfly.ldbc.where.NotEqual;
 import net.sourceforge.mayfly.ldbc.where.Or;
 import net.sourceforge.mayfly.ldbc.where.Where;
-import net.sourceforge.mayfly.ldbc.where.literal.Literal;
-import net.sourceforge.mayfly.ldbc.where.literal.QuotedString;
 import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.math.BigInteger;

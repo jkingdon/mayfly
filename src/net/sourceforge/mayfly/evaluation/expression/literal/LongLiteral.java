@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.ldbc.where.literal.Literal;
 
 public class LongLiteral extends Literal {
 

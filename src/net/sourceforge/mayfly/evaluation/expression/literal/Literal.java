@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc.where.literal;
+package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
