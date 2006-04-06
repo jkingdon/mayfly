@@ -167,6 +167,12 @@ public class TransactionTest extends SqlTestCase {
     // Conflict/merge situation - we have two commits (or a commit and
     // a rollback).  One is an ALTER TABLE; one is an update to a row in that table.
     // Hypersonic documentation discusses this.
+    
+    // SET CONSTRAINTS IMMEDIATE and SET CONSTRAINTS DEFERRED
+    // Does IMMEDIATE mean a racy kind of thing where it might matter
+    // what some other transaction does?  Or is it just a way of saying
+    // that we check against what is visible in our own transaction, and
+    // then check again on commit?
 
     public static void assertResultSet(String[] expectedRows, String sql, Connection connection)
     throws SQLException {

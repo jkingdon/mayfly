@@ -56,11 +56,13 @@ import java.util.Properties;
 public class JdbcDriver implements Driver {
 
     /** 
-     * <p>Create a database which you want to access via a JDBC URL.
+     * Create a database which you want to access via a JDBC URL.
+     * 
      * For many purposes, it will be more convenient to
      * instantiate a {@link Database} object, but if you need a
      * JDBC URL (for example, to pass to a database mapping layer
-     * like Hibernate or SqlMaps), call this method instead.</p>
+     * like Hibernate or SqlMaps), call this method instead.
+     * 
      * <p>Example:</p>
     <pre>
     static final DataStore standardSetup = makeData();
@@ -92,7 +94,9 @@ public class JdbcDriver implements Driver {
     }
 
     /**
-     * <p>Destroy databases managed by {@link JdbcDriver}.  That is,
+     * Destroy databases managed by {@link JdbcDriver}.
+     * 
+     * That is, destroy
      * all databases which have been created with {@link #create(DataStore)},
      * plus the default database (the one with url <tt>jdbc:mayfly:</tt>).</p>
      * 

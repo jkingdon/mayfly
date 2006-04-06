@@ -82,16 +82,35 @@ description of the semantics and syntax.
 @subsection create CREATE TABLE
 
 <pre>
-CREATE TABLE <var>name</var> ({<var>column-name</var> <var>data-type</var> }, ...)
+CREATE TABLE <var>name</var> (
+  {
+    {<var>column-name</var> <var>data-type</var> {[ NOT NULL | UNIQUE | PRIMARY KEY ]}... } |
+    UNIQUE(<var>column</var>, ...) |
+    PRIMARY KEY(<var>column</var>, ...)
+  }, ...
+)
 </pre>
 
-Supported data types are INTEGER and VARCHAR(<var>size</var>).
+At the moment the data type is ignored (what matters is what data you actually
+put into the database).  This is expected to change in a future version of Mayfly.
+
+Supported data types for numbers are TINYINT, SMALLINT, INTEGER and BIGINT (8, 16, 32, and 64
+bit integers, respectively).  For strings, there is VARCHAR(<var>size</var>) (with TEXT
+as a non-standard synonym).
 
 @subsection drop DROP TABLE
 
 <pre>
 DROP TABLE <var>name</var>
+DROP TABLE <var>name</var> IF EXISTS
+DROP TABLE IF EXISTS <var>name</var>
 </pre>
+
+Remove the table <var>name</var> and all its contents.
+Without IF EXISTS, there must be a table by that name.
+With the IF EXISTS (in either position), if there is no
+table by that name, the command does nothing, without
+an error.
 
 @subsection insert INSERT
 
@@ -139,8 +158,45 @@ An <var>expression</var> is:
   <var>0-9...</var> |
   <var>'<var>character</var>...'</var> |
   [ <var>alias</var> . ] <var>column</var> |
+  MAX ( [ ALL | DISTINCT ] <var>expression</var> )
+  MIN ( [ ALL | DISTINCT ] <var>expression</var> )
+  SUM ( [ ALL | DISTINCT ] <var>expression</var> )
+  AVG ( [ ALL | DISTINCT ] <var>expression</var> )
+  COUNT ( { [ ALL | DISTINCT ] <var>expression</var> } | * )
   NULL
 </pre>
+
+There is also some limited support for GROUP BY and HAVING.
+
+@subsection select UPDATE
+
+UPDATE <var>table</var> {SET <var>column</var> = <var>expression</var> }, ...
+  [WHERE <var>condition</var>]
+
+@section schemas Schemas
+
+A Database object can contain several <i>schemas</i> - each one
+has its own tables and they do not interact with each other.
+Currently, you must call the SET SCHEMA command to select which
+schema you are going to operate on.  Support for the syntax
+schema.table or schema.table.column is planned for the future
+but is not there now.
+
+The syntax of the schema commands is:
+
+<pre>
+CREATE SCHEMA name [AUTHORIZATION DBA] [ { <var>create-table-command</var> } ... ]
+
+SET SCHEMA name
+</pre>
+
+@section transactions Transactions and Threads
+
+It is not yet safe to share a database between several threads.
+
+Furthermore, even those aspects of transactions which are
+visible from within a single thread (for example, rollback),
+and not yet implemented.
 
 @section References
 

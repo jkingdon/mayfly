@@ -91,6 +91,7 @@ public class Database {
 
     /**
      * Execute an SQL command which returns results.
+     * 
      * This is similar to the JDBC java.sql.Statement#executeQuery(java.lang.String)
      * but is more convenient if you have a Database instance around.
      */
@@ -99,9 +100,13 @@ public class Database {
     }
     
     /**
-     * <p>Return table names.  The returned list only includes tables
+     * List your tables, as names.
+     * 
+     * <p>The returned list only includes tables
      * which you have explicitly created; there are no tables here
-     * which are for Mayfly's own use.</p>
+     * which are for Mayfly's own use.  If you have more than one
+     * schema, only tables in the current
+     * schema (as set by SET SCHEMA) are returned.</p>
      * 
      * <p>If a future version of Mayfly implements this functionality in
      * java.sql.DatabaseMetaData, this method is likely to remain, as
@@ -112,7 +117,9 @@ public class Database {
     }
 
     /**
-     * <p>Return schema names.  This returned list only includes schemas
+     * Return the schema names for this Database.
+     * 
+     * <p>This returned list only includes schemas
      * which you have explicitly created.  The anonymous schema is not
      * included in the returned list, but will always exist.</p>
      * 
@@ -125,7 +132,7 @@ public class Database {
     }
 
     /**
-     * <p>Column names in given table.</p>
+     * Return the column names in the given table.
      * 
      * <p>If a future version of Mayfly implements this functionality in
      * java.sql.DatabaseMetaData, this method may go away or become
@@ -149,15 +156,18 @@ public class Database {
 
     /**
      * Open a JDBC connection.
+     * 
      * This is similar to the JDBC java.sql.DriverManager#getConnection(java.lang.String)
-     * but is more convenient if you have a Database instance around.
+     * but is based on this Database, rather than the static Database used in the JDBC case.
      */
     public Connection openConnection() throws SQLException {
         return new JdbcConnection(this);
     }
 
     /**
-     * Take a snapshot of this database.  Specifically, return the data store, which is
+     * Take a snapshot of this database.
+     * 
+     * Specifically, return the data store, which is
      * an immutable object containing all the data, and table definitions, for this
      * database.  Because the data store is immutable, one might store it in a constant
      * and use it from multiple tests.  Here's an example:
