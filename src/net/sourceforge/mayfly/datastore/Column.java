@@ -6,10 +6,16 @@ import net.sourceforge.mayfly.util.ValueObject;
 public class Column extends ValueObject implements CellHeader {
     private final String tableOrAlias;
     private final String columnName;
+    private final Cell defaultValue;
+
+    public Column(String table, String name, Cell defaultValue) {
+        this.tableOrAlias = table;
+        this.columnName = name;
+        this.defaultValue = defaultValue;
+    }
 
     public Column(String table, String columnName) {
-        this.tableOrAlias = table;
-        this.columnName = columnName;
+        this(table, columnName, NullCell.INSTANCE);
     }
 
     public Column(String column) {
@@ -53,6 +59,10 @@ public class Column extends ValueObject implements CellHeader {
         } else {
             return tableOrAlias + "." + column;
         }
+    }
+
+    public Cell defaultValue() {
+        return defaultValue;
     }
 
 }

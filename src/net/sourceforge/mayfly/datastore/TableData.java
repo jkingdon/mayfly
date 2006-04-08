@@ -57,10 +57,11 @@ public class TableData {
         while (iter.hasNext()) {
             Column column = (Column) iter.next();
             if (specifiedColumnToValue.containsKey(column)) {
-                Cell cell = Cell.fromContents(specifiedColumnToValue.get(column));
+                Object value = specifiedColumnToValue.get(column);
+                Cell cell = value == null ? column.defaultValue() : Cell.fromContents(value);
                 tuple.append(new TupleElement(column, cell));
             } else {
-                tuple.append(new TupleElement(column, NullCell.INSTANCE));
+                tuple.append(new TupleElement(column, column.defaultValue()));
             }
         }
         Row newRow = new Row(tuple);
@@ -79,8 +80,8 @@ public class TableData {
                 TupleMapper mapper = new TupleMapper(row.tuple());
                 for (Iterator iterator = setClauses.iterator(); iterator.hasNext();) {
                     SetClause setClause = (SetClause) iterator.next();
-                    Cell cell = setClause.value().evaluate(row);
-                    mapper.put(findColumn(setClause.column()), cell);
+                    Column column = setClause.column(columns);
+                    mapper.put(column, setClause.value(row, column));
                 }
                 Row newRow = new Row(mapper.asTuple());
                 constraints.check(newRows, newRow);

@@ -354,4 +354,24 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean defaultValueCanBeExpression() {
+        // Who does this besides postgres?
+
+        // The postgres manual gives two examples: setting a date to now() (the
+        // SQL92 way seems to be CURRENT_DATE/CURRENT_TIME/CURRENT_TIMESTAMP,
+        // which is specifically allowed as a default value),
+        
+        // and auto-increment (which we
+        // will support, but maybe not with all the many syntaxes out there).
+        return false;
+    }
+
+    public boolean canUpdateToDefault() {
+        return true;
+    }
+
+    public boolean allowJdbcParameterAsDefault() {
+        return false;
+    }
+
 }

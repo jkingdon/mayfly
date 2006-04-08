@@ -10,6 +10,9 @@ public class Insert extends Command {
     private final List columns;
     private final List values;
 
+    /** @param values List of values to insert, where each element is cell contents
+     * or null for the default value
+     */
     public Insert(InsertTable table, List columns, List values) {
         this.table = table;
         this.columns = columns;

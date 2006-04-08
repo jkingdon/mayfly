@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupBy;
@@ -216,13 +217,22 @@ public class Parser {
 
     private Object parseAndEvaluate() {
         Expression expression = parseExpressionOrNull();
-        Cell cell = expression.evaluate(null);
-        return cell.asContents();
+        if (expression == null) {
+            // default value
+            return null;
+        }
+        else {
+            Cell cell = expression.evaluate(null);
+            return cell.asContents();
+        }
     }
 
     private Expression parseExpressionOrNull() {
         if (consumeIfMatches(TokenType.KEYWORD_null)) {
             return new NullExpression();
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_default)) {
+            return null;
         }
         else {
             try {
@@ -301,9 +311,37 @@ public class Parser {
         String name = consumeIdentifier();
         parseDataType();
 
+        Cell defaultValue = parseDefaultClause(name);
+
         parseColumnConstraints(table, name);
 
-        return new Column(table.table(), name);
+        return new Column(table.table(), name, defaultValue);
+    }
+
+    private Cell parseDefaultClause(String name) {
+        if (consumeIfMatches(TokenType.KEYWORD_default)) {
+            Expression expression = parseDefaultValue(name);
+            return expression.evaluate(null);
+        }
+        else {
+            return NullCell.INSTANCE;
+        }
+    }
+
+    private Expression parseDefaultValue(String name) {
+        if (currentTokenType() == TokenType.NUMBER) {
+            return parseNumber().asNonBoolean();
+        }
+        else if (currentTokenType() == TokenType.QUOTED_STRING) {
+            return parseQuotedString().asNonBoolean();
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_null)) {
+            return new NullExpression();
+        }
+        else {
+            throw new ParserException(
+                "expected default value for column " + name + " but got " + describeToken(currentToken()));
+        }
     }
 
     private void parseColumnConstraints(CreateTable table, String column) {
@@ -560,12 +598,10 @@ public class Parser {
             return new NonBooleanParserExpression(parseColumnReference());
         }
         else if (currentTokenType() == TokenType.NUMBER) {
-            Number number = consumeNumber();
-            return new NonBooleanParserExpression(makeLiteral(number));
+            return parseNumber();
         }
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
-            Token literal = expectAndConsume(TokenType.QUOTED_STRING);
-            return new NonBooleanParserExpression(new QuotedString(literal.getText()));
+            return parseQuotedString();
         }
         else if (consumeIfMatches(TokenType.PARAMETER)) {
             if (allowParameters) {
@@ -611,6 +647,16 @@ public class Parser {
         else {
             throw new ParserException("expected primary but got " + describeToken(currentToken()));
         }
+    }
+
+    private ParserExpression parseQuotedString() {
+        Token literal = expectAndConsume(TokenType.QUOTED_STRING);
+        return new NonBooleanParserExpression(new QuotedString(literal.getText()));
+    }
+
+    private ParserExpression parseNumber() {
+        Number number = consumeNumber();
+        return new NonBooleanParserExpression(makeLiteral(number));
     }
 
     private Literal makeLiteral(Number number) {

@@ -114,5 +114,9 @@ public class HypersonicDialect extends Dialect {
     public boolean haveTextType() {
         return false;
     }
+    
+    public boolean canUpdateToDefault() {
+        return false;
+    }
 
 }

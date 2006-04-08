@@ -146,5 +146,11 @@ public class MySqlDialect extends Dialect {
     public boolean haveDropTableFooIfExists() {
         return false;
     }
+    
+    public boolean allowJdbcParameterAsDefault() {
+        // I guess this fits along with "from foo?.tab"
+        // and other looseness allowed with ?
+        return true;
+    }
 
 }

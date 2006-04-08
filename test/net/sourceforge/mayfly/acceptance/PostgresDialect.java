@@ -135,5 +135,9 @@ public class PostgresDialect extends Dialect {
     public boolean haveDropTableIfExistsFoo() {
         return false;
     }
+    
+    public boolean defaultValueCanBeExpression() {
+        return true;
+    }
 
 }
