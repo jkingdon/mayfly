@@ -139,5 +139,9 @@ public class PostgresDialect extends Dialect {
     public boolean defaultValueCanBeExpression() {
         return true;
     }
+    
+    public boolean haveSerial() {
+        return true;
+    }
 
 }

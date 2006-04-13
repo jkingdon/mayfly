@@ -96,6 +96,11 @@ public class SyntaxTest extends SqlTestCase {
 
         // Part of DROP TABLE foo IF EXISTS in Mayfly, Hypersonic, and MySQL
         checkReserved("if");
+
+        checkReserved("generated");
+        checkReserved("serial");
+        checkReserved("identity");
+        checkReserved("auto_increment");
     }
 
     private void checkReserved(String word) throws Exception {

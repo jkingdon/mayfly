@@ -80,5 +80,29 @@ public class MayflyDialect extends Dialect {
     boolean wishThisWereTrue() {
         return false;
     }
+
+    public boolean haveSql200xAutoIncrement() {
+        /* 
+         * Not comletely sure how to parse this if
+         * GENERATED is non-reserved.
+         */
+        return wishThisWereTrue();
+    }
     
+    public boolean haveAutoUnderbarIncrement() {
+        /* 
+         * Not comletely sure how to parse this if
+         * AUTO_INCREMENT is non-reserved.
+         */
+        return wishThisWereTrue();
+    }
+    
+    public boolean haveIdentity() {
+        return true;
+    }
+
+    public boolean haveSerial() {
+        return true;
+    }
+
 }

@@ -152,5 +152,17 @@ public class MySqlDialect extends Dialect {
         // and other looseness allowed with ?
         return true;
     }
+    
+    public boolean haveAutoUnderbarIncrement() {
+        return true;
+    }
+    
+    public boolean haveSerial() {
+        return true;
+    }
+    
+    public boolean autoIncrementIsRelativeToLastValue() {
+        return true;
+    }
 
 }

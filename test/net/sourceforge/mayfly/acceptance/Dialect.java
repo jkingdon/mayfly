@@ -374,4 +374,28 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean haveAutoUnderbarIncrement() {
+        return false;
+    }
+
+    public boolean haveSerial() {
+        return false;
+    }
+
+    public boolean haveIdentity() {
+        return false;
+    }
+
+    public boolean haveSql200xAutoIncrement() {
+        return false;
+    }
+
+    public boolean autoIncrementIsRelativeToLastValue() {
+        // Not sure what the arguments on either side of
+        // this one are.  (If not relative to the last
+        // inserted value, it is a sequence, which is
+        // independent of what was explicitly inserted).
+        return false;
+    }
+
 }

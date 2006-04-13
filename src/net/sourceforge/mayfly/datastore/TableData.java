@@ -51,23 +51,31 @@ public class TableData {
         }
         
         M specifiedColumnToValue = columnsToInsert.zipper(new L(values));
+        Columns newColumns = columns;
         
         TupleBuilder tuple = new TupleBuilder();
         Iterator iter = columns.iterator();
         while (iter.hasNext()) {
             Column column = (Column) iter.next();
+            boolean isDefault;
             if (specifiedColumnToValue.containsKey(column)) {
                 Object value = specifiedColumnToValue.get(column);
-                Cell cell = value == null ? column.defaultValue() : Cell.fromContents(value);
+                isDefault = value == null;
+                Cell cell = isDefault ? column.defaultValue() : Cell.fromContents(value);
                 tuple.append(new TupleElement(column, cell));
             } else {
+                isDefault = true;
                 tuple.append(new TupleElement(column, column.defaultValue()));
+            }
+            
+            if (isDefault && column.isAutoIncrement()) {
+                newColumns = newColumns.replace(column.afterAutoIncrement());
             }
         }
         Row newRow = new Row(tuple);
         constraints.check(rows, newRow);
 
-        return new TableData(columns, constraints, (Rows) rows.with(newRow));
+        return new TableData(newColumns, constraints, (Rows) rows.with(newRow));
     }
 
     public UpdateTable update(List setClauses, Where where) {

@@ -71,7 +71,9 @@ public class DerbyDialect extends Dialect {
     
     public boolean isReservedWord(String word) {
         return "first".equalsIgnoreCase(word)
-            || "last".equalsIgnoreCase(word);
+            || "last".equalsIgnoreCase(word)
+            || "identity".equalsIgnoreCase(word)
+        ;
     }
     
     public boolean quotedIdentifiersAreCaseSensitive() {
@@ -125,6 +127,10 @@ public class DerbyDialect extends Dialect {
 
     public boolean haveDropTableIfExistsFoo() {
         return false;
+    }
+    
+    public boolean haveSql200xAutoIncrement() {
+        return true;
     }
 
 }

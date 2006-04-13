@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.Transformer;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -106,6 +107,20 @@ public class Columns extends Aggregate {
                 throw new MayflyException("duplicate column " + column.columnName());
             }
         }
+    }
+
+    public Columns replace(Column replacement) {
+        List result = new ArrayList();
+        for (Iterator iter = iterator(); iter.hasNext(); ) {
+            Column column = (Column) iter.next();
+            if (column.matches(replacement.tableOrAlias(), replacement.columnName())) {
+                result.add(replacement);
+            }
+            else {
+                result.add(column);
+            }
+        }
+        return new Columns(new ImmutableList(result));
     }
 
 }

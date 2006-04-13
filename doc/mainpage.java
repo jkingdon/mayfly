@@ -84,7 +84,8 @@ description of the semantics and syntax.
 <pre>
 CREATE TABLE <var>name</var> (
   {
-    {<var>column-name</var> <var>data-type</var> {[ NOT NULL | UNIQUE | PRIMARY KEY ]}... } |
+    {<var>column-name</var> <var>data-type</var> 
+        [ DEFAULT <var>default-value</var> ] {[ NOT NULL | UNIQUE | PRIMARY KEY ]}... } |
     UNIQUE(<var>column</var>, ...) |
     PRIMARY KEY(<var>column</var>, ...)
   }, ...
@@ -97,6 +98,10 @@ put into the database).  This is expected to change in a future version of Mayfl
 Supported data types for numbers are TINYINT, SMALLINT, INTEGER and BIGINT (8, 16, 32, and 64
 bit integers, respectively).  For strings, there is VARCHAR(<var>size</var>) (with TEXT
 as a non-standard synonym).
+
+An exception to the rule that Mayfly ignores data types are auto-increment columns.
+Either IDENTITY or SERIAL as datatypes indicate an integer column which causes the
+default value to start at one and increment after every row inserted. 
 
 @subsection drop DROP TABLE
 
@@ -118,6 +123,9 @@ an error.
 INSERT INTO <var>table</var> [ ( <var>column-name</var>, ... ) ]
   VALUES ( <var>expression</var>, ... )
 </pre>
+
+If <var>expression</var> is DEFAULT, the default value that was
+specified when creating the table is used.
 
 @subsection select SELECT
 
@@ -172,6 +180,9 @@ There is also some limited support for GROUP BY and HAVING.
 
 UPDATE <var>table</var> {SET <var>column</var> = <var>expression</var> }, ...
   [WHERE <var>condition</var>]
+
+If <var>expression</var> is DEFAULT, the default value that was
+specified when creating the table is used.
 
 @section schemas Schemas
 

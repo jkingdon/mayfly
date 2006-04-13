@@ -66,5 +66,18 @@ public class ColumnsTest extends TestCase {
         
         assertEquals(new Column("d"), columns.columnFromName("d"));
     }
+    
+    public void testReplace() throws Exception {
+        Columns columns = new Columns(new ImmutableList(Arrays.asList(
+            new Column[] {
+                new Column("foo", "a"),
+                new Column("bar", "a"),
+                new Column("foo", "b"),
+            })));
+        Columns newColumns = columns.replace(new Column("foo", "b", new LongCell(42), true));
+        
+        assertFalse(columns.columnFromName("b").isAutoIncrement());
+        assertTrue(newColumns.columnFromName("b").isAutoIncrement());
+    }
 
 }

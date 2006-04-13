@@ -7,15 +7,17 @@ public class Column extends ValueObject implements CellHeader {
     private final String tableOrAlias;
     private final String columnName;
     private final Cell defaultValue;
+    private final boolean isAutoIncrement;
 
-    public Column(String table, String name, Cell defaultValue) {
+    public Column(String table, String name, Cell defaultValue, boolean isAutoIncrement) {
         this.tableOrAlias = table;
         this.columnName = name;
         this.defaultValue = defaultValue;
+        this.isAutoIncrement = isAutoIncrement;
     }
 
     public Column(String table, String columnName) {
-        this(table, columnName, NullCell.INSTANCE);
+        this(table, columnName, NullCell.INSTANCE, false);
     }
 
     public Column(String column) {
@@ -63,6 +65,15 @@ public class Column extends ValueObject implements CellHeader {
 
     public Cell defaultValue() {
         return defaultValue;
+    }
+
+    public boolean isAutoIncrement() {
+        return isAutoIncrement;
+    }
+
+    public Column afterAutoIncrement() {
+        Cell newDefault = new LongCell(defaultValue.asLong() + 1L);
+        return new Column(tableOrAlias, columnName, newDefault, isAutoIncrement);
     }
 
 }

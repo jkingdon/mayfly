@@ -118,5 +118,17 @@ public class HypersonicDialect extends Dialect {
     public boolean canUpdateToDefault() {
         return false;
     }
+    
+    public boolean haveIdentity() {
+        return true;
+    }
+    
+    public boolean haveSql200xAutoIncrement() {
+        return true;
+    }
+    
+    public boolean autoIncrementIsRelativeToLastValue() {
+        return true;
+    }
 
 }

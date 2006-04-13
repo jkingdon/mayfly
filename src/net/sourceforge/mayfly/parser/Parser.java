@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
@@ -309,13 +310,16 @@ public class Parser {
 
     Column parseColumnDefinition(CreateTable table) {
         String name = consumeIdentifier();
-        parseDataType();
+        boolean isAutoIncrement = parseDataType();
 
         Cell defaultValue = parseDefaultClause(name);
+        if (isAutoIncrement) {
+            defaultValue = new LongCell(1);
+        }
 
         parseColumnConstraints(table, name);
 
-        return new Column(table.table(), name, defaultValue);
+        return new Column(table.table(), name, defaultValue, isAutoIncrement);
     }
 
     private Cell parseDefaultClause(String name) {
@@ -363,7 +367,8 @@ public class Parser {
         }
     }
 
-    private void parseDataType() {
+    private boolean parseDataType() {
+        boolean isAutoIncrement = false;
         if (consumeIfMatches(TokenType.KEYWORD_integer)) {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_smallint)) {
@@ -383,6 +388,12 @@ public class Parser {
             }
             else if (currentText.equalsIgnoreCase("text")) {
             }
+            else if (currentText.equalsIgnoreCase("identity")) {
+                isAutoIncrement = true;
+            }
+            else if (currentText.equalsIgnoreCase("serial")) {
+                isAutoIncrement = true;
+            }
             else {
                 throw new ParserException("expected data type but got " + currentText);
             }
@@ -390,6 +401,7 @@ public class Parser {
         else {
             throw new ParserException("expected data type but got " + describeToken(currentToken()));
         }
+        return isAutoIncrement;
     }
 
     Select parseSelect() {
