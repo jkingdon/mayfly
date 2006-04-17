@@ -7,10 +7,6 @@ import net.sourceforge.mayfly.evaluation.Expression;
 
 public abstract class Literal extends Expression {
 
-    public boolean matchesCell(Cell cell) {
-        return cell.equals(Cell.fromContents(valueForCellContentComparison()));
-    }
-
     public final Cell evaluate(Row row) {
         return valueAsCell();
     }
@@ -19,8 +15,6 @@ public abstract class Literal extends Expression {
         return valueAsCell();
     }
     
-    abstract public Object valueForCellContentComparison();
-
     protected abstract Cell valueAsCell();
 
 }

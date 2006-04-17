@@ -12,11 +12,7 @@ public class Count extends AggregateExpression {
         super(column, functionName, distinct);
     }
 
-    protected Cell pickOne(Cell minimum, Cell maximum, Cell count, Cell sum, Cell average) {
-        return count;
-    }
-    
-    protected Cell aggregateNonNumeric(Collection values) {
+    Cell aggregate(Collection values) {
         return new LongCell(values.size());
     }
 

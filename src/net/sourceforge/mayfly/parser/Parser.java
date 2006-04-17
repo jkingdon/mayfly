@@ -32,6 +32,7 @@ import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.Sum;
+import net.sourceforge.mayfly.evaluation.expression.literal.DecimalLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.Literal;
 import net.sourceforge.mayfly.evaluation.expression.literal.LongLiteral;
@@ -65,6 +66,7 @@ import net.sourceforge.mayfly.ldbc.where.Or;
 import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.StringBuilder;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -332,9 +334,15 @@ public class Parser {
         }
     }
 
-    private Expression parseDefaultValue(String name) {
-        if (currentTokenType() == TokenType.NUMBER) {
+    Expression parseDefaultValue(String name) {
+        if (currentTokenType() == TokenType.NUMBER /*|| currentTokenType() == TokenType.PERIOD*/) {
             return parseNumber().asNonBoolean();
+        }
+        else if (consumeIfMatches(TokenType.PLUS)) {
+            return parseNumber().asNonBoolean();
+        }
+        else if (consumeIfMatches(TokenType.MINUS)) {
+            return parseNegativeNumber().asNonBoolean();
         }
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
             return parseQuotedString().asNonBoolean();
@@ -375,6 +383,13 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_varchar)) {
             expectAndConsume(TokenType.OPEN_PAREN);
+            expectAndConsume(TokenType.NUMBER);
+            expectAndConsume(TokenType.CLOSE_PAREN);
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_decimal)) {
+            expectAndConsume(TokenType.OPEN_PAREN);
+            expectAndConsume(TokenType.NUMBER);
+            expectAndConsume(TokenType.COMMA);
             expectAndConsume(TokenType.NUMBER);
             expectAndConsume(TokenType.CLOSE_PAREN);
         }
@@ -612,6 +627,12 @@ public class Parser {
         else if (currentTokenType() == TokenType.NUMBER) {
             return parseNumber();
         }
+        else if (consumeIfMatches(TokenType.PLUS)) {
+            return parseNumber();
+        }
+        else if (consumeIfMatches(TokenType.MINUS)) {
+            return parseNegativeNumber();
+        }
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
             return parseQuotedString();
         }
@@ -667,7 +688,7 @@ public class Parser {
     }
 
     private ParserExpression parseNumber() {
-        Number number = consumeNumber();
+        Number number = parseNumericLiteral();
         return new NonBooleanParserExpression(makeLiteral(number));
     }
 
@@ -678,9 +699,53 @@ public class Parser {
         else if (number instanceof Long) {
             return new LongLiteral(number.longValue());
         }
+        else if (number instanceof BigDecimal) {
+            return new DecimalLiteral((BigDecimal)number);
+        }
+        else {
+            throw new UnimplementedException("don't yet handle " + number.getClass().getName());
+        }
+    }
+
+    private ParserExpression parseNegativeNumber() {
+        Number number = parseNumericLiteral();
+        return new NonBooleanParserExpression(makeNegativeLiteral(number));
+    }
+
+    private Literal makeNegativeLiteral(Number number) {
+        // Probably should have more unit tests for this, especially
+        // the edge cases (-2^31 is one).
+        if (number instanceof Integer) {
+            return new IntegerLiteral(- number.intValue());
+        }
+        else if (number instanceof Long) {
+            return new LongLiteral(- number.longValue());
+        }
         else {
             throw new UnimplementedException("don't yet handle big integers");
         }
+    }
+
+    Number parseNumericLiteral() {
+        if (consumeIfMatches(TokenType.PERIOD)) {
+            String secondInteger = expectAndConsume(TokenType.NUMBER).getText();
+            return new BigDecimal("." + secondInteger);
+        }
+
+        Token number = expectAndConsume(TokenType.NUMBER);
+        String firstInteger = number.getText();
+        if (consumeIfMatches(TokenType.PERIOD)) {
+            if (currentTokenType() == TokenType.NUMBER) {
+                String secondInteger = expectAndConsume(TokenType.NUMBER).getText();
+                return new BigDecimal(firstInteger + "." + secondInteger);
+            }
+            else {
+                // Might need to look into semantics for this.  Should it be
+                // BigDecimal or integer?
+                return new BigDecimal(firstInteger + ".");
+            }
+        }
+        return integerToObject(firstInteger);
     }
 
     class AggregateArgumentParser {
@@ -975,19 +1040,18 @@ public class Parser {
     }
 
     int consumeInteger() {
-        Number number = consumeNumber();
-        if (number instanceof Integer) {
-            return number.intValue();
+        Token number = expectAndConsume(TokenType.NUMBER);
+        String text = number.getText();
+        try {
+            return Integer.parseInt(text);
         }
-        else {
-            throw new ParserException(number.toString() + " is out of range");
+        catch (NumberFormatException e) {
+            // Out of range.  Most (all?) other cases are prevented in the lexer.
+            throw new ParserException(text + " is out of range");
         }
     }
 
-    private Number consumeNumber() {
-        Token number = expectAndConsume(TokenType.NUMBER);
-        String text = number.getText();
-
+    private Number integerToObject(String text) {
         try {
             return new Integer(text);
         }

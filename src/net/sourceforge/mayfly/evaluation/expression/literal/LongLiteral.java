@@ -16,12 +16,8 @@ public class LongLiteral extends Literal {
         return new LongCell(value);
     }
 
-    public Object valueForCellContentComparison() {
-        return new Long(value);
-    }
-    
     public String displayName() {
-        return "" + value;
+        return Long.toString(value);
     }
     
     public boolean sameExpression(Expression other) {

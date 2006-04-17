@@ -29,17 +29,15 @@ public class DefaultTest extends SqlTestCase {
         assertResultSet(new String[] { " null, 0 " }, query("select x, y from foo"));
     }
 
-    public void testNegative() throws Exception {
-        String sql = "create table foo (x integer default -5, y integer)";
-        if (dialect.wishThisWereTrue()) {
-            execute(sql);
-            execute("insert into foo(y) values(0)");
-            assertResultSet(new String[] { " -5 " }, query("select x from foo"));
-        }
-        else {
-            // No negative numbers...
-            expectExecuteFailure(sql, "expected default value for column x but got '-'");
-        }
+    public void testSignedLiterals() throws Exception {
+        /** Unary plus is so obscure, and so little used, that it is tested
+           in {@link net.sourceforge.mayfly.EndToEndTests} instead of here.
+           (It also is not supported by all databases).
+         */
+
+        execute("create table foo (x integer default -5, y integer)");
+        execute("insert into foo(y) values(0)");
+        assertResultSet(new String[] { " -5 " }, query("select x from foo"));
     }
 
     public void testJdbcParameter() throws Exception {

@@ -108,6 +108,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean canSumStrings() {
+        return true;
+    }
+    
     public boolean errorIfNotAggregateOrGrouped() {
         return false;
     }
@@ -129,6 +133,10 @@ public class MySqlDialect extends Dialect {
     }
     
     public boolean disallowNullsInExpressions() {
+        return false;
+    }
+    
+    public boolean disallowNullOnRightHandSideOfIn() {
         return false;
     }
 

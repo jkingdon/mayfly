@@ -115,6 +115,10 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
+    public boolean decimalScaleIsFromType() {
+        return false;
+    }
+    
     public boolean canUpdateToDefault() {
         return false;
     }

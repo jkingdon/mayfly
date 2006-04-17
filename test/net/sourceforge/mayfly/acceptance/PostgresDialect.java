@@ -120,6 +120,10 @@ public class PostgresDialect extends Dialect {
         return false;
     }
     
+    public boolean disallowNullOnRightHandSideOfIn() {
+        return false;
+    }
+
     public boolean allowMultipleNullsInUniqueColumn() {
         return true;
     }

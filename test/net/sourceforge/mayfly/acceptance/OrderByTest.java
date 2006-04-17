@@ -128,6 +128,8 @@ public class OrderByTest extends SqlTestCase {
             // in the select clause before foo.* is expanded.  That seems questionable,
             // in that mayfly seems to be the only database tested which does that.
             // 
+            // On the other hand, it seems a bit questionable to add a column and
+            // thus cause the ORDER BY to refer to something different.
             assertResultList(new String[] { "2", "3", "4", "5", "8" }, query(orderByB));
             expectQueryFailure(orderBySecondA, "ORDER BY 3 must be in range 1 to 2");
             expectQueryFailure(orderBySecondA2, "ORDER BY 2 refers to an expression not a column");

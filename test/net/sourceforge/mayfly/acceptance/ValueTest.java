@@ -283,14 +283,10 @@ public class ValueTest extends SqlTestCase {
     }
     
     public void testNegativeNumber() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
-
         execute("create table foo (x integer)");
         execute("insert into foo (x) values (-5)");
         execute("insert into foo (x) values (-3)");
-        execute("insert into foo (x) values (7)");
+        execute("insert into foo (x) values (+7)");
         
         assertResultSet(new String[] { " -5 " }, query("select x from foo where x < -4"));
     }

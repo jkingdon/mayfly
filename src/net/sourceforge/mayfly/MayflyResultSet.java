@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 
 public final class MayflyResultSet extends ResultSetStub {
@@ -69,6 +70,14 @@ public final class MayflyResultSet extends ResultSetStub {
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
+    }
+
+    public BigDecimal getBigDecimal(String columnName) throws SQLException {
+        return cellFromName(columnName).asBigDecimal();
+    }
+
+    public BigDecimal getBigDecimal(int oneBasedColumn) throws SQLException {
+        return cellFromIndex(oneBasedColumn).asBigDecimal();
     }
 
     public String getString(String columnName) throws SQLException {

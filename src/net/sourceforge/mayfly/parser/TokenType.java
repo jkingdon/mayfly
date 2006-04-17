@@ -44,6 +44,7 @@ public class TokenType {
     public static final TokenType KEYWORD_count = registerKeyword("count");
     public static final TokenType KEYWORD_create = registerKeyword("create");
     public static final TokenType KEYWORD_cross = registerKeyword("cross");
+    public static final TokenType KEYWORD_decimal = registerKeyword("decimal");
     public static final TokenType KEYWORD_default = registerKeyword("default");
     public static final TokenType KEYWORD_desc = registerKeyword("desc");
     public static final TokenType KEYWORD_distinct = registerKeyword("distinct");

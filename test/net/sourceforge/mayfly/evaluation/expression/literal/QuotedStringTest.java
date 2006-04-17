@@ -11,18 +11,23 @@ public class QuotedStringTest extends TestCase {
     public void testParse() throws Exception {
         assertEquals(new QuotedString("'steve'"), new Parser("'steve'").parsePrimary().asNonBoolean());
     }
-
-    public void testMatchesCell() throws Exception {
-        assertTrue(new QuotedString("'a'").matchesCell(new StringCell("a")));
-        assertFalse(new QuotedString("'b'").matchesCell(new StringCell("a")));
-
-        assertTrue(new QuotedString("'don''t'").matchesCell(new StringCell("don't")));
-        assertFalse(new QuotedString("'don''t'").matchesCell(new StringCell("don''t")));
-    }
-
+    
     public void testValue() throws Exception {
-        assertEquals("steve", new QuotedString("'steve'").valueForCellContentComparison());
-        assertEquals("a''b", new QuotedString("'a''''b'").valueForCellContentComparison());
+        {
+            StringCell cell = (StringCell) new QuotedString("'steve'").evaluate(null);
+            assertEquals("steve", cell.asString());
+        }
+
+        {
+            StringCell cell = (StringCell) new QuotedString("'a''''b'").evaluate(null);
+            assertEquals("a''b", cell.asString());
+        }
+    }
+    
+    public void testSameExpression() throws Exception {
+        assertTrue(new QuotedString("foo").sameExpression(new QuotedString("foo")));
+        // Check that comparison is with equals, not ==
+        assertTrue(new QuotedString("foo").sameExpression(new QuotedString(new String("foo"))));
     }
 
 }

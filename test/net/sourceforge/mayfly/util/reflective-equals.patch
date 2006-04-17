@@ -1,0 +1,345 @@
+Only in commons-lang: .classpath
+Only in commons-lang: .project
+Only in commons-lang: .settings
+diff -u -r commons-lang-2.1/src/java/org/apache/commons/lang/builder/EqualsBuilder.java commons-lang/src/java/org/apache/commons/lang/builder/EqualsBuilder.java
+--- commons-lang-2.1/src/java/org/apache/commons/lang/builder/EqualsBuilder.java	2005-06-12 09:11:52.000000000 +0530
++++ commons-lang/src/java/org/apache/commons/lang/builder/EqualsBuilder.java	2006-04-15 14:02:56.000000000 +0530
+@@ -17,6 +17,7 @@
+ 
+ import java.lang.reflect.AccessibleObject;
+ import java.lang.reflect.Field;
++import java.lang.reflect.Method;
+ import java.lang.reflect.Modifier;
+ 
+ /**
+@@ -113,6 +114,9 @@
+      *
+      * <p>Static fields will not be tested. Superclass fields will be included.</p>
+      *
++     * <p>When comparing objects within the objects passed in, those
++     * methods' own equals methods are called.</p>
++     * 
+      * @param lhs  <code>this</code> object
+      * @param rhs  the other object
+      * @return <code>true</code> if the two Objects have tested equals.
+@@ -136,6 +140,9 @@
+      *
+      * <p>Static fields will not be tested. Superclass fields will be included.</p>
+      *
++     * <p>When comparing objects within the objects passed in, those
++     * methods' own equals methods are called.</p>
++     * 
+      * @param lhs  <code>this</code> object
+      * @param rhs  the other object
+      * @param testTransients  whether to include transient fields
+@@ -162,6 +169,9 @@
+      * up to and including the specified superclass. A null superclass is treated
+      * as java.lang.Object.</p>
+      *
++     * <p>When comparing objects within the objects passed in, those
++     * methods' own equals methods are called.</p>
++     * 
+      * @param lhs  <code>this</code> object
+      * @param rhs  the other object
+      * @param testTransients  whether to include transient fields
+@@ -171,6 +181,47 @@
+      * @since 2.0
+      */
+     public static boolean reflectionEquals(Object lhs, Object rhs, boolean testTransients, Class reflectUpToClass) {
++        return reflectionEquals(lhs, rhs, testTransients, reflectUpToClass, false);
++    }
++
++    /**
++     * <p>This method uses reflection to determine if the two <code>Object</code>s
++     * are equal.</p>
++     *
++     * <p>It uses <code>AccessibleObject.setAccessible</code> to gain access to private
++     * fields. This means that it will throw a security exception if run under
++     * a security manager, if the permissions are not set up correctly. It is also
++     * not as efficient as testing explicitly.</p>
++     *
++     * <p>If the testTransients parameter is set to <code>true</code>, transient
++     * members will be tested, otherwise they are ignored, as they are likely
++     * derived fields, and not part of the value of the <code>Object</code>.</p>
++     *
++     * <p>Static fields will not be included. Superclass fields will be appended
++     * up to and including the specified superclass. A null superclass is treated
++     * as java.lang.Object.</p>
++     * 
++     * <p>If the recurseReflectively parameter is set to <code>false</code>, 
++     * when comparing objects within the objects passed in, those
++     * methods' own equals methods are called.  Otherwise, those methods'
++     * equals methods will be called only if they override the equals method
++     * from java.lang.Object, and methods which have no such override will be
++     * compared by reflectionEquals itself.  When calling reflectionEquals
++     * recursively, transient fields are not tested and superclass fields 
++     * will be tested.</p>
++     *
++     * @param lhs  <code>this</code> object
++     * @param rhs  the other object
++     * @param testTransients  whether to include transient fields
++     * @param reflectUpToClass  the superclass to reflect up to (inclusive),
++     *  may be <code>null</code>
++     * @param recurseReflectively Whether to use reflection when recursing to
++     *  compare objects which do not override the equals method from java.lang.Object. 
++     * @return <code>true</code> if the two Objects have tested equals.
++     * @since post-2.1
++     */
++    public static boolean reflectionEquals(Object lhs, Object rhs, boolean testTransients, Class reflectUpToClass,
++            boolean recurseReflectively) {
+         if (lhs == rhs) {
+             return true;
+         }
+@@ -202,10 +253,10 @@
+         }
+         EqualsBuilder equalsBuilder = new EqualsBuilder();
+         try {
+-            reflectionAppend(lhs, rhs, testClass, equalsBuilder, testTransients);
++            reflectionAppend(lhs, rhs, testClass, equalsBuilder, testTransients, recurseReflectively);
+             while (testClass.getSuperclass() != null && testClass != reflectUpToClass) {
+                 testClass = testClass.getSuperclass();
+-                reflectionAppend(lhs, rhs, testClass, equalsBuilder, testTransients);
++                reflectionAppend(lhs, rhs, testClass, equalsBuilder, testTransients, recurseReflectively);
+             }
+         } catch (IllegalArgumentException e) {
+             // In this case, we tried to test a subclass vs. a superclass and
+@@ -227,13 +278,15 @@
+      * @param clazz  the class to append details of
+      * @param builder  the builder to append to
+      * @param useTransients  whether to test transient fields
++     * @param recurseReflectively whether to compare reflectively when recursing
+      */
+     private static void reflectionAppend(
+         Object lhs,
+         Object rhs,
+         Class clazz,
+         EqualsBuilder builder,
+-        boolean useTransients) {
++        boolean useTransients,
++        boolean recurseReflectively) {
+         Field[] fields = clazz.getDeclaredFields();
+         AccessibleObject.setAccessible(fields, true);
+         for (int i = 0; i < fields.length && builder.isEquals; i++) {
+@@ -242,7 +295,7 @@
+                 && (useTransients || !Modifier.isTransient(f.getModifiers()))
+                 && (!Modifier.isStatic(f.getModifiers()))) {
+                 try {
+-                    builder.append(f.get(lhs), f.get(rhs));
++                    builder.append(f.get(lhs), f.get(rhs), recurseReflectively);
+                 } catch (IllegalAccessException e) {
+                     //this can't happen. Would get a Security exception instead
+                     //throw a runtime exception in case the impossible happens.
+@@ -280,6 +333,10 @@
+      * @return EqualsBuilder - used to chain calls.
+      */
+     public EqualsBuilder append(Object lhs, Object rhs) {
++        return append(lhs, rhs, false);
++    }
++
++    private EqualsBuilder append(Object lhs, Object rhs, boolean recurseReflectively) {
+         if (isEquals == false) {
+             return this;
+         }
+@@ -293,7 +350,7 @@
+         Class lhsClass = lhs.getClass();
+         if (!lhsClass.isArray()) {
+             // The simple case, not an array, just test the element
+-            isEquals = lhs.equals(rhs);
++            isEquals = objectsAreEqual(lhs, rhs, recurseReflectively);
+         } else if (lhs.getClass() != rhs.getClass()) {
+             // Here when we compare different dimensions, for example: a boolean[][] to a boolean[] 
+             this.setEquals(false);
+@@ -323,6 +380,29 @@
+         return this;
+     }
+ 
++    private boolean objectsAreEqual(Object lhs, Object rhs, boolean recurseReflectively) {
++        if (recurseReflectively) {
++            try {
++                Method equalsMethod = lhs.getClass().getMethod("equals", new Class[] { Object.class });
++                if (equalsMethod.getDeclaringClass() == Object.class) {
++                    /* Not checking transient fields but checking superclass fields, rather
++                       than passing along our own setting for those two parameters, is a
++                       deliberate (if perhaps wrong) choice.  I'm not 100% clear on when you'd use those
++                       features, but if one has reason to do a non-default thing, I'm
++                       not sure you'd want the same thing on recursing. */
++                    return reflectionEquals(lhs, rhs, false, null, recurseReflectively);
++                } else {
++                    return lhs.equals(rhs);
++                }
++            } catch (NoSuchMethodException e) {
++                // I don't think this can happen.
++                throw new InternalError("Could not find equals method: " + e.getMessage());
++            }
++        } else {
++            return lhs.equals(rhs);
++        }
++    }
++
+     /**
+      * <p>
+      * Test if two <code>long</code> s are equal.
+diff -u -r commons-lang-2.1/src/test/org/apache/commons/lang/builder/EqualsBuilderTest.java commons-lang/src/test/org/apache/commons/lang/builder/EqualsBuilderTest.java
+--- commons-lang-2.1/src/test/org/apache/commons/lang/builder/EqualsBuilderTest.java	2005-06-12 09:11:52.000000000 +0530
++++ commons-lang/src/test/org/apache/commons/lang/builder/EqualsBuilderTest.java	2006-04-15 13:56:16.000000000 +0530
+@@ -196,8 +196,8 @@
+         TestSubObject tso1ter = new TestSubObject(1, 4);
+         TestSubObject tso2 = new TestSubObject(2, 5);
+ 
+-        testReflectionEqualsEquivalenceRelationship(to1, to1Bis, to1Ter, to2, new TestObject(), testTransients);
+-        testReflectionEqualsEquivalenceRelationship(tso1, tso1bis, tso1ter, tso2, new TestSubObject(), testTransients);
++        testReflectionEqualsEquivalenceRelationship(to1, to1Bis, to1Ter, to2, new TestObject(), testTransients, false);
++        testReflectionEqualsEquivalenceRelationship(tso1, tso1bis, tso1ter, tso2, new TestSubObject(), testTransients, false);
+ 
+         // More sanity checks:
+ 
+@@ -237,6 +237,56 @@
+         assertTrue(!EqualsBuilder.reflectionEquals(to1, ttlo));
+         assertTrue(!EqualsBuilder.reflectionEquals(tso1, this));
+     }
++    
++    static class InnerEqualsless {
++        int x;
++
++        public InnerEqualsless(int x) {
++            this.x = x;
++        }
++    }
++
++    static class InnerEqualsful {
++        int y;
++
++        public InnerEqualsful(int y) {
++            this.y = y;
++        }
++        
++        public boolean equals(Object other) {
++            return other instanceof InnerEqualsful;
++        }
++        
++        public int hashCode() {
++            return 0;
++        }
++    }
++
++    static class Outer {
++        InnerEqualsless equalsless;
++        InnerEqualsful equalsful;
++        
++        public Outer(int x, int y) {
++            equalsless = new InnerEqualsless(x);
++            equalsful = new InnerEqualsful(y);
++        }
++    }
++
++    public void testRecurseReflectively() throws Exception {
++        Outer object1 = new Outer(5, 10);
++        Outer object1Bis = new Outer(5, 12);
++        Outer object1Ter = new Outer(5, 10);
++        Outer object2 = new Outer(8, 10);
++
++        // Test generally that setting recurseReflectively still generates a valid equals method
++        testReflectionEqualsEquivalenceRelationship(object1, object1Bis, object1Ter, object2, 
++            new Outer(5, 10), false, true);
++        
++        // Now get to the crux of the matter: the case in which recurseReflectively changes
++        // the answer:
++        assertFalse(EqualsBuilder.reflectionEquals(object1, object1Bis, false, null, false));
++        assertTrue(EqualsBuilder.reflectionEquals(object1, object1Bis, false, null, true));
++    }
+ 
+     /**
+      * Equivalence relationship tests inspired by "Effective Java":
+@@ -247,53 +297,59 @@
+      * <li>consistency</li>
+      * <li>non-null reference</li>
+      * </ul>
+-     * @param to a TestObject
+-     * @param toBis a TestObject, equal to to and toTer
++     * @param to an Object
++     * @param toBis an Object, equal to to and toTer
+      * @param toTer Left hand side, equal to to and toBis
+-     * @param to2 a different TestObject
+-     * @param oToChange a TestObject that will be changed
++     * @param to2 a different Object
++     * @param oToChange If a TestObject, one that will be changed
++     * @param recurseReflectively TODO
+      */
+     public void testReflectionEqualsEquivalenceRelationship(
+-        TestObject to,
+-        TestObject toBis,
+-        TestObject toTer,
+-        TestObject to2,
+-        TestObject oToChange,
+-        boolean testTransients) {
++        Object to,
++        Object toBis,
++        Object toTer,
++        Object to2,
++        Object oToChange,
++        boolean testTransients,
++        boolean recurseReflectively) {
+ 
+         // reflection test
+-        assertTrue(EqualsBuilder.reflectionEquals(to, to, testTransients));
+-        assertTrue(EqualsBuilder.reflectionEquals(to2, to2, testTransients));
++        assertTrue(EqualsBuilder.reflectionEquals(to, to, testTransients, null, recurseReflectively));
++        assertTrue(EqualsBuilder.reflectionEquals(to2, to2, testTransients, null, recurseReflectively));
+ 
+         // symmetry test
+-        assertTrue(EqualsBuilder.reflectionEquals(to, toBis, testTransients) && EqualsBuilder.reflectionEquals(toBis, to, testTransients));
++        assertTrue(EqualsBuilder.reflectionEquals(to, toBis, testTransients, null, recurseReflectively) 
++                && EqualsBuilder.reflectionEquals(toBis, to, testTransients, null, recurseReflectively));
+ 
+         // transitive test
+         assertTrue(
+-            EqualsBuilder.reflectionEquals(to, toBis, testTransients)
+-                && EqualsBuilder.reflectionEquals(toBis, toTer, testTransients)
+-                && EqualsBuilder.reflectionEquals(to, toTer, testTransients));
++            EqualsBuilder.reflectionEquals(to, toBis, testTransients, null, recurseReflectively)
++                && EqualsBuilder.reflectionEquals(toBis, toTer, testTransients, null, recurseReflectively)
++                && EqualsBuilder.reflectionEquals(to, toTer, testTransients, null, recurseReflectively));
+ 
+         // consistency test
+-        oToChange.setA(to.getA());
+-        if (oToChange instanceof TestSubObject) {
+-            ((TestSubObject) oToChange).setB(((TestSubObject) to).getB());
+-        }
+-        assertTrue(EqualsBuilder.reflectionEquals(oToChange, to, testTransients));
+-        assertTrue(EqualsBuilder.reflectionEquals(oToChange, to, testTransients));
+-        oToChange.setA(to.getA() + 1);
+-        if (oToChange instanceof TestSubObject) {
+-            ((TestSubObject) oToChange).setB(((TestSubObject) to).getB() + 1);
++        if (oToChange instanceof TestObject) {
++            ((TestObject)oToChange).setA(((TestObject)to).getA());
++            if (oToChange instanceof TestSubObject) {
++                ((TestSubObject) oToChange).setB(((TestSubObject) to).getB());
++            }
++            assertTrue(EqualsBuilder.reflectionEquals(oToChange, to, testTransients));
++            assertTrue(EqualsBuilder.reflectionEquals(oToChange, to, testTransients));
++            ((TestObject)oToChange).setA(((TestObject)to).getA() + 1);
++            if (oToChange instanceof TestSubObject) {
++                ((TestSubObject) oToChange).setB(((TestSubObject) to).getB() + 1);
++            }
++            assertTrue(!EqualsBuilder.reflectionEquals(oToChange, to, testTransients));
++            assertTrue(!EqualsBuilder.reflectionEquals(oToChange, to, testTransients));
+         }
+-        assertTrue(!EqualsBuilder.reflectionEquals(oToChange, to, testTransients));
+-        assertTrue(!EqualsBuilder.reflectionEquals(oToChange, to, testTransients));
+ 
+         // non-null reference test
+-        assertTrue(!EqualsBuilder.reflectionEquals(to, null, testTransients));
+-        assertTrue(!EqualsBuilder.reflectionEquals(to2, null, testTransients));
+-        assertTrue(!EqualsBuilder.reflectionEquals(null, to, testTransients));
+-        assertTrue(!EqualsBuilder.reflectionEquals(null, to2, testTransients));
+-        assertTrue(EqualsBuilder.reflectionEquals((Object) null, (Object) null, testTransients));
++        assertTrue(!EqualsBuilder.reflectionEquals(to, null, testTransients, null, recurseReflectively));
++        assertTrue(!EqualsBuilder.reflectionEquals(to2, null, testTransients, null, recurseReflectively));
++        assertTrue(!EqualsBuilder.reflectionEquals(null, to, testTransients, null, recurseReflectively));
++        assertTrue(!EqualsBuilder.reflectionEquals(null, to2, testTransients, null, recurseReflectively));
++        assertTrue(EqualsBuilder.reflectionEquals((Object) null, (Object) null, 
++            testTransients, null, recurseReflectively));
+     }
+ 
+     public void testSuper() {
+Only in commons-lang: target

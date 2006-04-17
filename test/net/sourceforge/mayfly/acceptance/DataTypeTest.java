@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 
 public class DataTypeTest extends SqlTestCase {
 
@@ -76,7 +76,7 @@ public class DataTypeTest extends SqlTestCase {
     //NUMERIC and DECIMAL
     //REAL, FLOAT, DOUBLE - precision can be given in binary digits (24 or 53, typically)
     // BIT and BIT VARYING; BOOLEAN
-    // SERIAL and BIGSERIAL (postgres for auto-increment)
+    // BIGSERIAL (see AutoIncrementTest for the auto-increment syntaxes we do look for)
     // DATE, TIME, TIMESTAMP
     // TIME WITH TIME ZONE is questionable (see postgres docs)
     // BLOB/CLOB
@@ -168,6 +168,44 @@ public class DataTypeTest extends SqlTestCase {
         }
         else {
             expectExecuteFailure(sql, "expected data type but got " + typeName);
+        }
+    }
+
+    public void testDecimal() throws Exception {
+        if (!dialect.wishThisWereTrue()) {
+            return;
+        }
+
+        execute("create table foo (price decimal(4, 2), list_price decimal(5, 2))");
+        execute("insert into foo (price, list_price) values (95.0, 99.95)");
+
+        {
+            ResultSet results = query("select price, list_price from foo");
+            assertTrue(results.next());
+            assertEquals(9500, results.getBigDecimal(1).movePointRight(2).intValue());
+            assertEquals(9995, results.getBigDecimal("list_price").movePointRight(2).intValue());
+            assertFalse(results.next());
+            results.close();
+        }
+
+        /* results.getBigDecimal with a scale intentionally not tested as it is deprecated
+           (might want to look at what it was supposed to do and why it was decprecated, though).
+         */
+
+        {
+            ResultSet results = query("select price, list_price from foo");
+            assertTrue(results.next());
+
+            BigDecimal price = (BigDecimal) results.getObject(1);
+            assertEquals(9500, price.movePointRight(2).intValue());
+            assertEquals(dialect.decimalScaleIsFromType() ? 2 : 1, price.scale());
+
+            BigDecimal listPrice = (BigDecimal) results.getObject("list_price");
+            assertEquals(9995, listPrice.movePointRight(2).intValue());
+            assertEquals(2, listPrice.scale());
+
+            assertFalse(results.next());
+            results.close();
         }
     }
 

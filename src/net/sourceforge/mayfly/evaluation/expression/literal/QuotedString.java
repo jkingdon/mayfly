@@ -16,10 +16,6 @@ public class QuotedString extends Literal {
         return withoutQuotes.replaceAll("''", "'");
     }
 
-    public Object valueForCellContentComparison() {
-        return stringWithoutQuotes();
-    }
-
     protected Cell valueAsCell() {
         return new StringCell(stringWithoutQuotes());
     }
@@ -31,7 +27,7 @@ public class QuotedString extends Literal {
     public boolean sameExpression(Expression other) {
         if (other instanceof QuotedString) {
             QuotedString string = (QuotedString) other;
-            return stringInQuotes == string.stringInQuotes;
+            return stringInQuotes.equals(string.stringInQuotes);
         }
         else {
             return false;

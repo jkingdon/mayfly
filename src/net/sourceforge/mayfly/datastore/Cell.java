@@ -1,8 +1,10 @@
 package net.sourceforge.mayfly.datastore;
 
+import java.math.BigDecimal;
 import java.sql.SQLException;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public abstract class Cell extends ValueObject {
@@ -37,6 +39,10 @@ public abstract class Cell extends ValueObject {
 
     abstract public Object asObject();
     
+    public BigDecimal asBigDecimal() {
+        throw new UnimplementedException("cannot yet get BigDecimal for " + getClass().getName());
+    }
+
     public Object asContents() {
         return asObject();
     }

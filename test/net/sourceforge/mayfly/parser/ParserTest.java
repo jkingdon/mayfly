@@ -21,6 +21,9 @@ import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.ldbc.where.Greater;
 import net.sourceforge.mayfly.ldbc.where.Where;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 public class ParserTest extends TestCase {
     
     public void testEmptyString() throws Exception {
@@ -421,6 +424,32 @@ public class ParserTest extends TestCase {
             // (how do we show context on "expected foo got bar"?).
             assertEquals("2147483648 is out of range", e.getMessage());
         }
+    }
+    
+    public void testNumericLiteral() throws Exception {
+        checkDecimal(5.6, "5.6");
+        checkDecimal(222333444555.0, "222333444555.");
+        checkDecimal(0.03, ".03");
+        
+        Integer smallishInteger = (Integer) new Parser("1000222333").parseNumericLiteral();
+        assertEquals(1000222333, smallishInteger.intValue());
+
+        Long biggishInteger = (Long) new Parser("9223372036854775807").parseNumericLiteral();
+        assertEquals(9223372036854775807L, biggishInteger.longValue());
+
+        BigInteger bigInteger = (BigInteger) new Parser("9223372036854775808").parseNumericLiteral();
+        assertEquals(new BigInteger("9223372036854775808"), bigInteger);
+    }
+    
+    public void testMoreTestsOfLeadingPeriod() throws Exception {
+//        BigDecimalLiteral value = new Parser(".07").parseDefaultValue("x");
+        // assertEquals(0.07, (some incantantion on value)
+        // likewise for parserPrimary()
+    }
+
+    private void checkDecimal(double expected, String input) {
+        BigDecimal decimal = (BigDecimal) new Parser(input).parseNumericLiteral();
+        assertEquals(expected, decimal.doubleValue(), 0.0001);
     }
     
     public void testMultipleConstraints() throws Exception {

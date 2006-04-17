@@ -171,6 +171,32 @@ public class WhereTest extends SqlTestCase {
 
     }
     
+    public void testExpressions() throws Exception {
+        execute("create table foo (a integer, b integer, c integer, description varchar(255))");
+        execute("insert into foo(a, b, c, description) values (1, 1, 3, 'equals b')");
+        execute("insert into foo(a, b, c, description) values (null, null, 3, 'is null')");
+        execute("insert into foo(a, b, c, description) values (1, 2, 3, 'equals nothing')");
+        
+        assertResultSet(
+            new String[] { " 'equals b' " },
+            query("select description from foo where a in (b, c)")
+        );
+    }
+    
+    public void testNullLiteralOnRightHandSideOfIn() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo(a, b) values (null, 17)");
+        String sql = "select b from foo where a in (null, 5)";
+        if (dialect.disallowNullOnRightHandSideOfIn()) {
+            expectQueryFailure(sql, 
+                "To check for null, use IS NULL or IS NOT NULL, not a null literal");
+        }
+        else {
+            // Hah!  Gotcha!  null = null evaluates to false.
+            assertResultSet(new String[] { }, query(sql));
+        }
+    }
+
     public void testInPrecedence() throws Exception {
         execute("create table foo (a integer, b integer)");
         execute("insert into foo (a, b) values (1, 1)");

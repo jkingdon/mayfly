@@ -104,5 +104,9 @@ public class MayflyDialect extends Dialect {
     public boolean haveSerial() {
         return true;
     }
+    
+    public boolean decimalScaleIsFromType() {
+        return wishThisWereTrue();
+    }
 
 }

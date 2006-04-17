@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
+import java.util.Collection;
+
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 
@@ -9,8 +11,8 @@ public class Sum extends AggregateExpression {
         super(column, functionName, distinct);
     }
 
-    protected Cell pickOne(Cell min, Cell max, Cell count, Cell sum, Cell average) {
-        return sum;
+    Cell aggregate(Collection values) {
+        return aggregateSumAverage(values, true);
     }
 
 }

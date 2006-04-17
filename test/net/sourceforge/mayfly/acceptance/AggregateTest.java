@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AggregateTest extends SqlTestCase {
@@ -197,13 +198,18 @@ public class AggregateTest extends SqlTestCase {
     
     public void testAsteriskOnlyForCount() throws Exception {
         execute("create table foo (x integer, y integer)");
-        if (!dialect.aggregateAsteriskIsForCountOnly()) {
-            return;
+
+        String averageOfStar = "select avg(*) from foo";
+        if (dialect.aggregateAsteriskIsForCountOnly()) {
+            expectQueryFailure(averageOfStar, "expected primary but got '*'");
+            expectQueryFailure("select sum(*) from foo", "expected primary but got '*'");
+            expectQueryFailure("select min(*) from foo", "expected primary but got '*'");
+            expectQueryFailure("select max(*) from foo", "expected primary but got '*'");
         }
-        expectQueryFailure("select avg(*) from foo", "expected primary but got '*'");
-        expectQueryFailure("select sum(*) from foo", "expected primary but got '*'");
-        expectQueryFailure("select min(*) from foo", "expected primary but got '*'");
-        expectQueryFailure("select max(*) from foo", "expected primary but got '*'");
+        else {
+            ResultSet results = query(averageOfStar);
+            results.close();
+        }
     }
 
     public void testStrings() throws Exception {
@@ -216,18 +222,20 @@ public class AggregateTest extends SqlTestCase {
         assertResultSet(new String[] { " 3 " }, query("select count(x) from foo"));
         assertResultSet(new String[] { " 2 " }, query("select count(distinct x) from foo"));
 
-        String sqlForMinimum = "select min(x) from foo";
-        if (dialect.wishThisWereTrue()) {
-            // is this indeed doing a string sort?
-            assertResultSet(new String[] { " 'one' " }, query(sqlForMinimum));
+        // string sort (just like ORDER BY)
+        assertResultSet(new String[] { " 'one' " }, query("select min(x) from foo"));
+        assertResultSet(new String[] { " 'two' " }, query("select max(x) from foo"));
+
+        String sum = "select sum(x) from foo";
+        String average = "select avg(x) from foo";
+        if (dialect.canSumStrings()) {
+            // Is this parsing the string for a number, or just using zero?  Do we care?
+            assertResultSet(new String[] { " 0 " }, query(sum));
+            assertResultSet(new String[] { " 0 " }, query(average));
         }
         else {
-            expectQueryFailure(sqlForMinimum, "attempt to apply min(x) to string 'one'");
-            expectQueryFailure("select max(x) from foo", "attempt to apply max(x) to string 'one'");
-
-            // what about these? Do the databases coerce the string to a number or something?
-            expectQueryFailure("select sum(x) from foo", "attempt to apply sum(x) to string 'one'");
-            expectQueryFailure("select avg(x) from foo", "attempt to apply avg(x) to string 'one'");
+            expectQueryFailure(sum, "attempt to apply sum(x) to string 'one'");
+            expectQueryFailure(average, "attempt to apply avg(x) to string 'one'");
         }
     }
     

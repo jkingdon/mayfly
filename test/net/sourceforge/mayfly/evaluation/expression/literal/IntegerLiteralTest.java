@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.parser.Parser;
 
 public class IntegerLiteralTest extends TestCase {
@@ -12,7 +12,8 @@ public class IntegerLiteralTest extends TestCase {
     }
 
     public void testValue() throws Exception {
-        assertEquals(new Long(5), new IntegerLiteral(5).valueForCellContentComparison());
+        LongCell cell = (LongCell) new IntegerLiteral(5).evaluate(null);
+        assertEquals(5L, cell.asLong());
     }
 
 }

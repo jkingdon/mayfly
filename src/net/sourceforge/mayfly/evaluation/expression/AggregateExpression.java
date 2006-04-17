@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
@@ -45,42 +46,54 @@ public abstract class AggregateExpression extends Expression {
 
     public Cell aggregate(Rows rows) {
         Collection values = findValues(rows);
-        
-        if (!values.isEmpty() && values.iterator().next() instanceof Cell) {
-            return aggregateNonNumeric(values);
+        return aggregate(values);
+    }
+
+    abstract Cell aggregate(Collection values);
+
+    Cell aggregateSumAverage(Collection values, boolean isSum) {
+        if (values.isEmpty()) {
+            /* In this case of sum, this is lame (0 would be more convenient), but standard.
+               Is it possible/desirable for Mayfly to help?
+               (giving an error and pointing out a better way, or whatever). */
+            return NullCell.INSTANCE;
         }
 
-        long min = Long.MAX_VALUE;
-        long max = Long.MIN_VALUE;
+        if (!(values.iterator().next() instanceof LongCell)) {
+            Cell first = (Cell) values.iterator().next();
+            throw new MayflyException("attempt to apply " + displayName() + " to " + first.displayName());
+        }
+
         long count = 0;
         long sum = 0;
         for (Iterator iter = values.iterator(); iter.hasNext();) {
-            long value = ((Long) iter.next()).longValue();
-            min = Math.min(min, value);
-            max = Math.max(max, value);
+            long value = ((LongCell) iter.next()).asLong();
             count++;
             sum += value;
         }
         
-        if (count > 0) {
-            return pickOne(new LongCell(min), new LongCell(max),
-                new LongCell(count), new LongCell(sum), new LongCell(sum / count));
-        } else {
-            return pickOne(NullCell.INSTANCE, NullCell.INSTANCE, 
-                new LongCell(0), 
-                
-                // Lame (0 would be more convenient), but standard.
-                // Is it possible/desirable for Mayfly to help?
-                // (giving an error and pointing out a better way, or whatever).
-                NullCell.INSTANCE,
-                
-                NullCell.INSTANCE);
-        }
+        return new LongCell(isSum ? sum : sum / count);
     }
 
-    protected Cell aggregateNonNumeric(Collection values) {
-        Cell first = (Cell) values.iterator().next();
-        throw new MayflyException("attempt to apply " + displayName() + " to " + first.displayName());
+    Cell aggregateMinMax(Collection values) {
+        Iterator iter = values.iterator();
+        if (!iter.hasNext()) {
+            return NullCell.INSTANCE;
+        }
+        
+        Cell bestSoFar = (Cell) iter.next();
+        while (iter.hasNext()) {
+            Cell candidate = (Cell) iter.next();
+            if (isBetter(candidate, bestSoFar)) {
+                bestSoFar = candidate;
+            }
+        }
+        
+        return bestSoFar;
+    }
+
+    boolean isBetter(Cell candidate, Cell bestSoFar) {
+        throw new MayflyInternalException("Override this for min/max");
     }
 
     private Collection findValues(Rows rows) {
@@ -95,20 +108,13 @@ public abstract class AggregateExpression extends Expression {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             Cell cell = evaluate(row);
-            if (cell instanceof NullCell) {
-            }
-            else if (cell instanceof LongCell) {
-                values.add(new Long(cell.asLong()));
-            }
-            else {
+            if (!(cell instanceof NullCell)) {
                 values.add(cell);
             }
         }
         return values;
     }
 
-    abstract protected Cell pickOne(Cell minimum, Cell maximum, Cell count, Cell sum, Cell average);
-    
     public boolean sameExpression(Expression other) {
         if (getClass().equals(other.getClass())) {
             AggregateExpression otherExpression = (AggregateExpression) other;

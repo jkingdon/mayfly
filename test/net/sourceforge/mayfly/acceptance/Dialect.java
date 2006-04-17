@@ -50,6 +50,10 @@ public abstract class Dialect {
     public boolean backslashInAStringIsAnEscape() {
         // For most SQL dialects (including SQL92 I believe), '\' is just a string
         // with one character in it.
+        
+        /** Note that there are security considerations to this choice; an application
+            trying to prevent SQL injection must use database-specific quoting
+            (or, setString) */
         return false;
     }
 
@@ -202,6 +206,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean canSumStrings() {
+        return false;
+    }
+
     public boolean errorIfNotAggregateOrGrouped() {
         return true;
     }
@@ -273,6 +281,10 @@ public abstract class Dialect {
         // "5 + null".  This may reduce confusion over the
         // "null propagates up" semantics (or might just delay
         // the time when people discover them :-)).
+        return true;
+    }
+
+    public boolean disallowNullOnRightHandSideOfIn() {
         return true;
     }
 
@@ -396,6 +408,11 @@ public abstract class Dialect {
         // inserted value, it is a sequence, which is
         // independent of what was explicitly inserted).
         return false;
+    }
+
+    public boolean decimalScaleIsFromType() {
+        // False is just bugginess, as far as I know.
+        return true;
     }
 
 }
