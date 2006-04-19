@@ -2,11 +2,14 @@ package net.sourceforge.mayfly.datastore;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.expression.literal.LongLiteral;
+
 public class CellTest extends TestCase {
     public void testAsInt() throws Exception {
         assertEquals(6, new LongCell(6).asInt());
-        assertEquals(6, Cell.fromContents(new Integer(6)).asInt());
-        assertEquals(6, Cell.fromContents(new Long(6)).asInt());
+        assertEquals(6, new IntegerLiteral(6).valueAsCell().asInt());
+        assertEquals(6, new LongLiteral(6).valueAsCell().asInt());
     }
 
     public void testAsLong() throws Exception {

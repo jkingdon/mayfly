@@ -59,9 +59,9 @@ public class TableData {
             Column column = (Column) iter.next();
             boolean isDefault;
             if (specifiedColumnToValue.containsKey(column)) {
-                Object value = specifiedColumnToValue.get(column);
+                Cell value = (Cell) specifiedColumnToValue.get(column);
                 isDefault = value == null;
-                Cell cell = isDefault ? column.defaultValue() : Cell.fromContents(value);
+                Cell cell = isDefault ? column.defaultValue() : value;
                 tuple.append(new TupleElement(column, cell));
             } else {
                 isDefault = true;

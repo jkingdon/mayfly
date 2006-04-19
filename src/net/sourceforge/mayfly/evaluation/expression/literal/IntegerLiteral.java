@@ -12,7 +12,7 @@ public class IntegerLiteral extends Literal {
         this.value = value;
     }
 
-    protected Cell valueAsCell() {
+    public Cell valueAsCell() {
         return new LongCell(value);
     }
 

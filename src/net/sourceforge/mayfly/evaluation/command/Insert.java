@@ -1,21 +1,20 @@
 package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-
-import java.util.List;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 public class Insert extends Command {
 
     private final InsertTable table;
-    private final List columns;
-    private final List values;
+    private final ImmutableList columnNames;
+    private final ImmutableList values;
 
     /** @param values List of values to insert, where each element is cell contents
      * or null for the default value
      */
-    public Insert(InsertTable table, List columns, List values) {
+    public Insert(InsertTable table, ImmutableList columnNames, ImmutableList values) {
         this.table = table;
-        this.columns = columns;
+        this.columnNames = columnNames;
         this.values = values;
     }
 
@@ -24,10 +23,10 @@ public class Insert extends Command {
     }
 
     public DataStore update(DataStore store, String currentSchema) {
-        if (columns == null) {
+        if (columnNames == null) {
             return store.addRow(schemaToUse(currentSchema), table(), values);
         } else {
-            return store.addRow(schemaToUse(currentSchema), table(), columns, values);
+            return store.addRow(schemaToUse(currentSchema), table(), columnNames, values);
         }
     }
 

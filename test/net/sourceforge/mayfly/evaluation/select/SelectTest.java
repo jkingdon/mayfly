@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.Schema;
+import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
@@ -211,16 +212,19 @@ public class SelectTest extends TestCase {
     }
 
     public void testExecuteSimpleJoin() throws Exception {
+        L fooColumns = new L().append("colA").append("colB");
+        L barColumns = new L().append("colX").append("colY");
         DataStore store =
             new DataStore(
                 new Schema()
-                    .createTable("foo", new L().append("colA").append("colB"))
-                    .addRow("foo", new L().append("colA").append("colB"), new L().append("1a").append("1b"))
-                    .addRow("foo", new L().append("colA").append("colB"), new L().append("2a").append("2b"))
-                    .createTable("bar", new L().append("colX").append("colY"))
-                    .addRow("bar", new L().append("colX").append("colY"), new L().append("1a").append("1b"))
-                    .addRow("bar", new L().append("colX").append("colY"), new L().append("2a").append("2b"))
-                    .addRow("bar", new L().append("colX").append("colY"), new L().append("3a").append("3b"))
+                    .createTable("foo", fooColumns)
+                    .addRow("foo", fooColumns, makeValues("1a", "1b"))
+                    .addRow("foo", fooColumns, makeValues("2a", "2b"))
+
+                    .createTable("bar", barColumns)
+                    .addRow("bar", barColumns, makeValues("1a", "1b"))
+                    .addRow("bar", barColumns, makeValues("2a", "2b"))
+                    .addRow("bar", barColumns, makeValues("3a", "3b"))
             );
 
         assertEquals(
@@ -238,9 +242,10 @@ public class SelectTest extends TestCase {
             new DataStore(
                 new Schema()
                     .createTable("foo", new L().append("colA"))
-                    .addRow("foo", new L().append("colA"), new L().append("1a"))
+                    .addRow("foo", new L().append("colA"), new L().append(new StringCell("1a")))
+
                     .createTable("bar", new L().append("colX"))
-                    .addRow("bar", new L().append("colX"), new L().append("barXValue"))
+                    .addRow("bar", new L().append("colX"), new L().append(new StringCell("barXValue")))
                 );
 
 
@@ -258,19 +263,24 @@ public class SelectTest extends TestCase {
     }
 
     public void testSimpleWhere() throws Exception {
+        L columnNames = new L().append("colA").append("colB");
         DataStore store =
             new DataStore(
                 new Schema()
-                    .createTable("foo", new L().append("colA").append("colB"))
-                    .addRow("foo", new L().append("colA").append("colB"), new L().append("1a").append("1b"))
-                    .addRow("foo", new L().append("colA").append("colB"), new L().append("2a").append("xx"))
-                    .addRow("foo", new L().append("colA").append("colB"), new L().append("3a").append("xx"))
+                    .createTable("foo", columnNames)
+                    .addRow("foo", columnNames, makeValues("1a", "1b"))
+                    .addRow("foo", columnNames, makeValues("2a", "xx"))
+                    .addRow("foo", columnNames, makeValues("3a", "xx"))
             );
 
         assertEquals(
-            store.table("foo").rows().elements(new int[]{1, 2}),
+            store.table("foo").rows().elements(new int[] {1, 2}),
             query(store, "select * from foo where colB = 'xx'")
         );
+    }
+
+    private L makeValues(String firstStringValue, String secondStringValue) {
+        return new L().append(new StringCell(firstStringValue)).append(new StringCell(secondStringValue));
     }
 
 

@@ -80,6 +80,37 @@ public final class MayflyResultSet extends ResultSetStub {
         return cellFromIndex(oneBasedColumn).asBigDecimal();
     }
 
+    /** @internal
+     * @deprecated */
+    public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
+        throw new SQLException("getBigDecimal with a scale is not implemented, as it is deprecated in JDBC");
+    }
+
+    /** @internal
+     * @deprecated */
+    public BigDecimal getBigDecimal(int oneBasedColumn, int scale) throws SQLException {
+        throw new SQLException("getBigDecimal with a scale is not implemented, as it is deprecated in JDBC");
+    }
+    
+    public double getDouble(String columnName) throws SQLException {
+        return cellFromName(columnName).asDouble();
+    }
+
+    public float getFloat(String columnName) throws SQLException {
+        /* As float is an inexact type, I think that truncating is
+           probably the right thing, rather than throwing an exception
+           for values out of range. */
+        return (float) cellFromName(columnName).asDouble();
+    }
+
+    public double getDouble(int oneBasedColumn) throws SQLException {
+        return cellFromIndex(oneBasedColumn).asDouble();
+    }
+
+    public float getFloat(int oneBasedColumn) throws SQLException {
+        return (float) cellFromIndex(oneBasedColumn).asDouble();
+    }
+
     public String getString(String columnName) throws SQLException {
         return cellFromName(columnName).asString();
     }
@@ -89,11 +120,19 @@ public final class MayflyResultSet extends ResultSetStub {
     }
 
     public Object getObject(String columnName) throws SQLException {
-        return cellFromName(columnName).asObject();
+        try {
+            return cellFromName(columnName).asObject();
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
 
     public Object getObject(int oneBasedColumn) throws SQLException {
-        return cellFromIndex(oneBasedColumn).asObject();
+        try {
+            return cellFromIndex(oneBasedColumn).asObject();
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
     
     public boolean wasNull() throws SQLException {
@@ -101,7 +140,11 @@ public final class MayflyResultSet extends ResultSetStub {
     }
 
     private Cell cellFromName(String columnName) throws SQLException {
-        return cell(columnFromName(columnName));
+        try {
+            return cell(columnFromName(columnName));
+        } catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
 
     private Column columnFromName(String columnName) throws SQLException {

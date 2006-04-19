@@ -20,18 +20,20 @@ public class TupleBuilder {
         return this;
     }
 
-    public TupleBuilder appendColumnCellContents(String tableName, String columnName, Object cellValue) {
-        Cell cell = Cell.fromContents(cellValue);
-        return appendColumnCell(tableName, columnName, cell);
+    public TupleBuilder appendColumnCellContents(String tableName, String columnName, String cellValue) {
+        return appendColumnCell(tableName, columnName, new StringCell(cellValue));
     }
 
     public TupleBuilder appendColumnCell(String tableName, String columnName, Cell cell) {
         return append(new Column(tableName, columnName), cell);
     }
 
-    public TupleBuilder appendColumnCellContents(String columnName, Object cellValue) {
-        Cell cell = Cell.fromContents(cellValue);
-        return appendColumnCell(columnName, cell);
+    public TupleBuilder appendColumnCellContents(String columnName, String cellValue) {
+        return appendColumnCell(columnName, new StringCell(cellValue));
+    }
+
+    public TupleBuilder appendColumnCellContents(String columnName, long cellValue) {
+        return appendColumnCell(columnName, new LongCell(cellValue));
     }
 
     public TupleBuilder appendColumnCell(String columnName, Cell cell) {

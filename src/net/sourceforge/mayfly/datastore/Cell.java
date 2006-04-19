@@ -1,28 +1,20 @@
 package net.sourceforge.mayfly.datastore;
 
-import java.math.BigDecimal;
-import java.sql.SQLException;
-
-import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.util.ValueObject;
 
+import java.math.BigDecimal;
+import java.sql.SQLException;
+
 public abstract class Cell extends ValueObject {
 
-    public static Cell fromContents(Object contents) {
-        if (contents instanceof Number) {
-            Number number = (Number) contents;
-            return new LongCell(number.longValue());
-        } else if (contents instanceof String) {
-            String string = (String) contents;
-            return new StringCell(string);
-        } else if (contents instanceof NullCellContent) {
-            return NullCell.INSTANCE;
-        } else {
-            throw new MayflyException("Don't know how to deal with type " + contents.getClass().getName());
-        }
-    }
-
+    /**
+        @internal
+        Convert to byte.  As byte is an exact type,
+        should throw an exception if the value cannot be
+        represented in a byte (likewise for {@link #asShort()},
+        {@link #asInt()}, and {@link #asLong()}.
+      */
     abstract public byte asByte() throws SQLException;
 
     abstract public short asShort() throws SQLException;
@@ -43,9 +35,12 @@ public abstract class Cell extends ValueObject {
         throw new UnimplementedException("cannot yet get BigDecimal for " + getClass().getName());
     }
 
-    public Object asContents() {
-        return asObject();
-    }
+    /**
+        @internal
+        Convert to double.  As double is a floating-point (inexact) type,
+        it is OK to truncate/round.
+      */
+    abstract public double asDouble() throws SQLException;
 
     abstract public int compareTo(Cell otherCell);
 

@@ -64,6 +64,7 @@ import net.sourceforge.mayfly.ldbc.where.Not;
 import net.sourceforge.mayfly.ldbc.where.NotEqual;
 import net.sourceforge.mayfly.ldbc.where.Or;
 import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.math.BigDecimal;
@@ -153,9 +154,9 @@ public class Parser {
         expectAndConsume(TokenType.KEYWORD_into);
         InsertTable table = parseInsertTable();
 
-        List columnNames = parseOptionalColumnNames();
+        ImmutableList columnNames = parseOptionalColumnNames();
         
-        List values = parseValueConstructor();
+        ImmutableList values = parseValueConstructor();
 
         return new Insert(table, columnNames, values);
     }
@@ -184,7 +185,7 @@ public class Parser {
         return new SetClause(column, value);
     }
 
-    private List parseOptionalColumnNames() {
+    private ImmutableList parseOptionalColumnNames() {
         if (currentTokenType() == TokenType.OPEN_PAREN) {
             return parseColumnNames();
         }
@@ -193,7 +194,7 @@ public class Parser {
         }
     }
 
-    private List parseColumnNames() {
+    private ImmutableList parseColumnNames() {
         expectAndConsume(TokenType.OPEN_PAREN);
 
         List columnNames = new ArrayList();
@@ -202,10 +203,10 @@ public class Parser {
         } while (consumeIfMatches(TokenType.COMMA));
 
         expectAndConsume(TokenType.CLOSE_PAREN);
-        return columnNames;
+        return new ImmutableList(columnNames);
     }
 
-    private List parseValueConstructor() {
+    private ImmutableList parseValueConstructor() {
         expectAndConsume(TokenType.KEYWORD_values);
 
         List values = new ArrayList();
@@ -215,18 +216,17 @@ public class Parser {
             values.add(parseAndEvaluate());
         } while (consumeIfMatches(TokenType.COMMA));
         expectAndConsume(TokenType.CLOSE_PAREN);
-        return values;
+        return new ImmutableList(values);
     }
 
-    private Object parseAndEvaluate() {
+    private Cell parseAndEvaluate() {
         Expression expression = parseExpressionOrNull();
         if (expression == null) {
             // default value
             return null;
         }
         else {
-            Cell cell = expression.evaluate(null);
-            return cell.asContents();
+            return expression.evaluate(null);
         }
     }
 
@@ -335,7 +335,7 @@ public class Parser {
     }
 
     Expression parseDefaultValue(String name) {
-        if (currentTokenType() == TokenType.NUMBER /*|| currentTokenType() == TokenType.PERIOD*/) {
+        if (currentTokenType() == TokenType.NUMBER || currentTokenType() == TokenType.PERIOD) {
             return parseNumber().asNonBoolean();
         }
         else if (consumeIfMatches(TokenType.PLUS)) {
@@ -624,7 +624,7 @@ public class Parser {
         if (currentTokenType() == TokenType.IDENTIFIER) {
             return new NonBooleanParserExpression(parseColumnReference());
         }
-        else if (currentTokenType() == TokenType.NUMBER) {
+        else if (currentTokenType() == TokenType.NUMBER || currentTokenType() == TokenType.PERIOD) {
             return parseNumber();
         }
         else if (consumeIfMatches(TokenType.PLUS)) {

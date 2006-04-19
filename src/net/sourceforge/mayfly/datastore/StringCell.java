@@ -31,6 +31,10 @@ public class StringCell extends Cell {
         throw new MayflyException("Attempt to read string " + content + " as a long");
     }
 
+    public double asDouble() throws SQLException {
+        throw new MayflyException("Attempt to read string " + content + " as a double");
+    }
+
     public String asString() {
         return content;
     }

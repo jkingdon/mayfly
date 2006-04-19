@@ -20,8 +20,8 @@ public class GreaterTest extends TestCase {
     public void testEval() throws Exception {
         Row row = new Row(
             new TupleBuilder()
-                .appendColumnCellContents("colA", new Long(6))
-                .appendColumnCellContents("colB", new Long(7))
+                .appendColumnCellContents("colA", 6)
+                .appendColumnCellContents("colB", 7)
         );
 
         assertFalse(new Greater(new IntegerLiteral(5), new SingleColumn("colA")).evaluate(row));

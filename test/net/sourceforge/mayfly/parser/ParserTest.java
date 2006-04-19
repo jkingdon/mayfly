@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.evaluation.expression.Divide;
 import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
+import net.sourceforge.mayfly.evaluation.expression.literal.DecimalLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.evaluation.from.From;
@@ -441,10 +442,14 @@ public class ParserTest extends TestCase {
         assertEquals(new BigInteger("9223372036854775808"), bigInteger);
     }
     
-    public void testMoreTestsOfLeadingPeriod() throws Exception {
-//        BigDecimalLiteral value = new Parser(".07").parseDefaultValue("x");
-        // assertEquals(0.07, (some incantantion on value)
-        // likewise for parserPrimary()
+    public void testLeadingPeriodInDefault() throws Exception {
+        DecimalLiteral value = (DecimalLiteral) new Parser(".07").parseDefaultValue("x");
+        assertEquals(0.07, value.valueAsCell().asDouble(), 0.000001);
+    }
+
+    public void testLeadingPeriodInPrimary() throws Exception {
+        DecimalLiteral value = (DecimalLiteral) new Parser(".07").parsePrimary().asNonBoolean();
+        assertEquals(0.07, value.valueAsCell().asDouble(), 0.000001);
     }
 
     private void checkDecimal(double expected, String input) {

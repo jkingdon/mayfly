@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -11,6 +12,10 @@ public class ImmutableList implements List {
 
     public static ImmutableList singleton(Object singleElement) {
         return new ImmutableList(Collections.singletonList(singleElement), true);
+    }
+    
+    public static ImmutableList fromArray(Object[] elements) {
+        return new ImmutableList(Arrays.asList(elements));
     }
     
     public static ImmutableList fromIterable(Iterable contents) {

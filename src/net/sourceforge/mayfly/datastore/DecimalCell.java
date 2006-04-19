@@ -30,7 +30,7 @@ public class DecimalCell extends Cell {
     }
 
     public String asString() {
-        /** Is this what other databases do?  Seems consistent with {@link LongCell},
+        /** What do other databases do?  I guess do it like {@link LongCell},
             but something makes me want to make sure I check this out and write a test. 
          */ 
         throw new UnimplementedException("Can't yet convert decimal to string");
@@ -42,6 +42,10 @@ public class DecimalCell extends Cell {
     
     public BigDecimal asBigDecimal() {
         return value;
+    }
+
+    public double asDouble() {
+        return value.doubleValue();
     }
 
     public int compareTo(Cell otherCell) {

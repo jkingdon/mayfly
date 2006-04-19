@@ -208,5 +208,55 @@ public class DataTypeTest extends SqlTestCase {
             results.close();
         }
     }
+    
+    public void testIntegerToFloat() throws Exception {
+        execute("create table foo (x bigint, y smallint)");
+        // 4503599627370495 is, I believe, the largest integer value which can be
+        // represented exactly in a double.
+        execute("insert into foo(x, y) values (4503599627370495, 32767)");
+        execute("insert into foo(x, y) values (-4503599627370495, -32767)");
+        // Likewise for float:
+        execute("insert into foo(x, y) values (8388607, 0)");
+        execute("insert into foo(x, y) values (-8388607, 0)");
+        
+        ResultSet results = query("select x, y from foo");
+
+        assertTrue(results.next());
+        assertEquals(32767.0, results.getDouble("y"), 0.00001);
+        assertEquals(4503599627370495.0, results.getDouble("x"), 0.00001);
+        assertEquals(32767.0f, results.getFloat("y"), 0.00001f);
+        /* Comparing as doubles rather than floats 
+           better shows that bits are lost
+           (although we'd have to pick a different integer(s) to
+           delve into exactly how many bits are lost) */ 
+        assertEquals(4503599627370495.0, results.getFloat("x"), 1.0);
+        
+        assertEquals(32767.0, results.getDouble(2), 0.00001);
+        assertEquals(32767.0f, results.getFloat(2), 0.00001f);
+
+        assertTrue(results.next());
+        assertEquals(- 4503599627370495.0, results.getDouble("x"), 0.00001);
+        assertEquals(- 32767.0f, results.getFloat("y"), 0.00001f);
+
+        assertTrue(results.next());
+        assertEquals(8388607.0f, results.getFloat("x"), 0.00001f);
+
+        assertTrue(results.next());
+        assertEquals(- 8388607.0f, results.getFloat("x"), 0.00001f);
+
+        assertFalse(results.next());
+        results.close();
+    }
+    
+    public void testDecimalToFloat() throws Exception {
+        execute("create table foo (x decimal(10,3))");
+        execute("insert into foo(x) values(53.904)");
+        
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+        assertEquals(53.904, results.getDouble("x"), 0.000001);
+        assertFalse(results.next());
+        results.close();
+    }
 
 }

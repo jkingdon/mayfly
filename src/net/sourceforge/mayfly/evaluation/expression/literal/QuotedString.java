@@ -16,7 +16,7 @@ public class QuotedString extends Literal {
         return withoutQuotes.replaceAll("''", "'");
     }
 
-    protected Cell valueAsCell() {
+    public Cell valueAsCell() {
         return new StringCell(stringWithoutQuotes());
     }
     

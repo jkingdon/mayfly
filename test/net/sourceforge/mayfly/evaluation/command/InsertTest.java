@@ -2,12 +2,10 @@ package net.sourceforge.mayfly.evaluation.command;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.NullCellContent;
-import net.sourceforge.mayfly.evaluation.command.Command;
-import net.sourceforge.mayfly.evaluation.command.Insert;
-import net.sourceforge.mayfly.evaluation.command.InsertTable;
-
-import java.util.Arrays;
+import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.StringCell;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 public class InsertTest extends TestCase {
     
@@ -15,8 +13,8 @@ public class InsertTest extends TestCase {
         assertEquals(
             new Insert(
                 new InsertTable("foo"),
-                Arrays.asList(new String[] {"a", "b"}),
-                Arrays.asList(new Object[] {new Long(5), "Value"})
+                ImmutableList.fromArray(new String[] {"a", "b"}),
+                ImmutableList.fromArray(new Object[] {new LongCell(5), new StringCell("Value")})
             ),
             Command.fromSql("insert into foo (a, b) values (5, 'Value')")
         );
@@ -26,8 +24,8 @@ public class InsertTest extends TestCase {
         assertEquals(
             new Insert(
                 new InsertTable("foo"),
-                Arrays.asList(new String[] {"a"}),
-                Arrays.asList(new Object[] {NullCellContent.INSTANCE})
+                ImmutableList.fromArray(new String[] {"a"}),
+                ImmutableList.fromArray(new Object[] {NullCell.INSTANCE})
             ),
             Command.fromSql("insert into foo (a) values (null)")
         );
@@ -38,7 +36,7 @@ public class InsertTest extends TestCase {
             new Insert(
                 new InsertTable("foo"),
                 null,
-                Arrays.asList(new Object[] {new Long(5)})
+                ImmutableList.fromArray(new Object[] {new LongCell(5)})
             ),
             Command.fromSql("insert into foo values (5)")
         );

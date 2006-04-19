@@ -43,6 +43,10 @@ public class LongCell extends Cell {
     public long asLong() {
         return value;
     }
+    
+    public double asDouble() {
+        return value;
+    }
 
     public Object asObject() {
         return new Long(value);

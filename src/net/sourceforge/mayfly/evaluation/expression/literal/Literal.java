@@ -15,6 +15,6 @@ public abstract class Literal extends Expression {
         return valueAsCell();
     }
     
-    protected abstract Cell valueAsCell();
+    public abstract Cell valueAsCell();
 
 }
