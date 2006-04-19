@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 
 public final class MayflyResultSet extends ResultSetStub {
+
     private int pos = -1;
     private boolean wasNull = false;
 
@@ -80,16 +81,19 @@ public final class MayflyResultSet extends ResultSetStub {
         return cellFromIndex(oneBasedColumn).asBigDecimal();
     }
 
+    private static final String SUGGEST_SET_SCALE = "Instead of passing a scale to getBigDecimal, \n" +
+        "call getBigDecimal without a scale and then call setScale on the returned BigDecimal";
+
     /** @internal
      * @deprecated */
     public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
-        throw new SQLException("getBigDecimal with a scale is not implemented, as it is deprecated in JDBC");
+        throw new SQLException(SUGGEST_SET_SCALE);
     }
 
     /** @internal
      * @deprecated */
     public BigDecimal getBigDecimal(int oneBasedColumn, int scale) throws SQLException {
-        throw new SQLException("getBigDecimal with a scale is not implemented, as it is deprecated in JDBC");
+        throw new SQLException(SUGGEST_SET_SCALE);
     }
     
     public double getDouble(String columnName) throws SQLException {

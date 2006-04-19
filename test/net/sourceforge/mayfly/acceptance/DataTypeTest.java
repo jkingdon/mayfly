@@ -188,9 +188,7 @@ public class DataTypeTest extends SqlTestCase {
             results.close();
         }
 
-        /* results.getBigDecimal with a scale intentionally not tested as it is deprecated
-           (might want to look at what it was supposed to do and why it was decprecated, though).
-         */
+        /* results.getBigDecimal with a scale intentionally not tested as it is deprecated */
 
         {
             ResultSet results = query("select price, list_price from foo");
