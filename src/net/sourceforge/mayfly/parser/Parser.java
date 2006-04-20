@@ -15,6 +15,7 @@ import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.CreateSchema;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
+import net.sourceforge.mayfly.evaluation.command.Delete;
 import net.sourceforge.mayfly.evaluation.command.DropTable;
 import net.sourceforge.mayfly.evaluation.command.Insert;
 import net.sourceforge.mayfly.evaluation.command.InsertTable;
@@ -138,6 +139,9 @@ public class Parser {
         else if (currentTokenType() == TokenType.KEYWORD_update) {
             return parseUpdate();
         }
+        else if (currentTokenType() == TokenType.KEYWORD_delete) {
+            return parseDelete();
+        }
         else {
             throw new ParserException("expected command but got " + describeToken(currentToken()));
         }
@@ -168,6 +172,14 @@ public class Parser {
         List setClauses = parseSetClauseList();
         Where where = parseOptionalWhere();
         return new Update(table, setClauses, where);
+    }
+    
+    private Command parseDelete() {
+        expectAndConsume(TokenType.KEYWORD_delete);
+        expectAndConsume(TokenType.KEYWORD_from);
+        InsertTable table = parseInsertTable();
+        Where where = parseOptionalWhere();
+        return new Delete(table, where);
     }
 
     private List parseSetClauseList() {

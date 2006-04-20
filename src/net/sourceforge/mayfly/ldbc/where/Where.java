@@ -5,7 +5,7 @@ public class Where extends BooleanExpression {
 
     public static final Where EMPTY = new Where(BooleanExpression.TRUE);
 
-    private BooleanExpression expression = BooleanExpression.TRUE;
+    private final BooleanExpression expression;
 
     public Where(BooleanExpression expression) {
         this.expression = expression;

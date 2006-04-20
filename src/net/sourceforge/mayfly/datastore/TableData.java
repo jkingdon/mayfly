@@ -104,6 +104,24 @@ public class TableData {
         return new UpdateTable(new TableData(columns, constraints, newRows), rowsAffected);
     }
 
+    public UpdateTable delete(Where where) {
+        Rows newRows = new Rows();
+        int rowsAffected = 0;
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            
+            if (where.evaluate(row)) {
+                ++rowsAffected;
+            }
+            else {
+                newRows = (Rows) newRows.with(row);
+            }
+
+        }
+        TableData newTable = new TableData(columns, constraints, newRows);
+        return new UpdateTable(newTable, rowsAffected);
+    }
+
     private String describeNamesAndValues(Columns columns, List values) {
         StringBuilder result = new StringBuilder();
         

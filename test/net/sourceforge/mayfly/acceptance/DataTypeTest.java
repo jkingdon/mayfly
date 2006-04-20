@@ -73,7 +73,7 @@ public class DataTypeTest extends SqlTestCase {
 
     // Here's a small sample of other types we don't test for yet:
     // INT (synonym for INTEGER), CHARACTER VARYING (synonym for VARCHAR)
-    //NUMERIC and DECIMAL
+    //NUMERIC
     //REAL, FLOAT, DOUBLE - precision can be given in binary digits (24 or 53, typically)
     // BIT and BIT VARYING; BOOLEAN
     // BIGSERIAL (see AutoIncrementTest for the auto-increment syntaxes we do look for)

@@ -88,6 +88,15 @@ public class Schema {
 
     public UpdateSchema update(String table, List setClauses, Where where) {
         UpdateTable result = table(table).update(setClauses, where);
+        return replaceTable(table, result);
+    }
+
+    public UpdateSchema delete(String table, Where where) {
+        UpdateTable result = table(table).delete(where);
+        return replaceTable(table, result);
+    }
+
+    private UpdateSchema replaceTable(String table, UpdateTable result) {
         Schema schema = new Schema(tables.with(lookUpTable(table), result.table()));
         return new UpdateSchema(schema, result.rowsAffected());
     }

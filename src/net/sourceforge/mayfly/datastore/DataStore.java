@@ -111,6 +111,15 @@ public class DataStore {
 
     public UpdateStore update(String schema, String table, List setClauses, Where where) {
         UpdateSchema result = schema(schema).update(table, setClauses, where);
+        return replaceSchema(schema, result);
+    }
+
+    public UpdateStore delete(String schema, String table, Where where) {
+        UpdateSchema result = schema(schema).delete(table, where);
+        return replaceSchema(schema, result);
+    }
+
+    private UpdateStore replaceSchema(String schema, UpdateSchema result) {
         return new UpdateStore(replace(schema, result.schema()), result.rowsAffected());
     }
 

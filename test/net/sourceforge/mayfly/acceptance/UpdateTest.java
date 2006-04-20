@@ -55,9 +55,6 @@ public class UpdateTest extends SqlTestCase {
     }
     
     public void testDefault() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
         execute("create table foo (a integer default 5)");
         execute("insert into foo(a) values (7)");
         String updateDefault = "update foo set a = default";
