@@ -45,6 +45,12 @@ public class ImmutableList implements List {
         return new ImmutableList(copy, true);
     }
 
+    public ImmutableList withAll(List elementsToAdd) {
+        List copy = new ArrayList(this);
+        copy.addAll(elementsToAdd);
+        return new ImmutableList(copy, true);
+    }
+
 
     
     public boolean add(Object o) {

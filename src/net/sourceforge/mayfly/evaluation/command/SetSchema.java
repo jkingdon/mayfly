@@ -11,12 +11,8 @@ public class SetSchema extends Command {
         this.name = name;
     }
 
-    public DataStore update(DataStore store, String schema) {
+    public UpdateStore update(DataStore store, String schema) {
         throw new MayflyInternalException("set schema doesn't operate on a data store");
-    }
-
-    public int rowsAffected() {
-        return 0;
     }
 
     public String name() {

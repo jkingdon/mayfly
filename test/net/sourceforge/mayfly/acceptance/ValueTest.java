@@ -153,10 +153,13 @@ public class ValueTest extends SqlTestCase {
     }
 
     public void testEmptyStringAsNull() throws Exception {
-        // TODO: empty string is treated as null by Oracle, but not by
-        // Postgres.  I've seen Postgres examples like 'foo' || '' => 'foo'
-        // but 'foo' || null => null.
-        // So what should Mayfly do?
+        /* Oracle treats empty string as null (although the documentation
+           claims this may change in some future version of Oracle).
+           Here we test for the standard behavior - '' and null are different. */
+        execute("create table foo (a varchar(255), b varchar(255))");
+        execute("insert into foo(a, b) values ('', 'empty string')");
+        execute("insert into foo(a, b) values (null, 'a null')");
+        assertResultSet(new String[] { " 'a null' "}, query("select b from foo where a is null"));
     }
     
     public void testExpressionInInsert() throws Exception {
@@ -299,9 +302,7 @@ public class ValueTest extends SqlTestCase {
         assertTrue(results.next());
         assertEquals(5, results.getInt("x"));
         assertEquals("5", results.getString("x"));
-        if (dialect.wishThisWereTrue()) {
-            assertEquals(5.0, results.getDouble("x"), 0.00001);
-        }
+        assertEquals(5.0, results.getDouble("x"), 0.00001);
         assertFalse(results.next());
     }
     

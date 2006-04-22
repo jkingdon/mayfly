@@ -317,9 +317,28 @@ public class Parser {
         else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
             table.addUniqueConstraint(parseColumnNames());
         }
+        else if (currentTokenType() == TokenType.KEYWORD_foreign) {
+            parseForeignKeyConstraint(table);
+        }
         else {
             throw new ParserException("expected column or table constraint but got " + describeToken(currentToken()));
         }
+    }
+
+    private void parseForeignKeyConstraint(CreateTable table) {
+        expectAndConsume(TokenType.KEYWORD_foreign);
+        expectAndConsume(TokenType.KEYWORD_key);
+        expectAndConsume(TokenType.OPEN_PAREN);
+        String referencingColumn = consumeIdentifier();
+        expectAndConsume(TokenType.CLOSE_PAREN);
+
+        expectAndConsume(TokenType.KEYWORD_references);
+        InsertTable targetTable = parseInsertTable();
+        expectAndConsume(TokenType.OPEN_PAREN);
+        String targetColumn = consumeIdentifier();
+        expectAndConsume(TokenType.CLOSE_PAREN);
+        
+        table.addForeignKeyConstraint(referencingColumn, targetTable, targetColumn);
     }
 
     Column parseColumnDefinition(CreateTable table) {

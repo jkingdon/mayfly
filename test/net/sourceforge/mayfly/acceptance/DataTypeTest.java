@@ -172,10 +172,6 @@ public class DataTypeTest extends SqlTestCase {
     }
 
     public void testDecimal() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
-
         execute("create table foo (price decimal(4, 2), list_price decimal(5, 2))");
         execute("insert into foo (price, list_price) values (95.0, 99.95)");
 

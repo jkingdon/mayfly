@@ -16,17 +16,14 @@ public class DropTable extends Command {
         return table;
     }
 
-    public DataStore update(DataStore store, String schema) {
+    public UpdateStore update(DataStore store, String schema) {
         if (ifExists) {
             if (!store.schema(schema).hasTable(table)) {
-                return store;
+                return new UpdateStore(store, 0);
             }
         }
-        return store.dropTable(schema, table);
-    }
-
-    public int rowsAffected() {
-        return 0;
+        DataStore newStore = store.dropTable(schema, table);
+        return new UpdateStore(newStore, 0);
     }
 
 }

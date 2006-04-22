@@ -50,7 +50,7 @@ public class MayflyDialect extends Dialect {
     }
     
     public boolean canGroupByColumnAlias() {
-        // We don't implement column aliases yet.
+        /** We don't implement column aliases yet.  {@see ResultTest#testAs()}. */
         return wishThisWereTrue();
     }
     

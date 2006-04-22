@@ -348,6 +348,10 @@ public abstract class Dialect {
         return false;
     }
 
+    public String databaseTypeForForeignKeys() {
+        return "";
+    }
+    
     public boolean haveTinyint() {
         return true;
     }

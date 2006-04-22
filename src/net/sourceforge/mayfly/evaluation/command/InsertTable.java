@@ -1,7 +1,13 @@
 package net.sourceforge.mayfly.evaluation.command;
 
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.util.ValueObject;
 
+// TODO: probably should be called TableReference or some such.
+// Might be an open question about when a user-specified name
+// (might differ in case from canonical, might not exist) gets
+// resolved.
+// (also when the default schema gets applied)
 public class InsertTable extends ValueObject {
 
     private final String tableName;
@@ -22,6 +28,14 @@ public class InsertTable extends ValueObject {
 
     public String schema(String defaultSchema) {
         return schema == null ? defaultSchema : schema;
+    }
+    
+    public String schema() {
+        if (schema == null) {
+            throw new MayflyInternalException(
+                "schema should have already been resolved against the default schema");
+        }
+        return schema;
     }
 
 }

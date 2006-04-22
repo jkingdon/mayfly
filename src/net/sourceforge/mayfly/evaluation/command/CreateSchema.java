@@ -20,17 +20,14 @@ public class CreateSchema extends Command {
         createTableCommands.add(command);
     }
 
-    public DataStore update(DataStore store, String currentSchema) {
+    public UpdateStore update(DataStore store, String currentSchema) {
         Schema schema = new Schema();
         for (Iterator iter = createTableCommands.iterator(); iter.hasNext();) {
             CreateTable command = (CreateTable) iter.next();
             schema = command.update(schema);
         }
-        return store.addSchema(schemaName, schema);
-    }
-
-    public int rowsAffected() {
-        return 0;
+        DataStore newStore = store.addSchema(schemaName, schema);
+        return new UpdateStore(newStore, 0);
     }
 
 }

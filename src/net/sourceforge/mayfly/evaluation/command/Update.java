@@ -11,23 +11,15 @@ public class Update extends Command {
     private final List setClauses;
     private final Where where;
 
-    private int rowsAffected;
-
     public Update(InsertTable table, List setClauses, Where where) {
         this.table = table;
         this.setClauses = setClauses;
         this.where = where;
     }
 
-    public DataStore update(DataStore store, String currentSchema) {
-        UpdateStore updateResult = store.update(
+    public UpdateStore update(DataStore store, String currentSchema) {
+        return store.update(
             table.schema(currentSchema), table.tableName(), setClauses, where);
-        rowsAffected = updateResult.rowsAffected();
-        return updateResult.store();
-    }
-
-    public int rowsAffected() {
-        return rowsAffected;
     }
 
 }

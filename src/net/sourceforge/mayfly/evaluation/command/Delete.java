@@ -8,22 +8,14 @@ public class Delete extends Command {
     private final InsertTable table;
     private final Where where;
 
-    private int rowsAffected;
-
     public Delete(InsertTable table, Where where) {
         this.table = table;
         this.where = where;
     }
 
-    public DataStore update(DataStore store, String currentSchema) {
-        UpdateStore updateResult = store.delete(
+    public UpdateStore update(DataStore store, String currentSchema) {
+        return store.delete(
             table.schema(currentSchema), table.tableName(), where);
-        rowsAffected = updateResult.rowsAffected();
-        return updateResult.store();
-    }
-
-    public int rowsAffected() {
-        return rowsAffected;
     }
 
 }

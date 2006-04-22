@@ -44,6 +44,13 @@ public class ImmutableListTest extends TestCase {
         assertEquals("b", addToNonEmpty.get(1));
     }
     
+    public void testWithAll() throws Exception {
+        ImmutableList list = new ImmutableList().with("a");
+        ImmutableList actual = list.withAll(new L().append("b").append("c"));
+        L expected = new L().append("a").append("b").append("c");
+        assertEquals(expected, actual);
+    }
+    
     public void testFromAggregate() throws Exception {
         Strings source = new Strings("a", "b");
         ImmutableList list = ImmutableList.fromIterable(source);

@@ -163,9 +163,16 @@ public class GroupByTest extends SqlTestCase {
     
     public void testGroupByAggregate() throws Exception {
         // select pub_id, sum(price) from titles group by pub_id, sum(price)
+        // Might have to go back to 
+        // The Practical SQL Handbook; Using Structured Query Language, 2nd edition.
+        // to remember why you'd group by an aggregate.
         if (!dialect.wishThisWereTrue()) {
             return;
         }
+        execute("create table books (pub_id integer, price integer)");
+        execute("insert into books (pub_id, price) values (1, 1995)");
+        execute("insert into books (pub_id, price) values (1, 2995)");
+        execute("insert into books (pub_id, price) values (2, 2195)");
     }
     
     public void testGroupByAggregateViaAlias() throws Exception {
@@ -317,6 +324,7 @@ public class GroupByTest extends SqlTestCase {
     
     public void testGroupByAndOrderBy() throws Exception {
         // For example, select type, avg(price) order by avg(price)
+        // or the error case: select type group by type order by price
         if (!dialect.wishThisWereTrue()) {
             return;
         }

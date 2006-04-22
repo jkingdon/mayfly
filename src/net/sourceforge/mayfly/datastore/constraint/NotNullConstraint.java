@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 
-public class NotNullConstraint implements Constraint {
+public class NotNullConstraint extends Constraint {
 
     private final Column column;
 

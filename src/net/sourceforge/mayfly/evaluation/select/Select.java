@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyResultSet;
-import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
@@ -10,6 +9,7 @@ import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.command.Command;
+import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.what.Selected;
@@ -117,12 +117,8 @@ public class Select extends Command {
         return limit.limit(sorted);
     }
 
-    public DataStore update(DataStore store, String schema) {
-        throw new UnimplementedException(UPDATE_MESSAGE);
-    }
-
-    public int rowsAffected() {
-        throw new UnimplementedException(UPDATE_MESSAGE);
+    public UpdateStore update(DataStore store, String schema) {
+        throw new MayflyException(UPDATE_MESSAGE);
     }
 
 }

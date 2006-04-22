@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 import net.sourceforge.mayfly.datastore.constraint.NotNullConstraint;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 import net.sourceforge.mayfly.datastore.constraint.UniqueConstraint;
@@ -23,6 +24,7 @@ public class CreateTable extends Command {
     private List primaryKeyColumns;
     private List /* <List<String>> */ uniqueConstraints = new ArrayList();
     private List notNullConstraints = new ArrayList();
+    private List foreignKeyConstraints = new ArrayList();
 
     public CreateTable(String table, List columnNames) {
         this.table = table;
@@ -37,19 +39,25 @@ public class CreateTable extends Command {
         return table;
     }
 
-    public DataStore update(DataStore store, String schema) {
+    public UpdateStore update(DataStore store, String schema) {
         Schema oldSchema = store.schema(schema);
         Schema updatedSchema = update(oldSchema);
-        return store.replace(schema, updatedSchema);
+        DataStore newStore = store
+            .replace(schema, updatedSchema)
+            .addStoreConstraints(foreignKeyConstraints());
+        return new UpdateStore(newStore, 0);
     }
 
     public Schema update(Schema schema) {
-        Constraints constraints = makeConstraints();
+        Constraints constraints = makeTableConstraints();
         return schema.createTable(table(), columns, constraints);
     }
 
-    private Constraints makeConstraints() {
-        ImmutableList constraints = ImmutableList.fromIterable(uniqueConstraints().plus(notNullConstraints()));
+    private Constraints makeTableConstraints() {
+        ImmutableList constraints = ImmutableList.fromIterable(
+            uniqueConstraints()
+            .plus(notNullConstraints())
+        );
         return new Constraints(primaryKey(), constraints);
     }
 
@@ -79,6 +87,21 @@ public class CreateTable extends Command {
         return result;
     }
 
+    private L foreignKeyConstraints() {
+        L result = new L();
+        for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
+            UnresolvedForeignKey key = (UnresolvedForeignKey) iter.next();
+            result.add(
+                new ForeignKey(
+                    columns.columnFromName(key.referencingColumn),
+                    key.targetTable,
+                    key.targetColumn
+                )
+            );
+        }
+        return result;
+    }
+
     private Columns resolveColumns(List constraintColumns) {
         List resolvedColumns = new ArrayList();
         for (Iterator iter = constraintColumns.iterator(); iter.hasNext();) {
@@ -87,10 +110,6 @@ public class CreateTable extends Command {
             resolvedColumns.add(column);
         }
         return new Columns(new ImmutableList(resolvedColumns));
-    }
-
-    public int rowsAffected() {
-        return 0;
     }
 
     public void addColumn(Column column) {
@@ -110,6 +129,23 @@ public class CreateTable extends Command {
 
     public void addNotNullConstraint(String column) {
         notNullConstraints.add(column);
+    }
+
+    public void addForeignKeyConstraint(String referencingColumn, InsertTable targetTable, String targetColumn) {
+        foreignKeyConstraints.add(new UnresolvedForeignKey(referencingColumn, targetTable, targetColumn));
+    }
+    
+    static class UnresolvedForeignKey {
+        final String referencingColumn;
+        final InsertTable targetTable;
+        final String targetColumn;
+
+        public UnresolvedForeignKey(String referencingColumn, InsertTable targetTable, String targetColumn) {
+            this.referencingColumn = referencingColumn;
+            this.targetTable = targetTable;
+            this.targetColumn = targetColumn;
+        }
+        
     }
 
 }

@@ -60,7 +60,7 @@ public class MayflyConnection {
             String proposed = setSchema.name();
             database.dataStore().schema(proposed);
             currentSchema = proposed;
-            return setSchema.rowsAffected();
+            return 0;
         }
         return database.executeUpdate(command, currentSchema);
     }

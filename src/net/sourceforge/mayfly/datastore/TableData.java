@@ -97,6 +97,7 @@ public class TableData {
                 ++rowsAffected;
             }
             else {
+                constraints.check(newRows, row);
                 newRows = (Rows) newRows.with(row);
             }
 
@@ -151,7 +152,7 @@ public class TableData {
         return result.toString();
     }
 
-    private Columns findColumns(List columnNames) {
+    public Columns findColumns(List columnNames) {
         L columnList =
             new L(columnNames)
                 .collect(
@@ -199,6 +200,17 @@ public class TableData {
 
     public Rows rows() {
         return rows;
+    }
+
+    public boolean hasValue(String column, Cell value) {
+        Column foundColumn = columns.columnFromName(column);
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            if (row.cell(foundColumn).sqlEquals(value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

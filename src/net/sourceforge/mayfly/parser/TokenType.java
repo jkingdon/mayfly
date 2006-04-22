@@ -51,6 +51,7 @@ public class TokenType {
     public static final TokenType KEYWORD_distinct = registerKeyword("distinct");
     public static final TokenType KEYWORD_drop = registerKeyword("drop");
     public static final TokenType KEYWORD_exists = registerKeyword("exists");
+    public static final TokenType KEYWORD_foreign = registerKeyword("foreign");
     public static final TokenType KEYWORD_from = registerKeyword("from");
     public static final TokenType KEYWORD_group = registerKeyword("group");
     public static final TokenType KEYWORD_having = registerKeyword("having");
@@ -74,6 +75,7 @@ public class TokenType {
     public static final TokenType KEYWORD_order = registerKeyword("order");
     public static final TokenType KEYWORD_outer = registerKeyword("outer");
     public static final TokenType KEYWORD_primary = registerKeyword("primary");
+    public static final TokenType KEYWORD_references = registerKeyword("references");
     public static final TokenType KEYWORD_schema = registerKeyword("schema");
     public static final TokenType KEYWORD_select = registerKeyword("select");
     public static final TokenType KEYWORD_set = registerKeyword("set");

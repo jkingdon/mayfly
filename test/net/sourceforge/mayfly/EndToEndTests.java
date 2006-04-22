@@ -24,5 +24,15 @@ public class EndToEndTests extends SqlTestCase {
         execute("insert into foo(y) values(0)");
         assertResultSet(new String[] { " -5, 44000 " }, query("select x, z from foo"));
     }
+    
+    public void testQueryVersusUpdate() throws Exception {
+        /* Might be interesting to see what other databases do
+           (for example, I think hypersonic 1.8.x will throw
+           exceptions such as these but 1.7.x will be lenient). */
+        execute("create table foo (x integer)");
+        expectExecuteFailure("select x from foo", "SELECT is only available with query, not update");
+        expectQueryFailure("insert into foo(x) values(5)", 
+            "expected SELECT but got INSERT");
+    }
 
 }

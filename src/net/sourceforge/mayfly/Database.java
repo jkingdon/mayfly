@@ -2,6 +2,7 @@ package net.sourceforge.mayfly;
 
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.command.Command;
+import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.jdbc.JdbcConnection;
 
 import java.sql.Connection;
@@ -85,8 +86,9 @@ public class Database {
      * Only intended for use within Mayfly.
      */
     public int executeUpdate(Command command, String currentSchema) {
-        dataStore = command.update(dataStore, currentSchema);
-        return command.rowsAffected();
+        UpdateStore result = command.update(dataStore, currentSchema);
+        dataStore = result.store();
+        return result.rowsAffected();
     }
 
     /**

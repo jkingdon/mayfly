@@ -22,7 +22,11 @@ public class Insert extends Command {
         return table.tableName();
     }
 
-    public DataStore update(DataStore store, String currentSchema) {
+    public UpdateStore update(DataStore store, String currentSchema) {
+        return new UpdateStore(insertOneRow(store, currentSchema), 1);
+    }
+
+    private DataStore insertOneRow(DataStore store, String currentSchema) {
         if (columnNames == null) {
             return store.addRow(schemaToUse(currentSchema), table(), values);
         } else {
@@ -34,8 +38,4 @@ public class Insert extends Command {
         return table.schema(currentSchema);
     }
 
-    public int rowsAffected() {
-        return 1;
-    }
-    
 }

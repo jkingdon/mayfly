@@ -2,6 +2,8 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.datastore.constraint.StoreConstraints;
+import net.sourceforge.mayfly.evaluation.command.InsertTable;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.ldbc.where.Where;
@@ -30,48 +32,52 @@ public class DataStore {
     public static final String ANONYMOUS_SCHEMA_NAME = "";
     public static final CaseInsensitiveString ANONYMOUS_SCHEMA = new CaseInsensitiveString(ANONYMOUS_SCHEMA_NAME);
 
-    private final ImmutableMap namedSchemas;
+    private final ImmutableMap schemas;
+    private final StoreConstraints storeConstraints;
     
     public DataStore() {
         this(new Schema());
     }
 
     public DataStore(Schema anonymousSchema) {
-        this(new ImmutableMap().with(ANONYMOUS_SCHEMA, anonymousSchema));
+        this(new ImmutableMap().with(ANONYMOUS_SCHEMA, anonymousSchema), new StoreConstraints());
     }
 
-    private DataStore(ImmutableMap namedSchemas) {
-        this.namedSchemas = namedSchemas;
+    private DataStore(ImmutableMap namedSchemas, StoreConstraints storeContraints) {
+        this.schemas = namedSchemas;
+        this.storeConstraints = storeContraints;
     }
 
     public DataStore addSchema(String newSchemaName, Schema newSchema) {
         if (schemaExists(newSchemaName)) {
             throw new MayflyException("schema " + newSchemaName + " already exists");
         }
-        return new DataStore(namedSchemas.with(new CaseInsensitiveString(newSchemaName), newSchema));
+        ImmutableMap newSchemas = schemas.with(new CaseInsensitiveString(newSchemaName), newSchema);
+        return new DataStore(newSchemas, storeConstraints);
     }
 
     public DataStore replace(String newSchemaName, Schema newSchema) {
         if (schemaExists(newSchemaName)) {
-            return new DataStore(namedSchemas.with(new CaseInsensitiveString(newSchemaName), newSchema));
+            ImmutableMap newSchemas = schemas.with(new CaseInsensitiveString(newSchemaName), newSchema);
+            return new DataStore(newSchemas, storeConstraints);
         } else {
             throw new MayflyInternalException("no schema " + newSchemaName);
         }
     }
 
     private boolean schemaExists(String newSchemaName) {
-        return namedSchemas.containsKey(new CaseInsensitiveString(newSchemaName));
+        return schemas.containsKey(new CaseInsensitiveString(newSchemaName));
     }
 
     public Schema schema(String schema) {
         if (schemaExists(schema)) {
-            return (Schema) namedSchemas.get(new CaseInsensitiveString(schema));
+            return (Schema) schemas.get(new CaseInsensitiveString(schema));
         }
         throw new MayflyException("no schema " + schema);
     }
 
     public Schema anonymousSchema() {
-        return (Schema) namedSchemas.get(ANONYMOUS_SCHEMA);
+        return (Schema) schemas.get(ANONYMOUS_SCHEMA);
     }
     
     public DataStore dropTable(String schema, String table) {
@@ -80,6 +86,10 @@ public class DataStore {
 
     public TableData table(String schema, String table) {
         return schema(schema).table(table);
+    }
+
+    public TableData table(InsertTable table) {
+        return schema(table.schema()).table(table.tableName());
     }
 
     public TableData table(String table) {
@@ -92,15 +102,33 @@ public class DataStore {
 
     public DataStore addRow(String schema, String table, List columnNames, List values) {
         return replace(schema, schema(schema).addRow(table, columnNames, values));
+//
+//        Schema foundSchema = schema(schema);
+//        TableData foundTable = foundSchema.table(table);
+//
+//        check(schema, table, foundTable.findColumns(columnNames), values);
+//
+//        return replace(schema, foundSchema.addRow(table, columnNames, values));
     }
 
     public DataStore addRow(String schema, String table, List values) {
         return replace(schema, schema(schema).addRow(table, values));
+//
+//        Schema foundSchema = schema(schema);
+//        TableData foundTable = foundSchema.table(table);
+//        
+//        check(schema, table, foundTable.columns(), values);
+//
+//        return replace(schema, foundSchema.addRow(table, values));
     }
+
+//    private void check(String schema, String table, Columns columns, List values) {
+//        storeConstraints.checkInsert(this, schema, table, columns, values);
+//    }
 
     public Set schemas() {
         Set names = new TreeSet();
-        for (Iterator iter = namedSchemas.keySet().iterator(); iter.hasNext();) {
+        for (Iterator iter = schemas.keySet().iterator(); iter.hasNext();) {
             CaseInsensitiveString key = (CaseInsensitiveString) iter.next();
             if (!key.equals(ANONYMOUS_SCHEMA)) {
                 names.add(key.getString());
@@ -121,6 +149,10 @@ public class DataStore {
 
     private UpdateStore replaceSchema(String schema, UpdateSchema result) {
         return new UpdateStore(replace(schema, result.schema()), result.rowsAffected());
+    }
+
+    public DataStore addStoreConstraints(List newStoreConstraints) {
+        return new DataStore(schemas, storeConstraints.withAll(newStoreConstraints));
     }
 
 }

@@ -151,6 +151,10 @@ public class MySqlDialect extends Dialect {
         return false;
     }
 
+    public String databaseTypeForForeignKeys() {
+        return " type=innodb";
+    }
+    
     public boolean haveDropTableFooIfExists() {
         return false;
     }
