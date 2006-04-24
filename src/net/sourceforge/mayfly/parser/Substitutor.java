@@ -40,11 +40,14 @@ public class Substitutor {
     private static Token tokenFromValue(Object value) {
         if (value instanceof Number) {
             Number numberValue = (Number) value;
-            return new Token(TokenType.NUMBER, "" + numberValue);
+            return new Token(TokenType.NUMBER, numberValue.toString());
         }
         else if (value instanceof String) {
             String stringValue = (String) value;
             return new Token(TokenType.QUOTED_STRING, "'" + StringEscapeUtils.escapeSql(stringValue) + "'");
+        }
+        else if (value == null) {
+            return new Token(TokenType.KEYWORD_null, "null");
         }
         else {
             throw new MayflyInternalException("Don't know how to substitute a " + value.getClass().getName());

@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 
 public class StatementTest extends SqlTestCase {
 
@@ -20,16 +21,25 @@ public class StatementTest extends SqlTestCase {
     
     public void testSyntaxErrorDetectedEarly() throws Exception {
         String sql = "insert into some place or another";
-        if (!dialect.detectsSyntaxErrorsInPrepareStatement()) {
-            connection.prepareStatement(sql);
-        }
-        else {
+        if (dialect.detectsSyntaxErrorsInPrepareStatement()) {
             try {
                 connection.prepareStatement(sql);
                 fail();
             } catch (SQLException e) {
                 assertMessage("expected VALUES but got place", e);
             }
+        }
+        else {
+            PreparedStatement prepared = connection.prepareStatement(sql);
+
+            try {
+                prepared.executeUpdate();
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage("expected VALUES but got place", e);
+            }
+            prepared.close();
         }
     }
     
@@ -100,17 +110,28 @@ public class StatementTest extends SqlTestCase {
         prepared.close();
     }
     
-    public void xtestSetToNull() throws Exception {
-        execute("create table Foo (a varchar(80))");
+    public void testSetToNull() throws Exception {
+        execute("create table foo (a varchar(80))");
 
         PreparedStatement prepared = connection.prepareStatement("insert into foo (a) values (?)");
-        try {
-            prepared.setString(1, null); // Or maybe this should mean the same as setNull?
-            fail();
-        } catch (SQLException e) {
-            assertMessage("no null", e);
-        }
+        // That passing null should mean the same as setNull sems to be the consensus
+        // of databases tested.
+        prepared.setString(1, null);
+        prepared.executeUpdate();
         prepared.close();
+        
+        assertResultSet(new String[] { " null " }, query("select a from foo"));
+    }
+    
+    public void testSetNull() throws Exception {
+        execute("create table foo (x integer)");
+        
+        PreparedStatement prepared = connection.prepareStatement("insert into foo (x) values (?)");
+        prepared.setNull(1, Types.INTEGER);
+        prepared.executeUpdate();
+        prepared.close();
+        
+        assertResultSet(new String[] { " null " }, query("select x from foo"));
     }
     
     public void testMissingSetCall() throws Exception {

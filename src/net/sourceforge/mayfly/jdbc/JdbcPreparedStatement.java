@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.sql.SQLWarning;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.BitSet;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Vector;
@@ -37,6 +38,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
     private final String sql;
     private Vector parameters;
     private final int parameterCount;
+    private BitSet parameterSpecified;
 
     JdbcPreparedStatement(String sql, MayflyConnection mayflyConnection) throws SQLException {
         this.mayflyConnection = mayflyConnection;
@@ -50,6 +52,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
             new Parser(tokens, true).parse();
 
             parameters.setSize(parameterCount);
+            parameterSpecified = new BitSet(parameterCount);
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
@@ -74,8 +77,16 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     private List substitutedTokens() throws SQLException {
+        // This didn't work for me.  Perhaps a bug in which libgcj
+        // was returning an answer past the length of the bitset, but
+        // I didn't investigate enough to be sure.
+//        int firstUnspecifiedParameter = parameterSpecified.nextClearBit(0);
+//        if (firstUnspecifiedParameter != -1) {
+//            int oneBased = firstUnspecifiedParameter + 1;
+//            throw new MayflyException("Parameter " + oneBased + " missing");
+//        }
         for (int i = 0; i < parameterCount; ++i) {
-            if (parameters.get(i) == null) {
+            if (!parameterSpecified.get(i)) {
                 int oneBased = i + 1;
                 throw new MayflyException("Parameter " + oneBased + " missing");
             }
@@ -84,8 +95,8 @@ public class JdbcPreparedStatement implements PreparedStatement {
         return Substitutor.substitute(new Lexer(sql).tokens(), parameters);
     }
 
-    public void setNull(int parameterIndex, int sqlType) throws SQLException {
-        throw new UnimplementedException();
+    public void setNull(int oneBased, int sqlType) throws SQLException {
+        setParameter(oneBased, null);
     }
 
     public void setBoolean(int parameterIndex, boolean value) throws SQLException {
@@ -104,18 +115,19 @@ public class JdbcPreparedStatement implements PreparedStatement {
         setParameter(oneBased, new Long(value));
     }
 
-    private void setParameter(int oneBasedParameterIndex, Object value) throws SQLException {
-        int zeroBased = oneBasedParameterIndex - 1;
+    private void setParameter(int oneBased, Object value) throws SQLException {
+        int zeroBased = oneBased - 1;
 
         if (zeroBased < 0) {
-            throw new SQLException("Parameter index " + oneBasedParameterIndex + " is out of bounds");
+            throw new SQLException("Parameter index " + oneBased + " is out of bounds");
         }
 
         if (zeroBased >= parameterCount) {
-            throw new SQLException("Parameter index " + oneBasedParameterIndex + " is out of bounds");
+            throw new SQLException("Parameter index " + oneBased + " is out of bounds");
         }
 
         parameters.set(zeroBased, value);
+        parameterSpecified.set(zeroBased);
     }
 
     public void setLong(int parameterIndex, long value) throws SQLException {
@@ -237,9 +249,9 @@ public class JdbcPreparedStatement implements PreparedStatement {
         throw new UnimplementedException();
     }
 
-    public void setNull(int paramIndex, int sqlType, String typeName)
+    public void setNull(int oneBased, int sqlType, String typeName)
             throws SQLException {
-        throw new UnimplementedException();
+        setNull(oneBased, sqlType);
     }
 
     public void setURL(int parameterIndex, URL value) throws SQLException {
