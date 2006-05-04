@@ -390,6 +390,10 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean notNullImpliesDefaults() {
+        return false;
+    }
+
     public boolean haveAutoUnderbarIncrement() {
         return false;
     }

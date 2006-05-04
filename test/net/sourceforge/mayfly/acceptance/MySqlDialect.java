@@ -165,6 +165,14 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean notNullImpliesDefaults() {
+        // An odd (though documented) quirk of MySQL:
+        // declaring a field NOT NULL changes its
+        // default value from NULL to some other
+        // value (0, '', etc).
+        return true;
+    }
+    
     public boolean haveAutoUnderbarIncrement() {
         return true;
     }

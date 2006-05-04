@@ -10,6 +10,18 @@ public class DefaultTest extends SqlTestCase {
         execute("insert into foo(y) values(0)");
         assertResultSet(new String[] { "111222333" }, query("select x from foo"));
     }
+    
+    public void testImplicitAndNotNull() throws Exception {
+        execute("create table foo (id integer, x integer not null, description varchar(255) not null)");
+        String sql = "insert into foo(id) values(1)";
+        if (dialect.notNullImpliesDefaults()) {
+            execute(sql);
+            assertResultSet(new String[] { " 1, 0, '' " }, query("select id, x, description from foo"));
+        }
+        else {
+            expectExecuteFailure(sql, "column x cannot be null");
+        }
+    }
 
     public void testExplicitInsert() throws Exception {
         execute("create table foo (x integer default 111222333)");
