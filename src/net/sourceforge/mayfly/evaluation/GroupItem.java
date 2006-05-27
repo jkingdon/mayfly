@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.util.ValueObject;
 
 public class GroupItem extends ValueObject {
 
-    private final Expression expression;
+    private Expression expression;
 
     public GroupItem(Expression expression) {
         this.expression = expression;
@@ -28,7 +28,7 @@ public class GroupItem extends ValueObject {
     }
 
     public void resolve(Row row) {
-        expression.resolve(row);
+        expression = expression.resolveAndReturn(row);
     }
 
 }

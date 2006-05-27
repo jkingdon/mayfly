@@ -1,9 +1,11 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
-import java.util.Collection;
-
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+
+import java.util.Collection;
 
 public class Average extends AggregateExpression {
 
@@ -13,6 +15,10 @@ public class Average extends AggregateExpression {
 
     Cell aggregate(Collection values) {
         return aggregateSumAverage(values, false);
+    }
+    
+    public Expression resolveAndReturn(Row row) {
+        return new Average((SingleColumn) column.resolveAndReturn(row), functionName, distinct);
     }
 
 }

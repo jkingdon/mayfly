@@ -7,10 +7,10 @@ import net.sourceforge.mayfly.evaluation.Expression;
 
 abstract public class BinaryOperator extends Expression {
 
-    private final Expression left;
-    private final Expression right;
+    protected final Expression left;
+    protected final Expression right;
 
-    public BinaryOperator(Expression left, Expression right) {
+    protected BinaryOperator(Expression left, Expression right) {
         this.left = left;
         this.right = right;
     }
@@ -66,10 +66,7 @@ abstract public class BinaryOperator extends Expression {
         }
     }
     
-    public void resolve(Row row) {
-        left.resolve(row);
-        right.resolve(row);
-    }
+    public abstract Expression resolveAndReturn(Row row);
     
     public Expression left() {
         return left;

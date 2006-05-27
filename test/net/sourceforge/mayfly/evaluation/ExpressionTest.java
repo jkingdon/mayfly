@@ -21,11 +21,12 @@ public class ExpressionTest extends TestCase {
     
     public void testResolve() throws Exception {
         Expression one = new Parser("x + 5 * avg(x) - count(*)").parseExpression().asNonBoolean();
-        one.resolve(new Row(new TupleBuilder().appendColumnCell("foo", "x", NullCell.INSTANCE)));
+        Expression resolved = one.resolveAndReturn(
+            new Row(new TupleBuilder().appendColumnCell("foo", "x", NullCell.INSTANCE)));
 
         String expectedString = "foo.x + 5 * avg( foo.x ) - count ( * )";
         Expression expected = new Parser(expectedString).parseExpression().asNonBoolean();
-        assertTrue("expected " + expectedString + " but was:" + one.toString(), expected.sameExpression(one));
+        assertTrue("expected " + expectedString + " but was:" + resolved.toString(), expected.sameExpression(resolved));
     }
     
 }

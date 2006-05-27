@@ -9,7 +9,7 @@ import net.sourceforge.mayfly.evaluation.Expression;
 
 public class SingleColumn extends Expression {
     private final String originalTableOrAlias;
-    private String tableOrAlias;
+    private final String tableOrAlias;
     private final String columnName;
 
     public SingleColumn(String columnName) {
@@ -19,6 +19,12 @@ public class SingleColumn extends Expression {
     public SingleColumn(String tableOrAlias, String columnName) {
         this.tableOrAlias = tableOrAlias;
         this.originalTableOrAlias = tableOrAlias;
+        this.columnName = columnName;
+    }
+
+    private SingleColumn(String tableOrAlias, String originalTableOrAlias, String columnName) {
+        this.tableOrAlias = tableOrAlias;
+        this.originalTableOrAlias = originalTableOrAlias;
         this.columnName = columnName;
     }
 
@@ -66,16 +72,19 @@ public class SingleColumn extends Expression {
         }
     }
     
-    public void resolve(Row row) {
+    public Expression resolveAndReturn(Row row) {
         if (tableOrAlias == null) {
             Column column = lookup(row);
             if (column.tableOrAlias() == null) {
                 throw new NullPointerException();
             }
-            tableOrAlias = column.tableOrAlias();
+            return new SingleColumn(column.tableOrAlias(), originalTableOrAlias, columnName);
+        }
+        else {
+            return this;
         }
     }
-
+    
     public String tableOrAlias() {
         return tableOrAlias;
     }

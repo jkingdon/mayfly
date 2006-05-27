@@ -82,9 +82,10 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
-    public boolean canHaveHavingWithoutGroupBy() {
-        return true;
-    }
+    // True for postgres 8.0.7, false for postgres 8.1.4
+//    public boolean canHaveHavingWithoutGroupBy() {
+//        return true;
+//    }
     
     public boolean aggregateAsteriskIsForCountOnly() {
         // I didn't really look into just what postgres

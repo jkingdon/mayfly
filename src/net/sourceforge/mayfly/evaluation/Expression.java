@@ -12,8 +12,7 @@ import java.util.Collections;
 abstract public class Expression extends WhatElement {
 
     public Selected selected(Row dummyRow) {
-        resolve(dummyRow);
-        return new Selected(Collections.singletonList(this));
+        return new Selected(Collections.singletonList(resolveAndReturn(dummyRow)));
     }
 
     public String firstColumn() {
@@ -30,7 +29,8 @@ abstract public class Expression extends WhatElement {
 
     abstract public boolean sameExpression(Expression other);
 
-    public void resolve(Row row) {
+    public Expression resolveAndReturn(Row row) {
+        return this;
     }
 
     public static String firstAggregate(Expression left, Expression right) {

@@ -17,9 +17,9 @@ import java.util.Iterator;
 
 public abstract class AggregateExpression extends Expression {
 
-    private final SingleColumn column;
-    private final String functionName;
-    private final boolean distinct;
+    protected final SingleColumn column;
+    protected final String functionName;
+    protected final boolean distinct;
 
     protected AggregateExpression(SingleColumn column, String functionName, boolean distinct) {
         this.column = column;
@@ -123,10 +123,6 @@ public abstract class AggregateExpression extends Expression {
         else {
             return false;
         }
-    }
-    
-    public void resolve(Row row) {
-        column.resolve(row);
     }
     
 }

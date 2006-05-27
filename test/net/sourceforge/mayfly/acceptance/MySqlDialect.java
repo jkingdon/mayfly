@@ -13,14 +13,14 @@ public class MySqlDialect extends Dialect {
     public Connection openConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver");
         Connection bootstrapConnection = DriverManager.getConnection("jdbc:mysql://localhost/");
-        SqlTestCase.execute("CREATE DATABASE test", bootstrapConnection);
+        SqlTestCase.execute("CREATE DATABASE mayflytest", bootstrapConnection);
         bootstrapConnection.close();
 
         return openAdditionalConnection();
     }
 
     public Connection openAdditionalConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/test");
+        return DriverManager.getConnection("jdbc:mysql://localhost/mayflytest");
     }
 
     public void shutdown(Connection connection) throws Exception {
