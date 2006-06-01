@@ -6,10 +6,10 @@ public class TupleBuilderTest extends TestCase {
     
     public void testBasics() throws Exception {
         assertEquals(
-            new Tuple(new TupleElement(new Column("a"), new StringCell("val"))),
+            new Row(new TupleElement(new Column("a"), new StringCell("val"))),
             new TupleBuilder()
                 .appendColumnCellContents("a", "val")
-                .asTuple()
+                .asRow()
         );
     }
 

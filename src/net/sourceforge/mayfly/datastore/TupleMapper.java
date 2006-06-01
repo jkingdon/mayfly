@@ -9,7 +9,7 @@ public class TupleMapper {
     
     M columnToCell;
 
-    public TupleMapper(Tuple initial) {
+    public TupleMapper(Row initial) {
         columnToCell = new M();
         for (Iterator iter = initial.iterator(); iter.hasNext();) {
             TupleElement element = (TupleElement) iter.next();
@@ -21,7 +21,7 @@ public class TupleMapper {
         columnToCell.put(column, cell);
     }
 
-    public Tuple asTuple() {
+    public Row asRow() {
         TupleBuilder builder = new TupleBuilder();
         for (Iterator iter = columnToCell.entrySet().iterator(); iter.hasNext();) {
             Map.Entry entry = (Map.Entry) iter.next();
@@ -29,7 +29,7 @@ public class TupleMapper {
             Cell cell = (Cell) entry.getValue();
             builder.append(column, cell);
         }
-        return builder.asTuple();
+        return new Row(builder);
     }
 
 }

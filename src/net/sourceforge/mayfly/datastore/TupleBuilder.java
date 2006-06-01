@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 
 public class TupleBuilder {
@@ -40,8 +41,12 @@ public class TupleBuilder {
         return append(new Column(columnName), cell);
     }
 
-    public Tuple asTuple() {
-        return new Tuple(elements.asImmutable());
+    public ImmutableList asElements() {
+        return elements.asImmutable();
+    }
+    
+    public Row asRow() {
+        return new Row(elements.asImmutable());
     }
 
 }

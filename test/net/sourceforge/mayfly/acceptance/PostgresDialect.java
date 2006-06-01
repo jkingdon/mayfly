@@ -102,6 +102,12 @@ public class PostgresDialect extends Dialect {
     }
     
     public boolean backslashInAStringIsAnEscape() {
+        /*
+         * "our long-term plan to transition to SQL-standard 
+         * string literal rules, wherein backslash is 
+         * not a special character."
+         * http://www.postgresql.org/docs/techdocs.50
+         */
         return true;
     }
     

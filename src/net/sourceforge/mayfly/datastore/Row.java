@@ -12,19 +12,23 @@ public class Row extends Aggregate {
     private final Tuple tuple;
 
     public Row(TupleElement element) {
-        this(new Tuple(element));
+        this(ImmutableList.singleton(element));
+    }
+    
+    public Row(ImmutableList elements) {
+        this(new Tuple(elements));
     }
 
-    public Row(Tuple tuple) {
+    private Row(Tuple tuple) {
         this.tuple = tuple;
     }
 
-    public Row(TupleBuilder tuple) {
-        this.tuple = tuple.asTuple();
+    public Row(TupleBuilder builder) {
+        this(builder.asElements());
     }
 
     protected Aggregate createNew(Iterable items) {
-        return new Row(new Tuple(ImmutableList.fromIterable(items)));
+        return new Row(ImmutableList.fromIterable(items));
     }
 
     public Iterator iterator() {

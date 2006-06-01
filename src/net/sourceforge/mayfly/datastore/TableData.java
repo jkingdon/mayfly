@@ -85,13 +85,13 @@ public class TableData {
             Row row = (Row) iter.next();
             
             if (where.evaluate(row)) {
-                TupleMapper mapper = new TupleMapper(row.tuple());
+                TupleMapper mapper = new TupleMapper(row);
                 for (Iterator iterator = setClauses.iterator(); iterator.hasNext();) {
                     SetClause setClause = (SetClause) iterator.next();
                     Column column = setClause.column(columns);
                     mapper.put(column, setClause.value(row, column));
                 }
-                Row newRow = new Row(mapper.asTuple());
+                Row newRow = mapper.asRow();
                 constraints.check(newRows, newRow);
                 newRows = (Rows) newRows.with(newRow);
                 ++rowsAffected;

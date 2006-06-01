@@ -12,14 +12,6 @@ import java.util.Iterator;
 public class Tuple extends Aggregate {
     private final ImmutableList elements;
 
-    public Tuple() {
-        this(new ImmutableList());
-    }
-
-    public Tuple(TupleElement tuple) {
-        this(ImmutableList.singleton(tuple));
-    }
-
     public Tuple(ImmutableList elements) {
         this.elements = elements;
     }
