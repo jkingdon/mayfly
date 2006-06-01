@@ -377,8 +377,8 @@ public abstract class Dialect {
         // SQL92 way seems to be CURRENT_DATE/CURRENT_TIME/CURRENT_TIMESTAMP,
         // which is specifically allowed as a default value),
         
-        // and auto-increment (which we
-        // will support, but maybe not with all the many syntaxes out there).
+        // and auto-increment (but is the default-value-as-expression way of
+        // doing it one that we want to try to have?).
         return false;
     }
 
