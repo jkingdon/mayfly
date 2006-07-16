@@ -303,7 +303,24 @@ public class Parser {
         } while (consumeIfMatches(TokenType.COMMA));
 
         expectAndConsume(TokenType.CLOSE_PAREN);
+        
+        parseTableTypeIfPresent();
+
         return table;
+    }
+
+    private void parseTableTypeIfPresent() {
+        if (consumeNonReservedWordIfMatches("type")) {
+            expectAndConsume(TokenType.EQUAL);
+            String tableType = consumeIdentifier();
+            if ("innodb".equalsIgnoreCase(tableType)
+                || "myisam".equalsIgnoreCase(tableType)) {
+                // For now, ignore the type
+            }
+            else {
+                throw new ParserException("unrecognized table type " + tableType);
+            }
+        }
     }
 
     private void parseTableElement(CreateTable table) {

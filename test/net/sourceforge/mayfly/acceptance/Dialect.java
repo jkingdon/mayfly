@@ -352,6 +352,10 @@ public abstract class Dialect {
         return "";
     }
     
+    public boolean foreignKeyCanReferToAnotherSchema() {
+        return true;
+    }
+
     public boolean haveTinyint() {
         return true;
     }

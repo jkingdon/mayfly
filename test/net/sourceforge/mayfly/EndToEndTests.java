@@ -34,5 +34,17 @@ public class EndToEndTests extends SqlTestCase {
         expectQueryFailure("insert into foo(x) values(5)", 
             "expected SELECT but got INSERT");
     }
+    
+    public void testTableType() throws Exception {
+        /* MySQL compatibility.  In the future perhaps the type will
+           do something like give an error if you specify myisam
+           and try to use features it doesn't support, like
+           transactions or foreign keys.  For now the type is a noop.  */
+        execute("create table countries (id integer) type=innodb");
+        execute("create table mixedcase (id integer) type=InnoDB");
+        execute("create table cities (id integer) type=myisam");
+        expectExecuteFailure("create table cities (id integer) type=DataSinkHole", 
+            "unrecognized table type DataSinkHole");
+    }
 
 }

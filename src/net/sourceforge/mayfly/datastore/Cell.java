@@ -26,6 +26,10 @@ public abstract class Cell extends ValueObject {
     abstract public String asString();
 
     public String toString() {
+        return asBriefString();
+    }
+    
+    public String asBriefString() {
         return asObject().toString();
     }
 

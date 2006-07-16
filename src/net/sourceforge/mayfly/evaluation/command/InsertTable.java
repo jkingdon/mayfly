@@ -31,11 +31,28 @@ public class InsertTable extends ValueObject {
     }
     
     public String schema() {
+        assertSchemaIsResolved();
+        return schema;
+    }
+
+    public void assertSchemaIsResolved() {
         if (schema == null) {
             throw new MayflyInternalException(
                 "schema should have already been resolved against the default schema");
         }
-        return schema;
+    }
+
+    public InsertTable fillInSchema(String defaultSchema) {
+        if (defaultSchema == null) {
+            throw new NullPointerException("Default schema shouldn't be null");
+        }
+
+        if (schema == null) {
+            return new InsertTable(defaultSchema, tableName);
+        }
+        else {
+            return this;
+        }
     }
 
 }

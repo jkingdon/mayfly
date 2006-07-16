@@ -44,7 +44,7 @@ public class CreateTable extends Command {
         Schema updatedSchema = update(oldSchema);
         DataStore newStore = store
             .replace(schema, updatedSchema)
-            .addStoreConstraints(foreignKeyConstraints());
+            .addStoreConstraints(foreignKeyConstraints(schema));
         return new UpdateStore(newStore, 0);
     }
 
@@ -87,14 +87,18 @@ public class CreateTable extends Command {
         return result;
     }
 
-    private L foreignKeyConstraints() {
+    private L foreignKeyConstraints(String schema) {
         L result = new L();
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
             UnresolvedForeignKey key = (UnresolvedForeignKey) iter.next();
+            InsertTable targetTable = key.targetTable;
             result.add(
                 new ForeignKey(
-                    columns.columnFromName(key.referencingColumn),
-                    key.targetTable,
+                    schema,
+                    table,
+                    key.referencingColumn,
+
+                    targetTable.fillInSchema(schema),
                     key.targetColumn
                 )
             );

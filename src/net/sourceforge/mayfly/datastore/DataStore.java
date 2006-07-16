@@ -101,30 +101,30 @@ public class DataStore {
     }
 
     public DataStore addRow(String schema, String table, List columnNames, List values) {
-        return replace(schema, schema(schema).addRow(table, columnNames, values));
-//
-//        Schema foundSchema = schema(schema);
-//        TableData foundTable = foundSchema.table(table);
-//
-//        check(schema, table, foundTable.findColumns(columnNames), values);
-//
-//        return replace(schema, foundSchema.addRow(table, columnNames, values));
+//        return replace(schema, schema(schema).addRow(table, columnNames, values));
+
+        Schema foundSchema = schema(schema);
+        TableData foundTable = foundSchema.table(table);
+
+        check(schema, table, foundTable.findColumns(columnNames), values);
+
+        return replace(schema, foundSchema.addRow(table, columnNames, values));
     }
 
     public DataStore addRow(String schema, String table, List values) {
-        return replace(schema, schema(schema).addRow(table, values));
-//
-//        Schema foundSchema = schema(schema);
-//        TableData foundTable = foundSchema.table(table);
-//        
-//        check(schema, table, foundTable.columns(), values);
-//
-//        return replace(schema, foundSchema.addRow(table, values));
+//        return replace(schema, schema(schema).addRow(table, values));
+
+        Schema foundSchema = schema(schema);
+        TableData foundTable = foundSchema.table(table);
+        
+        check(schema, table, foundTable.columns(), values);
+
+        return replace(schema, foundSchema.addRow(table, values));
     }
 
-//    private void check(String schema, String table, Columns columns, List values) {
-//        storeConstraints.checkInsert(this, schema, table, columns, values);
-//    }
+    private void check(String schema, String table, Columns columns, List values) {
+        storeConstraints.checkInsert(this, schema, table, columns, values);
+    }
 
     public Set schemas() {
         Set names = new TreeSet();
