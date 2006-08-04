@@ -3,6 +3,8 @@ package net.sourceforge.mayfly.acceptance;
 import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 public class DataTypeTest extends SqlTestCase {
 
@@ -77,7 +79,7 @@ public class DataTypeTest extends SqlTestCase {
     //REAL, FLOAT, DOUBLE - precision can be given in binary digits (24 or 53, typically)
     // BIT and BIT VARYING; BOOLEAN
     // BIGSERIAL (see AutoIncrementTest for the auto-increment syntaxes we do look for)
-    // DATE, TIME, TIMESTAMP
+    // DATE (see testDate), TIME, TIMESTAMP
     // TIME WITH TIME ZONE is questionable (see postgres docs)
     // BLOB/CLOB
     
@@ -252,5 +254,42 @@ public class DataTypeTest extends SqlTestCase {
         assertFalse(results.next());
         results.close();
     }
+    
+    public static final long ONE_DAY = 1000L * 60L * 60L * 24L;
 
+    public void testDate() throws Exception {
+        if (!dialect.wishThisWereTrue()) {
+            // Looks like this might be where we need to start
+            // remembering column types.  There is nothing in
+            // '2003-11-27' that says it is a date not a string.
+            return;
+        }
+
+        execute("create table foo (start_date date, end_date date)");
+        //execute("insert into foo (start_date, end_date) values (date '2003-11-27', date '2003-11-29')");
+        execute("insert into foo (start_date, end_date) values ('2003-11-27', '2003-11-29')");
+
+        // The simple case: in which the database's dates are interpreted
+        // to be GMT:
+        {
+            Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+            ResultSet results = query("select start_date, end_date from foo");
+            assertTrue(results.next());
+
+            long november27gmt = 1069891200000L;
+            long november29gmt = november27gmt + 2 * ONE_DAY;
+            assertEquals(november27gmt, results.getDate(1, gmt).getTime());
+            assertEquals(november29gmt, results.getDate("end_date", gmt).getTime());
+
+            assertFalse(results.next());
+            results.close();
+        }
+
+        // TODO: without a calendar.
+        // TODO: with a non-GMT calendar.
+        // TODO: setDate, calendar and non-calendar
+        // TODO: getObject
+        // TODO: getDate on non-date
+    }
+    
 }

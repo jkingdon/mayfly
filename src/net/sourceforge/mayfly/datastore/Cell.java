@@ -39,6 +39,10 @@ public abstract class Cell extends ValueObject {
         throw new UnimplementedException("cannot yet get BigDecimal for " + getClass().getName());
     }
 
+    public java.sql.Date asDate() throws SQLException {
+        throw new SQLException("Attempt to read " + displayName() + " as a date");
+    }
+
     /**
         @internal
         Convert to double.  As double is a floating-point (inexact) type,

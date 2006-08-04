@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.evaluation.what.Selected;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Calendar;
 
 public final class MayflyResultSet extends ResultSetStub {
 
@@ -121,6 +122,10 @@ public final class MayflyResultSet extends ResultSetStub {
 
     public String getString(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asString();
+    }
+    
+    public java.sql.Date getDate(int oneBasedColumn, Calendar calendar) throws SQLException {
+        return cellFromIndex(oneBasedColumn).asDate();
     }
 
     public Object getObject(String columnName) throws SQLException {

@@ -451,6 +451,11 @@ public class Parser {
             }
             else if (currentText.equalsIgnoreCase("text")) {
             }
+            else if (currentText.equalsIgnoreCase("date")) {
+                // This is a reserved word in SQL92, I think for the
+                // DATE '2003-04-22' syntax for literals.
+                // We could follow that lead if need be...
+            }
             else if (currentText.equalsIgnoreCase("identity")) {
                 isAutoIncrement = true;
             }
