@@ -4,10 +4,14 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.jdbc.JdbcConnection;
+import net.sourceforge.mayfly.parser.Parser;
 
+import java.io.IOException;
+import java.io.Reader;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -79,6 +83,27 @@ public class Database {
      */
     public int execute(String sql) throws SQLException {
         return defaultConnection.execute(sql);
+    }
+
+    /**
+     * Execute a series of SQL commands separated by semicolons.
+     * This method closes the reader when done.
+     */
+    public void executeScript(Reader script) throws SQLException {
+        try {
+            List commands = new Parser(script).parseCommands();
+            for (Iterator iter = commands.iterator(); iter.hasNext();) {
+                Command command = (Command) iter.next();
+                defaultConnection.executeUpdate(command);
+            }
+        }
+        finally {
+            try {
+                script.close();
+            } catch (IOException e) {
+                throw (SQLException) new SQLException().initCause(e);
+            }
+        }
     }
 
     /**

@@ -3,21 +3,30 @@ package net.sourceforge.mayfly.parser;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.util.StringBuilder;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Lexer {
 
-    private final String sql;
-    private int position;
+    private Reader sql;
 
     public Lexer(String sql) {
+        this(new StringReader(sql));
+    }
+    
+    /**
+     * Create a lexer which reads input from a Reader.
+     * The caller is responsible for closing the Reader.
+     */
+    public Lexer(Reader sql) {
         this.sql = sql;
-        position = 0;
     }
     
     Lexer() {
-        this(null);
+        this((Reader)null);
     }
 
     public List tokens() {
@@ -26,6 +35,10 @@ public class Lexer {
         while (true) {
             if (current == '.') {
                 tokens.add(new Token(TokenType.PERIOD, "."));
+                current = nextCharacter();
+            }
+            else if (current == ';') {
+                tokens.add(new Token(TokenType.SEMICOLON, ";"));
                 current = nextCharacter();
             }
             else if (current == ',') {
@@ -199,11 +212,10 @@ public class Lexer {
     }
 
     private int nextCharacter() {
-        if (position < sql.length()) {
-            return sql.charAt(position++);
-        }
-        else {
-            return -1;
+        try {
+            return sql.read();
+        } catch (IOException e) {
+            throw new MayflyException(e);
         }
     }
 

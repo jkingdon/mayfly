@@ -68,6 +68,7 @@ import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.StringBuilder;
 
+import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -90,6 +91,14 @@ public class Parser {
     public Parser(String sql) {
         this(new Lexer(sql).tokens());
     }
+    
+    /**
+     * Create a parser which reads input from a Reader.
+     * The caller is responsible for closing the Reader.
+     */
+    public Parser(Reader sql) {
+        this(new Lexer(sql).tokens());
+    }
 
     public Parser(List tokens) {
         this(tokens, false);
@@ -98,6 +107,21 @@ public class Parser {
     public Parser(List tokens, boolean allowParameters) {
         this.tokens = tokens;
         this.allowParameters = allowParameters;
+    }
+
+    public List parseCommands() {
+        List commands = new ArrayList();
+        while (true) {
+            if (consumeIfMatches(TokenType.END_OF_FILE)) {
+                return commands;
+            }
+            else if (consumeIfMatches(TokenType.SEMICOLON)) {
+                
+            }
+            else {
+                commands.add(parseCommand());
+            }
+        }
     }
 
     public Command parse() {

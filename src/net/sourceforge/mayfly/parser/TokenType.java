@@ -34,6 +34,7 @@ public class TokenType {
     public static final TokenType EQUAL = new TokenType("'='");
     public static final TokenType LESS_GREATER = new TokenType("'<>'");
     public static final TokenType BANG_EQUAL = new TokenType("'!='");
+    public static final TokenType SEMICOLON = new TokenType("';'");
 
     public static final TokenType KEYWORD_all = registerKeyword("all");
     public static final TokenType KEYWORD_and = registerKeyword("and");

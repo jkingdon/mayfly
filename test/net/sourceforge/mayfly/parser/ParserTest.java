@@ -24,6 +24,7 @@ import net.sourceforge.mayfly.ldbc.where.Where;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.List;
 
 public class ParserTest extends TestCase {
     
@@ -463,6 +464,18 @@ public class ParserTest extends TestCase {
         // but can be in any order.
         new Parser("x integer unique primary key").parseColumnDefinition(new CreateTable("foo"));
         new Parser("x integer primary key unique").parseColumnDefinition(new CreateTable("foo"));
+    }
+    
+    public void testMultipleCommands() throws Exception {
+        List commands = 
+            new Parser("select x from foo;;select y from foo").parseCommands();
+        assertEquals(2, commands.size());
+    }
+
+    public void testMultipleCommands2() throws Exception {
+        List commands = 
+            new Parser("select x from foo;").parseCommands();
+        assertEquals(1, commands.size());
     }
 
     private void expectFailure(String sql, String expectedMessage) {

@@ -5,6 +5,8 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.acceptance.SqlTestCase;
 import net.sourceforge.mayfly.datastore.DataStore;
 
+import java.io.Reader;
+import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -96,6 +98,18 @@ public class DatabaseTest extends TestCase {
         expected.add("MARS");
         expected.add("Venus");
         assertEquals(expected, database.schemas());
+    }
+    
+    public void testScript() throws Exception {
+        Reader script = new StringReader(
+            "create table foo (x integer); insert into foo(x) values(5)" +
+            ";insert into foo(x)values(7)"
+        );
+        database.executeScript(script);
+        SqlTestCase.assertResultSet(
+            new String[] { "5", "7" },
+            database.query("select x from foo")
+        );
     }
     
 }
