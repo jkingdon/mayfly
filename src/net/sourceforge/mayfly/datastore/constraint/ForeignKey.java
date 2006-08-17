@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.evaluation.command.InsertTable;
 
@@ -41,7 +42,6 @@ public class ForeignKey {
                 throwInsertException(schema, value);
             }
         }
-        
     }
 
     private void throwInsertException(String schema, Cell value) {
@@ -65,6 +65,17 @@ public class ForeignKey {
             }
         }
         throw new MayflyInternalException("Didn't find " + targetColumn + " in " + columns.toString());
+    }
+
+    public void checkDelete(DataStore store, String schema, String table, Row row) {
+        if (targetTable.schema(schema).equalsIgnoreCase(schema)
+            && targetTable.tableName().equalsIgnoreCase(table)) {
+            Cell cell = row.cell(row.findColumn(targetColumn));
+            if (store.table(referencerSchema, referencerTable).hasValue(referencerColumn, cell)) {
+                throw new MayflyException("foreign key violation: table " + referencerTable + 
+                    " refers to " + targetColumn + " " + cell.asBriefString() + " in " + targetTable.tableName());
+            }
+        }
     }
 
 }

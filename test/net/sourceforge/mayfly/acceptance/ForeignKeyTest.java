@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.acceptance;
 
 public class ForeignKeyTest extends SqlTestCase {
     
-    public void testBasics() throws Exception {
+    public void testInsertAndDelete() throws Exception {
         execute("create table countries (id integer primary key, name varchar(255))" +
             dialect.databaseTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
@@ -20,7 +20,7 @@ public class ForeignKeyTest extends SqlTestCase {
         String sql = "delete from countries";
         if (dialect.wishThisWereTrue()) {
             expectExecuteFailure(sql,
-                "foreign key violation: the cities table refers to id 1 in countries");
+                "foreign key violation: table cities refers to id 1 in countries");
             execute("delete from cities");
             execute("delete from countries");
         }
@@ -86,7 +86,7 @@ public class ForeignKeyTest extends SqlTestCase {
             );
             
             expectExecuteFailure("update countries set id = 3 where name = 'West Germany'", 
-                "foreign key violation: the cities table refers to id 3 in countries");
+                "foreign key violation: the cities table refers to id 2 in countries");
             execute("update countries set id = 4 where name = 'East Germany'");
         }
         else {
