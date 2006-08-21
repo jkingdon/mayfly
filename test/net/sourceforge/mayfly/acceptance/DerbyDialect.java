@@ -105,7 +105,7 @@ public class DerbyDialect extends Dialect {
     }
     
     public boolean willWaitForWriterToCommit() {
-        /* If we are in a situation where we another
+        /* If we are in a situation where another
            connection has written data but not committed,
            Derby will just wait.  It will eventually time
            out if we wait long enough.
@@ -130,6 +130,14 @@ public class DerbyDialect extends Dialect {
     }
     
     public boolean haveSql200xAutoIncrement() {
+        return true;
+    }
+    
+    public boolean onDeleteSetDefaultBroken() {
+        // I'm not sure what "on delete set default"
+        // would mean, other than what we are
+        // testing for.  Unless I'm missing something,
+        // it simply doesn't work in Derby.
         return true;
     }
 

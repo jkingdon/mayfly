@@ -6,11 +6,10 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
-import net.sourceforge.mayfly.evaluation.command.InsertTable;
-
-import java.util.List;
+import net.sourceforge.mayfly.datastore.TableReference;
 
 public class ForeignKey {
 
@@ -18,64 +17,114 @@ public class ForeignKey {
     private final String referencerTable;
     private final String referencerColumn;
 
-    private final InsertTable targetTable;
+    private final TableReference targetTable;
     private final String targetColumn;
 
-    public ForeignKey(String referencerSchema, String referencerTable, String referencerColumn, 
-        InsertTable targetTable, String targetColumn) {
+    private final Action action;
+
+    public ForeignKey(
+        String referencerSchema, String referencerTable, String referencerColumn, 
+        TableReference targetTable, String targetColumn, Action action) {
         
         this.referencerSchema = referencerSchema;
         this.referencerTable = referencerTable;
         this.referencerColumn = referencerColumn;
 
         this.targetTable = targetTable;
-        targetTable.assertSchemaIsResolved();
         this.targetColumn = targetColumn;
+        this.action = action;
     }
 
-    public void checkInsert(DataStore store, String schema, String table, Columns columns, List values) {
-        if (referencerSchema.equalsIgnoreCase(schema)
-            && referencerTable.equalsIgnoreCase(table)) {
-            TableData foundTable = store.table(targetTable);
-            Cell value = pickValue(columns, values);
-            if (!foundTable.hasValue(targetColumn, value)) {
-                throwInsertException(schema, value);
-            }
+    public void checkInsert(DataStore store, String schema, String table, 
+        Row proposedRow) {
+
+        if (!referencerSchema.equalsIgnoreCase(schema) || 
+            !referencerTable.equalsIgnoreCase(table)) {
+            throw new MayflyInternalException(
+                "I'm confused about what tables foreign key constraints" +
+                " are attached to");
+        }
+
+        TableData foundTable = store.table(targetTable);
+        Cell value = pickValue(proposedRow);
+        if (!(value instanceof NullCell) &&
+            !foundTable.hasValue(targetColumn, value)) {
+            throwInsertException(schema, value);
         }
     }
 
     private void throwInsertException(String schema, Cell value) {
-        StringBuilder targetTableName = new StringBuilder();
-        if (!targetTable.schema().equalsIgnoreCase(schema)) {
-            targetTableName.append(targetTable.schema());
-            targetTableName.append(".");
-        }
-        targetTableName.append(targetTable.tableName());
-        throw new MayflyException("foreign key violation: " + targetTableName.toString() + 
+        String targetTableName = formatTableName(
+            schema, targetTable.schema(), targetTable.tableName());
+        throw new MayflyException("foreign key violation: " + targetTableName + 
             " has no " +
             targetColumn +
             " " + value.asBriefString());
     }
 
-    private Cell pickValue(Columns columns, List values) {
-        for (int i = 0; i < columns.size(); ++i) {
-            Column column = columns.get(i);
-            if (column.matchesName(referencerColumn)) {
-                return (Cell) values.get(i);
-            }
+    private String formatTableName(
+        String defaultSchema, String schemaToFormat, String tableToFormat) {
+        StringBuilder result = new StringBuilder();
+        if (!schemaToFormat.equalsIgnoreCase(defaultSchema)) {
+            result.append(schemaToFormat);
+            result.append(".");
         }
-        throw new MayflyInternalException("Didn't find " + targetColumn + " in " + columns.toString());
+        result.append(tableToFormat);
+        return result.toString();
     }
 
-    public void checkDelete(DataStore store, String schema, String table, Row row) {
-        if (targetTable.schema(schema).equalsIgnoreCase(schema)
-            && targetTable.tableName().equalsIgnoreCase(table)) {
-            Cell cell = row.cell(row.findColumn(targetColumn));
-            if (store.table(referencerSchema, referencerTable).hasValue(referencerColumn, cell)) {
-                throw new MayflyException("foreign key violation: table " + referencerTable + 
-                    " refers to " + targetColumn + " " + cell.asBriefString() + " in " + targetTable.tableName());
+    private Cell pickValue(Row proposedRow) {
+        Columns columns = proposedRow.columns();
+        for (int i = 0; i < columns .size(); ++i) {
+            Column column = columns.get(i);
+            if (column.matchesName(referencerColumn)) {
+                return proposedRow.cell(column);
             }
         }
+        throw new MayflyInternalException("Didn't find " + targetColumn + 
+            " in " + columns.toString());
+    }
+
+    public void checkDelete(DataStore store, String schema, String table, 
+        Row rowToDelete) {
+        checkDelete(store, schema, table, rowToDelete, null);
+    }
+
+    public DataStore checkDelete(DataStore store, String schema, String table, 
+        Row rowToDelete, Row replacementRow) {
+        if (tableIsMyTarget(schema, table)) {
+            Column column = rowToDelete.findColumn(targetColumn);
+            Cell oldValue = rowToDelete.cell(column);
+            if (replacementRow != null) {
+                Cell newValue = replacementRow.cell(column);
+                if (oldValue.sqlEquals(newValue)) {
+                    return store;
+                }
+            }
+            TableData referencer = 
+                store.table(referencerSchema, referencerTable);
+            if (referencer.hasValue(referencerColumn, oldValue)) {
+                return action.handleDelete(oldValue, store, 
+                    referencerSchema, referencerTable, referencerColumn,
+                    targetTable, targetColumn);
+            }
+        }
+        return store;
+    }
+
+    public void checkDropTable(DataStore store, String schema, String table) {
+        if (tableIsMyTarget(schema, table)) {
+            throw new MayflyException(
+                "cannot drop " + table +
+                " because a foreign key in table " + 
+                formatTableName(schema, referencerSchema, referencerTable) +
+                " refers to it"
+            );
+        }
+    }
+
+    private boolean tableIsMyTarget(String schema, String table) {
+        return targetTable.matches(schema, table);
     }
 
 }

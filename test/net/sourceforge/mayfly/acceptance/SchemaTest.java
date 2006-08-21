@@ -91,7 +91,8 @@ public class SchemaTest extends SqlTestCase {
         }
 
         String sql = "create schema mars authorization dba create table foo (x integer) create table bar (x integer)";
-        if (dialect.canCreateSchemaAndTablesInSameStatement() && dialect.authorizationAllowedInCreateSchema()) {
+        if (dialect.canCreateSchemaAndTablesInSameStatement() && 
+            dialect.authorizationAllowedInCreateSchema()) {
             execute(sql);
             execute("set schema mars");
             assertEquals(1, execute("insert into bar(x) values (5)"));
@@ -107,7 +108,8 @@ public class SchemaTest extends SqlTestCase {
         }
 
         String sql = "create schema mars create table foo (x integer) create table bar (x integer)";
-        if (dialect.canCreateSchemaAndTablesInSameStatement() && !dialect.authorizationRequiredInCreateSchema()) {
+        if (dialect.canCreateSchemaAndTablesInSameStatement() && 
+            !dialect.authorizationRequiredInCreateSchema()) {
             execute(sql);
             execute("set schema mars");
             assertEquals(1, execute("insert into bar(x) values (5)"));

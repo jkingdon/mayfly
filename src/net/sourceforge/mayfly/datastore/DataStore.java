@@ -2,8 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.datastore.constraint.StoreConstraints;
-import net.sourceforge.mayfly.evaluation.command.InsertTable;
+import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.ldbc.where.Where;
@@ -33,19 +32,17 @@ public class DataStore {
     public static final CaseInsensitiveString ANONYMOUS_SCHEMA = new CaseInsensitiveString(ANONYMOUS_SCHEMA_NAME);
 
     private final ImmutableMap schemas;
-    private final StoreConstraints storeConstraints;
     
     public DataStore() {
         this(new Schema());
     }
 
     public DataStore(Schema anonymousSchema) {
-        this(new ImmutableMap().with(ANONYMOUS_SCHEMA, anonymousSchema), new StoreConstraints());
+        this(new ImmutableMap().with(ANONYMOUS_SCHEMA, anonymousSchema));
     }
 
-    private DataStore(ImmutableMap namedSchemas, StoreConstraints storeContraints) {
+    private DataStore(ImmutableMap namedSchemas) {
         this.schemas = namedSchemas;
-        this.storeConstraints = storeContraints;
     }
 
     public DataStore addSchema(String newSchemaName, Schema newSchema) {
@@ -53,13 +50,19 @@ public class DataStore {
             throw new MayflyException("schema " + newSchemaName + " already exists");
         }
         ImmutableMap newSchemas = schemas.with(new CaseInsensitiveString(newSchemaName), newSchema);
-        return new DataStore(newSchemas, storeConstraints);
+        return new DataStore(newSchemas);
     }
 
     public DataStore replace(String newSchemaName, Schema newSchema) {
+        return replace(schemas, newSchemaName, newSchema);
+    }
+
+    private DataStore replace(ImmutableMap existingSchemas, 
+        String newSchemaName, Schema newSchema) {
         if (schemaExists(newSchemaName)) {
-            ImmutableMap newSchemas = schemas.with(new CaseInsensitiveString(newSchemaName), newSchema);
-            return new DataStore(newSchemas, storeConstraints);
+            ImmutableMap newSchemas = existingSchemas.with(
+                new CaseInsensitiveString(newSchemaName), newSchema);
+            return new DataStore(newSchemas);
         } else {
             throw new MayflyInternalException("no schema " + newSchemaName);
         }
@@ -81,14 +84,15 @@ public class DataStore {
     }
     
     public DataStore dropTable(String schema, String table) {
-        return replace(schema, schema(schema).dropTable(table));
+        Checker checker = new Checker(this, schema, table);
+        return replace(schema, schema(schema).dropTable(checker, table));
     }
 
     public TableData table(String schema, String table) {
         return schema(schema).table(table);
     }
 
-    public TableData table(InsertTable table) {
+    public TableData table(TableReference table) {
         return schema(table.schema()).table(table.tableName());
     }
 
@@ -101,29 +105,15 @@ public class DataStore {
     }
 
     public DataStore addRow(String schema, String table, List columnNames, List values) {
-//        return replace(schema, schema(schema).addRow(table, columnNames, values));
+        Checker checker = new Checker(this, schema, table);
 
-        Schema foundSchema = schema(schema);
-        TableData foundTable = foundSchema.table(table);
-
-        check(schema, table, foundTable.findColumns(columnNames), values);
-
-        return replace(schema, foundSchema.addRow(table, columnNames, values));
+        return replace(schema, 
+            schema(schema).addRow(checker, table, columnNames, values));
     }
 
     public DataStore addRow(String schema, String table, List values) {
-//        return replace(schema, schema(schema).addRow(table, values));
-
-        Schema foundSchema = schema(schema);
-        TableData foundTable = foundSchema.table(table);
-        
-        check(schema, table, foundTable.columns(), values);
-
-        return replace(schema, foundSchema.addRow(table, values));
-    }
-
-    private void check(String schema, String table, Columns columns, List values) {
-        storeConstraints.checkInsert(this, schema, table, columns, values);
+        Checker checker = new Checker(this, schema, table);
+        return replace(schema, schema(schema).addRow(checker, table, values));
     }
 
     public Set schemas() {
@@ -137,22 +127,58 @@ public class DataStore {
         return names;
     }
 
-    public UpdateStore update(String schema, String table, List setClauses, Where where) {
-        UpdateSchema result = schema(schema).update(table, setClauses, where);
+    public UpdateStore update(String schema, String table, 
+        List setClauses, Where where) {
+        Checker checker = new Checker(this, schema, table);
+        UpdateSchema result = 
+            schema(schema).update(checker, table, setClauses, where);
         return replaceSchema(schema, result);
     }
 
     public UpdateStore delete(String schema, String table, Where where) {
-        UpdateSchema result = schema(schema).delete(table, where);
-        return replaceSchema(schema, result);
+        Checker checker = new Checker(this, schema, table);
+        UpdateSchema result = schema(schema).delete(table, where, checker);
+        
+        /**
+         * Here we merge the schemas: the one corresponding to schema
+         * was returned
+         * by delete, and the rest come in via the checker.
+         * This way the checker is the only thing which operates across
+         * schemas - the regular code just affects the one.
+         */
+        ImmutableMap schemas = checker.store().schemas;
+        DataStore newStore = replace(schemas, schema, result.schema());
+
+        return new UpdateStore(
+            newStore, 
+            result.rowsAffected()
+        );
     }
 
     private UpdateStore replaceSchema(String schema, UpdateSchema result) {
-        return new UpdateStore(replace(schema, result.schema()), result.rowsAffected());
+        return new UpdateStore(
+            replace(schema, result.schema()), 
+            result.rowsAffected()
+        );
     }
 
-    public DataStore addStoreConstraints(List newStoreConstraints) {
-        return new DataStore(schemas, storeConstraints.withAll(newStoreConstraints));
+    public DataStore checkDelete(String schema, String table, 
+        Row rowToDelete, Row replacementRow) {
+        DataStore store = this;
+        for (Iterator iter = schemas.values().iterator(); iter.hasNext();) {
+            Schema potentialReferencer = (Schema) iter.next();
+            store = potentialReferencer.checkDelete(
+                store,
+                schema, table, rowToDelete, replacementRow);
+        }
+        return store;
+    }
+
+    public void checkDropTable(String schema, String table) {
+        for (Iterator iter = schemas.values().iterator(); iter.hasNext();) {
+            Schema potentialReferencer = (Schema) iter.next();
+            potentialReferencer.checkDropTable(this, schema, table);
+        }
     }
 
 }

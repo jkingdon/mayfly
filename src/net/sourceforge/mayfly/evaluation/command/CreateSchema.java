@@ -24,7 +24,7 @@ public class CreateSchema extends Command {
         Schema schema = new Schema();
         for (Iterator iter = createTableCommands.iterator(); iter.hasNext();) {
             CreateTable command = (CreateTable) iter.next();
-            schema = command.update(schema);
+            schema = command.update(store, schemaName, schema);
         }
         DataStore newStore = store.addSchema(schemaName, schema);
         return new UpdateStore(newStore, 0);

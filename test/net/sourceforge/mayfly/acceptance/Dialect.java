@@ -356,6 +356,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean onDeleteSetDefaultBroken() {
+        return false;
+    }
+
     public boolean haveTinyint() {
         return true;
     }

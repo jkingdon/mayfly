@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.ldbc.where.Where;
@@ -30,18 +31,19 @@ public class TableData {
         this.rows = rows;
     }
 
-    public TableData addRow(List columnNames, List values) {
+    public TableData addRow(Checker checker, List columnNames, List values) {
         Columns specified = findColumns(columnNames);
         specified.checkForDuplicates();
         
-        return addRow(specified, values);
+        return addRow(checker, specified, values);
     }
 
-    public TableData addRow(List values) {
-        return addRow(columns, values);
+    public TableData addRow(Checker checker, List values) {
+        return addRow(checker, columns, values);
     }
 
-    private TableData addRow(Columns columnsToInsert, List values) {
+    private TableData addRow(Checker checker,
+        Columns columnsToInsert, List values) {
         if (columnsToInsert.size() != values.size()) {
             if (values.size() > columnsToInsert.size()) {
                 throw new MayflyException("Too many values.\n" + describeNamesAndValues(columnsToInsert, values));
@@ -74,11 +76,14 @@ public class TableData {
         }
         Row newRow = new Row(tuple);
         constraints.check(rows, newRow);
+        if (checker != null) {
+            checker.checkInsert(constraints, newRow);
+        }
 
         return new TableData(newColumns, constraints, (Rows) rows.with(newRow));
     }
 
-    public UpdateTable update(List setClauses, Where where) {
+    public UpdateTable update(Checker checker, List setClauses, Where where) {
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
@@ -93,6 +98,9 @@ public class TableData {
                 }
                 Row newRow = mapper.asRow();
                 constraints.check(newRows, newRow);
+                checker.checkInsert(constraints, newRow);
+                checker.checkDelete(row, newRow);
+
                 newRows = (Rows) newRows.with(newRow);
                 ++rowsAffected;
             }
@@ -102,10 +110,11 @@ public class TableData {
             }
 
         }
-        return new UpdateTable(new TableData(columns, constraints, newRows), rowsAffected);
+        TableData newTable = new TableData(columns, constraints, newRows);
+        return new UpdateTable(newTable, rowsAffected);
     }
 
-    public UpdateTable delete(Where where) {
+    public UpdateTable delete(Where where, Checker checker) {
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
@@ -113,6 +122,7 @@ public class TableData {
             
             if (where.evaluate(row)) {
                 ++rowsAffected;
+                checker.checkDelete(row, null);
             }
             else {
                 newRows = (Rows) newRows.with(row);
@@ -211,6 +221,17 @@ public class TableData {
             }
         }
         return false;
+    }
+
+    public DataStore checkDelete(
+        DataStore store,
+        String schema, String table, Row rowToDelete, Row replacementRow) {
+        return constraints.checkDelete(store, schema, table, 
+            rowToDelete, replacementRow);
+    }
+
+    public void checkDropTable(DataStore store, String schema, String table) {
+        constraints.checkDropTable(store, schema, table);
     }
 
 }

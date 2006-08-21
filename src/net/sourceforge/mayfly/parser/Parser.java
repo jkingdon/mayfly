@@ -7,6 +7,11 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.constraint.Action;
+import net.sourceforge.mayfly.datastore.constraint.Cascade;
+import net.sourceforge.mayfly.datastore.constraint.NoAction;
+import net.sourceforge.mayfly.datastore.constraint.SetDefault;
+import net.sourceforge.mayfly.datastore.constraint.SetNull;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupBy;
@@ -379,7 +384,40 @@ public class Parser {
         String targetColumn = consumeIdentifier();
         expectAndConsume(TokenType.CLOSE_PAREN);
         
-        table.addForeignKeyConstraint(referencingColumn, targetTable, targetColumn);
+        Action action = parseAction();
+        table.addForeignKeyConstraint(referencingColumn, 
+            targetTable, targetColumn,
+            action);
+    }
+
+    private Action parseAction() {
+        if (consumeIfMatches(TokenType.KEYWORD_on)) {
+            expectAndConsume(TokenType.KEYWORD_delete);
+            if (consumeNonReservedWordIfMatches("no")) {
+                expectNonReservedWord("action");
+                return new NoAction();
+            }
+            else if (consumeNonReservedWordIfMatches("cascade")) {
+                return new Cascade();
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_set)) {
+                if (consumeIfMatches(TokenType.KEYWORD_null)) {
+                    return new SetNull();
+                }
+                else if (consumeIfMatches(TokenType.KEYWORD_default)) {
+                    return new SetDefault();
+                }
+                else {
+                    throw new ParserException("expected ON DELETE action " +
+                        " but got SET " + describeToken(currentToken()));
+                }
+            }
+            else {
+                throw new ParserException("expected ON DELETE action " +
+                    " but got " + describeToken(currentToken()));
+            }
+        }
+        return new NoAction();
     }
 
     Column parseColumnDefinition(CreateTable table) {
@@ -424,7 +462,8 @@ public class Parser {
         }
         else {
             throw new ParserException(
-                "expected default value for column " + name + " but got " + describeToken(currentToken()));
+                "expected default value for column " + name + 
+                " but got " + describeToken(currentToken()));
         }
     }
 
@@ -1164,7 +1203,14 @@ public class Parser {
             return true;
         }
         
-        throw new ParserException("expected " + word + " but got " + currentText);
+        return false;
+    }
+
+    private void expectNonReservedWord(String word) {
+        if (!consumeNonReservedWordIfMatches(word)) {
+            throw new ParserException("expected " + word + 
+                " but got " + describeToken(currentToken()));
+        }
     }
 
     Token expectAndConsume(TokenType expectedType) {

@@ -119,12 +119,19 @@ public class SyntaxTest extends SqlTestCase {
 
     private void assertReserved(String keyword) throws Exception {
         expectExecuteFailure("create table foo (" + keyword + " integer)",
-            "expected column or table constraint but got " + keyword.toUpperCase());
+            "expected column or table constraint but got " + 
+                keyword.toUpperCase()
+        );
     }
     
     public void testWrongIdentifierForNonReserved() throws Exception {
+        // The current rule is that the wrong identifier just
+        // doesn't get consumed, so that if an identifier doesn't
+        // end up being legal there, we'll eventually get another
+        // syntax error.  Is there some reason this won't work?
         execute("create table foo (x integer)");
-        expectExecuteFailure("select x from foo limit 10 ofset 20", "expected offset but got ofset");
+        expectExecuteFailure("select x from foo limit 10 ofset 20", 
+            "expected end of file but got ofset");
     }
 
 }

@@ -12,11 +12,17 @@ public class DefaultTest extends SqlTestCase {
     }
     
     public void testImplicitAndNotNull() throws Exception {
-        execute("create table foo (id integer, x integer not null, description varchar(255) not null)");
+        execute(
+            "create table foo (" +
+                "id integer, " +
+                "x integer not null, " +
+                "description varchar(255) not null" +
+            ")");
         String sql = "insert into foo(id) values(1)";
         if (dialect.notNullImpliesDefaults()) {
             execute(sql);
-            assertResultSet(new String[] { " 1, 0, '' " }, query("select id, x, description from foo"));
+            assertResultSet(new String[] { " 1, 0, '' " }, 
+                query("select id, x, description from foo"));
         }
         else {
             expectExecuteFailure(sql, "column x cannot be null");
@@ -28,7 +34,8 @@ public class DefaultTest extends SqlTestCase {
         String sql = "insert into foo(x) values(default)";
         if (dialect.canUpdateToDefault()) {
             execute(sql);
-            assertResultSet(new String[] { "111222333" }, query("select x from foo"));
+            assertResultSet(new String[] { "111222333" }, 
+                query("select x from foo"));
         }
         else {
             expectExecuteFailure(sql, "no column default");

@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
+import net.sourceforge.mayfly.datastore.constraint.Action;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 import net.sourceforge.mayfly.datastore.constraint.NotNullConstraint;
@@ -40,25 +41,29 @@ public class CreateTable extends Command {
     }
 
     public UpdateStore update(DataStore store, String schema) {
-        Schema oldSchema = store.schema(schema);
-        Schema updatedSchema = update(oldSchema);
-        DataStore newStore = store
-            .replace(schema, updatedSchema)
-            .addStoreConstraints(foreignKeyConstraints(schema));
-        return new UpdateStore(newStore, 0);
+        Schema updatedSchema = update(store, schema, store.schema(schema));
+        return new UpdateStore(store.replace(schema, updatedSchema), 0);
     }
 
-    public Schema update(Schema schema) {
-        Constraints constraints = makeTableConstraints();
+    public Schema update(DataStore store, String schemaName, Schema schema) {
+        Constraints constraints = makeTableConstraints(store, schemaName);
         return schema.createTable(table(), columns, constraints);
     }
 
-    private Constraints makeTableConstraints() {
+    private Constraints makeTableConstraints(
+        DataStore store, String schema) {
         ImmutableList constraints = ImmutableList.fromIterable(
             uniqueConstraints()
             .plus(notNullConstraints())
         );
-        return new Constraints(primaryKey(), constraints);
+        return new Constraints(primaryKey(), constraints, 
+            
+            // TODO: passing in store here is (I think)
+            // subtlely wrong.  In the case of
+            // CREATE SCHEMA S1 CREATE TABLE FOO ... CREATE TABLE BAR ...
+            // then store won't contain FOO.
+            foreignKeyConstraints(store, schema).asImmutable()
+        );
     }
 
     private PrimaryKey primaryKey() {
@@ -87,7 +92,7 @@ public class CreateTable extends Command {
         return result;
     }
 
-    private L foreignKeyConstraints(String schema) {
+    private L foreignKeyConstraints(DataStore store, String schema) {
         L result = new L();
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
             UnresolvedForeignKey key = (UnresolvedForeignKey) iter.next();
@@ -98,8 +103,10 @@ public class CreateTable extends Command {
                     table,
                     key.referencingColumn,
 
-                    targetTable.fillInSchema(schema),
-                    key.targetColumn
+                    targetTable.resolve(store, schema),
+                    key.targetColumn,
+                    
+                    key.action
                 )
             );
         }
@@ -135,19 +142,26 @@ public class CreateTable extends Command {
         notNullConstraints.add(column);
     }
 
-    public void addForeignKeyConstraint(String referencingColumn, InsertTable targetTable, String targetColumn) {
-        foreignKeyConstraints.add(new UnresolvedForeignKey(referencingColumn, targetTable, targetColumn));
+    public void addForeignKeyConstraint(String referencingColumn, 
+        InsertTable targetTable, String targetColumn, Action action) {
+        foreignKeyConstraints.add(
+            new UnresolvedForeignKey(
+                referencingColumn, targetTable, targetColumn, action
+            ));
     }
     
     static class UnresolvedForeignKey {
         final String referencingColumn;
         final InsertTable targetTable;
         final String targetColumn;
+        final Action action;
 
-        public UnresolvedForeignKey(String referencingColumn, InsertTable targetTable, String targetColumn) {
+        public UnresolvedForeignKey(String referencingColumn, 
+            InsertTable targetTable, String targetColumn, Action action) {
             this.referencingColumn = referencingColumn;
             this.targetTable = targetTable;
             this.targetColumn = targetColumn;
+            this.action = action;
         }
         
     }

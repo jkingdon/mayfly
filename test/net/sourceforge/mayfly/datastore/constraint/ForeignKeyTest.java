@@ -7,15 +7,17 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Schema;
+import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.evaluation.command.InsertTable;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 public class ForeignKeyTest extends TestCase {
 
     public void testCheckInsert() throws Exception {
-        InsertTable barTable = new InsertTable(DataStore.ANONYMOUS_SCHEMA_NAME, "bar");
-        ForeignKey key = new ForeignKey(DataStore.ANONYMOUS_SCHEMA_NAME, "foo", "bar_id", barTable, "id");
+        TableReference barTable = new TableReference(
+            DataStore.ANONYMOUS_SCHEMA_NAME, "bar");
+        ForeignKey key = new ForeignKey(DataStore.ANONYMOUS_SCHEMA_NAME, 
+            "foo", "bar_id", barTable, "id", new NoAction());
         DataStore store =
             new DataStore(
                 new Schema()
@@ -25,11 +27,13 @@ public class ForeignKeyTest extends TestCase {
                     .addRow("bar", ImmutableList.singleton("id"), ImmutableList.singleton(new LongCell(5)))
             );
         key.checkInsert(store, DataStore.ANONYMOUS_SCHEMA_NAME, "foo",
-            store.table("foo").columns(), ImmutableList.singleton(new LongCell(5)));
+            singleColumnRow("bar_id", new LongCell(5))
+        );
 
         try {
             key.checkInsert(store, DataStore.ANONYMOUS_SCHEMA_NAME, "foo",
-                store.table("foo").columns(), ImmutableList.singleton(new LongCell(55)));
+                singleColumnRow("bar_id", new LongCell(55))
+            );
             fail();
         }
         catch (MayflyException e) {
@@ -37,9 +41,16 @@ public class ForeignKeyTest extends TestCase {
         }
     }
 
+    private static Row singleColumnRow(String columnName, LongCell cell) {
+        return new TupleBuilder()
+            .appendColumnCell(columnName, cell).asRow();
+    }
+
     public void testCheckDelete() throws Exception {
-        InsertTable barTable = new InsertTable(DataStore.ANONYMOUS_SCHEMA_NAME, "bar");
-        ForeignKey key = new ForeignKey(DataStore.ANONYMOUS_SCHEMA_NAME, "foo", "bar_id", barTable, "id");
+        TableReference barTable = new TableReference(
+            DataStore.ANONYMOUS_SCHEMA_NAME, "bar");
+        ForeignKey key = new ForeignKey(DataStore.ANONYMOUS_SCHEMA_NAME, 
+            "foo", "bar_id", barTable, "id", new NoAction());
         DataStore store =
             new DataStore(
                 new Schema()
@@ -50,10 +61,10 @@ public class ForeignKeyTest extends TestCase {
                     .addRow("bar", ImmutableList.singleton("id"), ImmutableList.singleton(new LongCell(5)))
                     .addRow("bar", ImmutableList.singleton("id"), ImmutableList.singleton(new LongCell(6)))
             );
-        Row sixRow = new TupleBuilder().appendColumnCell("id", new LongCell(6)).asRow();
+        Row sixRow = singleColumnRow("id", new LongCell(6));
         key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "bar", sixRow);
 
-        Row fiveRow = new TupleBuilder().appendColumnCell("id", new LongCell(5)).asRow();
+        Row fiveRow = singleColumnRow("id", new LongCell(5));
         try {
             key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "bar", fiveRow);
             fail();
