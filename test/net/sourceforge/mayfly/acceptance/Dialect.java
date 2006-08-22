@@ -356,7 +356,7 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean onDeleteSetDefaultBroken() {
+    public boolean onDeleteSetDefaultMissing() {
         return false;
     }
 
@@ -429,6 +429,10 @@ public abstract class Dialect {
     public boolean decimalScaleIsFromType() {
         // False is just bugginess, as far as I know.
         return true;
+    }
+
+    public boolean onUpdateSetNullAndCascadeMissing() {
+        return false;
     }
 
 }

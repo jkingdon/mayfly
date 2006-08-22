@@ -3,6 +3,10 @@ package net.sourceforge.mayfly.parser;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.constraint.Cascade;
+import net.sourceforge.mayfly.datastore.constraint.NoAction;
+import net.sourceforge.mayfly.datastore.constraint.SetDefault;
+import net.sourceforge.mayfly.datastore.constraint.SetNull;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Divide;
@@ -21,6 +25,7 @@ import net.sourceforge.mayfly.ldbc.what.WhatElement;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.ldbc.where.Greater;
 import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -219,7 +224,8 @@ public class ParserTest extends TestCase {
         } catch (ParserException e) {
             // This would be a nice message, as would "expected boolean but got f" or some such.
 //            assertEquals("expected boolean operator but got 5", e.getMessage());
-            assertEquals("expected boolean expression but got non-boolean expression", e.getMessage());
+            assertEquals("expected boolean expression but got " +
+                "non-boolean expression", e.getMessage());
         }
     }
     
@@ -261,7 +267,8 @@ public class ParserTest extends TestCase {
         } catch (ParserException e) {
             // Would be really nice to say what is going on with a more specific error message
 //            assertEquals("expected boolean expression but got 5 + x", e.getMessage());
-            assertEquals("expected boolean expression but got non-boolean expression", e.getMessage());
+            assertEquals("expected boolean expression but got " +
+                "non-boolean expression", e.getMessage());
         }
     }
     
@@ -271,7 +278,8 @@ public class ParserTest extends TestCase {
             parser.parseCondition().asNonBoolean();
             fail();
         } catch (ParserException e) {
-            assertEquals("expected non-boolean expression but got boolean expression", e.getMessage());
+            assertEquals("expected non-boolean expression but got " +
+                "boolean expression", e.getMessage());
 //          assertEquals("expected non-boolean expression but got 5 = x", e.getMessage());
         }
     }
@@ -462,8 +470,50 @@ public class ParserTest extends TestCase {
         // UNIQUE and PRIMARY KEY together don't make much sense.
         // The rule here is that constraints must be after DEFAULT
         // but can be in any order.
-        new Parser("x integer unique primary key").parseColumnDefinition(new CreateTable("foo"));
-        new Parser("x integer primary key unique").parseColumnDefinition(new CreateTable("foo"));
+        new Parser("x integer unique primary key").parseColumnDefinition(
+            new CreateTable("foo"));
+        new Parser("x integer primary key unique").parseColumnDefinition(
+            new CreateTable("foo"));
+    }
+    
+    public void testForeignKeyActions() throws Exception {
+        try {
+            new Parser("on earthquake run away").parseActions();
+            fail();
+        }
+        catch (ParserException e) {
+            assertEquals("expected UPDATE or DELETE but got earthquake",
+                e.getMessage());
+        }
+        
+        try {
+            new Parser("on delete no action " +
+                "on insert think about it").parseActions();
+            fail();
+        }
+        catch (ParserException e) {
+            assertEquals("expected UPDATE but got INSERT",
+                e.getMessage());
+        }
+        
+        checkActions("on update no action on delete no action", 
+            NoAction.class, NoAction.class);
+        checkActions("on delete set null on update cascade", 
+            SetNull.class, Cascade.class);
+        checkActions("on delete set default", 
+            SetDefault.class, NoAction.class);
+        checkActions("on update set default", 
+            NoAction.class, SetDefault.class);
+    }
+
+    private void checkActions(String sql, 
+        Class expectedOnDelete, Class expectedOnUpdate) {
+        Parser parser = new Parser(sql);
+        Parser.Actions actions = parser.parseActions();
+        assertEquals("", parser.remainingTokens());
+
+        MayflyAssert.assertInstanceOf(expectedOnDelete, actions.onDelete);
+        MayflyAssert.assertInstanceOf(expectedOnUpdate, actions.onUpdate);
     }
     
     public void testMultipleCommands() throws Exception {

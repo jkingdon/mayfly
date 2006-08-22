@@ -384,40 +384,73 @@ public class Parser {
         String targetColumn = consumeIdentifier();
         expectAndConsume(TokenType.CLOSE_PAREN);
         
-        Action action = parseAction();
+        Actions actions = parseActions();
         table.addForeignKeyConstraint(referencingColumn, 
             targetTable, targetColumn,
-            action);
+            actions.onDelete, actions.onUpdate);
     }
 
-    private Action parseAction() {
+    Actions parseActions() {
+        Actions actions = new Actions();
         if (consumeIfMatches(TokenType.KEYWORD_on)) {
-            expectAndConsume(TokenType.KEYWORD_delete);
-            if (consumeNonReservedWordIfMatches("no")) {
-                expectNonReservedWord("action");
-                return new NoAction();
-            }
-            else if (consumeNonReservedWordIfMatches("cascade")) {
-                return new Cascade();
-            }
-            else if (consumeIfMatches(TokenType.KEYWORD_set)) {
-                if (consumeIfMatches(TokenType.KEYWORD_null)) {
-                    return new SetNull();
+            if (consumeIfMatches(TokenType.KEYWORD_delete)) {
+                actions.onDelete = parseForeignKeyAction();
+                if (consumeIfMatches(TokenType.KEYWORD_on)) {
+                    expectAndConsume(TokenType.KEYWORD_update);
+                    actions.onUpdate = parseForeignKeyAction();
                 }
-                else if (consumeIfMatches(TokenType.KEYWORD_default)) {
-                    return new SetDefault();
-                }
-                else {
-                    throw new ParserException("expected ON DELETE action " +
-                        " but got SET " + describeToken(currentToken()));
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_update)) {
+                actions.onUpdate = parseForeignKeyAction();
+                if (consumeIfMatches(TokenType.KEYWORD_on)) {
+                    expectAndConsume(TokenType.KEYWORD_delete);
+                    actions.onDelete = parseForeignKeyAction();
                 }
             }
             else {
-                throw new ParserException("expected ON DELETE action " +
-                    " but got " + describeToken(currentToken()));
+                throw new ParserException(
+                    "expected UPDATE or DELETE but got " + 
+                    describeToken(currentToken()));
             }
         }
-        return new NoAction();
+        return actions;
+    }
+    
+    class Actions {
+        Action onDelete;
+        Action onUpdate;
+
+        public Actions() {
+            onDelete = new NoAction();
+            onUpdate = new NoAction();
+        }
+        
+    }
+
+    private Action parseForeignKeyAction() {
+        if (consumeNonReservedWordIfMatches("no")) {
+            expectNonReservedWord("action");
+            return new NoAction();
+        }
+        else if (consumeNonReservedWordIfMatches("cascade")) {
+            return new Cascade();
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_set)) {
+            if (consumeIfMatches(TokenType.KEYWORD_null)) {
+                return new SetNull();
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_default)) {
+                return new SetDefault();
+            }
+            else {
+                throw new ParserException("expected ON DELETE action " +
+                    " but got SET " + describeToken(currentToken()));
+            }
+        }
+        else {
+            throw new ParserException("expected ON DELETE action " +
+                " but got " + describeToken(currentToken()));
+        }
     }
 
     Column parseColumnDefinition(CreateTable table) {

@@ -106,7 +106,8 @@ public class CreateTable extends Command {
                     targetTable.resolve(store, schema),
                     key.targetColumn,
                     
-                    key.action
+                    key.onDelete,
+                    key.onUpdate
                 )
             );
         }
@@ -143,10 +144,11 @@ public class CreateTable extends Command {
     }
 
     public void addForeignKeyConstraint(String referencingColumn, 
-        InsertTable targetTable, String targetColumn, Action action) {
+        InsertTable targetTable, String targetColumn, 
+        Action onDelete, Action onUpdate) {
         foreignKeyConstraints.add(
             new UnresolvedForeignKey(
-                referencingColumn, targetTable, targetColumn, action
+                referencingColumn, targetTable, targetColumn, onDelete, onUpdate
             ));
     }
     
@@ -154,14 +156,17 @@ public class CreateTable extends Command {
         final String referencingColumn;
         final InsertTable targetTable;
         final String targetColumn;
-        final Action action;
+        final Action onDelete;
+        final Action onUpdate;
 
         public UnresolvedForeignKey(String referencingColumn, 
-            InsertTable targetTable, String targetColumn, Action action) {
+            InsertTable targetTable, String targetColumn, 
+            Action onDelete, Action onUpdate) {
             this.referencingColumn = referencingColumn;
             this.targetTable = targetTable;
             this.targetColumn = targetColumn;
-            this.action = action;
+            this.onDelete = onDelete;
+            this.onUpdate = onUpdate;
         }
         
     }

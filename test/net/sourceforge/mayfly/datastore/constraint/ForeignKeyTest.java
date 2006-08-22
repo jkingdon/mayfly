@@ -16,8 +16,7 @@ public class ForeignKeyTest extends TestCase {
     public void testCheckInsert() throws Exception {
         TableReference barTable = new TableReference(
             DataStore.ANONYMOUS_SCHEMA_NAME, "bar");
-        ForeignKey key = new ForeignKey(DataStore.ANONYMOUS_SCHEMA_NAME, 
-            "foo", "bar_id", barTable, "id", new NoAction());
+        ForeignKey key = new ForeignKey("foo", "bar_id", barTable, "id");
         DataStore store =
             new DataStore(
                 new Schema()
@@ -49,8 +48,7 @@ public class ForeignKeyTest extends TestCase {
     public void testCheckDelete() throws Exception {
         TableReference barTable = new TableReference(
             DataStore.ANONYMOUS_SCHEMA_NAME, "bar");
-        ForeignKey key = new ForeignKey(DataStore.ANONYMOUS_SCHEMA_NAME, 
-            "foo", "bar_id", barTable, "id", new NoAction());
+        ForeignKey key = new ForeignKey("foo", "bar_id", barTable, "id");
         DataStore store =
             new DataStore(
                 new Schema()
@@ -62,19 +60,19 @@ public class ForeignKeyTest extends TestCase {
                     .addRow("bar", ImmutableList.singleton("id"), ImmutableList.singleton(new LongCell(6)))
             );
         Row sixRow = singleColumnRow("id", new LongCell(6));
-        key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "bar", sixRow);
+        key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "bar", sixRow, null);
 
         Row fiveRow = singleColumnRow("id", new LongCell(5));
         try {
-            key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "bar", fiveRow);
+            key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "bar", fiveRow, null);
             fail();
         }
         catch (MayflyException e) {
             assertEquals("foreign key violation: table foo refers to id 5 in bar", e.getMessage());
         }
         
-        key.checkDelete(store, "another_schema", "bar", fiveRow);
-        key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "another_table", fiveRow);
+        key.checkDelete(store, "another_schema", "bar", fiveRow, null);
+        key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "another_table", fiveRow, null);
     }
 
 }

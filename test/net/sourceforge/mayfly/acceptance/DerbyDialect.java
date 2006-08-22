@@ -133,11 +133,18 @@ public class DerbyDialect extends Dialect {
         return true;
     }
     
-    public boolean onDeleteSetDefaultBroken() {
-        // I'm not sure what "on delete set default"
-        // would mean, other than what we are
-        // testing for.  Unless I'm missing something,
-        // it simply doesn't work in Derby.
+    // Derby also has the foreign key actions:
+    // ON UPDATE RESTRICT
+    // ON DELETE RESTRICT
+    // which appear to be the same as NO ACTION except how triggers are handled.
+    // We don't test these currently.
+
+    public boolean onDeleteSetDefaultMissing() {
+        /* Derby doesn't claim to have ON DELETE SET DEFAULT */
+        return true;
+    }
+
+    public boolean onUpdateSetNullAndCascadeMissing() {
         return true;
     }
 

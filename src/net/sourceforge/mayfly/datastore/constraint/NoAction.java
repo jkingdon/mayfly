@@ -16,4 +16,13 @@ public class NoAction extends Action {
             " in " + targetTable.tableName());
     }
 
+    public DataStore handleUpdate(Cell oldValue, Cell newValue, 
+        DataStore store, String referencerSchema, 
+        String referencerTable, 
+        String referencerColumn, TableReference targetTable, String targetColumn) {
+        return handleDelete(oldValue, store, 
+            referencerSchema, referencerTable, referencerColumn, 
+            targetTable, targetColumn);
+    }
+    
 }

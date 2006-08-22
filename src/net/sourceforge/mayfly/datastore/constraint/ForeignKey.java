@@ -20,11 +20,19 @@ public class ForeignKey {
     private final TableReference targetTable;
     private final String targetColumn;
 
-    private final Action action;
+    private final Action onDelete;
+    private final Action onUpdate;
+    
+    public ForeignKey(String referencerTable, String referencerColumn,
+        TableReference targetTable, String targetColumn) {
+        this(DataStore.ANONYMOUS_SCHEMA_NAME, referencerTable, referencerColumn,
+            targetTable, targetColumn, new NoAction(), new NoAction());
+    }
 
     public ForeignKey(
         String referencerSchema, String referencerTable, String referencerColumn, 
-        TableReference targetTable, String targetColumn, Action action) {
+        TableReference targetTable, String targetColumn, 
+        Action onDelete, Action onUpdate) {
         
         this.referencerSchema = referencerSchema;
         this.referencerTable = referencerTable;
@@ -32,7 +40,18 @@ public class ForeignKey {
 
         this.targetTable = targetTable;
         this.targetColumn = targetColumn;
-        this.action = action;
+        this.onDelete = onDelete;
+        this.onUpdate = onUpdate;
+        
+        if (onUpdate instanceof Cascade) {
+            throw new MayflyException("ON UPDATE CASCADE not implemented");
+        }
+        else if (onUpdate instanceof SetNull) {
+            throw new MayflyException("ON UPDATE SET NULL not implemented");
+        }
+        else if (onUpdate instanceof SetDefault) {
+            throw new MayflyException("ON UPDATE SET DEFAULT not implemented");
+        }
     }
 
     public void checkInsert(DataStore store, String schema, String table, 
@@ -85,28 +104,31 @@ public class ForeignKey {
             " in " + columns.toString());
     }
 
-    public void checkDelete(DataStore store, String schema, String table, 
-        Row rowToDelete) {
-        checkDelete(store, schema, table, rowToDelete, null);
-    }
-
     public DataStore checkDelete(DataStore store, String schema, String table, 
         Row rowToDelete, Row replacementRow) {
         if (tableIsMyTarget(schema, table)) {
             Column column = rowToDelete.findColumn(targetColumn);
             Cell oldValue = rowToDelete.cell(column);
+            TableData referencer = 
+                store.table(referencerSchema, referencerTable);
+
             if (replacementRow != null) {
                 Cell newValue = replacementRow.cell(column);
                 if (oldValue.sqlEquals(newValue)) {
                     return store;
                 }
+                if (referencer.hasValue(referencerColumn, oldValue)) {
+                    return onUpdate.handleUpdate(oldValue, newValue, 
+                        store, referencerSchema, referencerTable,
+                        referencerColumn, targetTable, targetColumn);
+                }
             }
-            TableData referencer = 
-                store.table(referencerSchema, referencerTable);
-            if (referencer.hasValue(referencerColumn, oldValue)) {
-                return action.handleDelete(oldValue, store, 
-                    referencerSchema, referencerTable, referencerColumn,
-                    targetTable, targetColumn);
+            else {
+                if (referencer.hasValue(referencerColumn, oldValue)) {
+                    return onDelete.handleDelete(oldValue, store, 
+                        referencerSchema, referencerTable, referencerColumn,
+                        targetTable, targetColumn);
+                }
             }
         }
         return store;

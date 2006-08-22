@@ -167,19 +167,28 @@ public class ForeignKeyTest extends SqlTestCase {
             "no table bad_table");
     }
 
-    public void testOnDeleteNoAction() throws Exception {
+    public void testNoAction() throws Exception {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
             dialect.databaseTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)" +
-            "on delete no action)" +
+            "on delete no action on update no action)" +
             dialect.databaseTypeForForeignKeys());
         execute("insert into countries values (1, 'India')");
         execute("insert into cities values ('Bombay', 1)");
         expectExecuteFailure("delete from countries", 
             "foreign key violation: table cities refers to id 1 in countries");
+        expectExecuteFailure(
+            "update countries set id = 999 where id = 1",
+            "foreign key violation: table cities refers to id 1 in countries");
+
+        assertResultSet(
+            new String[] { " 1, 'India' " }, 
+            query("select * from countries"));
+        assertResultSet(new String[] { " 'Bombay', 1 " }, 
+            query("select * from cities"));
     }
 
     public void testOnDeleteCascade() throws Exception {
@@ -235,7 +244,7 @@ public class ForeignKeyTest extends SqlTestCase {
         execute("insert into countries values (2, 'India')");
         execute("insert into cities values ('Bombay', 2)");
         String sql = "delete from countries where id = 2";
-        if (dialect.onDeleteSetDefaultBroken()) {
+        if (dialect.onDeleteSetDefaultMissing()) {
             expectExecuteFailure(sql, "foreign key violation");
         }
         else {
@@ -245,11 +254,95 @@ public class ForeignKeyTest extends SqlTestCase {
         }
     }
 
-    // Check ON DELETE NO ACTION etc grammar against SQL92 grammar.
+    public void testOnUpdateNoAction() throws Exception {
+        execute(
+            "create table countries " +
+            "(id integer primary key, name varchar(255))" +
+            dialect.databaseTypeForForeignKeys());
+        execute("create table cities (name varchar(255), country integer, " +
+            "foreign key (country) references countries(id)" +
+            "on update no action on delete cascade)" +
+            dialect.databaseTypeForForeignKeys());
+        execute("insert into countries values (1, 'USSR')");
+        execute("insert into countries values (2, 'Russia')");
+        execute("insert into cities values ('Moscow', 1)");
+        expectExecuteFailure(
+            "update countries set id = 999 where id = 1",
+            "foreign key violation: table cities refers to id 1 in countries");
+        assertResultSet(
+            new String[] { " 1, 'USSR' ", " 2, 'Russia' " }, 
+            query("select * from countries"));
+        assertResultSet(new String[] { " 'Moscow', 1 " }, 
+            query("select * from cities"));
+    }
+
+    public void testOnUpdateCascade() throws Exception {
+        execute(
+            "create table countries " +
+            "(id integer primary key, name varchar(255))" +
+            dialect.databaseTypeForForeignKeys());
+        String createCities = "create table cities (name varchar(255), country integer, " +
+                    "foreign key (country) references countries(id)" +
+                    "on update cascade)" +
+                    dialect.databaseTypeForForeignKeys();
+        if (dialect.onUpdateSetNullAndCascadeMissing()) {
+            expectExecuteFailure(createCities, 
+                "ON UPDATE CASCADE not implemented");
+        }
+        else {
+            execute(createCities);
+            execute("insert into countries values (1, 'USSR')");
+            execute("insert into countries values (2, 'Russia')");
+            execute("insert into cities values ('Moscow', 1)");
     
-    // ON UPDATE
-    // NO ACTION, CASCADE, SET NULL, SET DEFAULT
+            execute("update countries set id = 999 where id = 1");
+    
+            assertResultSet(
+                new String[] { " 999, 'USSR' ", " 2, 'Russia' " }, 
+                query("select * from countries"));
+            assertResultSet(new String[] { " 'Moscow', 999 " }, 
+                query("select * from cities"));
+            
+            // The action shouldn't affect the following two cases:
+            execute("update cities set country = 2");
+            expectExecuteFailure("update cities set country = 5",
+                "foreign key violation: countries has no id 5");
+        }
+    }
+
+    public void testOnUpdateSetNull() throws Exception {
+        execute(
+            "create table countries " +
+            "(id integer primary key, name varchar(255))" +
+            dialect.databaseTypeForForeignKeys());
+        String createCities = "create table cities (name varchar(255), country integer, " +
+                    "foreign key (country) references countries(id)" +
+                    "on update set null)" +
+                    dialect.databaseTypeForForeignKeys();
+        if (dialect.onUpdateSetNullAndCascadeMissing()) {
+            expectExecuteFailure(createCities, "ON UPDATE SET NULL not implemented");
+        }
+        else {
+            execute(createCities);
+            execute("insert into countries values (1, 'USSR')");
+            execute("insert into countries values (2, 'Russia')");
+            execute("insert into cities values ('Moscow', 1)");
+            execute("update countries set id = 999 where id = 1");
+            assertResultSet(
+                new String[] { " 999, 'USSR' ", " 2, 'Russia' " }, 
+                query("select * from countries"));
+            assertResultSet(new String[] { " 'Moscow', null " }, 
+                query("select * from cities"));
+        }
+    }
+
+    // ON UPDATE SET DEFAULT
+    
     // multiple referencing columns
+    // multiple referencing columns where one is NULL (but others are not)
     // "references foo" (omitting the '(' column... ')')
+    // two level cascade: X REFERS TO Y ON DELETE NO ACTION
+    //   and Y REFERS TO Z ON DELETE CASCADE
+    //   Now delete a row in Z - sould fail because X still refers to it.
 
 }

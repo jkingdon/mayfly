@@ -108,5 +108,9 @@ public class MayflyDialect extends Dialect {
     public boolean decimalScaleIsFromType() {
         return wishThisWereTrue();
     }
+    
+    public boolean onUpdateSetNullAndCascadeMissing() {
+        return true;
+    }
 
 }
