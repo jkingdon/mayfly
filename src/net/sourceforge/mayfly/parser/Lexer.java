@@ -50,8 +50,22 @@ public class Lexer {
                 current = nextCharacter();
             }
             else if (current == '-') {
-                tokens.add(new Token(TokenType.MINUS, "-"));
                 current = nextCharacter();
+                if (current == '-') {
+                    while (true) {
+                        current = nextCharacter();
+                        if (current == '\n') {
+                            current = nextCharacter();
+                            break;
+                        }
+                        else if (current == -1) {
+                            break;
+                        }
+                    }
+                }
+                else {
+                    tokens.add(new Token(TokenType.MINUS, "-"));
+                }
             }
             else if (current == '/') {
                 tokens.add(new Token(TokenType.DIVIDE, "/"));

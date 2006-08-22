@@ -3,7 +3,8 @@ package net.sourceforge.mayfly.acceptance;
 public class ForeignKeyTest extends SqlTestCase {
     
     public void testInsertAndDelete() throws Exception {
-        execute("create table countries (id integer primary key, name varchar(255))" +
+        execute("create table countries (id integer primary key, " +
+            "name varchar(255))" +
             dialect.databaseTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)" +

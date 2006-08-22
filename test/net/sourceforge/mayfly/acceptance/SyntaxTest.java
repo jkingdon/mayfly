@@ -22,10 +22,12 @@ public class SyntaxTest extends SqlTestCase {
     }
     
     public void testQuotedIdentifier() throws Exception {
-        String createTableSql = "create table \"join\" (\"null\" integer, \"=\" integer, \"\u00a1\" integer)";
+        String createTableSql = "create table \"join\" (" +
+            "\"null\" integer, \"=\" integer, \"\u00a1\" integer)";
         if (dialect.canQuoteIdentifiers()) {
             execute(createTableSql);
-            execute("insert into \"join\" (\"null\", \"=\", \"\u00a1\") values (3, 5, 7)");
+            execute("insert into \"join\" (" +
+                "\"null\", \"=\", \"\u00a1\") values (3, 5, 7)");
             assertResultSet(new String[] { "7, 5, 3" }, query("select \"\u00a1\", \"=\", \"null\" from \"join\""));
         }
         else {
@@ -36,7 +38,8 @@ public class SyntaxTest extends SqlTestCase {
     public void testQuotedIdentifiersCaseSensitive() throws Exception {
         // The unquoted one is to be taken as the same as quoted "FOO"
         String createTableSql = "create table foo (foo integer, \"Foo\" integer, \"foo\" integer)";
-        if (dialect.canQuoteIdentifiers() && dialect.quotedIdentifiersAreCaseSensitive()) {
+        if (dialect.canQuoteIdentifiers() && 
+            dialect.quotedIdentifiersAreCaseSensitive()) {
             execute(createTableSql);
             execute("insert into foo (\"Foo\", \"foo\", \"FOO\") values (3, 5, 7)");
             assertResultSet(new String[] { "5, 3, 7" }, query("select \"foo\", \"Foo\", foo from foo"));

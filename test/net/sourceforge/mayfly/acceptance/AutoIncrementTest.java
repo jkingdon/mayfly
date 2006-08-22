@@ -5,7 +5,12 @@ import java.sql.SQLException;
 public class AutoIncrementTest extends SqlTestCase {
     
     public void testAutoUnderbarIncrement() throws Exception {
-        String sql = "create table foo (x integer primary key auto_increment, y varchar(255))";
+        // I think MySQL also accepts "primary key auto_increment"
+        // but mayfly doesn't (at least yet).  The grammar in the MySQL
+        // manual says that auto_increment has to be before "primary key"
+        String sql = "create table foo (" +
+            "x integer auto_increment primary key, " +
+            "y varchar(255))";
         if (dialect.haveAutoUnderbarIncrement()) {
             execute(sql);
             check();

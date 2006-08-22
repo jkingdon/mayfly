@@ -458,6 +458,11 @@ public class Parser {
         boolean isAutoIncrement = parseDataType();
 
         Cell defaultValue = parseDefaultClause(name);
+        
+        if (consumeNonReservedWordIfMatches("auto_increment")) {
+            isAutoIncrement = true;
+        }
+
         if (isAutoIncrement) {
             defaultValue = new LongCell(1);
         }

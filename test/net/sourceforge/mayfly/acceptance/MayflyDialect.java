@@ -90,11 +90,7 @@ public class MayflyDialect extends Dialect {
     }
     
     public boolean haveAutoUnderbarIncrement() {
-        /* 
-         * Not comletely sure how to parse this if
-         * AUTO_INCREMENT is non-reserved.
-         */
-        return wishThisWereTrue();
+        return true;
     }
     
     public boolean haveIdentity() {

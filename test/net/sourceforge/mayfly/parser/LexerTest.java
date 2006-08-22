@@ -45,6 +45,21 @@ public class LexerTest extends TestCase {
         );
     }
     
+    public void testSql92Comments() throws Exception {
+        check(
+            new TokenType[] {
+                TokenType.MINUS,
+                TokenType.MINUS,
+                TokenType.MINUS,
+                TokenType.END_OF_FILE
+            },
+            new String[] { "-", "-", "-", null },
+            "- - ----- this is a comment\n" +
+            "-- this is another comment\r\n" +
+            "- --- and a third comment"
+        );
+    }
+    
     public void testLessThanAndGreaterThan() throws Exception {
         check(
             new TokenType[] {
@@ -296,7 +311,8 @@ public class LexerTest extends TestCase {
         );
     }
     
-    private void check(TokenType[] expectedTypes, String[] expectedTexts, String input) {
+    private void check(TokenType[] expectedTypes, String[] expectedTexts, 
+        String input) {
         check(expectedTypes, expectedTexts, lex(input));
     }
 

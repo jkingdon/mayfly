@@ -79,15 +79,26 @@ SQL guide, such as those found at <a href="http://www.sqlzoo.net/" >sqlzoo.net</
 Here we emphasis conciseness and identifying our SQL subset, instead of a full
 description of the semantics and syntax.
 
+@subsection comments
+
+Text from -- to a newline is a comment. 
+
 @subsection create CREATE TABLE
 
 <pre>
 CREATE TABLE <var>name</var> (
   {
     {<var>column-name</var> <var>data-type</var> 
-        [ DEFAULT <var>default-value</var> ] {[ NOT NULL | UNIQUE | PRIMARY KEY ]}... } |
+        [ DEFAULT <var>default-value</var> ]
+        [ AUTO_INCREMENT ]
+        {[ NOT NULL | UNIQUE | PRIMARY KEY ]}... 
+    } |
     UNIQUE(<var>column</var>, ...) |
     PRIMARY KEY(<var>column</var>, ...)
+    FOREIGN KEY(<var>column</var>) REFERENCES <var>table</var>(<var>column</var>)
+      [ ON DELETE <var>action</var> [ ON UPDATE <var>action</var> ] |
+        ON UPDATE <var>action</var> [ ON DELETE <var>action</var> ]
+      ]
   }, ...
 )
 </pre>
@@ -102,6 +113,9 @@ as a non-standard synonym).
 An exception to the rule that Mayfly ignores data types are auto-increment columns.
 Either IDENTITY or SERIAL as datatypes indicate an integer column which causes the
 default value to start at one and increment after every row inserted. 
+
+Foreign key actions for ON DELETE are NO ACTION, CASCADE, SET NULL, 
+and SET DEFAULT.  Foreign key actions for ON UPDATE are NO ACTION only.
 
 @subsection drop DROP TABLE
 
