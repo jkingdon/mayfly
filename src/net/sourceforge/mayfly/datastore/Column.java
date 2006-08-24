@@ -1,6 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.types.DataType;
+import net.sourceforge.mayfly.datastore.types.DefaultDataType;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public class Column extends ValueObject implements CellHeader {
@@ -8,16 +10,19 @@ public class Column extends ValueObject implements CellHeader {
     private final String columnName;
     private final Cell defaultValue;
     private final boolean isAutoIncrement;
+    private final DataType type;
 
-    public Column(String table, String name, Cell defaultValue, boolean isAutoIncrement) {
+    public Column(String table, String name, Cell defaultValue, 
+        boolean isAutoIncrement, DataType type) {
         this.tableOrAlias = table;
         this.columnName = name;
         this.defaultValue = defaultValue;
         this.isAutoIncrement = isAutoIncrement;
+        this.type = type;
     }
 
     public Column(String table, String columnName) {
-        this(table, columnName, NullCell.INSTANCE, false);
+        this(table, columnName, NullCell.INSTANCE, false, new DefaultDataType());
     }
 
     public Column(String column) {
@@ -73,7 +78,15 @@ public class Column extends ValueObject implements CellHeader {
 
     public Column afterAutoIncrement() {
         Cell newDefault = new LongCell(defaultValue.asLong() + 1L);
-        return new Column(tableOrAlias, columnName, newDefault, isAutoIncrement);
+        return new Column(tableOrAlias, columnName, newDefault, 
+            isAutoIncrement, type);
+    }
+
+    /**
+     * Coerce to the type of this column.
+     */
+    public Cell coerce(Cell value) {
+        return type.coerce(value);
     }
 
 }

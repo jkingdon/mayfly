@@ -311,13 +311,82 @@ public class LexerTest extends TestCase {
         );
     }
     
+    public void testLineNumbers() throws Exception {
+        List tokens = lex("width \n 53");
+        assertEquals(3, tokens.size());
+
+        {
+            Token width = (Token) tokens.get(0);
+            assertEquals("width", width.getText());
+            assertEquals(1, width.startLineNumber());
+            assertEquals(1, width.startColumn());
+            assertEquals(1, width.endLineNumber());
+            assertEquals(6, width.endColumn());
+        }
+
+        {
+            Token fiftyThree = (Token) tokens.get(1);
+            assertEquals("53", fiftyThree.getText());
+            assertEquals(2, fiftyThree.startLineNumber());
+            assertEquals(2, fiftyThree.startColumn());
+            assertEquals(2, fiftyThree.endLineNumber());
+            assertEquals(4, fiftyThree.endColumn());
+        }
+        
+        {
+            Token endOfFile = (Token) tokens.get(2);
+            assertEquals(null, endOfFile.getText());
+            assertEquals(2, endOfFile.startLineNumber());
+            assertEquals(4, endOfFile.startColumn());
+            assertEquals(2, endOfFile.endLineNumber());
+            assertEquals(4, endOfFile.endColumn());
+        }
+    }
+    
+    public void testLineNumberAndComment() throws Exception {
+        List tokens = lex("-- first line\n.-- comment at end of file");
+        assertEquals(2, tokens.size());
+        
+        {
+            Token period = (Token) tokens.get(0);
+            assertEquals(TokenType.PERIOD, period.getType());
+            assertEquals(2, period.startLineNumber());
+            assertEquals(1, period.startColumn());
+            assertEquals(2, period.endLineNumber());
+            assertEquals(2, period.endColumn());
+        }
+        
+        {
+            Token endOfFile = (Token) tokens.get(1);
+            assertEquals(TokenType.END_OF_FILE, endOfFile.getType());
+            assertEquals(2, endOfFile.startLineNumber());
+            assertEquals(27, endOfFile.startColumn());
+            assertEquals(2, endOfFile.endLineNumber());
+            assertEquals(27, endOfFile.endColumn());
+        }
+    }
+    
+    public void testNewlineEndsToken() throws Exception {
+        List tokens = lex("'c''est'\n<");
+        assertEquals(3, tokens.size());
+        
+        Token string = (Token) tokens.get(0);
+        assertEquals(TokenType.QUOTED_STRING, string.getType());
+        assertEquals(1, string.startLineNumber());
+        assertEquals(1, string.startColumn());
+        assertEquals(1, string.endLineNumber());
+        assertEquals(9, string.endColumn());
+    }
+    
     private void check(TokenType[] expectedTypes, String[] expectedTexts, 
         String input) {
         check(expectedTypes, expectedTexts, lex(input));
     }
 
-    public static void check(TokenType[] expectedTypes, String[] expectedTexts, List actual) {
-        assertEquals("test setup problem with expectations", expectedTexts.length, expectedTypes.length);
+    public static void check(TokenType[] expectedTypes, String[] expectedTexts, 
+        List actual) {
+        assertEquals("test setup problem with expectations", 
+            expectedTexts.length, expectedTypes.length);
         List actualTexts = new ArrayList(actual.size());
         List actualTypes = new ArrayList(actual.size());
         for (int i = 0; i < actual.size(); ++i) {

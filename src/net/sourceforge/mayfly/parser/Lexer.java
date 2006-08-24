@@ -12,6 +12,12 @@ import java.util.List;
 public class Lexer {
 
     private Reader sql;
+    private int currentLine;
+    private int currentColumn;
+    private int previousLine = -1;
+    private int previousColumn = -1;
+    private int tokenLine;
+    private int tokenColumn;
 
     public Lexer(String sql) {
         this(new StringReader(sql));
@@ -23,6 +29,8 @@ public class Lexer {
      */
     public Lexer(Reader sql) {
         this.sql = sql;
+        this.currentLine = 1;
+        this.currentColumn = 1;
     }
     
     Lexer() {
@@ -31,23 +39,25 @@ public class Lexer {
 
     public List tokens() {
         List tokens = new ArrayList();
+        tokenLine = currentLine;
+        tokenColumn = currentColumn;
         int current = nextCharacter();
         while (true) {
             if (current == '.') {
-                tokens.add(new Token(TokenType.PERIOD, "."));
                 current = nextCharacter();
+                addToken(tokens, TokenType.PERIOD, ".");
             }
             else if (current == ';') {
-                tokens.add(new Token(TokenType.SEMICOLON, ";"));
                 current = nextCharacter();
+                addToken(tokens, TokenType.SEMICOLON, ";");
             }
             else if (current == ',') {
-                tokens.add(new Token(TokenType.COMMA, ","));
                 current = nextCharacter();
+                addToken(tokens, TokenType.COMMA, ",");
             }
             else if (current == '+') {
-                tokens.add(new Token(TokenType.PLUS, "+"));
                 current = nextCharacter();
+                addToken(tokens, TokenType.PLUS, "+");
             }
             else if (current == '-') {
                 current = nextCharacter();
@@ -55,71 +65,75 @@ public class Lexer {
                     while (true) {
                         current = nextCharacter();
                         if (current == '\n') {
+                            tokenLine = currentLine;
+                            tokenColumn = currentColumn;
                             current = nextCharacter();
                             break;
                         }
                         else if (current == -1) {
+                            tokenLine = currentLine;
+                            tokenColumn = currentColumn;
                             break;
                         }
                     }
                 }
                 else {
-                    tokens.add(new Token(TokenType.MINUS, "-"));
+                    addToken(tokens, TokenType.MINUS, "-");
                 }
             }
             else if (current == '/') {
-                tokens.add(new Token(TokenType.DIVIDE, "/"));
                 current = nextCharacter();
+                addToken(tokens, TokenType.DIVIDE, "/");
             }
             else if (current == '*') {
-                tokens.add(new Token(TokenType.ASTERISK, "*"));
                 current = nextCharacter();
+                addToken(tokens, TokenType.ASTERISK, "*");
             }
             else if (current == '(') {
-                tokens.add(new Token(TokenType.OPEN_PAREN, "("));
                 current = nextCharacter();
+                addToken(tokens, TokenType.OPEN_PAREN, "(");
             }
             else if (current == ')') {
-                tokens.add(new Token(TokenType.CLOSE_PAREN, ")"));
                 current = nextCharacter();
+                addToken(tokens, TokenType.CLOSE_PAREN, ")");
             }
             else if (current == '?') {
-                tokens.add(new Token(TokenType.PARAMETER, "?"));
                 current = nextCharacter();
+                addToken(tokens, TokenType.PARAMETER, "?");
             }
             else if (current == '<') {
                 current = nextCharacter();
                 if (current == '>') {
-                    tokens.add(new Token(TokenType.LESS_GREATER, "<>"));
                     current = nextCharacter();
+                    addToken(tokens, TokenType.LESS_GREATER, "<>");
                 }
                 else if (current == '=') {
-                    tokens.add(new Token(TokenType.LESS_EQUAL, "<="));
                     current = nextCharacter();
+                    addToken(tokens, TokenType.LESS_EQUAL, "<=");
                 }
                 else {
-                    tokens.add(new Token(TokenType.LESS, "<"));
+                    addToken(tokens, TokenType.LESS, "<");
                 }
             }
             else if (current == '>') {
                 current = nextCharacter();
                 if (current == '=') {
-                    tokens.add(new Token(TokenType.GREATER_EQUAL, ">="));
                     current = nextCharacter();
+                    addToken(tokens, TokenType.GREATER_EQUAL, ">=");
                 }
                 else {
-                    tokens.add(new Token(TokenType.GREATER, ">"));
+                    addToken(tokens, TokenType.GREATER, ">");
                 }
             }
             else if (current == '=') {
                 current = nextCharacter();
-                tokens.add(new Token(TokenType.EQUAL, "="));
+                addToken(tokens, TokenType.EQUAL, "=");
             }
             else if (current == '!') {
                 current = nextCharacter();
                 if (current == '=') {
-                    tokens.add(new Token(TokenType.BANG_EQUAL, "!="));
                     current = nextCharacter();
+                    addToken(tokens, TokenType.BANG_EQUAL, "!=");
                 }
                 else {
                     throw new MayflyException("expected '=' but got " + describeCharacter(current));
@@ -128,20 +142,21 @@ public class Lexer {
             else if (current == '|') {
                 current = nextCharacter();
                 if (current == '|') {
-                    tokens.add(new Token(TokenType.CONCATENATE, "||"));
                     current = nextCharacter();
+                    addToken(tokens, TokenType.CONCATENATE, "||");
                 }
                 else {
                     throw new MayflyException("expected '|' but got " + describeCharacter(current));
                 }
             }
             else if (isIdentifierStart(current)) {
-                StringBuilder text = new StringBuilder();
+                StringBuilder textBuilder = new StringBuilder();
                 while (isIdentifierCharacter(current)) {
-                    text.append((char)current);
+                    textBuilder.append((char)current);
                     current = nextCharacter();
                 }
-                tokens.add(keywordOrIdentifier(text.toString()));
+                String text = textBuilder.toString();
+                addToken(tokens, keywordOrIdentifier(text), text);
             }
             else if (current >= '0' && current <= '9') {
                 StringBuilder text = new StringBuilder();
@@ -149,7 +164,7 @@ public class Lexer {
                     text.append((char)current);
                     current = nextCharacter();
                 }
-                tokens.add(new Token(TokenType.NUMBER, text.toString()));
+                addToken(tokens, TokenType.NUMBER, text.toString());
             }
             else if (current == '\"') {
                 StringBuilder text = new StringBuilder();
@@ -162,13 +177,16 @@ public class Lexer {
                     }
                 }
                 current = nextCharacter();
-                tokens.add(new Token(TokenType.IDENTIFIER, text.toString()));
+                addToken(tokens, TokenType.IDENTIFIER, text.toString());
             }
-            else if (current == ' ' || current == '\t' || current == '\n' || current == '\r') {
+            else if (current == ' ' || current == '\t' || current == '\n' || 
+                current == '\r') {
+                tokenLine = currentLine;
+                tokenColumn = currentColumn;
                 current = nextCharacter();
             }
             else if (current == -1) {
-                tokens.add(new Token(TokenType.END_OF_FILE));
+                addEndOfFile(tokens);
                 break;
             }
             else if (current == '\'') {
@@ -195,13 +213,41 @@ public class Lexer {
                     }
                 }
                 text.append("'");
-                tokens.add(new Token(TokenType.QUOTED_STRING, text.toString()));
+                addToken(tokens, TokenType.QUOTED_STRING, text.toString());
             }
             else {
                 throw new MayflyException("unexpected character " + describeCharacter(current));
             }
         }
         return tokens;
+    }
+
+    /**
+     * Usage is to call nextCharacter() and then call this
+     * method.  In other words, the character most recently
+     * read by nextCharacter is <i>not</i> part of the token
+     * we are adding here; the character before that is the
+     * last character of the token.
+     */
+    private void addToken(List tokens, TokenType tokenType, String text) {
+        tokens.add(
+            new Token(tokenType, text, 
+                tokenLine, tokenColumn, previousLine, previousColumn)
+        );
+        tokenLine = currentLine;
+        tokenColumn = currentColumn;
+    }
+    
+    /**
+     * Key difference with {@link #addToken(List, TokenType, String)}
+     * is that we haven't called nextCharacter (since we are at the
+     * end of file).
+     */
+    private void addEndOfFile(List tokens) {
+        tokens.add(
+            new Token(TokenType.END_OF_FILE, null,
+                previousLine, previousColumn, previousLine, previousColumn)
+        );
     }
 
     String describeCharacter(int current) {
@@ -215,30 +261,40 @@ public class Lexer {
         return "'" + (char)current + "'";
     }
 
-    private Token keywordOrIdentifier(String text) {
+    private TokenType keywordOrIdentifier(String text) {
         TokenType type = TokenType.lookupKeyword(text);
-        if (type != null) {
-            return new Token(type, text);
-        }
-        else {
-            return new Token(TokenType.IDENTIFIER, text);
-        }
+        return type != null ? type : TokenType.IDENTIFIER;
     }
 
     private int nextCharacter() {
         try {
-            return sql.read();
+            previousLine = currentLine;
+            previousColumn = currentColumn;
+
+            int character = sql.read();
+
+            if (character == '\n') {
+                currentColumn = 1;
+                ++currentLine;
+            }
+            else {
+                ++currentColumn;
+            }
+            return character;
         } catch (IOException e) {
             throw new MayflyException(e);
         }
     }
 
     private boolean isIdentifierStart(int current) {
-        return (current >= 'a' && current <= 'z') || (current >= 'A' && current <= 'Z');
+        return (current >= 'a' && current <= 'z') || 
+            (current >= 'A' && current <= 'Z');
     }
 
     private boolean isIdentifierCharacter(int current) {
-        return isIdentifierStart(current) || (current >= '0' && current <= '9') || current == '_';
+        return isIdentifierStart(current) || 
+            (current >= '0' && current <= '9') ||
+            current == '_';
     }
 
 }

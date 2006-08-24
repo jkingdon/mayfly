@@ -1,10 +1,12 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.util.ValueObject;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.Calendar;
 
 public abstract class Cell extends ValueObject {
 
@@ -21,7 +23,7 @@ public abstract class Cell extends ValueObject {
     
     abstract public int asInt() throws SQLException;
 
-    abstract public long asLong();
+    abstract public long asLong() throws MayflyException;
 
     abstract public String asString();
 
@@ -39,7 +41,7 @@ public abstract class Cell extends ValueObject {
         throw new UnimplementedException("cannot yet get BigDecimal for " + getClass().getName());
     }
 
-    public java.sql.Date asDate() throws SQLException {
+    public java.sql.Date asDate(Calendar calendar) throws SQLException {
         throw new SQLException("Attempt to read " + displayName() + " as a date");
     }
 

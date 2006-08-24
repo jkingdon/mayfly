@@ -89,7 +89,7 @@ public class Database {
      * Execute a series of SQL commands separated by semicolons.
      * This method closes the reader when done.
      */
-    public void executeScript(Reader script) throws SQLException {
+    public void executeScript(Reader script) throws MayflyException {
         try {
             List commands = new Parser(script).parseCommands();
             for (Iterator iter = commands.iterator(); iter.hasNext();) {
@@ -101,7 +101,7 @@ public class Database {
             try {
                 script.close();
             } catch (IOException e) {
-                throw (SQLException) new SQLException().initCause(e);
+                throw new MayflyException(e);
             }
         }
     }

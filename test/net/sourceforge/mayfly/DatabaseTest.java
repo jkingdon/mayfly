@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.acceptance.SqlTestCase;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.parser.ParserException;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -110,6 +111,28 @@ public class DatabaseTest extends TestCase {
             new String[] { "5", "7" },
             database.query("select x from foo")
         );
+    }
+    
+    public void xtestScriptError() throws Exception {
+        // The lexer now can supply the line numbers;
+        // so the remaining task is for the parser to
+        // pass them along.
+        Reader script = new StringReader(
+            "create table foo\n" +
+            "   (x integer,\n" +
+            "    y not);"
+        );
+        try {
+            database.executeScript(script);
+            fail();
+        }
+        catch (ParserException e) {
+            assertEquals("expected data type but got NOT", e.getMessage());
+            assertEquals(3, e.startLineNumber());
+            assertEquals(7, e.startColumn());
+            assertEquals(3, e.endLineNumber());
+            assertEquals(10, e.endColumn());
+        }
     }
     
 }

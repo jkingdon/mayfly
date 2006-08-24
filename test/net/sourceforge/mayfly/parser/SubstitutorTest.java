@@ -21,17 +21,23 @@ public class SubstitutorTest extends TestCase {
 
     public void testSubstitute() throws Exception {
         List tokens = Arrays.asList(new Token[] {
-            new Token(TokenType.PARAMETER), new Token(TokenType.EQUAL), new Token(TokenType.IDENTIFIER, "x")
+            makeToken(TokenType.PARAMETER), makeToken(TokenType.EQUAL), 
+            new Token(TokenType.IDENTIFIER, "x", -1, -1, -1, -1)
         });
         LexerTest.check(
-            new TokenType[] { TokenType.NUMBER, TokenType.EQUAL, TokenType.IDENTIFIER },
+            new TokenType[] { 
+                TokenType.NUMBER, TokenType.EQUAL, TokenType.IDENTIFIER },
             new String[] { "5", null, "x" },
             Substitutor.substitute(tokens, Collections.singletonList(new Long(5)))
         );
     }
+
+    private Token makeToken(TokenType tokenType) {
+        return new Token(tokenType, null, -1, -1, -1 ,-1);
+    }
     
     public void testString() throws Exception {
-        List tokens = Collections.singletonList(new Token(TokenType.PARAMETER));
+        List tokens = Collections.singletonList(makeToken(TokenType.PARAMETER));
         LexerTest.check(
             new TokenType[] { TokenType.QUOTED_STRING },
             new String[] { "'can''t'" },
@@ -42,6 +48,19 @@ public class SubstitutorTest extends TestCase {
     public void testCount() throws Exception {
         List tokens = new Lexer("select ? + x from foo where x = ? or ? = y").tokens();
         assertEquals(3, Substitutor.parameterCount(tokens));
+    }
+    
+    public void testLineNumbers() throws Exception {
+        List unsubstituted = new Lexer("x = ?").tokens();
+        List tokens = Substitutor.substitute(
+            unsubstituted, Collections.singletonList(new Long(1234567)));
+        assertEquals(4, tokens.size());
+        Token number = (Token) tokens.get(2);
+        assertEquals("1234567", number.getText());
+        assertEquals(1, number.startLineNumber());
+        assertEquals(5, number.startColumn());
+        assertEquals(1, number.endLineNumber());
+        assertEquals(6, number.endColumn());
     }
 
 }

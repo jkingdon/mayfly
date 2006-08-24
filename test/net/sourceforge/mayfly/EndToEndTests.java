@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly;
 
+import java.sql.SQLException;
+
 import net.sourceforge.mayfly.acceptance.MayflyDialect;
 import net.sourceforge.mayfly.acceptance.SqlTestCase;
 
@@ -45,6 +47,17 @@ public class EndToEndTests extends SqlTestCase {
         execute("create table cities (id integer) type=myisam");
         expectExecuteFailure("create table cities (id integer) type=DataSinkHole", 
             "unrecognized table type DataSinkHole");
+    }
+
+    public void testTimestamp() throws Exception {
+        execute("create table foo (x timestamp)");
+        try {
+            execute("insert into foo(x) values('something')");
+            fail();
+        } catch (UnimplementedException expected) {
+            assertEquals("data type timestamp is not implemented", 
+                expected.getMessage());
+        }
     }
 
 }

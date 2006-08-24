@@ -8,6 +8,8 @@ public class AutoIncrementTest extends SqlTestCase {
         // I think MySQL also accepts "primary key auto_increment"
         // but mayfly doesn't (at least yet).  The grammar in the MySQL
         // manual says that auto_increment has to be before "primary key"
+        // Trying to extrapolate from the SQL92 grammar kind of might
+        // imply pickiness about the order.
         String sql = "create table foo (" +
             "x integer auto_increment primary key, " +
             "y varchar(255))";

@@ -124,8 +124,14 @@ public final class MayflyResultSet extends ResultSetStub {
         return cellFromIndex(oneBasedColumn).asString();
     }
     
-    public java.sql.Date getDate(int oneBasedColumn, Calendar calendar) throws SQLException {
-        return cellFromIndex(oneBasedColumn).asDate();
+    public java.sql.Date getDate(String columnName, Calendar calendar)
+    throws SQLException {
+        return cellFromName(columnName).asDate(calendar);
+    }
+
+    public java.sql.Date getDate(int oneBasedColumn, Calendar calendar)
+    throws SQLException {
+        return cellFromIndex(oneBasedColumn).asDate(calendar);
     }
 
     public Object getObject(String columnName) throws SQLException {

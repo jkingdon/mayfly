@@ -12,6 +12,10 @@ import net.sourceforge.mayfly.datastore.constraint.Cascade;
 import net.sourceforge.mayfly.datastore.constraint.NoAction;
 import net.sourceforge.mayfly.datastore.constraint.SetDefault;
 import net.sourceforge.mayfly.datastore.constraint.SetNull;
+import net.sourceforge.mayfly.datastore.types.DataType;
+import net.sourceforge.mayfly.datastore.types.DateDataType;
+import net.sourceforge.mayfly.datastore.types.DefaultDataType;
+import net.sourceforge.mayfly.datastore.types.UnimplementedDataType;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupBy;
@@ -455,7 +459,8 @@ public class Parser {
 
     Column parseColumnDefinition(CreateTable table) {
         String name = consumeIdentifier();
-        boolean isAutoIncrement = parseDataType();
+        ParsedDataType parsed = parseDataType();
+        boolean isAutoIncrement = parsed.isAutoIncrement;
 
         Cell defaultValue = parseDefaultClause(name);
         
@@ -469,7 +474,8 @@ public class Parser {
 
         parseColumnConstraints(table, name);
 
-        return new Column(table.table(), name, defaultValue, isAutoIncrement);
+        return new Column(table.table(), name, defaultValue, 
+            isAutoIncrement, parsed.type);
     }
 
     private Cell parseDefaultClause(String name) {
@@ -524,8 +530,9 @@ public class Parser {
         }
     }
 
-    private boolean parseDataType() {
+    private ParsedDataType parseDataType() {
         boolean isAutoIncrement = false;
+        DataType type = new DefaultDataType();
         if (consumeIfMatches(TokenType.KEYWORD_integer)) {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_smallint)) {
@@ -556,6 +563,11 @@ public class Parser {
                 // This is a reserved word in SQL92, I think for the
                 // DATE '2003-04-22' syntax for literals.
                 // We could follow that lead if need be...
+                type = new DateDataType();
+            }
+            else if (currentText.equalsIgnoreCase("timestamp")) {
+                // Reserved word in SQL92; maybe we should too...
+                type = new UnimplementedDataType(currentText);
             }
             else if (currentText.equalsIgnoreCase("identity")) {
                 isAutoIncrement = true;
@@ -564,13 +576,25 @@ public class Parser {
                 isAutoIncrement = true;
             }
             else {
-                throw new ParserException("expected data type but got " + currentText);
+                throw new ParserException("expected data type but got " +
+                    currentText);
             }
         }
         else {
             throw new ParserException("expected data type but got " + describeToken(currentToken()));
         }
-        return isAutoIncrement;
+        return new ParsedDataType(isAutoIncrement, type);
+    }
+    
+    class ParsedDataType {
+        boolean isAutoIncrement;
+        DataType type;
+
+        public ParsedDataType(boolean isAutoIncrement, DataType type) {
+            this.isAutoIncrement = isAutoIncrement;
+            this.type = type;
+        }
+        
     }
 
     Select parseSelect() {

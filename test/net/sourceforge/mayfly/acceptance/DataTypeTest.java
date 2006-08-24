@@ -258,16 +258,11 @@ public class DataTypeTest extends SqlTestCase {
     public static final long ONE_DAY = 1000L * 60L * 60L * 24L;
 
     public void testDate() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            // Looks like this might be where we need to start
-            // remembering column types.  There is nothing in
-            // '2003-11-27' that says it is a date not a string.
-            return;
-        }
-
         execute("create table foo (start_date date, end_date date)");
-        //execute("insert into foo (start_date, end_date) values (date '2003-11-27', date '2003-11-29')");
-        execute("insert into foo (start_date, end_date) values ('2003-11-27', '2003-11-29')");
+        //execute("insert into foo (start_date, end_date) 
+        //    values (date '2003-11-27', date '2003-11-29')");
+        execute("insert into foo (start_date, end_date) " +
+            "values ('2003-11-27', '2003-11-29')");
 
         // The simple case: in which the database's dates are interpreted
         // to be GMT:
@@ -290,6 +285,7 @@ public class DataTypeTest extends SqlTestCase {
         // TODO: setDate, calendar and non-calendar
         // TODO: getObject
         // TODO: getDate on non-date
+        // TODO: default '2004-07-27'
     }
-    
+
 }

@@ -59,20 +59,8 @@ public class TableData {
         Iterator iter = columns.iterator();
         while (iter.hasNext()) {
             Column column = (Column) iter.next();
-            boolean isDefault;
-            if (specifiedColumnToValue.containsKey(column)) {
-                Cell value = (Cell) specifiedColumnToValue.get(column);
-                isDefault = value == null;
-                Cell cell = isDefault ? column.defaultValue() : value;
-                tuple.append(new TupleElement(column, cell));
-            } else {
-                isDefault = true;
-                tuple.append(new TupleElement(column, column.defaultValue()));
-            }
-            
-            if (isDefault && column.isAutoIncrement()) {
-                newColumns = newColumns.replace(column.afterAutoIncrement());
-            }
+            newColumns = setColumn(
+                specifiedColumnToValue, newColumns, tuple, column);
         }
         Row newRow = new Row(tuple);
         constraints.check(rows, newRow);
@@ -81,6 +69,25 @@ public class TableData {
         }
 
         return new TableData(newColumns, constraints, (Rows) rows.with(newRow));
+    }
+
+    private Columns setColumn(M specifiedColumnToValue, Columns newColumns, 
+        TupleBuilder tuple, Column column) {
+        boolean isDefault;
+        if (specifiedColumnToValue.containsKey(column)) {
+            Cell value = (Cell) specifiedColumnToValue.get(column);
+            isDefault = value == null;
+            Cell cell = isDefault ? column.defaultValue() : column.coerce(value);
+            tuple.append(new TupleElement(column, cell));
+        } else {
+            isDefault = true;
+            tuple.append(new TupleElement(column, column.defaultValue()));
+        }
+        
+        if (isDefault && column.isAutoIncrement()) {
+            newColumns = newColumns.replace(column.afterAutoIncrement());
+        }
+        return newColumns;
     }
 
     public UpdateTable update(Checker checker, List setClauses, Where where) {

@@ -17,7 +17,7 @@ public class Substitutor {
             Token token = (Token) tokenIterator.next();
             if (token.getType() == TokenType.PARAMETER) {
                 Object value = parameterIterator.next();
-                result.add(tokenFromValue(value));
+                result.add(tokenFromValue(value, token));
             }
             else {
                 result.add(token);
@@ -37,17 +37,19 @@ public class Substitutor {
         return count;
     }
 
-    private static Token tokenFromValue(Object value) {
+    private static Token tokenFromValue(Object value, Token oldToken) {
         if (value instanceof Number) {
             Number numberValue = (Number) value;
-            return new Token(TokenType.NUMBER, numberValue.toString());
+            return new Token(TokenType.NUMBER, numberValue.toString(), oldToken);
         }
         else if (value instanceof String) {
             String stringValue = (String) value;
-            return new Token(TokenType.QUOTED_STRING, "'" + StringEscapeUtils.escapeSql(stringValue) + "'");
+            return new Token(TokenType.QUOTED_STRING, 
+                "'" + StringEscapeUtils.escapeSql(stringValue) + "'",
+                oldToken);
         }
         else if (value == null) {
-            return new Token(TokenType.KEYWORD_null, "null");
+            return new Token(TokenType.KEYWORD_null, "null", oldToken);
         }
         else {
             throw new MayflyInternalException("Don't know how to substitute a " + value.getClass().getName());
