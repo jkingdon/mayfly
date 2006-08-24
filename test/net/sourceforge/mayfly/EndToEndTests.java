@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly;
 
-import java.sql.SQLException;
-
 import net.sourceforge.mayfly.acceptance.MayflyDialect;
 import net.sourceforge.mayfly.acceptance.SqlTestCase;
 
@@ -22,9 +20,12 @@ public class EndToEndTests extends SqlTestCase {
     }
 
     public void testUnaryPlus() throws Exception {
-        execute("create table foo (x integer default -5, y integer, z integer default +44000)");
+        execute("create table foo (x integer default -5, " +
+            "y integer, " +
+            "z integer default +44000)");
         execute("insert into foo(y) values(0)");
-        assertResultSet(new String[] { " -5, 44000 " }, query("select x, z from foo"));
+        assertResultSet(new String[] { " -5, 44000 " }, 
+            query("select x, z from foo"));
     }
     
     public void testQueryVersusUpdate() throws Exception {
@@ -32,7 +33,8 @@ public class EndToEndTests extends SqlTestCase {
            (for example, I think hypersonic 1.8.x will throw
            exceptions such as these but 1.7.x will be lenient). */
         execute("create table foo (x integer)");
-        expectExecuteFailure("select x from foo", "SELECT is only available with query, not update");
+        expectExecuteFailure("select x from foo", 
+            "SELECT is only available with query, not update");
         expectQueryFailure("insert into foo(x) values(5)", 
             "expected SELECT but got INSERT");
     }

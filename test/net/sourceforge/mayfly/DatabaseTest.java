@@ -113,10 +113,7 @@ public class DatabaseTest extends TestCase {
         );
     }
     
-    public void xtestScriptError() throws Exception {
-        // The lexer now can supply the line numbers;
-        // so the remaining task is for the parser to
-        // pass them along.
+    public void testScriptError() throws Exception {
         Reader script = new StringReader(
             "create table foo\n" +
             "   (x integer,\n" +

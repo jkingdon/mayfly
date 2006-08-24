@@ -49,4 +49,17 @@ public class Token {
         return endColumn;
     }
 
+    String describe() {
+        TokenType type = getType();
+        if (type == TokenType.NUMBER) {
+            return getText();
+        }
+        else if (type == TokenType.IDENTIFIER) {
+            return getText();
+        }
+        else {
+            return type.description();
+        }
+    }
+
 }

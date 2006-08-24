@@ -160,7 +160,8 @@ public class Parser {
                 return parseCreateTable();
             }
             else {
-                throw new ParserException("expected create command but got " + describeToken(currentToken()));
+                throw new ParserException("create command",
+                    currentToken());
             }
         }
         else if (currentTokenType() == TokenType.KEYWORD_set) {
@@ -176,7 +177,8 @@ public class Parser {
             return parseDelete();
         }
         else {
-            throw new ParserException("expected command but got " + describeToken(currentToken()));
+            throw new ParserException("command",
+                currentToken());
         }
     }
 
@@ -371,7 +373,9 @@ public class Parser {
             parseForeignKeyConstraint(table);
         }
         else {
-            throw new ParserException("expected column or table constraint but got " + describeToken(currentToken()));
+            throw new ParserException(
+                "column or table constraint",
+                currentToken());
         }
     }
 
@@ -413,8 +417,8 @@ public class Parser {
             }
             else {
                 throw new ParserException(
-                    "expected UPDATE or DELETE but got " + 
-                    describeToken(currentToken()));
+                    "UPDATE or DELETE",
+                    currentToken());
             }
         }
         return actions;
@@ -448,12 +452,12 @@ public class Parser {
             }
             else {
                 throw new ParserException("expected ON DELETE action " +
-                    " but got SET " + describeToken(currentToken()));
+                    " but got SET " + currentToken().describe());
             }
         }
         else {
-            throw new ParserException("expected ON DELETE action " +
-                " but got " + describeToken(currentToken()));
+            throw new ParserException("ON DELETE action",
+                currentToken());
         }
     }
 
@@ -506,8 +510,8 @@ public class Parser {
         }
         else {
             throw new ParserException(
-                "expected default value for column " + name + 
-                " but got " + describeToken(currentToken()));
+                "default value for column " + name,
+                currentToken());
         }
     }
 
@@ -581,7 +585,7 @@ public class Parser {
             }
         }
         else {
-            throw new ParserException("expected data type but got " + describeToken(currentToken()));
+            throw new ParserException("data type", currentToken());
         }
         return new ParsedDataType(isAutoIncrement, type);
     }
@@ -664,7 +668,7 @@ public class Parser {
                 left = new NonBooleanParserExpression(new Plus(left.asNonBoolean(), parseFactor().asNonBoolean()));
             }
             else {
-                throw new MayflyInternalException("Didn't expect token " + describeToken(token));
+                throw new MayflyInternalException("Didn't expect token " + token.describe());
             }
         }
         return left;
@@ -693,7 +697,7 @@ public class Parser {
                 );
             }
             else {
-                throw new MayflyInternalException("Didn't expect token " + describeToken(token));
+                throw new MayflyInternalException("Didn't expect token " + token.describe());
             }
         }
         return left;
@@ -856,7 +860,7 @@ public class Parser {
             return expression;
         }
         else {
-            throw new ParserException("expected primary but got " + describeToken(currentToken()));
+            throw new ParserException("primary", currentToken());
         }
     }
 
@@ -1270,8 +1274,8 @@ public class Parser {
 
     private void expectNonReservedWord(String word) {
         if (!consumeNonReservedWordIfMatches(word)) {
-            throw new ParserException("expected " + word + 
-                " but got " + describeToken(currentToken()));
+            throw new ParserException(word,
+                currentToken());
         }
     }
 
@@ -1279,10 +1283,8 @@ public class Parser {
         Token token = currentToken();
         if (token.getType() != expectedType) {
             throw new ParserException(
-                "expected " +
-                describeExpectation(expectedType) +
-                " but got " +
-                describeToken(token)
+                describeExpectation(expectedType),
+                token
             );
         }
         return consume();
@@ -1292,7 +1294,8 @@ public class Parser {
      * @internal
      * Consume the current token.  This is a slightly dangerous operation,
      * in the sense that it is easy to be careless about whether you are
-     * consuming the token type that you think.  So call {@link #expectAndConsume(int)}
+     * consuming the token type that you think.  
+     * So call {@link #expectAndConsume(TokenType)}
      * instead where feasible.
      */
     private Token consume() {
@@ -1301,19 +1304,6 @@ public class Parser {
 
     private String describeExpectation(TokenType expectedType) {
         return expectedType.description();
-    }
-
-    private String describeToken(Token token) {
-        TokenType type = token.getType();
-        if (type == TokenType.NUMBER) {
-            return token.getText();
-        }
-        else if (type == TokenType.IDENTIFIER) {
-            return token.getText();
-        }
-        else {
-            return type.description();
-        }
     }
 
 }

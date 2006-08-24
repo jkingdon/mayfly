@@ -1,24 +1,58 @@
 package net.sourceforge.mayfly.parser;
 
+import java.sql.SQLException;
+
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.UnimplementedException;
 
 public class ParserException extends MayflyException {
 
-    public ParserException(String message) {
+    /**
+     * We keep track of where the error occurred.  It, of
+     * course, is available to Java code which has the
+     * {@link ParserException} (not yet carried over
+     * to the {@link SQLException}).  But how else
+     * should it be provided?  Maybe the start line number
+     * (not columns or end line number) in the message?  
+     * Or put it in the message
+     * only if it is not one (or only if the input is
+     * more than one line)?
+     * It isn't clear how to address both the desire
+     * to be informative, but also the desire to
+     * avoid clutter in the (many) cases in which the
+     * line number won't be helpful.
+     */
+    private final int startLineNumber;
+    private final int startColumn;
+    private final int endLineNumber;
+    private final int endColumn;
+
+    public ParserException(String message, 
+        int startLineNumber, int startColumn, 
+        int endLineNumber, int endColumn) {
         super(message);
+        this.startLineNumber = startLineNumber;
+        this.startColumn = startColumn;
+        this.endLineNumber = endLineNumber;
+        this.endColumn = endColumn;
     }
 
-    public ParserException(String message, Throwable cause) {
-        super(message, cause);
+    public ParserException(String message) {
+        this(message, -1, -1, -1, -1);
     }
-
-    public ParserException(Throwable cause) {
-        super(cause);
+    
+    public ParserException(String expected, Token actual) {
+        this("expected " +
+            expected +
+            " but got " +
+            actual.describe(),
+            actual.startLineNumber(),
+            actual.startColumn(),
+            actual.endLineNumber(),
+            actual.endColumn());
     }
 
     public int startLineNumber() {
-        throw new UnimplementedException();
+        return startLineNumber;
     }
 
     /**
@@ -30,15 +64,15 @@ public class ParserException extends MayflyException {
      * return 8.
      */
     public int startColumn() {
-        throw new UnimplementedException();
+        return startColumn;
     }
 
     public int endLineNumber() {
-        throw new UnimplementedException();
+        return endLineNumber;
     }
 
     public int endColumn() {
-        throw new UnimplementedException();
+        return endColumn;
     }
 
 }
