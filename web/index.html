@@ -41,10 +41,16 @@
 
 <h2>News</h2>
 
-<p>7 Dec 2005: Version 0.1 released.  This marks the first time we've had <a href="http://sourceforge.net/project/showfiles.php?group_id=150560">downloadable zip files</a> and <a href="doc/" >online documentation</a>.</p>
+<p>25 Aug 2006: Version 0.2 released.  This adds schemas (and SET SCHEMA),
+GROUP BY, auto-increment columns, and primary and foreign keys.</p>
+
+<p>7 Dec 2005: Version 0.1 released.  This marks the first time we've had 
+<a href="http://sourceforge.net/project/showfiles.php?group_id=150560">downloadable zip files</a> and 
+<a href="doc/" >online documentation</a>.</p>
 
 <p>Also see our
-<a href="http://sourceforge.net/projects/mayfly/lists" >mailing lists</a> and <a href="http://sourceforge.net/news/?group_id=150560" >sourceforge news page</a>.</p>
+<a href="http://sourceforge.net/projects/mayfly/lists" >mailing lists</a> and 
+<a href="http://sourceforge.net/news/?group_id=150560" >sourceforge news page</a>.</p>
 
 <h2>Why Mayfly?</h2>
 
@@ -65,9 +71,9 @@ SQL database as easy as creating any other in-memory data structure.</p>
 <li>The ability to very cheaply snapshot the database (both metadata and
 data) and restore from that point.</li>
 
-<!-- Need link to javadoc
-<li>Your choice of JDBC or the Mayfly-specific Database class</li>
--->
+<li>Your choice of JDBC or the Mayfly-specific 
+<a href="doc/html/classnet_1_1sourceforge_1_1mayfly_1_1Database.html" 
+>Database</a> class</li>
 
 <li>Any number of tables, columns, and rows (limited by available memory and
 to a certain extent by query speed).</li>
@@ -76,9 +82,11 @@ to a certain extent by query speed).</li>
 
 <li>WHERE clauses with =, !=, &lt;, &gt;, AND, OR, NOT</li>
 
-<li>ORDER BY</li>
+<li>ORDER BY and GROUP BY</li>
 
-<li>Integer and string data types.</li>
+<li>Integer, decimal and string data types.  Auto-increment columns.</li>
+
+<li>Primary and foreign keys.</li>
 </ul>
 
 <h2>More background and discussion</h2>

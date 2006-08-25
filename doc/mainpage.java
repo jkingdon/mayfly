@@ -21,13 +21,17 @@ a mayfly database, connects to it, and executes a few SQL commands.
 It's easier to make that work first and subsequently hook in Mayfly to the
 rest of your application.
 
-The source download mayfly-<var>version</var>-src.zip is useful if you
-want to be able to browse Mayfly source (for example, the "attach sources"
-feature found in Java development tools can help you distinguish between
+The file mayfly-<var>version</var>-src-ide.zip within the main
+download is designed to make it easy to browse Mayfly source (for example,
+using the "attach sources"
+feature found in Java development tools).  Either the sources or the
+Mayfly documentation can help you distinguish between
 methods you would ordinarily call and methods which are public but would
-generally only be called form within Mayfly).  The source download also
-includes the Mayfly tests, which you might want to browse to get an idea
-of what SQL features are and are not implemented.
+generally only be called from within Mayfly.
+
+The source download mayfly-<var>version</var>-src.zip contains everything
+you need to rebuild Mayfly and run the Mayfly tests.  Because it contains
+jar files for non-Mayfly databases, it is rather large.
 
 @section connecting Connecting
 
@@ -103,12 +107,14 @@ CREATE TABLE <var>name</var> (
 )
 </pre>
 
-At the moment the data type is ignored (what matters is what data you actually
-put into the database).  This is expected to change in a future version of Mayfly.
+At the moment the data type is mostly ignored (what matters is what data you actually
+put into the database).  Future versions of Mayfly are expected to make more use
+of the data type.
 
 Supported data types for numbers are TINYINT, SMALLINT, INTEGER and BIGINT (8, 16, 32, and 64
-bit integers, respectively).  For strings, there is VARCHAR(<var>size</var>) (with TEXT
-as a non-standard synonym).
+bit integers, respectively).  DECIMAL(x,y) is supported.
+For strings, there is VARCHAR(<var>size</var>) (with TEXT
+as a non-standard synonym).  There is partial support for DATE.
 
 An exception to the rule that Mayfly ignores data types are auto-increment columns.
 Either IDENTITY or SERIAL as datatypes indicate an integer column which causes the

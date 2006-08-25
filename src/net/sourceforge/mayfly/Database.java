@@ -19,7 +19,7 @@ import java.util.Set;
  * A Database contains a set of tables, but can be managed as easily as
  * any other object.
  * 
- * <p>Example:</p>
+ * <p>Here's an example of what your test might look like:</p>
  * <pre>
  * private Database database;
  * public void setUp() throws Exception {

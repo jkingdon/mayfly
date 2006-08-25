@@ -1,5 +1,5 @@
 <project default="test">
-    <property name="version" value="0.1"/>
+    <property name="version" value="0.2"/>
     <!--
     <property name="build.compiler" value="gcj"/>
     -->
@@ -85,15 +85,19 @@
     </target>
 
     <target name="dist" depends="jar,doc">
+        <zip destfile="build/mayfly-${version}-src-ide.zip">
+            <fileset dir="src">
+            	<include name="net/**" />
+        	</fileset>
+        </zip>
         <zip destfile="build/mayfly-${version}.zip">
             <fileset dir="build">
                 <include name="mayfly-${version}.jar"/>
+                <include name="mayfly-${version}-src-ide.zip"/>
                 <include name="doc/**"/>
             </fileset>
             <fileset dir="src/lib">
-                <include name="antlr-2.7.5.jar"/>
-                <include name="commons-collections-3.1.jar"/>
-                <include name="commons-lang-2.1.jar"/>
+                <include name="*.jar"/>
             </fileset>
             <fileset dir=".">
                 <include name="DESCRIPTION.txt"/>

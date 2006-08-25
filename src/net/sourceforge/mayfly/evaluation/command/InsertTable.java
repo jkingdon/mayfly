@@ -5,11 +5,13 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.util.ValueObject;
 
-/** A raw table reference out of the parser (that is, we
+/** 
+ * @internal
+ * A raw table reference out of the parser (that is, we
  * have not yet applied the default schema nor checked
  * that the table exists, nor canonicalized the table name).
  * 
- * Should probably be renamed to UnresolveTableReference.
+ * Should probably be renamed to UnresolvedTableReference.
  */
 public class InsertTable extends ValueObject {
 

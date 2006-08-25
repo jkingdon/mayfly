@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 
 /**
+ * @internal
  * This class knows about the various things which are
  * needed to check datastore-wide constraints.
  * Passing around those things as an object seems
