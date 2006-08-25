@@ -2,8 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import junit.framework.TestCase;
 
-import java.util.Calendar;
-import java.util.TimeZone;
+import org.joda.time.DateTimeZone;
 
 public class DateCellTest extends TestCase {
     
@@ -13,10 +12,9 @@ public class DateCellTest extends TestCase {
     }
     
     public void testAsDate() throws Exception {
-        Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
         long march1 = 636249600000L;
         assertEquals(march1,
-            new DateCell(1990, 3, 1).asDate(gmt).getTime());
+            new DateCell(1990, 3, 1).asDate(DateTimeZone.UTC).getTime());
     }
 
 }

@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly;
 
+import org.joda.time.DateTimeZone;
+
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.NullCell;
@@ -126,12 +128,16 @@ public final class MayflyResultSet extends ResultSetStub {
     
     public java.sql.Date getDate(String columnName, Calendar calendar)
     throws SQLException {
-        return cellFromName(columnName).asDate(calendar);
+        return cellFromName(columnName).asDate(timeZone(calendar));
     }
 
     public java.sql.Date getDate(int oneBasedColumn, Calendar calendar)
     throws SQLException {
-        return cellFromIndex(oneBasedColumn).asDate(calendar);
+        return cellFromIndex(oneBasedColumn).asDate(timeZone(calendar));
+    }
+
+    private DateTimeZone timeZone(Calendar calendar) {
+        return DateTimeZone.forTimeZone(calendar.getTimeZone());
     }
 
     public Object getObject(String columnName) throws SQLException {

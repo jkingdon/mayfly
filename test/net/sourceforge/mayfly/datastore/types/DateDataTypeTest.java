@@ -17,8 +17,17 @@ public class DateDataTypeTest extends TestCase {
         checkFailure("1066x12-25");
         checkFailure("106612-25");
         check(1066, 12, 25, "1066-12-25");
-        // OK, what's the deal with checking ranges and such?
-        check(1890, 2, 31, "1890-02-31");
+        try {
+            new DateDataType().stringToDate("1890-02-31");
+            fail();
+        }
+        catch (org.joda.time.IllegalFieldValueException expected) {
+            // I'm thinking it is probably a mistake for Mayfly
+            // to wrap the exception just to hide the fact that
+            // mayfly is implemented using Joda.  Is it the kind
+            // of exception that people would want to catch in
+            // a specific way?
+        }
     }
 
     public void testQuotingInMessage() throws Exception {

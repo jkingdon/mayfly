@@ -255,7 +255,9 @@ public class DataTypeTest extends SqlTestCase {
         results.close();
     }
     
-    public static final long ONE_DAY = 1000L * 60L * 60L * 24L;
+    private static final long ONE_MINUTE = 1000L * 60L;
+    private static final long ONE_HOUR = ONE_MINUTE * 60L;
+    public static final long ONE_DAY = ONE_HOUR * 24L;
 
     public void testDate() throws Exception {
         execute("create table foo (start_date date, end_date date)");
@@ -265,23 +267,43 @@ public class DataTypeTest extends SqlTestCase {
             "values ('2003-11-27', '2003-11-29')");
 
         // The simple case: in which the database's dates are interpreted
-        // to be GMT:
+        // to be UTC:
+        long november27gmt = 1069891200000L;
+        long november29gmt = november27gmt + 2 * ONE_DAY;
         {
             Calendar gmt = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
             ResultSet results = query("select start_date, end_date from foo");
             assertTrue(results.next());
 
-            long november27gmt = 1069891200000L;
-            long november29gmt = november27gmt + 2 * ONE_DAY;
             assertEquals(november27gmt, results.getDate(1, gmt).getTime());
             assertEquals(november29gmt, results.getDate("end_date", gmt).getTime());
 
             assertFalse(results.next());
             results.close();
         }
+        
+        // Same thing but non-UTC
+        {
+            Calendar indianTime = 
+                Calendar.getInstance(TimeZone.getTimeZone("GMT+0530"));
+            ResultSet results = query("select start_date, end_date from foo");
+            assertTrue(results.next());
+
+            // Midnight Indian time is 5 1/2 hours earlier than
+            // midnight UTC.
+            long november27indian = november27gmt -
+                (5 * ONE_HOUR + 30 * ONE_MINUTE);
+            long november29indian = november27indian + 2 * ONE_DAY;
+            assertEquals(november27indian, 
+                results.getDate(1, indianTime).getTime());
+            assertEquals(november29indian, 
+                results.getDate("end_date", indianTime).getTime());
+
+            assertFalse(results.next());
+            results.close();
+        }
 
         // TODO: without a calendar.
-        // TODO: with a non-GMT calendar.
         // TODO: setDate, calendar and non-calendar
         // TODO: getObject
         // TODO: getDate on non-date
