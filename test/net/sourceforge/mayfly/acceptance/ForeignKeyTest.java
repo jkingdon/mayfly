@@ -236,16 +236,23 @@ public class ForeignKeyTest extends SqlTestCase {
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
             dialect.databaseTypeForForeignKeys());
-        execute("create table cities (name varchar(255), " +
+
+        String createCities = "create table cities (name varchar(255), " +
             "country integer default 1, " +
             "foreign key (country) references countries(id)" +
             "on delete set default)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.databaseTypeForForeignKeys();
+        if (dialect.onDeleteSetDefaultMissing(true)) {
+            expectExecuteFailure(createCities, "errno 150");
+            return;
+        }
+        execute(createCities);
+
         execute("insert into countries values (1, 'The World')");
         execute("insert into countries values (2, 'India')");
         execute("insert into cities values ('Bombay', 2)");
         String sql = "delete from countries where id = 2";
-        if (dialect.onDeleteSetDefaultMissing()) {
+        if (dialect.onDeleteSetDefaultMissing(false)) {
             expectExecuteFailure(sql, "foreign key violation");
         }
         else {

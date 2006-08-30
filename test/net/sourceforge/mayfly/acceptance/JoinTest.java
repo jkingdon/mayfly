@@ -264,7 +264,10 @@ public class JoinTest extends SqlTestCase {
             query("select a from bar inner join types on a = type")
         );
 
-        // Hypersonic/MySQL say column A is ambiguous
+        // Hypersonic/MySQL4 say column A is ambiguous
+        // According to MySQL5 documentation, it is because MySQL4
+        // parses it as "(foo, bar) inner join types", not because
+        // the ON can reach outside of the joined tables as such.
         String ambiguousIfReachesOutOfJoin = "select foo.a, bar.a from foo, bar inner join types on a = type";
         if (dialect.onIsRestrictedToJoinsTables()) {
             assertResultSet(
@@ -324,7 +327,7 @@ public class JoinTest extends SqlTestCase {
         execute("insert into quux (q, name) values (8, 'QuuxDecoy')");
         
         String onsAtEnd = "select foo.name, quux.name from foo inner join bar inner join quux on b2 = q on f = b1";
-        if (dialect.rightHandArgumentToJoinCanBeJoin()) {
+        if (dialect.rightHandArgumentToJoinCanBeJoin(false)) {
             assertResultSet(
                 new String[] {" 'FooVal', 'QuuxVal' " },
                 query(onsAtEnd)
@@ -335,7 +338,7 @@ public class JoinTest extends SqlTestCase {
 
         String parenthesizedQuery = 
             "select foo.name, quux.name from foo inner join (bar inner join quux on b2 = q) on f = b1";
-        if (dialect.rightHandArgumentToJoinCanBeJoin()) {
+        if (dialect.rightHandArgumentToJoinCanBeJoin(true)) {
             assertResultSet(
                 new String[] {" 'FooVal', 'QuuxVal' " },
                 query(parenthesizedQuery)

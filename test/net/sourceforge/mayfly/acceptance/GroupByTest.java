@@ -256,10 +256,10 @@ public class GroupByTest extends SqlTestCase {
 
         String groupByYHavingY = "select avg(x) from foo group by y having y < 20";
         if (dialect.columnInHavingMustAlsoBeInSelect()) {
-            assertResultList(new String[] { " 2 " }, query(groupByYHavingY));            
+            expectQueryFailure(groupByYHavingY, "no column y");
         }
         else {
-            expectQueryFailure(groupByYHavingY, "no column y");
+            assertResultList(new String[] { " 2 " }, query(groupByYHavingY));            
         }
     }
     
@@ -290,10 +290,10 @@ public class GroupByTest extends SqlTestCase {
         
         String groupByYHavingY = "select avg(x) from foo group by y, z having (y + z / 10) < 60";
         if (dialect.columnInHavingMustAlsoBeInSelect()) {
-            assertResultList(new String[] { " 2 " }, query(groupByYHavingY));
+            expectQueryFailure(groupByYHavingY, null);
         }
         else {
-            expectQueryFailure(groupByYHavingY, null);
+            assertResultList(new String[] { " 2 " }, query(groupByYHavingY));
         }
     }
     

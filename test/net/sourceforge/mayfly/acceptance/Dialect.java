@@ -113,7 +113,7 @@ public abstract class Dialect {
         return true;
     }
     
-    public boolean rightHandArgumentToJoinCanBeJoin() {
+    public boolean rightHandArgumentToJoinCanBeJoin(boolean withParentheses) {
         return true;
     }
 
@@ -243,7 +243,7 @@ public abstract class Dialect {
     }
 
     public boolean columnInHavingMustAlsoBeInSelect() {
-        return true;
+        return false;
     }
 
     public boolean canHaveHavingWithoutGroupBy() {
@@ -356,7 +356,7 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean onDeleteSetDefaultMissing() {
+    public boolean onDeleteSetDefaultMissing(boolean tableCreateTime) {
         return false;
     }
 
@@ -432,6 +432,10 @@ public abstract class Dialect {
     }
 
     public boolean onUpdateSetNullAndCascadeMissing() {
+        return false;
+    }
+
+    public boolean datesAreOff() {
         return false;
     }
 

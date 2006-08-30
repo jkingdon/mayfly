@@ -21,6 +21,7 @@ public abstract class SqlTestCase extends TestCase {
         new MayflyDialect()
         //new HypersonicDialect()
         //new MySqlDialect()
+        //new MySql4Dialect()
         //new PostgresDialect()
         //new DerbyDialect()
         ;

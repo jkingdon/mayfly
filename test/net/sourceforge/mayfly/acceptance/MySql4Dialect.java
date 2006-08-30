@@ -1,23 +1,22 @@
 package net.sourceforge.mayfly.acceptance;
 
+import net.sourceforge.mayfly.UnimplementedException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * This is for MySQL 5.x.  For 4.x, see {@link net.sourceforge.mayfly.acceptance.MySql4Dialect}.
+ * This is for MySQL 4.x.  For 5.x, see {@link net.sourceforge.mayfly.acceptance.MySqlDialect}.
  * 
  * To make this work, install MySQL (the server), start it up on localhost,
  * and that might be all you need...
  */
-public class MySqlDialect extends Dialect {
-    
-    // For the moment, we keep the default SQL MODE setting.
-    // We probably want SET sql_mode = 'ANSI'
+public class MySql4Dialect extends Dialect {
 
     public Connection openConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver");
-        Connection bootstrapConnection = DriverManager.getConnection("jdbc:mysql://localhost/", "root", "");
+        Connection bootstrapConnection = DriverManager.getConnection("jdbc:mysql://localhost/");
         SqlTestCase.execute("CREATE DATABASE mayflytest", bootstrapConnection);
         bootstrapConnection.close();
 
@@ -25,7 +24,7 @@ public class MySqlDialect extends Dialect {
     }
 
     public Connection openAdditionalConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/mayflytest", "root", "");
+        return DriverManager.getConnection("jdbc:mysql://localhost/mayflytest");
     }
 
     public void shutdown(Connection connection) throws Exception {
@@ -63,13 +62,14 @@ public class MySqlDialect extends Dialect {
         return false;
     }
 
-    public boolean rightHandArgumentToJoinCanBeJoin(boolean withParentheses) {
-        // This appears to be a case in which MySQL5 is
-        // less standard (or at least, less similar to
-        // the other databases in our tests) than MySQL4.
-        return withParentheses;
+    public boolean onIsRestrictedToJoinsTables() {
+        return false;
     }
-
+    
+    public boolean considerTablesMentionedAfterJoin() {
+        return true;
+    }
+    
     public boolean detectsSyntaxErrorsInPrepareStatement() {
         return false;
     }
@@ -79,10 +79,7 @@ public class MySqlDialect extends Dialect {
     }
     
     public boolean notBindsMoreTightlyThanIn() {
-        // The default is the same as most databases: NOT has lower
-        // precedence than IN.  The other (MySQL4) behavior is
-        // available by setting the SQL mode HIGH_NOT_PRECEDENCE.
-        return super.notBindsMoreTightlyThanIn();
+        return true;
     }
 
     public boolean notRequiresBoolean() {
@@ -111,6 +108,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean aggregateDistinctIsForCountOnly() {
+        return true;
+    }
+    
     public boolean canSumStrings() {
         return true;
     }
@@ -121,6 +122,10 @@ public class MySqlDialect extends Dialect {
     
     public boolean disallowColumnAndAggregateInExpression() {
         return false;
+    }
+    
+    public boolean columnInHavingMustAlsoBeInSelect() {
+        return true;
     }
     
     public boolean canHaveHavingWithoutGroupBy() {
@@ -155,7 +160,8 @@ public class MySqlDialect extends Dialect {
     }
     
     public boolean onDeleteSetDefaultMissing(boolean tableCreateTime) {
-        return true;
+        // I'm guessing this is like MySQL5, but this is unconfirmed.
+        throw new UnimplementedException();
     }
     
     public boolean haveDropTableFooIfExists() {
@@ -189,7 +195,8 @@ public class MySqlDialect extends Dialect {
     }
 
     public boolean datesAreOff() {
-        return true;
+        // MySQL4 is presumed to be like MySQL5, but this is unconfirmed.
+        throw new UnimplementedException();
     }
 
 }

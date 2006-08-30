@@ -139,9 +139,11 @@ public class DerbyDialect extends Dialect {
     // which appear to be the same as NO ACTION except how triggers are handled.
     // We don't test these currently.
 
-    public boolean onDeleteSetDefaultMissing() {
-        /* Derby doesn't claim to have ON DELETE SET DEFAULT */
-        return true;
+    public boolean onDeleteSetDefaultMissing(boolean tableCreateTime) {
+        /* Derby doesn't claim to have ON DELETE SET DEFAULT.
+           But it doesn't complain when you create the table,
+           just when you try to delete. */
+        return !tableCreateTime;
     }
 
     public boolean onUpdateSetNullAndCascadeMissing() {

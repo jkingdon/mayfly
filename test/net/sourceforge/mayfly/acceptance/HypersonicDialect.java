@@ -36,7 +36,7 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
-    public boolean rightHandArgumentToJoinCanBeJoin() {
+    public boolean rightHandArgumentToJoinCanBeJoin(boolean withParentheses) {
         return false;
     }
     
