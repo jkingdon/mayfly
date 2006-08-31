@@ -42,6 +42,7 @@ import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.Sum;
+import net.sourceforge.mayfly.evaluation.expression.UnimplementedExpression;
 import net.sourceforge.mayfly.evaluation.expression.literal.DecimalLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.Literal;
@@ -493,7 +494,8 @@ public class Parser {
     }
 
     Expression parseDefaultValue(String name) {
-        if (currentTokenType() == TokenType.NUMBER || currentTokenType() == TokenType.PERIOD) {
+        if (currentTokenType() == TokenType.NUMBER || 
+            currentTokenType() == TokenType.PERIOD) {
             return parseNumber().asNonBoolean();
         }
         else if (consumeIfMatches(TokenType.PLUS)) {
@@ -507,6 +509,10 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_null)) {
             return new NullExpression();
+        }
+        else if (currentTokenType() == TokenType.KEYWORD_current_timestamp) {
+            Token token = expectAndConsume(TokenType.KEYWORD_current_timestamp);
+            return new UnimplementedExpression(token.getText());
         }
         else {
             throw new ParserException(
