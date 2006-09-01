@@ -236,6 +236,23 @@ public class LexerTest extends TestCase {
         );
     }
     
+    public void testIdentifierStartsWithKeyword() throws Exception {
+        check(new TokenType[] {
+                TokenType.IDENTIFIER,
+                TokenType.KEYWORD_int,
+                TokenType.KEYWORD_integer,
+                TokenType.END_OF_FILE
+            },
+            new String[] {
+                "integrate",
+                "int",
+                "integer",
+                null
+            },
+            "integrate int integer"
+        );
+    }
+    
     public void testKeywordsAreCaseInsensitive() throws Exception {
         check(new TokenType[] { TokenType.KEYWORD_all, TokenType.END_OF_FILE },
             new String[] { "aLL", null },

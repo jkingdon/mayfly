@@ -71,8 +71,13 @@ public class DataTypeTest extends SqlTestCase {
         checkType(true, "smallint", "32767");
     }
 
+    public void testInt() throws Exception {
+        // A synonym for INTEGER.  Specified by SQL92.
+        checkType(true, "Int", "2147483647");
+    }
+
     // Here's a small sample of other types we don't test for yet:
-    // INT (synonym for INTEGER), CHARACTER VARYING (synonym for VARCHAR)
+    // CHARACTER VARYING (synonym for VARCHAR)
     //NUMERIC
     //REAL, FLOAT, DOUBLE - precision can be given in binary digits (24 or 53, typically)
     // BIT and BIT VARYING; BOOLEAN
@@ -157,7 +162,8 @@ public class DataTypeTest extends SqlTestCase {
         results.close();
     }
 
-    private void checkType(boolean expectType, String typeName, String sampleValue) throws SQLException {
+    private void checkType(boolean expectType, String typeName, String sampleValue) 
+    throws SQLException {
         String sql = "create table foo (a " + typeName + ")";
         if (expectType) {
             execute(sql);

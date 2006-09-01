@@ -560,10 +560,12 @@ public class Parser {
         }
     }
 
-    private ParsedDataType parseDataType() {
+    ParsedDataType parseDataType() {
         boolean isAutoIncrement = false;
         DataType type = new DefaultDataType();
         if (consumeIfMatches(TokenType.KEYWORD_integer)) {
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_int)) {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_smallint)) {
         }
@@ -582,7 +584,8 @@ public class Parser {
         else if (currentTokenType() == TokenType.IDENTIFIER) {
             // These shouldn't be reserved if they are not in the
             // SQL standard, seems like.
-            String currentText = consumeIdentifier();
+            Token token = expectAndConsume(TokenType.IDENTIFIER);
+            String currentText = token.getText();
             if (currentText.equalsIgnoreCase("tinyint")) {
             }
             else if (currentText.equalsIgnoreCase("bigint")) {
@@ -606,8 +609,7 @@ public class Parser {
                 isAutoIncrement = true;
             }
             else {
-                throw new ParserException("expected data type but got " +
-                    currentText);
+                throw new ParserException("data type", token);
             }
         }
         else {

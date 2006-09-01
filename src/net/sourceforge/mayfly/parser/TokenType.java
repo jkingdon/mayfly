@@ -63,6 +63,7 @@ public class TokenType {
     public static final TokenType KEYWORD_in = registerKeyword("in");
     public static final TokenType KEYWORD_inner = registerKeyword("inner");
     public static final TokenType KEYWORD_insert = registerKeyword("insert");
+    public static final TokenType KEYWORD_int = registerKeyword("int");
     public static final TokenType KEYWORD_integer = registerKeyword("integer");
     public static final TokenType KEYWORD_into = registerKeyword("into");
     public static final TokenType KEYWORD_is = registerKeyword("is");

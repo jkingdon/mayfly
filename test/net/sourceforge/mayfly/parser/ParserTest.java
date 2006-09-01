@@ -527,6 +527,17 @@ public class ParserTest extends TestCase {
             new Parser("select x from foo;").parseCommands();
         assertEquals(1, commands.size());
     }
+    
+    public void testDataType() throws Exception {
+        try {
+            new Parser("  foobar").parseDataType();
+            fail();
+        } catch (ParserException e) {
+            assertEquals("expected data type but got foobar", e.getMessage());
+            assertEquals(3, e.startColumn());
+            assertEquals(9, e.endColumn());
+        }
+    }
 
     private void expectFailure(String sql, String expectedMessage) {
         try {
