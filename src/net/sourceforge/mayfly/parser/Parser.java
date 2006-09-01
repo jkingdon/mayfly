@@ -347,7 +347,7 @@ public class Parser {
     }
 
     private void parseTableTypeIfPresent() {
-        if (consumeNonReservedWordIfMatches("type")) {
+        if (consumeNonReservedWordIfMatches("engine")) {
             expectAndConsume(TokenType.EQUAL);
             String tableType = consumeIdentifier();
             if ("innodb".equalsIgnoreCase(tableType)

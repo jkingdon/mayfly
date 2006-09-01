@@ -39,15 +39,15 @@ public class EndToEndTests extends SqlTestCase {
             "expected SELECT but got INSERT");
     }
     
-    public void testTableType() throws Exception {
-        /* MySQL compatibility.  In the future perhaps the type will
+    public void testTableEngine() throws Exception {
+        /* MySQL compatibility.  In the future perhaps the engine will
            do something like give an error if you specify myisam
            and try to use features it doesn't support, like
-           transactions or foreign keys.  For now the type is a noop.  */
-        execute("create table countries (id integer) type=innodb");
-        execute("create table mixedcase (id integer) type=InnoDB");
-        execute("create table cities (id integer) type=myisam");
-        expectExecuteFailure("create table cities (id integer) type=DataSinkHole", 
+           transactions or foreign keys.  For now the engine is a noop.  */
+        execute("create table countries (id integer) engine=innodb");
+        execute("create table mixedcase (id integer) engine = InnoDB");
+        execute("create table cities (id integer) engine=myisam");
+        expectExecuteFailure("create table cities (id integer) engine=DataSinkHole", 
             "unrecognized table type DataSinkHole");
     }
     
@@ -57,7 +57,7 @@ public class EndToEndTests extends SqlTestCase {
          * if it is being set to ISO8859-15, for example, we
          * could complain about other characters being inserted.
          * But I'm not sure how useful that would be.  */
-        execute("create table foo (id integer) type=InnoDB character set utf8");
+        execute("create table foo (id integer) engine=InnoDB character set utf8");
         execute("create table bar (id integer) character set utf8");
         execute("create table baz (id integer) character set klingonEncoding1");
     }
