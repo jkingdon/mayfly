@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
+import net.sourceforge.mayfly.UnimplementedException;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -174,6 +176,10 @@ public class MySqlDialect extends Dialect {
         // default value from NULL to some other
         // value (0, '', etc).
         return true;
+    }
+
+    public boolean haveOnUpdateValue() {
+        throw new UnimplementedException("I think this should be true");
     }
     
     public boolean haveAutoUnderbarIncrement() {

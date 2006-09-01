@@ -101,6 +101,10 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    public boolean haveOnUpdateValue() {
+        return true;
+    }
+
     public boolean decimalScaleIsFromType() {
         return wishThisWereTrue();
     }

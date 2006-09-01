@@ -341,6 +341,7 @@ public class Parser {
         expectAndConsume(TokenType.CLOSE_PAREN);
         
         parseTableTypeIfPresent();
+        parseCharacterSetIfPresent();
 
         return table;
     }
@@ -356,6 +357,13 @@ public class Parser {
             else {
                 throw new ParserException("unrecognized table type " + tableType);
             }
+        }
+    }
+
+    private void parseCharacterSetIfPresent() {
+        if (consumeIfMatches(TokenType.KEYWORD_character)) {
+            expectAndConsume(TokenType.KEYWORD_set);
+            consumeIdentifier();
         }
     }
 
@@ -469,6 +477,8 @@ public class Parser {
 
         Cell defaultValue = parseDefaultClause(name);
         
+        Cell onUpdateValue = parseOnUpdateValue(name);
+
         if (consumeNonReservedWordIfMatches("auto_increment")) {
             isAutoIncrement = true;
         }
@@ -479,7 +489,7 @@ public class Parser {
 
         parseColumnConstraints(table, name);
 
-        return new Column(table.table(), name, defaultValue, 
+        return new Column(table.table(), name, defaultValue, onUpdateValue,
             isAutoIncrement, parsed.type);
     }
 
@@ -492,8 +502,18 @@ public class Parser {
             return NullCell.INSTANCE;
         }
     }
+    
+    private Cell parseOnUpdateValue(String columnName) {
+        if (consumeIfMatches(TokenType.KEYWORD_on)) {
+            expectAndConsume(TokenType.KEYWORD_update);
+            return parseDefaultValue(columnName).evaluate(null);
+        }
+        else {
+            return null;
+        }
+    }
 
-    Expression parseDefaultValue(String name) {
+    Expression parseDefaultValue(String columnName) {
         if (currentTokenType() == TokenType.NUMBER || 
             currentTokenType() == TokenType.PERIOD) {
             return parseNumber().asNonBoolean();
@@ -516,7 +536,7 @@ public class Parser {
         }
         else {
             throw new ParserException(
-                "default value for column " + name,
+                "default value for column " + columnName,
                 currentToken());
         }
     }

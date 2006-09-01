@@ -103,6 +103,7 @@ public class TableData {
                     Column column = setClause.column(columns);
                     mapper.put(column, setClause.value(row, column));
                 }
+                setOnUpdateColumns(mapper);
                 Row newRow = mapper.asRow();
                 constraints.check(newRows, newRow);
                 checker.checkInsert(constraints, newRow);
@@ -119,6 +120,15 @@ public class TableData {
         }
         TableData newTable = new TableData(columns, constraints, newRows);
         return new UpdateTable(newTable, rowsAffected);
+    }
+
+    private void setOnUpdateColumns(TupleMapper mapper) {
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            Column column = (Column) iter.next();
+            if (column.hasOnUpdateValue()) {
+                mapper.put(column, column.getOnUpdateValue());
+            }
+        }
     }
 
     public UpdateTable delete(Where where, Checker checker) {

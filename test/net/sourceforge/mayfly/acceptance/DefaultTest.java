@@ -101,6 +101,31 @@ public class DefaultTest extends SqlTestCase {
         }
     }
     
+    public void testUpdateDoesNotImplyDefault() throws Exception {
+        execute("create table foo (" +
+            "x integer not null, y integer default null)");
+        execute("insert into foo(x, y) values(5, 7)");
+        assertResultSet(new String[] { "5, 7" }, query("select x, y from foo"));
+        execute("update foo set x = 55");
+        assertResultSet(new String[] { "55, 7" }, query("select x, y from foo"));
+    }
+    
+    public void testOnUpdateValue() throws Exception {
+        String create = "create table foo (" +
+            "x integer not null, y integer on update null)";
+        if (dialect.haveOnUpdateValue()) {
+            execute(create);
+            execute("insert into foo(x, y) values(5, 7)");
+            assertResultSet(new String[] { "5, 7" }, query("select x, y from foo"));
+            execute("update foo set x = 55");
+            assertResultSet(new String[] { "55, null" }, 
+                query("select x, y from foo"));
+        }
+        else {
+            expectExecuteFailure(create, "ON UPDATE not recognized");
+        }
+    }
+
     public void testExpression() throws Exception {
         String sql = "create table foo (x integer default 2 + 2, y integer)";
         if (dialect.defaultValueCanBeExpression()) {
@@ -128,5 +153,5 @@ public class DefaultTest extends SqlTestCase {
         expectExecuteFailure("insert into foo(x) values(null)", "column x cannot be null");
         assertResultSet(new String[] { " 'zippo' " }, query("select x from foo"));
     }
-
+    
 }

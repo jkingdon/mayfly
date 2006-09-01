@@ -50,6 +50,17 @@ public class EndToEndTests extends SqlTestCase {
         expectExecuteFailure("create table cities (id integer) type=DataSinkHole", 
             "unrecognized table type DataSinkHole");
     }
+    
+    public void testCharacterSet() throws Exception {
+        /* Mayfly can store any unicode strings.  So it seems
+         * best to ignore the character set, I guess.  I suppose
+         * if it is being set to ISO8859-15, for example, we
+         * could complain about other characters being inserted.
+         * But I'm not sure how useful that would be.  */
+        execute("create table foo (id integer) type=InnoDB character set utf8");
+        execute("create table bar (id integer) character set utf8");
+        execute("create table baz (id integer) character set klingonEncoding1");
+    }
 
     public void testTimestamp() throws Exception {
         execute("create table foo (x timestamp)");

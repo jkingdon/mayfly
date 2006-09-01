@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
 import net.sourceforge.mayfly.util.ValueObject;
@@ -9,20 +10,22 @@ public class Column extends ValueObject implements CellHeader {
     private final String tableOrAlias;
     private final String columnName;
     private final Cell defaultValue;
+    private final Cell onUpdateValue;
     private final boolean isAutoIncrement;
     private final DataType type;
 
-    public Column(String table, String name, Cell defaultValue, 
+    public Column(String table, String name, Cell defaultValue, Cell onUpdateValue,
         boolean isAutoIncrement, DataType type) {
         this.tableOrAlias = table;
         this.columnName = name;
         this.defaultValue = defaultValue;
+        this.onUpdateValue = onUpdateValue;
         this.isAutoIncrement = isAutoIncrement;
         this.type = type;
     }
 
     public Column(String table, String columnName) {
-        this(table, columnName, NullCell.INSTANCE, false, new DefaultDataType());
+        this(table, columnName, NullCell.INSTANCE, null, false, new DefaultDataType());
     }
 
     public Column(String column) {
@@ -78,7 +81,7 @@ public class Column extends ValueObject implements CellHeader {
 
     public Column afterAutoIncrement() {
         Cell newDefault = new LongCell(defaultValue.asLong() + 1L);
-        return new Column(tableOrAlias, columnName, newDefault, 
+        return new Column(tableOrAlias, columnName, newDefault, onUpdateValue,
             isAutoIncrement, type);
     }
 
@@ -87,6 +90,20 @@ public class Column extends ValueObject implements CellHeader {
      */
     public Cell coerce(Cell value) {
         return type.coerce(value);
+    }
+
+    public boolean hasOnUpdateValue() {
+        return onUpdateValue != null;
+    }
+
+    public Cell getOnUpdateValue() {
+        if (hasOnUpdateValue()) {
+            return onUpdateValue;
+        }
+        else {
+            throw new MayflyInternalException(
+                "Column " + columnName + " does not have ON UPDATE value");
+        }
     }
 
 }

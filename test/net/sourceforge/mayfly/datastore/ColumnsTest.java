@@ -76,7 +76,7 @@ public class ColumnsTest extends TestCase {
                 new Column("foo", "b"),
             })));
         Columns newColumns = columns.replace(
-            new Column("foo", "b", new LongCell(42), 
+            new Column("foo", "b", new LongCell(42), null,
             true, new DefaultDataType()));
         
         assertFalse(columns.columnFromName("b").isAutoIncrement());

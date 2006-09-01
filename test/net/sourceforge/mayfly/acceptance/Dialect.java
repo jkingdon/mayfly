@@ -315,6 +315,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean haveOnUpdateValue() {
+        return false;
+    }
+
     public boolean quotedIdentifiersAreCaseSensitive() {
         // I guess SQL92 says this should be true.
         // Perhaps a bit tricky to get this true, and still have
