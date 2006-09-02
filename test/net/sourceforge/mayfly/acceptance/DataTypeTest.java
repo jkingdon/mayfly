@@ -1,6 +1,11 @@
 package net.sourceforge.mayfly.acceptance;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -83,6 +88,8 @@ public class DataTypeTest extends SqlTestCase {
     // BIT and BIT VARYING; BOOLEAN
     // BIGSERIAL (see AutoIncrementTest for the auto-increment syntaxes we do look for)
     // BLOB/CLOB
+    //   sorting and comparison (binary for BLOB, Unicode-based or some such for CLOB)
+    //   JDBC CLOB for a TEXT column
     
     public void testInteger() throws Exception {
         execute("create table foo (waist integer, inseam integer)");
@@ -253,6 +260,28 @@ public class DataTypeTest extends SqlTestCase {
         ResultSet results = query("select x from foo");
         assertTrue(results.next());
         assertEquals(53.904, results.getDouble("x"), 0.000001);
+        assertFalse(results.next());
+        results.close();
+    }
+    
+    public void xtestCharacterStream() throws Exception {
+        // Having trouble getting this to work with Derby;
+        // guess I should consult Derby documentation.
+        execute("create table foo (x varchar(255))");
+
+        PreparedStatement insert = 
+            connection.prepareStatement("insert into foo(x) values(?)");
+        // Check JDBC documentation: what is the third argument?
+        insert.setCharacterStream(1, new StringReader("value"), 1000);
+        assertEquals(1, insert.executeUpdate());
+        insert.close();
+        
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+        Reader stream = results.getCharacterStream("x");
+        String contents = IOUtils.toString(stream);
+        assertEquals("value", contents);
+        stream.close(); // Check JDBC documentation: should I close it?
         assertFalse(results.next());
         results.close();
     }
