@@ -177,10 +177,8 @@ public class MySqlDialect extends Dialect {
     }
 
     public boolean haveOnUpdateValue() {
-        // This works:
-        //  create table foo(x timestamp not null default current_timestamp on update current_timestamp)
-        // Need to find it in MySQL documentation and figure out
-        // what is different.
+        // As far as I can tell from the MySQL documentation,
+        // ON UPDATE only applies to ON UPDATE CURRENT_TIMESTAMP.
         return false;
     }
     
