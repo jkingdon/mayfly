@@ -264,24 +264,32 @@ public class DataTypeTest extends SqlTestCase {
         results.close();
     }
     
-    public void xtestCharacterStream() throws Exception {
-        // Having trouble getting this to work with Derby;
-        // guess I should consult Derby documentation.
+    public void testCharacterStream() throws Exception {
+        if (!dialect.wishThisWereTrue()) {
+            return;
+        }
+
         execute("create table foo (x varchar(255))");
 
         PreparedStatement insert = 
             connection.prepareStatement("insert into foo(x) values(?)");
-        // Check JDBC documentation: what is the third argument?
-        insert.setCharacterStream(1, new StringReader("value"), 1000);
+        String data = "value";
+        // Derby requires that the correct length be passed in.  That is bogus,
+        // because there is no way to get that length when reading from, say, a
+        // UTF-8 file, short of reading the whole file.  MySQL, Postgres and Hypersonic
+        // do fine with a length of "1000".
+        insert.setCharacterStream(1, new StringReader(data), data.length());
         assertEquals(1, insert.executeUpdate());
         insert.close();
         
         ResultSet results = query("select x from foo");
         assertTrue(results.next());
+
         Reader stream = results.getCharacterStream("x");
         String contents = IOUtils.toString(stream);
         assertEquals("value", contents);
         stream.close(); // Check JDBC documentation: should I close it?
+
         assertFalse(results.next());
         results.close();
     }
