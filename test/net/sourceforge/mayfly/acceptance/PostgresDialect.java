@@ -139,6 +139,10 @@ public class PostgresDialect extends Dialect {
         return false;
     }
     
+    public String binaryTypeName() {
+        return "bytea";
+    }
+    
     public boolean haveDropTableFooIfExists() {
         return false;
     }

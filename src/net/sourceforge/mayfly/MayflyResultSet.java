@@ -146,6 +146,25 @@ public final class MayflyResultSet extends ResultSetStub {
         return cellFromName(columnName).asBinaryStream();
     }
     
+    private static final String SUGGEST_GET_CHARACTER_STREAM = 
+        "We suggest getCharacterStream instead";
+
+    public InputStream getUnicodeStream(int columnIndex) throws SQLException {
+        throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
+    }
+    
+    public InputStream getUnicodeStream(String columnName) throws SQLException {
+        throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
+    }
+    
+    public InputStream getAsciiStream(int columnIndex) throws SQLException {
+        throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
+    }
+    
+    public InputStream getAsciiStream(String columnName) throws SQLException {
+        throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
+    }
+    
     public java.sql.Date getDate(String columnName, Calendar calendar)
     throws SQLException {
         return cellFromName(columnName).asDate(timeZone(calendar));

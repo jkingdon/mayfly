@@ -347,13 +347,14 @@ public class ForeignKeyTest extends SqlTestCase {
     // ON UPDATE SET DEFAULT
     // two level cascade: X REFERS TO Y ON DELETE NO ACTION
     //   and Y REFERS TO Z ON DELETE CASCADE
-    //   Now delete a row in Z - sould fail because X still refers to it.
+    //   Now delete a row in Z - should fail because X still refers to it.
     
     public void testSelfReference() throws Exception {
         execute("create table person(id integer primary key," +
             "mother integer," +
             "foreign key(mother) references person(id)" +
             ")"
+            + dialect.databaseTypeForForeignKeys()
         );
         execute("insert into person (id) values(1)");
         execute("insert into person (id, mother) values(2, 1)");

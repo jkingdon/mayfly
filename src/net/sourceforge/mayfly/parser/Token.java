@@ -37,7 +37,7 @@ abstract public class Token {
 
     public String getText() {
         throw new MayflyInternalException(
-            "Cannot get text for token of type" + type.description());
+            "Cannot get text for token of type " + type.description());
     }
 
 
