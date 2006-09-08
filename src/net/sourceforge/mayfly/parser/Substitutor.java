@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.parser;
 
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.util.ImmutableByteArray;
 
 import org.apache.commons.lang.StringEscapeUtils;
 
@@ -40,16 +41,20 @@ public class Substitutor {
     private static Token tokenFromValue(Object value, Token oldToken) {
         if (value instanceof Number) {
             Number numberValue = (Number) value;
-            return new Token(TokenType.NUMBER, numberValue.toString(), oldToken);
+            return new TextToken(TokenType.NUMBER, numberValue.toString(), oldToken);
         }
         else if (value instanceof String) {
             String stringValue = (String) value;
-            return new Token(TokenType.QUOTED_STRING, 
+            return new TextToken(TokenType.QUOTED_STRING, 
                 "'" + StringEscapeUtils.escapeSql(stringValue) + "'",
                 oldToken);
         }
+        else if (value instanceof ImmutableByteArray) {
+            ImmutableByteArray binaryValue = (ImmutableByteArray) value;
+            return new BinaryToken(binaryValue, oldToken);
+        }
         else if (value == null) {
-            return new Token(TokenType.KEYWORD_null, "null", oldToken);
+            return new TextToken(TokenType.KEYWORD_null, "null", oldToken);
         }
         else {
             throw new MayflyInternalException("Don't know how to substitute a " + value.getClass().getName());

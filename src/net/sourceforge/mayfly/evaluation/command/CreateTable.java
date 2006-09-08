@@ -103,7 +103,7 @@ public class CreateTable extends Command {
                     table,
                     key.referencingColumn,
 
-                    targetTable.resolve(store, schema),
+                    targetTable.resolve(store, schema, table),
                     key.targetColumn,
                     
                     key.onDelete,

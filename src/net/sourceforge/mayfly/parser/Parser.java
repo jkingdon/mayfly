@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.parser;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.datastore.BinaryCell;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.LongCell;
@@ -43,6 +44,7 @@ import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.Sum;
 import net.sourceforge.mayfly.evaluation.expression.UnimplementedExpression;
+import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
 import net.sourceforge.mayfly.evaluation.expression.literal.DecimalLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.Literal;
@@ -592,6 +594,12 @@ public class Parser {
             }
             else if (currentText.equalsIgnoreCase("text")) {
             }
+            else if (currentText.equalsIgnoreCase("blob")) {
+                if (consumeIfMatches(TokenType.OPEN_PAREN)) {
+                    expectAndConsume(TokenType.NUMBER);
+                    expectAndConsume(TokenType.CLOSE_PAREN);
+                }
+            }
             else if (currentText.equalsIgnoreCase("date")) {
                 // This is a reserved word in SQL92, I think for the
                 // DATE '2003-04-22' syntax for literals.
@@ -834,7 +842,8 @@ public class Parser {
         if (currentTokenType() == TokenType.IDENTIFIER) {
             return new NonBooleanParserExpression(parseColumnReference());
         }
-        else if (currentTokenType() == TokenType.NUMBER || currentTokenType() == TokenType.PERIOD) {
+        else if (currentTokenType() == TokenType.NUMBER || 
+            currentTokenType() == TokenType.PERIOD) {
             return parseNumber();
         }
         else if (consumeIfMatches(TokenType.PLUS)) {
@@ -857,6 +866,11 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_null)) {
             throw new FoundNullLiteral();
+        }
+        else if (currentTokenType() == TokenType.BINARY) {
+            Token token = expectAndConsume(TokenType.BINARY);
+            return new NonBooleanParserExpression(
+                new CellExpression(new BinaryCell(token.getBytes())));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_max, false)) {
             return new NonBooleanParserExpression(new Maximum(
@@ -1223,23 +1237,7 @@ public class Parser {
             } else {
                 result.append(" ");
             }
-            result.append(token.getText());
-        }
-        return result.toString();
-    }
-
-    public String debugTokens() {
-        StringBuilder result = new StringBuilder();
-        Iterator iter = tokens.iterator();
-        while (iter.hasNext()) {
-            Token token = (Token) iter.next();
-            if (token.getType() == TokenType.END_OF_FILE) {
-                break;
-            }
-            result.append(token.getType().description());
-            result.append(" ");
-            result.append(token.getText());
-            result.append("\n");
+            result.append(token.describe());
         }
         return result.toString();
     }

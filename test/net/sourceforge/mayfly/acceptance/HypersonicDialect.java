@@ -116,9 +116,15 @@ public class HypersonicDialect extends Dialect {
     }
     
     public boolean haveTextType() {
+        // VARCHAR or LONGVARCHAR (which are the same as
+        // each other, I think) are the hypersonic equivalent.
         return false;
     }
     
+    public String binaryTypeName() {
+        return "BINARY";
+    }
+
     public boolean decimalScaleIsFromType() {
         return false;
     }

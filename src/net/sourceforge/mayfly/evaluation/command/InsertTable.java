@@ -47,12 +47,18 @@ public class InsertTable extends ValueObject {
         }
     }
 
-    public TableReference resolve(DataStore store, String defaultSchema) {
+    public TableReference resolve(DataStore store, String defaultSchema,
+        String additionalTable) {
         if (defaultSchema == null) {
             throw new NullPointerException("Default schema shouldn't be null");
         }
-
+        
         String schemaToUse = schema == null ? defaultSchema : schema;
+
+        if (tableName.equalsIgnoreCase(additionalTable)) {
+            return new TableReference(schemaToUse, additionalTable);
+        }
+
         String canonicalTableName = 
             store.schema(schemaToUse).lookUpTable(tableName);
         return new TableReference(schemaToUse, canonicalTableName);

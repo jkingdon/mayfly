@@ -345,12 +345,50 @@ public class ForeignKeyTest extends SqlTestCase {
     }
 
     // ON UPDATE SET DEFAULT
+    // two level cascade: X REFERS TO Y ON DELETE NO ACTION
+    //   and Y REFERS TO Z ON DELETE CASCADE
+    //   Now delete a row in Z - sould fail because X still refers to it.
+    
+    public void testSelfReference() throws Exception {
+        execute("create table person(id integer primary key," +
+            "mother integer," +
+            "foreign key(mother) references person(id)" +
+            ")"
+        );
+        execute("insert into person (id) values(1)");
+        execute("insert into person (id, mother) values(2, 1)");
+        expectExecuteFailure("insert into person (id, mother) values(3, 7)",
+            "foreign key violation: person has no id 7");
+    }
+    
+    public void xtestCircularReference() throws Exception {
+        // Neither Hypersonic nor Derby allow a foreign key
+        // to reference a table which isn't yet created.
+        // Do you need to add
+        // the constraints later with ALTER TABLE?  Is there
+        // a syntax for forward-declaring a table?  Is the
+        // whole idea of circular foreign keys silly?
+        execute("create table team(id integer primary key," +
+            "captain integer," +
+            "foreign key(captain) references player(id)" +
+            ")"
+        );
+        execute("create table player(id integer primary key," +
+            "team integer," +
+            "foreign key(team) references team(id)" +
+        ")");
+        expectExecuteFailure("insert into team(id, captain) values(1, 10)",
+            "foreign key violation: table player has no id 10"
+        );
+        // One has to go through convolutions to just insert,
+        // unless one has enforce-constraints-on-commit.
+        execute("insert into team(id) values(1)");
+        execute("insert into player(id, team) values(10, 1)");
+        execute("update team set captain = 10 where id = 1");
+    }
     
     // multiple referencing columns
     // multiple referencing columns where one is NULL (but others are not)
     // "references foo" (omitting the '(' column... ')')
-    // two level cascade: X REFERS TO Y ON DELETE NO ACTION
-    //   and Y REFERS TO Z ON DELETE CASCADE
-    //   Now delete a row in Z - sould fail because X still refers to it.
 
 }

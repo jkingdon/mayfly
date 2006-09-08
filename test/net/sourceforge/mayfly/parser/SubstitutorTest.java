@@ -2,6 +2,8 @@ package net.sourceforge.mayfly.parser;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.util.ImmutableByteArray;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,7 +24,7 @@ public class SubstitutorTest extends TestCase {
     public void testSubstitute() throws Exception {
         List tokens = Arrays.asList(new Token[] {
             makeToken(TokenType.PARAMETER), makeToken(TokenType.EQUAL), 
-            new Token(TokenType.IDENTIFIER, "x", -1, -1, -1, -1)
+            new TextToken(TokenType.IDENTIFIER, "x", -1, -1, -1, -1)
         });
         LexerTest.check(
             new TokenType[] { 
@@ -33,7 +35,7 @@ public class SubstitutorTest extends TestCase {
     }
 
     private Token makeToken(TokenType tokenType) {
-        return new Token(tokenType, null, -1, -1, -1 ,-1);
+        return new TextToken(tokenType, null, -1, -1, -1 ,-1);
     }
     
     public void testString() throws Exception {
@@ -43,6 +45,16 @@ public class SubstitutorTest extends TestCase {
             new String[] { "'can''t'" },
             Substitutor.substitute(tokens, Collections.singletonList("can't"))
         );
+    }
+    
+    public void testBinary() throws Exception {
+        List input = Collections.singletonList(
+            new TextToken(TokenType.PARAMETER, "?", 4, 3, 4, 4));
+        List output = Substitutor.substitute(input, 
+            Collections.singletonList(new ImmutableByteArray( (byte)3 )));
+        assertEquals(1, output.size());
+        Token token = (Token) output.get(0);
+        assertEquals(TokenType.BINARY, token.getType());
     }
     
     public void testCount() throws Exception {

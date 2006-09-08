@@ -14,8 +14,20 @@ public class TableReferenceTest extends TestCase {
         );
         InsertTable raw = new InsertTable("Foo");
         assertEquals("Foo", raw.tableName());
+
         TableReference reference = raw.resolve(
-            store, DataStore.ANONYMOUS_SCHEMA_NAME);
+            store, DataStore.ANONYMOUS_SCHEMA_NAME, "bar");
+        assertEquals("FOO", reference.tableName());
+        assertTrue(reference.matches(DataStore.ANONYMOUS_SCHEMA_NAME, "FOo"));
+    }
+    
+    public void testAdditionalTable() throws Exception {
+        DataStore store = new DataStore(new Schema());
+        InsertTable raw = new InsertTable("Foo");
+        assertEquals("Foo", raw.tableName());
+
+        TableReference reference = raw.resolve(
+            store, DataStore.ANONYMOUS_SCHEMA_NAME, "FOO");
         assertEquals("FOO", reference.tableName());
         assertTrue(reference.matches(DataStore.ANONYMOUS_SCHEMA_NAME, "FOo"));
     }

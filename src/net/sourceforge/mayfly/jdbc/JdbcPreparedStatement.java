@@ -8,9 +8,12 @@ import net.sourceforge.mayfly.evaluation.select.Select;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.parser.Substitutor;
+import net.sourceforge.mayfly.util.ImmutableByteArray;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.sql.Array;
@@ -152,7 +155,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public void setBytes(int parameterIndex, byte[] value) throws SQLException {
-        throw new UnimplementedException();
+        setParameter(parameterIndex, new ImmutableByteArray(value));
     }
 
     public void setDate(int parameterIndex, java.sql.Date value) throws SQLException {
@@ -170,17 +173,28 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public void setAsciiStream(int parameterIndex, InputStream value, int length)
             throws SQLException {
-        throw new UnimplementedException();
+        throw new UnimplementedException("We recommend setCharacterStream instead");
     }
 
     public void setUnicodeStream(int parameterIndex, InputStream value, int length)
             throws SQLException {
-        throw new UnimplementedException();
+        throw new UnimplementedException("We recommend setCharacterStream instead");
     }
 
-    public void setBinaryStream(int parameterIndex, InputStream value, int length)
+    public void setBinaryStream(int parameterIndex, InputStream stream, int length)
             throws SQLException {
-        throw new UnimplementedException();
+        try {
+            try {
+                setParameter(parameterIndex, new ImmutableByteArray(stream));
+            }
+            finally {
+                stream.close();
+            }
+        }
+        catch (IOException e) {
+            throw (SQLException) new SQLException("Cannot read parameter")
+                .initCause(e);
+        }
     }
 
     public void clearParameters() throws SQLException {
@@ -211,7 +225,22 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public void setCharacterStream(int parameterIndex, Reader reader, int length)
             throws SQLException {
-        throw new UnimplementedException();
+        try {
+            setString(parameterIndex, readString(reader));
+        } catch (IOException e) {
+            throw (SQLException) new SQLException("Cannot read parameter")
+                .initCause(e);
+        }
+    }
+    
+    private String readString(Reader reader) throws IOException {
+        StringWriter writer = new StringWriter();
+        char[] buffer = new char[8192];
+        int n = 0;
+        while (-1 != (n = reader.read(buffer))) {
+            writer.write(buffer, 0, n);
+        }
+        return writer.toString();
     }
 
     public void setRef(int i, Ref value) throws SQLException {

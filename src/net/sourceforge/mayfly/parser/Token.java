@@ -1,24 +1,25 @@
 package net.sourceforge.mayfly.parser;
 
-public class Token {
+import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.util.ImmutableByteArray;
+
+abstract public class Token {
 
     private final TokenType type;
-    private final String text;
     private final int startLineNumber;
     private final int startColumn;
     private final int endLineNumber;
     private final int endColumn;
 
-    public Token(TokenType type, String text, Token oldToken) {
-        this(type, text, 
-            oldToken.startLineNumber(), oldToken.startColumn(), 
-            oldToken.endLineNumber(), oldToken.endColumn());
+    protected Token(TokenType type, Token oldToken) {
+        this(type, oldToken.startLineNumber(), 
+            oldToken.startColumn(), oldToken.endLineNumber(), 
+            oldToken.endColumn());
     }
 
-    public Token(TokenType type, String text, 
-        int startLineNumber, int startColumn, int endLineNumber, int endColumn) {
+    protected Token(TokenType type, int startLineNumber, 
+        int startColumn, int endLineNumber, int endColumn) {
         this.type = type;
-        this.text = text;
         this.startLineNumber = startLineNumber;
         this.startColumn = startColumn;
         this.endLineNumber = endLineNumber;
@@ -29,9 +30,16 @@ public class Token {
         return type;
     }
 
-    public String getText() {
-        return text;
+    public ImmutableByteArray getBytes() {
+        throw new MayflyInternalException(
+            "Cannot get bytes for token of type " + type.description());
     }
+
+    public String getText() {
+        throw new MayflyInternalException(
+            "Cannot get text for token of type" + type.description());
+    }
+
 
     public int startLineNumber() {
         return startLineNumber;

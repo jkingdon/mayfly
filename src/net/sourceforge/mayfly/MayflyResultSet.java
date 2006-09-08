@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly;
 
-import org.joda.time.DateTimeZone;
-
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.NullCell;
@@ -9,6 +7,11 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
+import org.joda.time.DateTimeZone;
+
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.StringReader;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -84,7 +87,8 @@ public final class MayflyResultSet extends ResultSetStub {
         return cellFromIndex(oneBasedColumn).asBigDecimal();
     }
 
-    private static final String SUGGEST_SET_SCALE = "Instead of passing a scale to getBigDecimal, \n" +
+    private static final String SUGGEST_SET_SCALE = 
+        "Instead of passing a scale to getBigDecimal, \n" +
         "call getBigDecimal without a scale and then call setScale on the returned BigDecimal";
 
     /** @internal
@@ -124,6 +128,22 @@ public final class MayflyResultSet extends ResultSetStub {
 
     public String getString(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asString();
+    }
+    
+    public Reader getCharacterStream(String columnName) throws SQLException {
+        return new StringReader(getString(columnName));
+    }
+    
+    public Reader getCharacterStream(int columnIndex) throws SQLException {
+        return new StringReader(getString(columnIndex));
+    }
+    
+    public InputStream getBinaryStream(int columnIndex) throws SQLException {
+        return cellFromIndex(columnIndex).asBinaryStream();
+    }
+    
+    public InputStream getBinaryStream(String columnName) throws SQLException {
+        return cellFromName(columnName).asBinaryStream();
     }
     
     public java.sql.Date getDate(String columnName, Calendar calendar)

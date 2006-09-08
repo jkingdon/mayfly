@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.util.ValueObject;
 
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 
@@ -18,26 +19,48 @@ public abstract class Cell extends ValueObject {
         represented in a byte (likewise for {@link #asShort()},
         {@link #asInt()}, and {@link #asLong()}.
       */
-    abstract public byte asByte() throws SQLException;
+    public byte asByte() throws SQLException {
+        throw new SQLException(
+            "Attempt to read " + displayName() + " as a byte");
+    }
 
-    abstract public short asShort() throws SQLException;
+    public short asShort() throws SQLException {
+        throw new SQLException(
+            "Attempt to read " + displayName() + " as a short");
+    }
+
+    public int asInt() throws SQLException {
+        throw new SQLException(
+            "Attempt to read " + displayName() + " as an int");
+    }
+
+    public long asLong() throws MayflyException {
+        throw new MayflyException(
+            "Attempt to read " + displayName() + " as a long");
+    }
+
+    public Object asObject() {
+        throw new UnimplementedException(
+            "Attempt to read " + displayName() + " as an object");
+    }
+
+    public String asString() {
+        throw new MayflyException(
+            "Attempt to read " + displayName() + " as a string");
+    }
     
-    abstract public int asInt() throws SQLException;
-
-    abstract public long asLong() throws MayflyException;
-
-    abstract public String asString();
-
     public String toString() {
         return asBriefString();
     }
-    
+
+    /**
+     * @internal
+     * Must override either this or {@link #asObject()} to avoid infinite loop.
+     */
     public String asBriefString() {
         return asObject().toString();
     }
 
-    abstract public Object asObject();
-    
     public BigDecimal asBigDecimal() {
         throw new UnimplementedException("cannot yet get BigDecimal for " + getClass().getName());
     }
@@ -51,7 +74,15 @@ public abstract class Cell extends ValueObject {
         Convert to double.  As double is a floating-point (inexact) type,
         it is OK to truncate/round.
       */
-    abstract public double asDouble() throws SQLException;
+    public double asDouble() throws SQLException {
+        throw new SQLException(
+            "Attempt to read " + displayName() + " as a double");
+    }
+
+    public InputStream asBinaryStream() throws SQLException {
+        throw new SQLException(
+            "Attempt to read " + displayName() + " as binary data");
+    }
 
     abstract public int compareTo(Cell otherCell);
 

@@ -231,7 +231,7 @@ public class Lexer {
      */
     private void addToken(List tokens, TokenType tokenType, String text) {
         tokens.add(
-            new Token(tokenType, text, 
+            new TextToken(tokenType, text, 
                 tokenLine, tokenColumn, previousLine, previousColumn)
         );
         tokenLine = currentLine;
@@ -245,8 +245,8 @@ public class Lexer {
      */
     private void addEndOfFile(List tokens) {
         tokens.add(
-            new Token(TokenType.END_OF_FILE, null,
-                previousLine, previousColumn, previousLine, previousColumn)
+            new EndOfFileToken(previousLine,
+                previousColumn)
         );
     }
 

@@ -1,7 +1,13 @@
 package net.sourceforge.mayfly.acceptance;
 
+import junitx.framework.ArrayAssert;
+
+import net.sourceforge.mayfly.EndToEndTests;
+
 import org.apache.commons.io.IOUtils;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
@@ -264,11 +270,12 @@ public class DataTypeTest extends SqlTestCase {
         results.close();
     }
     
+    /**
+     * @internal
+     * Also see {@link EndToEndTests#testCharacterStream()}
+     * which checks a few more cases.
+     */
     public void testCharacterStream() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
-
         execute("create table foo (x varchar(255))");
 
         PreparedStatement insert = 
@@ -285,7 +292,7 @@ public class DataTypeTest extends SqlTestCase {
         ResultSet results = query("select x from foo");
         assertTrue(results.next());
 
-        Reader stream = results.getCharacterStream("x");
+        Reader stream = results.getCharacterStream(1);
         String contents = IOUtils.toString(stream);
         assertEquals("value", contents);
         stream.close(); // Check JDBC documentation: should I close it?
@@ -294,4 +301,49 @@ public class DataTypeTest extends SqlTestCase {
         results.close();
     }
     
+    public void xtestBinaryLiteral() throws Exception {
+        // Is there a syntax for this?
+        // Do we care?
+        execute("create table foo (x blob(255))");
+        execute("insert into foo(x) values(1 || 2 || 255)");
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+
+        InputStream stream = results.getBinaryStream(1);
+        byte[] contents = IOUtils.toByteArray(stream);
+        ArrayAssert.assertEquals(new byte[] {1, 2, (byte) 255}, contents);
+        stream.close(); // Check JDBC documentation: should I close it?
+
+        assertFalse(results.next());
+        results.close();
+    }
+    
+    public void testBinaryStream() throws Exception {
+        execute("create table foo (x " + dialect.binaryTypeName() + ")");
+
+        PreparedStatement insert = 
+            connection.prepareStatement("insert into foo(x) values(?)");
+        byte[] data = new byte[] { 0x1, 0x3, (byte)0xff, (byte)0x90 };
+        /**
+            Requiring the correct length here probably wouldn't be
+            as big a deal as in the {@link #testCharacterStream}
+            case, although I guess there are cases (e.g. reading
+            from a network stream) in which it could be inconvenient.
+        */
+        insert.setBinaryStream(1, new ByteArrayInputStream(data), data.length);
+        assertEquals(1, insert.executeUpdate());
+        insert.close();
+        
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+
+        InputStream stream = results.getBinaryStream(1);
+        byte[] contents = IOUtils.toByteArray(stream);
+        ArrayAssert.assertEquals(data, contents);
+        stream.close(); // Check JDBC documentation: should I close it?
+
+        assertFalse(results.next());
+        results.close();
+    }
+
 }

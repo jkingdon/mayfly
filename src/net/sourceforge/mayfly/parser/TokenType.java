@@ -14,6 +14,8 @@ public class TokenType {
     }
 
     public static final TokenType END_OF_FILE = new TokenType("end of file");
+    public static final TokenType BINARY = new TokenType("binary data");
+
     public static final TokenType IDENTIFIER = new TokenType("identifier");
     public static final TokenType QUOTED_STRING = new TokenType("string");
     public static final TokenType NUMBER = new TokenType("number");

@@ -46,7 +46,7 @@ public class ParserTest extends TestCase {
     public void testRemainingTokens() throws Exception {
         Parser parser = new Parser("foo inner");
         parser.parseTableReference();
-        assertEquals("inner", parser.remainingTokens());
+        assertEquals("INNER", parser.remainingTokens());
     }
     
     public void testIdentifierDot() throws Exception {

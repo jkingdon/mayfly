@@ -352,7 +352,7 @@ public class LexerTest extends TestCase {
         
         {
             Token endOfFile = (Token) tokens.get(2);
-            assertEquals(null, endOfFile.getText());
+            assertEquals(TokenType.END_OF_FILE, endOfFile.getType());
             assertEquals(2, endOfFile.startLineNumber());
             assertEquals(4, endOfFile.startColumn());
             assertEquals(2, endOfFile.endLineNumber());
@@ -409,7 +409,12 @@ public class LexerTest extends TestCase {
         for (int i = 0; i < actual.size(); ++i) {
             Token token = (Token) actual.get(i);
             actualTypes.add(token.getType());
-            actualTexts.add(token.getText());
+            if (token.getType() == TokenType.END_OF_FILE) {
+                actualTexts.add(null);
+            }
+            else {
+                actualTexts.add(token.getText());
+            }
         }
         
         assertEquals(Arrays.asList(expectedTypes), actualTypes);
