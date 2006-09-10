@@ -117,4 +117,29 @@ public class RowTest extends TestCase {
         assertEquals(new Column("bar", "z"), row.findColumn("bar", "z"));
     }
 
+    public void testHeaderIs() throws Exception {
+        assertTrue(
+            new Row.HeaderIs(new Column("colA"))
+                .evaluate(new TupleElement(new Column("colA"), new StringCell("a")))
+        );
+        assertFalse(
+            new Row.HeaderIs(new Column("colB"))
+                .evaluate(new TupleElement(new Column("colA"), new StringCell("a")))
+        );
+    }
+
+    public void testGetHeader() throws Exception {
+        assertEquals(
+            new Column("colA"),
+            new Row.GetHeader().transform(new TupleElement(new Column("colA"), new StringCell("a")))
+        );
+    }
+
+    public void testGetCell() throws Exception {
+        assertEquals(
+            new StringCell("a"), 
+            new Row.GetCell().transform(new TupleElement(new Column("colA"), new StringCell("a")))
+        );
+    }
+    
 }

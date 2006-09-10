@@ -16,11 +16,6 @@ public class TupleBuilder {
         return append(new TupleElement(column, cell));
     }
     
-    public TupleBuilder appendAll(Tuple elementsToAdd) {
-        elements.addAll(elementsToAdd);
-        return this;
-    }
-
     public TupleBuilder appendColumnCellContents(String tableName, String columnName, String cellValue) {
         return appendColumnCell(tableName, columnName, new StringCell(cellValue));
     }

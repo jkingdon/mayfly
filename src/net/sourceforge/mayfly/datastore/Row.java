@@ -4,23 +4,22 @@ import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.Iterable;
+import net.sourceforge.mayfly.util.L;
+import net.sourceforge.mayfly.util.Selector;
+import net.sourceforge.mayfly.util.Transformer;
 
 import java.util.Iterator;
 
 public class Row extends Aggregate {
 
-    private final Tuple tuple;
+    private final ImmutableList elements;
 
     public Row(TupleElement element) {
         this(ImmutableList.singleton(element));
     }
     
     public Row(ImmutableList elements) {
-        this(new Tuple(elements));
-    }
-
-    private Row(Tuple tuple) {
-        this.tuple = tuple;
+        this.elements = elements;
     }
 
     public Row(TupleBuilder builder) {
@@ -32,7 +31,7 @@ public class Row extends Aggregate {
     }
 
     public Iterator iterator() {
-        return tuple.iterator();
+        return elements.iterator();
     }
 
 
@@ -41,11 +40,11 @@ public class Row extends Aggregate {
     }
 
     public Cell cell(String tableOrAlias, String column) {
-        return tuple.cellFor(findColumn(tableOrAlias, column));
+        return cellFor(findColumn(tableOrAlias, column));
     }
     
     public Cell byPosition(int position) {
-        return tuple.cellFor(new PositionalHeader(position));
+        return cellFor(new PositionalHeader(position));
     }
 
     public Column findColumn(String columnName) {
@@ -53,29 +52,78 @@ public class Row extends Aggregate {
     }
 
     public Column findColumn(String tableOrAlias, String columnName) {
-        return tuple.headers().thatAreColumns().columnFromName(tableOrAlias, columnName);
+        return headers().thatAreColumns().columnFromName(tableOrAlias, columnName);
     }
 
     public Columns columns() {
-        return new Columns(ImmutableList.fromIterable(tuple.headers()));
+        return new Columns(ImmutableList.fromIterable(headers()));
     }
 
     public Columns columnsForTable(String aliasOrTable) {
-        return tuple.columnsForTable(aliasOrTable);
+        L found = new L();
+        for (int i = 0; i < elements.size(); ++i) {
+            TupleElement element = (TupleElement) elements.get(i);
+            Column column = element.column();
+            if (column.matchesAliasOrTable(aliasOrTable)) {
+                found.add(column);
+            }
+        }
+        return new Columns(new ImmutableList(found));
+    }
+
+    public Cell cellFor(CellHeader header) {
+        return withHeader(header).cell();
+    }
+
+    public TupleElement withHeader(CellHeader header) {
+        return ((TupleElement)findFirst(new HeaderIs(header)));
+    }
+
+    public CellHeaders headers() {
+        return new CellHeaders(collect(new GetHeader()));
+    }
+
+    public Cells cells() {
+        return new Cells(collect(new GetCell()));
+    }
+
+
+    public static class HeaderIs implements Selector {
+        private CellHeader header;
+
+        public HeaderIs(CellHeader header) {
+            this.header = header;
+        }
+
+        public boolean evaluate(Object candidate) {
+            return ((TupleElement)candidate).header().equals(header);
+        }
+
+        public String toString() {
+            return header.toString();
+        }
+    }
+
+    public static class GetHeader implements Transformer {
+        public Object transform(Object from) {
+            return ((TupleElement)from).header();
+        }
+    }
+
+    public static class GetCell implements Transformer {
+        public Object transform(Object from) {
+            return ((TupleElement)from).cell();
+        }
     }
 
     public String toString() {
-        String columns = tuple.headers().toString();
-        String cells = tuple.cells().toString();
+        String columns = headers().toString();
+        String cells = cells().toString();
 
         return "\n" +
                "Row:\n" +
                "\tcolumns:\t" + columns + "\n" +
                "\tcells:\t" + cells;
-    }
-
-    public Tuple tuple() {
-        return tuple;
     }
 
 }
