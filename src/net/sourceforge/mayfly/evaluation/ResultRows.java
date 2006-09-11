@@ -2,6 +2,11 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.util.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @internal
@@ -12,14 +17,27 @@ import net.sourceforge.mayfly.datastore.Rows;
  */
 public class ResultRows {
 
-    private final Rows rows;
+    private final ImmutableList rows;
 
     public ResultRows(Rows rows) {
-        this.rows = rows;
+        this(makeResultRows(rows));
+    }
+
+    private static ImmutableList makeResultRows(Rows inputRows) {
+        List result = new ArrayList();
+        for (Iterator iter = inputRows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            result.add(new ResultRow(row));
+        }
+        return new ImmutableList(result);
     }
 
     public ResultRows() {
-        this(new Rows());
+        this(new ImmutableList());
+    }
+    
+    public ResultRows(ImmutableList rows) {
+        this.rows = rows;
     }
 
     public int size() {
@@ -27,7 +45,11 @@ public class ResultRows {
     }
 
     public ResultRow row(int index) {
-        return new ResultRow((Row) rows.element(index));
+        return (ResultRow) rows.get(index);
+    }
+    
+    public ImmutableList asList() {
+        return rows;
     }
 
 }

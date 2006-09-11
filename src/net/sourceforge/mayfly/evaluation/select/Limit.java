@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.evaluation.select;
 
-import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 public class Limit {
@@ -18,16 +18,16 @@ public class Limit {
         this.offset = offset;
     }
 
-    public Rows limit(Rows rows) {
+    public ResultRows limit(ResultRows rows) {
         if (offset == 0 && count >= rows.size()) {
             return rows;
         }
         
         if (offset > rows.size()) {
-            return new Rows();
+            return new ResultRows();
         }
         int end = Math.min(offset + count, rows.size());
-        return new Rows(new ImmutableList(rows.asList().subList(offset, end)));
+        return new ResultRows(new ImmutableList(rows.asList().subList(offset, end)));
     }
 
     public boolean isSpecified() {

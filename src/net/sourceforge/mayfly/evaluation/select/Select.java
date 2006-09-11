@@ -114,8 +114,8 @@ public class Select extends Command {
 
         Rows afterGrouping = groupBy.group(afterWhere, what, selected);
 
-        Rows sorted = orderBy.sort(store, afterGrouping, what);
-        return new ResultRows(limit.limit(sorted));
+        ResultRows sorted = new ResultRows(orderBy.sort(store, afterGrouping, what));
+        return limit.limit(sorted);
     }
 
     public UpdateStore update(DataStore store, String schema) {
