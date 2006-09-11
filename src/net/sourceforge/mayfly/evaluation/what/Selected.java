@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.ValueObject;
@@ -36,13 +37,13 @@ public class Selected extends ValueObject implements Iterable {
         return this;
     }
 
-    public Cell evaluate(int oneBasedColumn, Row row) {
+    public Cell evaluate(int oneBasedColumn, ResultRow row) {
         int zeroBasedColumn = oneBasedColumn - 1;
         if (zeroBasedColumn < 0 || zeroBasedColumn >= expressions.size()) {
             throw new MayflyException("no column " + oneBasedColumn);
         }
         Expression element = (Expression) expressions.get(zeroBasedColumn);
-        return element.findValue(zeroBasedColumn, row);
+        return row.findValue(zeroBasedColumn, element);
     }
 
     public Rows aggregate(Rows rows) {

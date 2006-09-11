@@ -3,11 +3,11 @@ package net.sourceforge.mayfly.evaluation.select;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
@@ -241,20 +241,20 @@ public class SelectTest extends TestCase {
         String alias2, String column2, String value2, 
         String alias3, String column3, String value3, 
         String alias4, String column4, String value4, 
-        Row row) {
+        ResultRow row) {
         assertEquals(4, row.size());
-        assertRowElement(alias1, column1, value1, (TupleElement) row.element(0));
-        assertRowElement(alias2, column2, value2, (TupleElement) row.element(1));
-        assertRowElement(alias3, column3, value3, (TupleElement) row.element(2));
-        assertRowElement(alias4, column4, value4, (TupleElement) row.element(3));
+        assertRowElement(alias1, column1, value1, row.element(0));
+        assertRowElement(alias2, column2, value2, row.element(1));
+        assertRowElement(alias3, column3, value3, row.element(2));
+        assertRowElement(alias4, column4, value4, row.element(3));
     }
 
     private void assertRow(String alias1, String column1, String value1, 
         String alias2, String column2, String value2, 
-        Row row) {
+        ResultRow row) {
         assertEquals(2, row.size());
-        assertRowElement(alias1, column1, value1, (TupleElement) row.element(0));
-        assertRowElement(alias2, column2, value2, (TupleElement) row.element(1));
+        assertRowElement(alias1, column1, value1, row.element(0));
+        assertRowElement(alias2, column2, value2, row.element(1));
     }
 
     private void assertRowElement(String alias, String column, String value, TupleElement element) {

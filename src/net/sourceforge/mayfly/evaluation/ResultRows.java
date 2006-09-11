@@ -18,12 +18,16 @@ public class ResultRows {
         this.rows = rows;
     }
 
+    public ResultRows() {
+        this(new Rows());
+    }
+
     public int size() {
         return rows.size();
     }
 
-    public Row row(int index) {
-        return (Row) rows.element(index);
+    public ResultRow row(int index) {
+        return new ResultRow((Row) rows.element(index));
     }
 
 }

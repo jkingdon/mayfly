@@ -3,7 +3,7 @@ package net.sourceforge.mayfly;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.NullCell;
-import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
@@ -231,7 +231,7 @@ public final class MayflyResultSet extends ResultSetStub {
         return cell;
     }
 
-    private Row currentRow() throws SQLException {
+    private ResultRow currentRow() throws SQLException {
         return rows.row(checkedRowNumber());
     }
 
