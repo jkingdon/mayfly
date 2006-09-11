@@ -4,7 +4,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
 import org.joda.time.DateTimeZone;
@@ -21,10 +21,10 @@ public final class MayflyResultSet extends ResultSetStub {
     private int pos = -1;
     private boolean wasNull = false;
 
-    private final Rows rows;
+    private final ResultRows rows;
     private final Selected selected;
 
-    public MayflyResultSet(Selected selected, Rows rows) {
+    public MayflyResultSet(Selected selected, ResultRows rows) {
         super();
         this.selected = selected;
         this.rows = rows;
@@ -232,7 +232,7 @@ public final class MayflyResultSet extends ResultSetStub {
     }
 
     private Row currentRow() throws SQLException {
-        return (Row) rows.element(checkedRowNumber());
+        return rows.row(checkedRowNumber());
     }
 
     private int checkedRowNumber() throws SQLException {

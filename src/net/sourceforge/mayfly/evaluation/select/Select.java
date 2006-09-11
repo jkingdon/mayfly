@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.from.From;
@@ -99,7 +100,7 @@ public class Select extends Command {
         return (Row) joinedRows.element(0);
     }
 
-    Rows query(DataStore store, String currentSchema, Selected selected) {
+    ResultRows query(DataStore store, String currentSchema, Selected selected) {
         Iterator iterator = from.iterator();
 
         FromElement firstTable = (FromElement) iterator.next();
@@ -114,7 +115,7 @@ public class Select extends Command {
         Rows afterGrouping = groupBy.group(afterWhere, what, selected);
 
         Rows sorted = orderBy.sort(store, afterGrouping, what);
-        return limit.limit(sorted);
+        return new ResultRows(limit.limit(sorted));
     }
 
     public UpdateStore update(DataStore store, String schema) {
