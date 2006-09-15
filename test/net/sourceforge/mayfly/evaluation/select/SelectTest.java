@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.StringCell;
-import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
@@ -257,10 +256,10 @@ public class SelectTest extends TestCase {
         assertRowElement(alias2, column2, value2, row.element(1));
     }
 
-    private void assertRowElement(String alias, String column, String value, TupleElement element) {
+    private void assertRowElement(String alias, String column, String value, ResultRow.Element element) {
         assertEquals(alias, element.column().tableOrAlias());
         assertEquals(column, element.column().columnName());
-        assertEquals(value, element.cell().asString());
+        assertEquals(value, element.value.asString());
     }
 
     private ResultRows query(DataStore store, String sql) {

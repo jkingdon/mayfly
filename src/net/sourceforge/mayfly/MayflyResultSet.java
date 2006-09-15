@@ -1,11 +1,11 @@
 package net.sourceforge.mayfly;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
+import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 
 import org.joda.time.DateTimeZone;
 
@@ -201,15 +201,10 @@ public final class MayflyResultSet extends ResultSetStub {
 
     private Cell cellFromName(String columnName) throws SQLException {
         try {
-            return cell(columnFromName(columnName));
-        } catch (MayflyException e) {
-            throw e.asSqlException();
-        }
-    }
-
-    private Column columnFromName(String columnName) throws SQLException {
-        try {
-            return currentRow().findColumn(columnName);
+            SingleColumn column = currentRow().findColumn(columnName);
+            Cell cell = currentRow().findValue(column);
+            wasNull = cell instanceof NullCell;
+            return cell;
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
@@ -223,12 +218,6 @@ public final class MayflyResultSet extends ResultSetStub {
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
-    }
-
-    private Cell cell(Column column) throws SQLException {
-        Cell cell = currentRow().cell(column);
-        wasNull = cell instanceof NullCell;
-        return cell;
     }
 
     private ResultRow currentRow() throws SQLException {

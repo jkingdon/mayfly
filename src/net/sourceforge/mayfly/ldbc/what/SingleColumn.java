@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.ldbc.what;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
@@ -52,6 +53,14 @@ public class SingleColumn extends Expression {
         return column.matches(tableOrAlias, columnName);
     }
     
+    public boolean matches(String target) {
+        if (target.indexOf('.') != -1) {
+            throw new MayflyException("column name " + target + " should not contain a period");
+        }
+
+        return this.columnName.equalsIgnoreCase(target);
+    }
+
     public boolean sameExpression(Expression other) {
         if (other instanceof SingleColumn) {
             SingleColumn column = (SingleColumn) other;

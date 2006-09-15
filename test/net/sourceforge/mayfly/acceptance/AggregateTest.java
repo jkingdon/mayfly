@@ -241,5 +241,6 @@ public class AggregateTest extends SqlTestCase {
     
     // TODO: String case with no non-null values:
     // Should still get the errors based on the column type....
+    // select count(*) from foo cross join bar -> gives the count of the result rows, right?
 
 }

@@ -86,7 +86,7 @@ public class GroupedRows {
             }
             else if (expression.firstAggregate() != null) {
                 Cell aggregated = expression.aggregate(rowsForKey);
-                builder.append(new PositionalHeader(i), aggregated);
+                builder.append(new PositionalHeader(i, expression), aggregated);
             }
             else {
                 throw new MayflyException(expression.displayName() + " is not aggregate or mentioned in GROUP BY");

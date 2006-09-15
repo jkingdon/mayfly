@@ -49,8 +49,8 @@ public class Selected extends ValueObject implements Iterable {
     public Rows aggregate(Rows rows) {
         TupleBuilder builder = new TupleBuilder();
         for (int i = 0; i < expressions.size(); ++i) {
-            Expression element = (Expression) expressions.get(i);
-            builder.append(new PositionalHeader(i), element.aggregate(rows));
+            Expression expression = (Expression) expressions.get(i);
+            builder.append(new PositionalHeader(i, expression), expression.aggregate(rows));
         }
         Row resultRow = new Row(builder);
         return new Rows(resultRow);

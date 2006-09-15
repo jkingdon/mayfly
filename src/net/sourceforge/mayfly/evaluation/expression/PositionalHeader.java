@@ -2,11 +2,12 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.CellHeader;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.util.ValueObject;
+import net.sourceforge.mayfly.evaluation.Expression;
 
-public class PositionalHeader extends ValueObject implements CellHeader {
+public class PositionalHeader implements CellHeader {
 
     private final int positionInSelected;
+    public final Expression expression;
 
     /**
      * @internal
@@ -16,7 +17,22 @@ public class PositionalHeader extends ValueObject implements CellHeader {
      * the word position is a potentially confusing way to refer to it.
      */
     public PositionalHeader(int positionInSelected) {
+        this(positionInSelected, null);
+    }
+    
+    public PositionalHeader(int positionInSelected, Expression expression) {
         this.positionInSelected = positionInSelected;
+        this.expression = expression;
+    }
+    
+    public boolean equals(Object obj) {
+        if (obj == null) { return false; }
+        if (!(obj.getClass() == PositionalHeader.class)) { return false; }
+        return positionInSelected == ((PositionalHeader)obj).positionInSelected;
+    }
+    
+    public int hashCode() {
+        return positionInSelected;
     }
     
     public String toString() {
