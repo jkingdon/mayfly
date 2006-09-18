@@ -3,12 +3,18 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.parser.Location;
 
 public class LongLiteral extends Literal {
 
-    private final long value;
+    public final long value;
 
     public LongLiteral(long value) {
+        this(value, Location.UNKNOWN);
+    }
+
+    public LongLiteral(long value, Location location) {
+        super(location);
         this.value = value;
     }
 

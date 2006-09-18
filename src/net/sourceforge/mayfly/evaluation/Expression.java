@@ -6,10 +6,21 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.what.WhatElement;
+import net.sourceforge.mayfly.parser.Location;
 
 import java.util.Collections;
 
 abstract public class Expression extends WhatElement {
+    
+    public final Location location;
+    
+    protected Expression(Location location) {
+        this.location = location;
+    }
+    
+    protected Expression() {
+        this(Location.UNKNOWN);
+    }
 
     public Selected selected(Row dummyRow) {
         return new Selected(Collections.singletonList(resolveAndReturn(dummyRow)));

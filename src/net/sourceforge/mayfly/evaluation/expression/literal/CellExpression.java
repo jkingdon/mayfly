@@ -3,12 +3,14 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.parser.Location;
 
 public class CellExpression extends Literal {
 
     private final Cell value;
 
     public CellExpression(Cell value) {
+        super(Location.UNKNOWN);
         this.value = value;
     }
 

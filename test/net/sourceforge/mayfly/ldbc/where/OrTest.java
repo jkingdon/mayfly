@@ -6,24 +6,27 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class OrTest extends TestCase {
 
     public void testParse() throws Exception {
-        assertEquals(
-                new Or(
-                    new Or(
-                        new Equal(new SingleColumn("name"), new QuotedString("'steve'")),
-                        new Equal(new SingleColumn("species"), new QuotedString("'homo sapiens'"))
-                    ),
-                    new Equal(new SingleColumn("size"), new IntegerLiteral(6))
-                ),
-                new Parser("name='steve' or species='homo sapiens' or size = 6").parseCondition().asBoolean()
-        );
+        Or outer = (Or) 
+            new Parser("name='steve' or species='homo sapiens' or size = 6")
+                .parseCondition().asBoolean();
+            Or inner = (Or) outer.leftSide;
+                Equal name = (Equal) inner.leftSide;
+                    MayflyAssert.assertColumn("name", name.leftSide);
+                    MayflyAssert.assertString("steve", name.rightSide);
+                Equal species = (Equal) inner.rightSide;
+                    MayflyAssert.assertColumn("species", species.leftSide);
+                    MayflyAssert.assertString("homo sapiens", species.rightSide);
+            Equal size = (Equal) outer.rightSide;
+                MayflyAssert.assertColumn("size", size.leftSide);
+                MayflyAssert.assertInteger(6, size.rightSide);
     }
 
     public void testEvaluate() throws Exception {

@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Not yet immutable, because of {@link #add(WhatElement)}
+ */
 public class What extends Aggregate {
 
     private List elements;

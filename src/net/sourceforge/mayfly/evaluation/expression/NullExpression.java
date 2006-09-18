@@ -5,8 +5,13 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.parser.Location;
 
 public class NullExpression extends Expression {
+
+    public NullExpression(Location location) {
+        super(location);
+    }
 
     public Cell evaluate(Row row) {
         return NullCell.INSTANCE;

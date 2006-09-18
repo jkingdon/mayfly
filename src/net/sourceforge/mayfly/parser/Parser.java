@@ -81,8 +81,6 @@ import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.io.Reader;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -279,9 +277,10 @@ public class Parser {
         }
     }
 
-    private Expression parseExpressionOrNull() {
-        if (consumeIfMatches(TokenType.KEYWORD_null)) {
-            return new NullExpression();
+    Expression parseExpressionOrNull() {
+        if (currentTokenType() == TokenType.KEYWORD_null) {
+            Token nullToken = expectAndConsume(TokenType.KEYWORD_null);
+            return new NullExpression(nullToken.location);
         }
         else if (consumeIfMatches(TokenType.KEYWORD_default)) {
             return null;
@@ -533,6 +532,7 @@ public class Parser {
     }
 
     Expression parseDefaultValue(String columnName) {
+        Location start = currentToken().location;
         if (currentTokenType() == TokenType.NUMBER || 
             currentTokenType() == TokenType.PERIOD) {
             return parseNumber().asNonBoolean();
@@ -541,13 +541,14 @@ public class Parser {
             return parseNumber().asNonBoolean();
         }
         else if (consumeIfMatches(TokenType.MINUS)) {
-            return parseNegativeNumber().asNonBoolean();
+            return parseNegativeNumber(start).asNonBoolean();
         }
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
             return parseQuotedString().asNonBoolean();
         }
-        else if (consumeIfMatches(TokenType.KEYWORD_null)) {
-            return new NullExpression();
+        else if (currentTokenType() == TokenType.KEYWORD_null) {
+            Token nullToken = expectAndConsume(TokenType.KEYWORD_null);
+            return new NullExpression(nullToken.location);
         }
         else if (currentTokenType() == TokenType.KEYWORD_current_timestamp) {
             Token token = expectAndConsume(TokenType.KEYWORD_current_timestamp);
@@ -855,6 +856,7 @@ public class Parser {
 
     public ParserExpression parsePrimary() {
         AggregateArgumentParser argumentParser = new AggregateArgumentParser();
+        Location start = currentToken().location;
 
         if (currentTokenType() == TokenType.IDENTIFIER) {
             return new NonBooleanParserExpression(parseColumnReference());
@@ -867,7 +869,7 @@ public class Parser {
             return parseNumber();
         }
         else if (consumeIfMatches(TokenType.MINUS)) {
-            return parseNegativeNumber();
+            return parseNegativeNumber(start);
         }
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
             return parseQuotedString();
@@ -925,68 +927,70 @@ public class Parser {
 
     private ParserExpression parseQuotedString() {
         Token literal = expectAndConsume(TokenType.QUOTED_STRING);
-        return new NonBooleanParserExpression(new QuotedString(literal.getText()));
+        return new NonBooleanParserExpression(
+            new QuotedString(literal.getText(), literal.location));
     }
 
     private ParserExpression parseNumber() {
-        Number number = parseNumericLiteral();
-        return new NonBooleanParserExpression(makeLiteral(number));
+        Literal number = parseNumericLiteral();
+        return new NonBooleanParserExpression(number);
     }
 
-    private Literal makeLiteral(Number number) {
-        if (number instanceof Integer) {
-            return new IntegerLiteral(number.intValue());
-        }
-        else if (number instanceof Long) {
-            return new LongLiteral(number.longValue());
-        }
-        else if (number instanceof BigDecimal) {
-            return new DecimalLiteral((BigDecimal)number);
-        }
-        else {
-            throw new UnimplementedException("don't yet handle " + number.getClass().getName());
-        }
+    private ParserExpression parseNegativeNumber(Location start) {
+        Literal number = parseNumericLiteral();
+        return new NonBooleanParserExpression(makeNegativeLiteral(number, start));
     }
 
-    private ParserExpression parseNegativeNumber() {
-        Number number = parseNumericLiteral();
-        return new NonBooleanParserExpression(makeNegativeLiteral(number));
-    }
+    private Literal makeNegativeLiteral(Literal number, Location start) {
+        Location location = start.combine(number.location);
 
-    private Literal makeNegativeLiteral(Number number) {
         // Probably should have more unit tests for this, especially
         // the edge cases (-2^31 is one).
-        if (number instanceof Integer) {
-            return new IntegerLiteral(- number.intValue());
+        if (number instanceof IntegerLiteral) {
+            IntegerLiteral integer = (IntegerLiteral) number;
+            return new IntegerLiteral(- integer.value, location);
         }
-        else if (number instanceof Long) {
-            return new LongLiteral(- number.longValue());
+        else if (number instanceof LongLiteral) {
+            LongLiteral longLiteral = (LongLiteral) number;
+            return new LongLiteral(- longLiteral.value, location);
         }
         else {
             throw new UnimplementedException("don't yet handle big integers");
         }
     }
 
-    Number parseNumericLiteral() {
+    Literal parseNumericLiteral() {
+        Location firstToken = currentToken().location;
+
         if (consumeIfMatches(TokenType.PERIOD)) {
-            String secondInteger = expectAndConsume(TokenType.NUMBER).getText();
-            return new BigDecimal("." + secondInteger);
+            Token number = expectAndConsume(TokenType.NUMBER);
+            String secondInteger = number.getText();
+            return new DecimalLiteral("." + secondInteger, 
+                firstToken.combine(number.location)
+            );
         }
 
         Token number = expectAndConsume(TokenType.NUMBER);
         String firstInteger = number.getText();
-        if (consumeIfMatches(TokenType.PERIOD)) {
+        if (currentTokenType() == TokenType.PERIOD) {
+            Token period = expectAndConsume(TokenType.PERIOD);
             if (currentTokenType() == TokenType.NUMBER) {
-                String secondInteger = expectAndConsume(TokenType.NUMBER).getText();
-                return new BigDecimal(firstInteger + "." + secondInteger);
+                Token secondNumber = expectAndConsume(TokenType.NUMBER);
+                String secondInteger = secondNumber.getText();
+                return new DecimalLiteral(
+                    firstInteger + "." + secondInteger,
+                    firstToken.combine(secondNumber.location));
             }
             else {
                 // Might need to look into semantics for this.  Should it be
                 // BigDecimal or integer?
-                return new BigDecimal(firstInteger + ".");
+                return new DecimalLiteral(
+                    firstInteger + ".",
+                    firstToken.combine(period.location)
+                );
             }
         }
-        return integerToObject(firstInteger);
+        return integerToObject(firstInteger, firstToken);
     }
 
     class AggregateArgumentParser {
@@ -1276,21 +1280,21 @@ public class Parser {
         }
     }
 
-    private Number integerToObject(String text) {
+    private Literal integerToObject(String text, Location location) {
         try {
-            return new Integer(text);
+            return new IntegerLiteral(Integer.parseInt(text), location);
         }
         catch (NumberFormatException e) {
             // Out of range.  Most (all?) other cases are prevented in the lexer.
         }
 
         try {
-            return new Long(text);
+            return new LongLiteral(Long.parseLong(text), location);
         }
         catch (NumberFormatException e) {
         }
 
-        return new BigInteger(text);
+        throw new UnimplementedException("don't yet handle BigInteger " + text);
     }
 
     boolean consumeIfMatches(TokenType type) {

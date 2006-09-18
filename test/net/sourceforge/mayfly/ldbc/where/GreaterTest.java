@@ -7,14 +7,15 @@ import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class GreaterTest extends TestCase {
 
     public void testParse() throws Exception {
-        assertEquals(
-                new Greater(new SingleColumn("size"), new IntegerLiteral(6)),
-                new Parser("size > 6").parseCondition().asBoolean()
-        );
+        Greater greater = 
+            (Greater) new Parser("size > 6").parseCondition().asBoolean();
+        MayflyAssert.assertColumn("size", greater.leftSide);
+        MayflyAssert.assertInteger(6, greater.rightSide);
     }
 
     public void testEval() throws Exception {

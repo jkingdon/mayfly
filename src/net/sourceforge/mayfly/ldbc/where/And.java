@@ -2,8 +2,8 @@ package net.sourceforge.mayfly.ldbc.where;
 
 
 public class And extends BooleanExpression {
-    private BooleanExpression leftSide;
-    private BooleanExpression rightSide;
+    public final BooleanExpression leftSide;
+    public final BooleanExpression rightSide;
 
     public And(BooleanExpression leftSide, BooleanExpression rightSide) {
         this.leftSide = leftSide;

@@ -3,8 +3,8 @@ package net.sourceforge.mayfly.ldbc.where;
 
 public class Or extends BooleanExpression {
 
-    private BooleanExpression leftSide;
-    private BooleanExpression rightSide;
+    public final BooleanExpression leftSide;
+    public final BooleanExpression rightSide;
 
     public Or(BooleanExpression leftSide, BooleanExpression rightSide) {
         this.leftSide = leftSide;

@@ -8,12 +8,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Not yet immutable, because of {@link #add(FromElement)}
+ */
 public class From extends Aggregate {
 
-    private List fromElements = new ArrayList();
+    private final List fromElements;
 
-
-    public From() { }
+    public From() { this.fromElements = new ArrayList(); }
 
     public From(List fromElements) {
         this.fromElements = fromElements;

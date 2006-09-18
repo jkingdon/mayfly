@@ -3,12 +3,18 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.parser.Location;
 
 public class IntegerLiteral extends Literal {
 
-    private final int value;
+    public final int value;
 
     public IntegerLiteral(int value) {
+        this(value, Location.UNKNOWN);
+    }
+
+    public IntegerLiteral(int value, Location location) {
+        super(location);
         this.value = value;
     }
 

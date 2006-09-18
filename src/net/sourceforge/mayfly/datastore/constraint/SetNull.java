@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.evaluation.expression.NullExpression;
+import net.sourceforge.mayfly.parser.Location;
 
 public class SetNull extends Action {
 
@@ -12,7 +13,7 @@ public class SetNull extends Action {
         String referencerSchema, String referencerTable, 
         String referencerColumn, 
         TableReference targetTable, String targetColumn) {
-        return setValue(oldValue, new NullExpression(), 
+        return setValue(oldValue, new NullExpression(Location.UNKNOWN), 
             store, referencerSchema, referencerTable, referencerColumn);
     }
 

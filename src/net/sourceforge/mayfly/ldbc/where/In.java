@@ -3,18 +3,19 @@ package net.sourceforge.mayfly.ldbc.where;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class In extends BooleanExpression {
 
-    private Expression leftSide;
-    private List expressions;
+    public final Expression leftSide;
+    public final ImmutableList expressions;
 
     public In(Expression leftSide, List expressions) {
         this.leftSide = leftSide;
-        this.expressions = expressions;
+        this.expressions = new ImmutableList(expressions);
     }
 
     public boolean evaluate(Object rowObject) {

@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.GroupByKeys;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.Command;
@@ -15,6 +16,7 @@ import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.what.What;
+import net.sourceforge.mayfly.ldbc.what.WhatElement;
 import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.parser.Parser;
 
@@ -34,11 +36,25 @@ public class Select extends Command {
         return new Parser(tokens).parseQuery();
     }
 
+    /**
+     * Not yet immutable, because of {@link What#add(WhatElement)}
+     */
     private final What what;
+
+    /**
+     * Not yet immutable, because of {@link From#add(FromElement)}
+     */
     private final From from;
+
     private final Where where;
+
+    /**
+     * Not yet immutable, because of {@link GroupByKeys}
+     */
     private final Aggregator groupBy;
+    /** Not yet immutable */
     private final OrderBy orderBy;
+
     private final Limit limit;
 
     public Select(What what, From from, Where where) {

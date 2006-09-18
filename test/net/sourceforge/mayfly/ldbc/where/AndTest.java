@@ -6,37 +6,43 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class AndTest extends TestCase {
 
     public void testParseWithParens() throws Exception {
-        assertEquals(
-                new And(
-                    new Equal(new SingleColumn("name"), new QuotedString("'steve'")),
-                    new And(
-                        new Equal(new SingleColumn("species"), new QuotedString("'homo sapiens'")),
-                        new Equal(new SingleColumn("size"), new IntegerLiteral(6))
-                    )
-                ),
-                new Parser("name='steve' and (species='homo sapiens' and size = 6)").parseCondition().asBoolean()
-        );
+        And outer = (And) 
+            new Parser("name='steve' and (species='homo sapiens' and size = 6)")
+                .parseCondition().asBoolean();
+            Equal name = (Equal) outer.leftSide;
+                MayflyAssert.assertColumn("name", name.leftSide);
+                MayflyAssert.assertString("steve", name.rightSide);
+            And inner = (And) outer.rightSide;
+                Equal species = (Equal) inner.leftSide;
+                    MayflyAssert.assertColumn("species", species.leftSide);
+                    MayflyAssert.assertString("homo sapiens", species.rightSide);
+                Equal size = (Equal) inner.rightSide;
+                    MayflyAssert.assertColumn("size", size.leftSide);
+                    MayflyAssert.assertInteger(6, size.rightSide);
     }
 
     public void testParse() throws Exception {
-        assertEquals(
-                new And(
-                    new And(
-                        new Equal(new SingleColumn("name"), new QuotedString("'steve'")),
-                        new Equal(new SingleColumn("species"), new QuotedString("'homo sapiens'"))
-                    ),
-                    new Equal(new SingleColumn("size"), new IntegerLiteral(6))
-                ),
-                new Parser("name='steve' and species='homo sapiens' and size = 6").parseCondition().asBoolean()
-        );
+        And outer = (And) 
+            new Parser("name='steve' and species='homo sapiens' and size = 6")
+                .parseCondition().asBoolean();
+            And inner = (And) outer.leftSide;
+                Equal name = (Equal) inner.leftSide;
+                    MayflyAssert.assertColumn("name", name.leftSide);
+                    MayflyAssert.assertString("steve", name.rightSide);
+                Equal species = (Equal) inner.rightSide;
+                    MayflyAssert.assertColumn("species", species.leftSide);
+                    MayflyAssert.assertString("homo sapiens", species.rightSide);
+            Equal size = (Equal) outer.rightSide;
+                MayflyAssert.assertColumn("size", size.leftSide);
+                MayflyAssert.assertInteger(6, size.rightSide);
     }
 
     public void testEvaluate() throws Exception {

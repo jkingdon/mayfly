@@ -3,15 +3,21 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DecimalCell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.parser.Location;
 
 import java.math.BigDecimal;
 
 public class DecimalLiteral extends Literal {
 
-    private final BigDecimal value;
+    public final BigDecimal value;
 
-    public DecimalLiteral(BigDecimal value) {
-        this.value = value;
+    public DecimalLiteral(String value) {
+        this(value, Location.UNKNOWN);
+    }
+
+    public DecimalLiteral(String value, Location location) {
+        super(location);
+        this.value = new BigDecimal(value);
     }
 
     public Cell valueAsCell() {

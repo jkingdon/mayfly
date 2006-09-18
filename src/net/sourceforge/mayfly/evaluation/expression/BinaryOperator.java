@@ -11,6 +11,7 @@ abstract public class BinaryOperator extends Expression {
     protected final Expression right;
 
     protected BinaryOperator(Expression left, Expression right) {
+        super(left.location.combine(right.location));
         this.left = left;
         this.right = right;
     }

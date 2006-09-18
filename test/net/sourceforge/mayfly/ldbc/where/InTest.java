@@ -10,19 +10,17 @@ import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.L;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class InTest extends TestCase {
     
     public void testParse() throws Exception {
-        assertEquals(
-            new In(
-                new SingleColumn("a"),
-                new L()
-	                .append(new IntegerLiteral(1))
-	                .append(new IntegerLiteral(2))
-                ),
-                new Parser("a in (1, 2)").parseCondition().asBoolean()
-        );
+        In condition = (In) new Parser("a in (7, 10)").parseCondition().asBoolean();
+            MayflyAssert.assertColumn("a", condition.leftSide);
+            
+            assertEquals(2, condition.expressions.size());
+            assertEquals(7, ((IntegerLiteral)condition.expressions.get(0)).value);
+            assertEquals(10, ((IntegerLiteral)condition.expressions.get(1)).value);
     }
     
     public void testEvaluate() throws Exception {

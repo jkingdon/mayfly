@@ -6,8 +6,8 @@ import net.sourceforge.mayfly.evaluation.Expression;
 
 abstract public class RowExpression extends BooleanExpression {
 
-    private Expression leftSide;
-    private Expression rightSide;
+    public final Expression leftSide;
+    public final Expression rightSide;
 
     public RowExpression(Expression leftSide, Expression rightSide) {
         this.leftSide = leftSide;

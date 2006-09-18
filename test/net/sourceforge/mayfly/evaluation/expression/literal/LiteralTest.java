@@ -2,13 +2,9 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import junit.framework.TestCase;
 
-import java.math.BigDecimal;
-
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
-import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 
 public class LiteralTest extends TestCase {
 
@@ -30,14 +26,10 @@ public class LiteralTest extends TestCase {
     }
     
     public void testBigDecimalAndSame() throws Exception {
-        assertTrue(decimalFromString("7.0").sameExpression(decimalFromString("7.0")));
-        assertFalse(decimalFromString("7.00").sameExpression(decimalFromString("7.0")));
-        assertFalse(decimalFromString("7.00").sameExpression(new IntegerLiteral(7)));
-        assertFalse(new IntegerLiteral(7).sameExpression(decimalFromString("7.00")));
-    }
-
-    private DecimalLiteral decimalFromString(String value) {
-        return new DecimalLiteral(new BigDecimal(value));
+        assertTrue(new DecimalLiteral("7.0").sameExpression(new DecimalLiteral("7.0")));
+        assertFalse(new DecimalLiteral("7.00").sameExpression(new DecimalLiteral("7.0")));
+        assertFalse(new DecimalLiteral("7.00").sameExpression(new IntegerLiteral(7)));
+        assertFalse(new IntegerLiteral(7).sameExpression(new DecimalLiteral("7.00")));
     }
 
 }

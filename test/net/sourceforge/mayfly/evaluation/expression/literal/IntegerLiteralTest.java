@@ -4,11 +4,12 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class IntegerLiteralTest extends TestCase {
 
     public void testParse() throws Exception {
-        assertEquals(new IntegerLiteral(5), new Parser("5").parsePrimary().asNonBoolean());
+        MayflyAssert.assertInteger(5, new Parser("5").parsePrimary().asNonBoolean());
     }
 
     public void testValue() throws Exception {

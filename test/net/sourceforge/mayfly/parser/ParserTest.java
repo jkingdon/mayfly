@@ -3,18 +3,22 @@ package net.sourceforge.mayfly.parser;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.constraint.Cascade;
 import net.sourceforge.mayfly.datastore.constraint.NoAction;
 import net.sourceforge.mayfly.datastore.constraint.SetDefault;
 import net.sourceforge.mayfly.datastore.constraint.SetNull;
+import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Divide;
 import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
+import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.literal.DecimalLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.expression.literal.LongLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
@@ -27,8 +31,6 @@ import net.sourceforge.mayfly.ldbc.where.Greater;
 import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.List;
 
 public class ParserTest extends TestCase {
@@ -245,20 +247,20 @@ public class ParserTest extends TestCase {
         Parser parser = new Parser("(y + z / 10) < 60");
         BooleanExpression condition = parser.parseCondition().asBoolean();
         assertEquals("", parser.remainingTokens());
-        assertEquals(
-            new Greater(
-                new IntegerLiteral(60),
-                new Plus(
-                    new SingleColumn("y"), 
-                    new Divide(
-                        new SingleColumn("z"), 
-                        new IntegerLiteral(10)
-                    ))
-            ),
-            condition
-        );
-    }
+        
+        Greater greater = (Greater) condition;
+            IntegerLiteral sixty = (IntegerLiteral) greater.leftSide;
+                assertEquals(60, sixty.value);
     
+            Plus plus = (Plus) greater.rightSide;
+                MayflyAssert.assertColumn("y", plus.left());
+                
+                Divide divide = (Divide) plus.right();
+                    MayflyAssert.assertColumn("z", divide.left());
+                    
+                    MayflyAssert.assertInteger(10, divide.right());
+    }
+
     public void testExpectedBooleanGotNonBoolean() throws Exception {
         Parser parser = new Parser("5 + x");
         try {
@@ -288,6 +290,32 @@ public class ParserTest extends TestCase {
         Parser parser = new Parser("'hi'");
         assertEquals(new QuotedString("'hi'"), parser.parsePrimary().asNonBoolean());
         assertEquals("", parser.remainingTokens());
+    }
+
+    public void testExpressionLocation() throws Exception {
+        checkExpression(NullExpression.class, 3, 7, "  null  ");
+        checkExpression(IntegerLiteral.class, 2, 4, " 43  ");
+        checkExpression(LongLiteral.class, 2, 12, " 4555666777  ");
+        checkExpression(QuotedString.class, 2, 7, " 'foo' ");
+        checkExpression(DecimalLiteral.class, 3, 10, "  3.14159 ");
+        checkExpression(DecimalLiteral.class, 1, 3, ".5");
+        checkExpression(DecimalLiteral.class, 1, 3, "5.");
+        checkExpression(IntegerLiteral.class, 2, 6, " - 43  ");
+        checkExpression(LongLiteral.class, 2, 13, " -4555666777  ");
+        checkExpression(Plus.class, 2, 12, " -5 + 8 / 2  ");
+    }
+
+    private void checkExpression(Class expectedClass, 
+        int expectedStartColumn, int expectedEndColumn, String input) {
+
+        Parser parser = new Parser(input);
+        Expression expression = parser.parseExpressionOrNull();
+        MayflyAssert.assertInstanceOf(expectedClass, expression);
+
+        assertEquals(1, expression.location.startLineNumber);
+        assertEquals(expectedStartColumn, expression.location.startColumn);
+        assertEquals(1, expression.location.endLineNumber);
+        assertEquals(expectedEndColumn, expression.location.endColumn);
     }
     
     public void testSingleColumnAsWhat() throws Exception {
@@ -332,48 +360,50 @@ public class ParserTest extends TestCase {
         Parser parser = new Parser("a * b + c / e - a");
         WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
-        assertEquals(
-            new Minus(
-                new Plus(
-                    new Multiply(new SingleColumn("a"), new SingleColumn("b")),
-                    new Divide(new SingleColumn("c"), new SingleColumn("e"))
-                ),
-                new SingleColumn("a")
-            ),
-            expression
-        );
+        
+        Minus minus = (Minus) expression;
+ 
+            Plus plus = (Plus) minus.left();
+    
+                Multiply multiply = (Multiply) plus.left();
+                    MayflyAssert.assertColumn("a", multiply.left());
+                    MayflyAssert.assertColumn("b", multiply.right());
+                Divide divide = (Divide) plus.right();
+                    MayflyAssert.assertColumn("c", divide.left());
+                    MayflyAssert.assertColumn("e", divide.right());
+            
+            MayflyAssert.assertColumn("a", minus.right());
     }
     
     public void testDivideAssociativity() throws Exception {
         Parser parser = new Parser("a / b * c / d");
         WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
-        assertEquals(
-            new Divide(
-                new Multiply(
-                    new Divide(new SingleColumn("a"), new SingleColumn("b")),
-                    new SingleColumn("c")
-                ),
-                new SingleColumn("d")
-            ),
-            expression
-        );
+        
+        Divide outerDivide = (Divide) expression;
+            Multiply multiply = (Multiply) outerDivide.left();
+                Divide innerDivide = (Divide) multiply.left();
+                    MayflyAssert.assertColumn("a", innerDivide.left());
+                    MayflyAssert.assertColumn("b", innerDivide.right());
+                MayflyAssert.assertColumn("c", multiply.right());
+    
+            MayflyAssert.assertColumn("d", outerDivide.right());
     }
 
     public void testMinusAssociativity() throws Exception {
         Parser parser = new Parser("a-b-c+d");
         WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
-        assertEquals(
-            new Plus(
-                new Minus(
-                    new Minus(new SingleColumn("a"), new SingleColumn("b")),
-                    new SingleColumn("c")
-                ),
-                new SingleColumn("d")
-            ),
-            expression
-        );
+        
+        Plus plus = (Plus) expression;
+            Minus outerMinus = (Minus) plus.left();
+    
+                Minus innerMinus = (Minus) outerMinus.left();
+                    MayflyAssert.assertColumn("a", innerMinus.left());
+                    MayflyAssert.assertColumn("b", innerMinus.right());
+    
+                MayflyAssert.assertColumn("c", outerMinus.right());
+            MayflyAssert.assertColumn("d", plus.right());
     }
 
     public void testConcatenateAssociativity() throws Exception {
@@ -383,29 +413,26 @@ public class ParserTest extends TestCase {
         Parser parser = new Parser("a || b || c || d");
         WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
-        assertEquals(
-            new Concatenate(
-                new Concatenate(
-                    new Concatenate(new SingleColumn("a"), new SingleColumn("b")),
-                    new SingleColumn("c")
-                ),
-                new SingleColumn("d")
-            ),
-            expression
-        );
+
+        Concatenate d = (Concatenate) expression;
+            Concatenate c = (Concatenate) d.left();
+                Concatenate b = (Concatenate) c.left();
+                    MayflyAssert.assertColumn("a", b.left());
+                    MayflyAssert.assertColumn("b", b.right());
+                MayflyAssert.assertColumn("c", c.right());
+            MayflyAssert.assertColumn("d", d.right());
     }
     
     public void testParenthesesInExpression() throws Exception {
         Parser parser = new Parser("x / (y * z)");
         WhatElement expression = parser.parseExpression().asNonBoolean();
         assertEquals("", parser.remainingTokens());
-        assertEquals(
-            new Divide(
-                new SingleColumn("x"),
-                new Multiply(new SingleColumn("y"), new SingleColumn("z"))
-            ),
-            expression
-        );
+        
+        Divide divide = (Divide) expression;
+            MayflyAssert.assertColumn("x", divide.left());
+            Multiply multiply = (Multiply) divide.right();
+                MayflyAssert.assertColumn("y", multiply.left());
+                MayflyAssert.assertColumn("z", multiply.right());
     }
 
     public void testAliasOmitted() throws Exception {
@@ -441,14 +468,22 @@ public class ParserTest extends TestCase {
         checkDecimal(222333444555.0, "222333444555.");
         checkDecimal(0.03, ".03");
         
-        Integer smallishInteger = (Integer) new Parser("1000222333").parseNumericLiteral();
-        assertEquals(1000222333, smallishInteger.intValue());
+        IntegerLiteral smallishInteger = (IntegerLiteral) 
+            new Parser("1000222333").parseNumericLiteral();
+        assertEquals(1000222333, smallishInteger.value);
 
-        Long biggishInteger = (Long) new Parser("9223372036854775807").parseNumericLiteral();
-        assertEquals(9223372036854775807L, biggishInteger.longValue());
+        LongLiteral biggishInteger = (LongLiteral) 
+            new Parser("9223372036854775807").parseNumericLiteral();
+        assertEquals(9223372036854775807L, biggishInteger.value);
 
-        BigInteger bigInteger = (BigInteger) new Parser("9223372036854775808").parseNumericLiteral();
-        assertEquals(new BigInteger("9223372036854775808"), bigInteger);
+        try {
+            new Parser("9223372036854775808").parseNumericLiteral();
+            fail();
+        }
+        catch (UnimplementedException e) {
+            assertEquals("don't yet handle BigInteger 9223372036854775808",
+                e.getMessage());
+        }
     }
     
     public void testLeadingPeriodInDefault() throws Exception {
@@ -462,8 +497,8 @@ public class ParserTest extends TestCase {
     }
 
     private void checkDecimal(double expected, String input) {
-        BigDecimal decimal = (BigDecimal) new Parser(input).parseNumericLiteral();
-        assertEquals(expected, decimal.doubleValue(), 0.0001);
+        DecimalLiteral decimal = (DecimalLiteral) new Parser(input).parseNumericLiteral();
+        assertEquals(expected, decimal.value.doubleValue(), 0.0001);
     }
     
     public void testMultipleConstraints() throws Exception {
