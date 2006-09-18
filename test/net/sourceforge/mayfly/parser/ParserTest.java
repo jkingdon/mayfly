@@ -476,6 +476,23 @@ public class ParserTest extends TestCase {
             new CreateTable("foo"));
     }
     
+    public void testConstraint() throws Exception {
+        new Parser("unique(x)").parseTableElement(new CreateTable("foo"));
+
+        Parser namedConstraint = new Parser("constraint foo_x_constraint unique(x)");
+        namedConstraint.parseTableElement(new CreateTable("foo"));
+        assertEquals("", namedConstraint.remainingTokens());
+
+        try {
+            new Parser("select integer").parseTableElement(null);
+            fail();
+        }
+        catch (ParserException e) {
+            assertEquals("expected column or table constraint but got SELECT",
+                e.getMessage());
+        }
+    }
+    
     public void testForeignKeyActions() throws Exception {
         try {
             new Parser("on earthquake run away").parseActions();

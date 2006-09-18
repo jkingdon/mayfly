@@ -45,6 +45,7 @@ public class TokenType {
     public static final TokenType KEYWORD_avg = registerKeyword("avg");
     public static final TokenType KEYWORD_by = registerKeyword("by");
     public static final TokenType KEYWORD_character = registerKeyword("character");
+    public static final TokenType KEYWORD_constraint = registerKeyword("constraint");
     public static final TokenType KEYWORD_count = registerKeyword("count");
     public static final TokenType KEYWORD_create = registerKeyword("create");
     public static final TokenType KEYWORD_cross = registerKeyword("cross");

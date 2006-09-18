@@ -180,8 +180,7 @@ public class Parser {
             return parseDelete();
         }
         else {
-            throw new ParserException("command",
-                currentToken());
+            throw new ParserException("command", currentToken());
         }
     }
 
@@ -369,11 +368,30 @@ public class Parser {
         }
     }
 
-    private void parseTableElement(CreateTable table) {
+    void parseTableElement(CreateTable table) {
         if (currentTokenType() == TokenType.IDENTIFIER) {
             table.addColumn(parseColumnDefinition(table));
         }
-        else if (consumeIfMatches(TokenType.KEYWORD_primary)) {
+        else if (currentTokenType() == TokenType.KEYWORD_primary
+            || currentTokenType() == TokenType.KEYWORD_unique
+            || currentTokenType() == TokenType.KEYWORD_foreign
+            || currentTokenType() == TokenType.KEYWORD_constraint
+            ) {
+            parseConstraint(table);
+        }
+        else {
+            throw new ParserException(
+                "column or table constraint",
+                currentToken());
+        }
+    }
+
+    private void parseConstraint(CreateTable table) {
+        if (consumeIfMatches(TokenType.KEYWORD_constraint)) {
+            consumeIdentifier();
+        }
+
+        if (consumeIfMatches(TokenType.KEYWORD_primary)) {
             expectAndConsume(TokenType.KEYWORD_key);
             table.setPrimaryKey(parseColumnNames());
         }
@@ -384,9 +402,8 @@ public class Parser {
             parseForeignKeyConstraint(table);
         }
         else {
-            throw new ParserException(
-                "column or table constraint",
-                currentToken());
+            throw new MayflyInternalException(
+                "expected constraint but got " + currentToken().describe());
         }
     }
 

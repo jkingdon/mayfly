@@ -58,6 +58,18 @@ public class PrimaryKeyTest extends SqlTestCase {
             "attempt to define more than one primary key for table foo");
     }
     
+    public void testNamedConstraint() throws Exception {
+        // TODO: the case of "constraint mars.my_primary_key" (with schema)
+        execute("create table foo (x integer, " +
+            "constraint my_primary_key primary key(x)" +
+            ")");
+        
+        execute("insert into foo(x) values(5)");
+        // TODO: message should mention my_primary_key
+        expectExecuteFailure("insert into foo(x) values(5)", 
+            "primary key x already has a value 5");
+    }
+    
     public void testNotNull() throws Exception {
         // Not a primary key, but related enough to put in the same test file
         execute("create table foo (x integer not null)");
