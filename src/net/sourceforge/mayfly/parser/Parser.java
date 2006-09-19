@@ -278,9 +278,10 @@ public class Parser {
     }
 
     Expression parseExpressionOrNull() {
-        if (currentTokenType() == TokenType.KEYWORD_null) {
-            Token nullToken = expectAndConsume(TokenType.KEYWORD_null);
-            return new NullExpression(nullToken.location);
+        Location start = currentToken().location;
+
+        if (consumeIfMatches(TokenType.KEYWORD_null)) {
+            return new NullExpression(start);
         }
         else if (consumeIfMatches(TokenType.KEYWORD_default)) {
             return null;
@@ -533,12 +534,13 @@ public class Parser {
 
     Expression parseDefaultValue(String columnName) {
         Location start = currentToken().location;
+
         if (currentTokenType() == TokenType.NUMBER || 
             currentTokenType() == TokenType.PERIOD) {
-            return parseNumber().asNonBoolean();
+            return parseNumber(start).asNonBoolean();
         }
         else if (consumeIfMatches(TokenType.PLUS)) {
-            return parseNumber().asNonBoolean();
+            return parseNumber(start).asNonBoolean();
         }
         else if (consumeIfMatches(TokenType.MINUS)) {
             return parseNegativeNumber(start).asNonBoolean();
@@ -546,9 +548,8 @@ public class Parser {
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
             return parseQuotedString().asNonBoolean();
         }
-        else if (currentTokenType() == TokenType.KEYWORD_null) {
-            Token nullToken = expectAndConsume(TokenType.KEYWORD_null);
-            return new NullExpression(nullToken.location);
+        else if (consumeIfMatches(TokenType.KEYWORD_null)) {
+            return new NullExpression(start);
         }
         else if (currentTokenType() == TokenType.KEYWORD_current_timestamp) {
             Token token = expectAndConsume(TokenType.KEYWORD_current_timestamp);
@@ -863,10 +864,10 @@ public class Parser {
         }
         else if (currentTokenType() == TokenType.NUMBER || 
             currentTokenType() == TokenType.PERIOD) {
-            return parseNumber();
+            return parseNumber(start);
         }
         else if (consumeIfMatches(TokenType.PLUS)) {
-            return parseNumber();
+            return parseNumber(start);
         }
         else if (consumeIfMatches(TokenType.MINUS)) {
             return parseNegativeNumber(start);
@@ -931,18 +932,18 @@ public class Parser {
             new QuotedString(literal.getText(), literal.location));
     }
 
-    private ParserExpression parseNumber() {
-        Literal number = parseNumericLiteral();
+    private ParserExpression parseNumber(Location start) {
+        Literal number = parseNumericLiteral(start);
         return new NonBooleanParserExpression(number);
     }
 
     private ParserExpression parseNegativeNumber(Location start) {
-        Literal number = parseNumericLiteral();
-        return new NonBooleanParserExpression(makeNegativeLiteral(number, start));
+        Literal number = parseNumericLiteral(start);
+        return new NonBooleanParserExpression(makeNegativeLiteral(number));
     }
 
-    private Literal makeNegativeLiteral(Literal number, Location start) {
-        Location location = start.combine(number.location);
+    private Literal makeNegativeLiteral(Literal number) {
+        Location location = number.location;
 
         // Probably should have more unit tests for this, especially
         // the edge cases (-2^31 is one).
@@ -959,14 +960,12 @@ public class Parser {
         }
     }
 
-    Literal parseNumericLiteral() {
-        Location firstToken = currentToken().location;
-
+    Literal parseNumericLiteral(Location start) {
         if (consumeIfMatches(TokenType.PERIOD)) {
             Token number = expectAndConsume(TokenType.NUMBER);
             String secondInteger = number.getText();
             return new DecimalLiteral("." + secondInteger, 
-                firstToken.combine(number.location)
+                start.combine(number.location)
             );
         }
 
@@ -979,18 +978,18 @@ public class Parser {
                 String secondInteger = secondNumber.getText();
                 return new DecimalLiteral(
                     firstInteger + "." + secondInteger,
-                    firstToken.combine(secondNumber.location));
+                    start.combine(secondNumber.location));
             }
             else {
                 // Might need to look into semantics for this.  Should it be
                 // BigDecimal or integer?
                 return new DecimalLiteral(
                     firstInteger + ".",
-                    firstToken.combine(period.location)
+                    start.combine(period.location)
                 );
             }
         }
-        return integerToObject(firstInteger, firstToken);
+        return integerToObject(firstInteger, start.combine(number.location));
     }
 
     class AggregateArgumentParser {

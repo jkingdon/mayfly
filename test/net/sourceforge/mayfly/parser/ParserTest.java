@@ -300,6 +300,7 @@ public class ParserTest extends TestCase {
         checkExpression(DecimalLiteral.class, 3, 10, "  3.14159 ");
         checkExpression(DecimalLiteral.class, 1, 3, ".5");
         checkExpression(DecimalLiteral.class, 1, 3, "5.");
+        checkExpression(DecimalLiteral.class, 2, 7, " + 0.5\n");
         checkExpression(IntegerLiteral.class, 2, 6, " - 43  ");
         checkExpression(LongLiteral.class, 2, 13, " -4555666777  ");
         checkExpression(Plus.class, 2, 12, " -5 + 8 / 2  ");
@@ -469,15 +470,15 @@ public class ParserTest extends TestCase {
         checkDecimal(0.03, ".03");
         
         IntegerLiteral smallishInteger = (IntegerLiteral) 
-            new Parser("1000222333").parseNumericLiteral();
+            new Parser("1000222333").parseNumericLiteral(Location.UNKNOWN);
         assertEquals(1000222333, smallishInteger.value);
 
         LongLiteral biggishInteger = (LongLiteral) 
-            new Parser("9223372036854775807").parseNumericLiteral();
+            new Parser("9223372036854775807").parseNumericLiteral(Location.UNKNOWN);
         assertEquals(9223372036854775807L, biggishInteger.value);
 
         try {
-            new Parser("9223372036854775808").parseNumericLiteral();
+            new Parser("9223372036854775808").parseNumericLiteral(Location.UNKNOWN);
             fail();
         }
         catch (UnimplementedException e) {
@@ -497,7 +498,7 @@ public class ParserTest extends TestCase {
     }
 
     private void checkDecimal(double expected, String input) {
-        DecimalLiteral decimal = (DecimalLiteral) new Parser(input).parseNumericLiteral();
+        DecimalLiteral decimal = (DecimalLiteral) new Parser(input).parseNumericLiteral(Location.UNKNOWN);
         assertEquals(expected, decimal.value.doubleValue(), 0.0001);
     }
     
