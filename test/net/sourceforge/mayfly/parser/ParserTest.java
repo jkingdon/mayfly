@@ -10,12 +10,17 @@ import net.sourceforge.mayfly.datastore.constraint.SetDefault;
 import net.sourceforge.mayfly.datastore.constraint.SetNull;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
+import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
+import net.sourceforge.mayfly.evaluation.expression.Count;
 import net.sourceforge.mayfly.evaluation.expression.Divide;
+import net.sourceforge.mayfly.evaluation.expression.Maximum;
+import net.sourceforge.mayfly.evaluation.expression.Minimum;
 import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
+import net.sourceforge.mayfly.evaluation.expression.Sum;
 import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
 import net.sourceforge.mayfly.evaluation.expression.literal.DecimalLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
@@ -24,6 +29,7 @@ import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.evaluation.select.Select;
+import net.sourceforge.mayfly.ldbc.what.CountAll;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.ldbc.what.What;
 import net.sourceforge.mayfly.ldbc.what.WhatElement;
@@ -307,6 +313,15 @@ public class ParserTest extends TestCase {
         checkExpression(IntegerLiteral.class, 2, 6, " - 43  ");
         checkExpression(LongLiteral.class, 2, 13, " -4555666777  ");
         checkExpression(Plus.class, 2, 12, " -5 + 8 / 2  ");
+        checkExpression(Maximum.class, 2, 11, " max ( x ) ");
+        checkExpression(Minimum.class, 2, 11, " min ( x ) ");
+        checkExpression(CountAll.class, 2, 11, " count (*) ");
+        checkExpression(Count.class, 2, 13, " count (yyy) ");
+        checkExpression(Average.class, 2, 11, " avg ( x ) ");
+        checkExpression(Sum.class, 1, 9, "sum( x )");
+        // TODO: column
+        // TODO: null (exception should include location)
+        // TODO: parenthesized expression
     }
     
     public void testBinaryLocation() throws Exception {

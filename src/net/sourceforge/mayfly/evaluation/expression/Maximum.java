@@ -6,11 +6,16 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.parser.Location;
 
 public class Maximum extends AggregateExpression {
 
+    public Maximum(SingleColumn column, String spellingOfMax, boolean distinct, Location location) {
+        super(column, spellingOfMax, distinct, location);
+    }
+    
     public Maximum(SingleColumn column, String spellingOfMax, boolean distinct) {
-        super(column, spellingOfMax, distinct);
+        this(column, spellingOfMax, distinct, Location.UNKNOWN);
     }
     
     Cell aggregate(Collection values) {

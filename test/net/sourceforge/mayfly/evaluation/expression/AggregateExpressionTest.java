@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.ldbc.what.CountAll;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.parser.Location;
 
 public class AggregateExpressionTest extends TestCase {
     
@@ -11,6 +12,9 @@ public class AggregateExpressionTest extends TestCase {
         Maximum one = new Maximum(new SingleColumn("x"), "MAX", false);
         Maximum two = new Maximum(new SingleColumn("X"), "Max", false);
         assertTrue(one.sameExpression(two));
+        assertTrue(one.sameExpression(
+            new Maximum(new SingleColumn("x"), "MAX", false, new Location (5, 6, 7, 8))
+        ));
         
         assertFalse(one.sameExpression(new Maximum(new SingleColumn("y"), "MAX", false)));
         assertFalse(one.sameExpression(new Maximum(new SingleColumn("x"), "MAX", true)));

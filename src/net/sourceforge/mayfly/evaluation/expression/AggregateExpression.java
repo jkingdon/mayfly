@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.parser.Location;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,10 +22,16 @@ public abstract class AggregateExpression extends Expression {
     protected final String functionName;
     protected final boolean distinct;
 
-    protected AggregateExpression(SingleColumn column, String functionName, boolean distinct) {
+    protected AggregateExpression(SingleColumn column, String functionName, boolean distinct, 
+        Location location) {
+        super(location);
         this.column = column;
         this.functionName = functionName;
         this.distinct = distinct;
+    }
+
+    protected AggregateExpression(SingleColumn column, String functionName, boolean distinct) {
+        this(column, functionName, distinct, Location.UNKNOWN);
     }
 
     public Cell evaluate(Row row) {

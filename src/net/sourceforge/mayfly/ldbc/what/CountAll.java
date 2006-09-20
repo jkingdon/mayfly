@@ -5,13 +5,19 @@ import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.parser.Location;
 
 public class CountAll extends Expression {
 
     private final String functionName;
 
-    public CountAll(String functionName) {
+    public CountAll(String functionName, Location location) {
+        super(location);
         this.functionName = functionName;
+    }
+
+    public CountAll(String functionName) {
+        this(functionName, Location.UNKNOWN);
     }
 
     public Cell evaluate(Row row) {

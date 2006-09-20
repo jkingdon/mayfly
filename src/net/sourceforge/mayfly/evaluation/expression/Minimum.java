@@ -1,16 +1,21 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
-import java.util.Collection;
-
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.parser.Location;
+
+import java.util.Collection;
 
 public class Minimum extends AggregateExpression {
 
+    public Minimum(SingleColumn column, String functionName, boolean distinct, Location location) {
+        super(column, functionName, distinct, location);
+    }
+    
     public Minimum(SingleColumn column, String functionName, boolean distinct) {
-        super(column, functionName, distinct);
+        this(column, functionName, distinct, Location.UNKNOWN);
     }
     
     Cell aggregate(Collection values) {
@@ -22,7 +27,7 @@ public class Minimum extends AggregateExpression {
     }
 
     public Expression resolveAndReturn(Row row) {
-        return new Minimum((SingleColumn) column.resolveAndReturn(row), functionName, distinct);
+        return new Minimum((SingleColumn) column.resolveAndReturn(row), functionName, distinct, location);
     }
 
 }

@@ -5,12 +5,14 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.UnimplementedCell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.parser.Location;
 
 public class UnimplementedExpression extends Expression {
 
     private final String expression;
 
     public UnimplementedExpression(String expression) {
+        super(Location.UNKNOWN);
         this.expression = expression;
     }
 

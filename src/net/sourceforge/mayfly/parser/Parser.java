@@ -899,26 +899,36 @@ public class Parser {
         }
         else if (argumentParser.parse(TokenType.KEYWORD_max, false)) {
             return new NonBooleanParserExpression(new Maximum(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                argumentParser.location));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_min, false)) {
             return new NonBooleanParserExpression(new Minimum(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                argumentParser.location));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_sum, false)) {
             return new NonBooleanParserExpression(new Sum(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                argumentParser.location
+            ));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_avg, false)) {
             return new NonBooleanParserExpression(new Average(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
+                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                argumentParser.location
+            ));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_count, true)) {
             if (argumentParser.gotAsterisk) {
-                return new NonBooleanParserExpression(new CountAll(argumentParser.functionName));
+                return new NonBooleanParserExpression(
+                    new CountAll(argumentParser.functionName, argumentParser.location)
+                );
             } else {
                 return new NonBooleanParserExpression(new Count(
-                    (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct));
+                    (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                    argumentParser.location
+                ));
             }
         }
         else if (consumeIfMatches(TokenType.OPEN_PAREN)) {
@@ -1002,11 +1012,12 @@ public class Parser {
         String functionName;
         boolean gotAsterisk;
         boolean distinct;
+        Location location;
 
         boolean parse(TokenType aggregateTokenType, boolean allowAsterisk) {
             if (currentTokenType() == aggregateTokenType) {
-                Token max = expectAndConsume(aggregateTokenType);
-                functionName = max.getText();
+                Token function = expectAndConsume(aggregateTokenType);
+                functionName = function.getText();
                 expectAndConsume(TokenType.OPEN_PAREN);
                 if (allowAsterisk && consumeIfMatches(TokenType.ASTERISK)) {
                     gotAsterisk = true;
@@ -1018,7 +1029,9 @@ public class Parser {
                     }
                     expression = parseExpression().asNonBoolean();
                 }
-                expectAndConsume(TokenType.CLOSE_PAREN);
+                Token end = expectAndConsume(TokenType.CLOSE_PAREN);
+
+                location = function.location.combine(end.location);
                 return true;
             }
             return false;
