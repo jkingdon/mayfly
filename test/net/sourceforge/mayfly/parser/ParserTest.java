@@ -16,6 +16,7 @@ import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
+import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
 import net.sourceforge.mayfly.evaluation.expression.literal.DecimalLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.LongLiteral;
@@ -29,8 +30,10 @@ import net.sourceforge.mayfly.ldbc.what.WhatElement;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.ldbc.where.Greater;
 import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.util.ImmutableByteArray;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ParserTest extends TestCase {
@@ -304,6 +307,20 @@ public class ParserTest extends TestCase {
         checkExpression(IntegerLiteral.class, 2, 6, " - 43  ");
         checkExpression(LongLiteral.class, 2, 13, " -4555666777  ");
         checkExpression(Plus.class, 2, 12, " -5 + 8 / 2  ");
+    }
+    
+    public void testBinaryLocation() throws Exception {
+        TextToken original = new TextToken(TokenType.PARAMETER, "?", 5, 73, 5, 74);
+        List tokens = new ArrayList();
+        tokens.add(new BinaryToken(new ImmutableByteArray(((byte)42)), original));
+        tokens.add(new EndOfFileToken(6, 1));
+        Parser parser = new Parser(tokens);
+
+        CellExpression expression = (CellExpression) parser.parseExpressionOrNull();
+        assertEquals(5, expression.location.startLineNumber);
+        assertEquals(73, expression.location.startColumn);
+        assertEquals(5, expression.location.endLineNumber);
+        assertEquals(74, expression.location.endColumn);
     }
 
     private void checkExpression(Class expectedClass, 

@@ -10,7 +10,11 @@ public class CellExpression extends Literal {
     private final Cell value;
 
     public CellExpression(Cell value) {
-        super(Location.UNKNOWN);
+        this(value, Location.UNKNOWN);
+    }
+
+    public CellExpression(Cell value, Location location) {
+        super(location);
         this.value = value;
     }
 

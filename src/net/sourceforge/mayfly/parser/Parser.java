@@ -110,6 +110,11 @@ public class Parser {
         this(new Lexer(sql).tokens());
     }
 
+    /**
+     * Create a parser from a list of tokens.  The parser
+     * will mutate the list as it parses.
+     * The list must end with an end of file token.
+     */
     public Parser(List tokens) {
         this(tokens, false);
     }
@@ -890,7 +895,7 @@ public class Parser {
         else if (currentTokenType() == TokenType.BINARY) {
             Token token = expectAndConsume(TokenType.BINARY);
             return new NonBooleanParserExpression(
-                new CellExpression(new BinaryCell(token.getBytes())));
+                new CellExpression(new BinaryCell(token.getBytes()), start));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_max, false)) {
             return new NonBooleanParserExpression(new Maximum(
