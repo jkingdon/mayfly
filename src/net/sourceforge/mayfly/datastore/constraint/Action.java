@@ -9,7 +9,6 @@ import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.ldbc.where.Equal;
-import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 public abstract class Action {
@@ -30,11 +29,9 @@ public abstract class Action {
         UpdateStore update = store.update(referencerSchema, referencerTable,
             ImmutableList.singleton(
                 new SetClause(referencerColumn, valueToAssign)), 
-            new Where(
-                new Equal(
-                    new SingleColumn(referencerTable, referencerColumn),
-                    new CellExpression(oldValue)
-                )
+            new Equal(
+                new SingleColumn(referencerTable, referencerColumn),
+                new CellExpression(oldValue)
             )
         );
         return update.store();

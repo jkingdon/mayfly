@@ -38,7 +38,12 @@ public class MayflyAssert {
     }
 
     public static void assertColumn(String expectedName, Expression expression) {
+        assertColumn(null, expectedName, expression);
+    }
+
+    public static void assertColumn(String expectedAlias, String expectedName, Expression expression) {
         SingleColumn y = (SingleColumn) expression;
+        Assert.assertEquals(expectedAlias, y.tableOrAlias());
         Assert.assertEquals(expectedName, y.columnName());
     }
 

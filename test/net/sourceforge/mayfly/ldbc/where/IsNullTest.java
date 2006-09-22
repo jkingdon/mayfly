@@ -8,14 +8,13 @@ import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class IsNullTest extends TestCase {
 
     public void testParse() throws Exception {
-        assertEquals(
-                new IsNull(new SingleColumn("name")),
-                new Parser("name is null").parseCondition().asBoolean()
-        );
+        IsNull condition = (IsNull) new Parser("name is null").parseCondition().asBoolean();
+        MayflyAssert.assertColumn("name", condition.expression);
     }
 
     public void testEvaluate() throws Exception {

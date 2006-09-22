@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.parser.Location;
 
 public class SingleColumn extends Expression {
     private final String originalTableOrAlias;
@@ -17,7 +18,16 @@ public class SingleColumn extends Expression {
         this(null, columnName);
     }
 
+    public SingleColumn(String columnName, Location location) {
+        this(null, columnName, location);
+    }
+
     public SingleColumn(String tableOrAlias, String columnName) {
+        this(tableOrAlias, columnName, Location.UNKNOWN);
+    }
+
+    public SingleColumn(String tableOrAlias, String columnName, Location location) {
+        super(location);
         this.tableOrAlias = tableOrAlias;
         this.originalTableOrAlias = tableOrAlias;
         this.columnName = columnName;

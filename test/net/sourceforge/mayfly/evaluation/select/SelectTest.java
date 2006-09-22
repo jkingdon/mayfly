@@ -5,107 +5,12 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.StringCell;
-import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
-import net.sourceforge.mayfly.evaluation.from.From;
-import net.sourceforge.mayfly.evaluation.from.FromTable;
-import net.sourceforge.mayfly.evaluation.from.InnerJoin;
-import net.sourceforge.mayfly.evaluation.from.LeftJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.what.All;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
-import net.sourceforge.mayfly.ldbc.what.What;
-import net.sourceforge.mayfly.ldbc.where.Equal;
-import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.L;
 
 public class SelectTest extends TestCase {
-
-    public void testOrderBy() throws Exception {
-        assertEquals(
-            new Select(
-                new What()
-                    .add(new All()),
-                new From()
-                    .add(new FromTable("foo")),
-                Where.EMPTY,
-                new NoGroupBy(),
-                new OrderBy()
-                    .add(new SingleColumn("a")), Limit.NONE
-            ),
-            Select.selectFromSql("select * from foo order by a")
-        );
-    }
-
-    public void testParseExplicitJoin() throws Exception {
-        assertEquals(
-            new Select(
-                new What()
-                    .add(new All()),
-                new From()
-                    .add(new InnerJoin(
-                        new FromTable("places"),
-                        new FromTable("types"),
-                        new Where(
-                            new Equal(new SingleColumn("type"), new SingleColumn("id"))
-                        )
-                    )),
-                Where.EMPTY
-            ),
-            Select.selectFromSql(
-                "select * from places inner join types on type = id"
-            )
-        );
-    }
-    
-    public void testParseLeftJoin() throws Exception {
-        assertEquals(
-            new Select(
-                new What()
-                    .add(new All()),
-                new From()
-                    .add(new LeftJoin(
-                        new FromTable("places"),
-                        new FromTable("types"),
-                        new Where(
-                            new Equal(new SingleColumn("type"), new SingleColumn("id"))
-                        )
-                    )),
-                Where.EMPTY
-            ),
-            Select.selectFromSql(
-                "select * from places left outer join types on type = id"
-            )
-        );
-    }
-    
-    public void testNestedJoins() throws Exception {
-        assertEquals(
-            new Select(
-                new What()
-                    .add(new All()),
-                new From()
-                    .add(new InnerJoin(
-                        new InnerJoin(
-                            new FromTable("foo"),
-                            new FromTable("bar"),
-                            new Where(
-                                new Equal(new SingleColumn("f"), new SingleColumn("b1"))
-                            )
-                        ),
-                        new FromTable("quux"),
-                        new Where(
-                            new Equal(new SingleColumn("b2"), new SingleColumn("q"))
-                        )
-                    )),
-                Where.EMPTY
-            ),
-            Select.selectFromSql(
-                "select * from foo inner join bar on f = b1 inner join quux on b2 = q"
-            )
-        );
-    }
 
     public void testExecuteSimpleJoin() throws Exception {
         L fooColumns = new L().append("colA").append("colB");

@@ -2,23 +2,23 @@ package net.sourceforge.mayfly.ldbc.where;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class NotEqualTest extends TestCase {
+
     public void testParse() throws Exception {
-        assertEquals(
-                new Not(new Equal(new SingleColumn("name"), new QuotedString("'steve'"))),
-                new Parser("name <> 'steve'").parseCondition().asBoolean()
-        );
+        Not notEqual = (Not) new Parser("name <> 'steve'").parseCondition().asBoolean();
+        Equal equal = (Equal) notEqual.operand;
+        MayflyAssert.assertColumn("name", equal.leftSide);
+        MayflyAssert.assertString("steve", equal.rightSide);
     }
 
     public void testParse2() throws Exception {
-        assertEquals(
-                new Not(new Equal(new SingleColumn("name"), new QuotedString("'steve'"))),
-                new Parser("name != 'steve'").parseCondition().asBoolean()
-        );
+        Not notEqual = (Not) new Parser("name!='steve'").parseCondition().asBoolean();
+        Equal equal = (Equal) notEqual.operand;
+        MayflyAssert.assertColumn("name", equal.leftSide);
+        MayflyAssert.assertString("steve", equal.rightSide);
     }
 
 }

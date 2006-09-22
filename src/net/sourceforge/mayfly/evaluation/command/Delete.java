@@ -1,14 +1,14 @@
 package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 
 public class Delete extends Command {
 
     private final InsertTable table;
-    private final Where where;
+    private final BooleanExpression where;
 
-    public Delete(InsertTable table, Where where) {
+    public Delete(InsertTable table, BooleanExpression where) {
         this.table = table;
         this.where = where;
     }

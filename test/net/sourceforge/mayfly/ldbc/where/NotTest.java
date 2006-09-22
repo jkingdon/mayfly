@@ -9,14 +9,15 @@ import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class NotTest extends TestCase {
     
     public void testParse() throws Exception {
-        assertEquals(
-            new Not(new Equal(new SingleColumn("name"), new QuotedString("'jim'"))),
-            new Parser("not name = 'jim'").parseCondition().asBoolean()
-        );
+        Not not = (Not) new Parser("not name = 'jim'").parseCondition().asBoolean();
+        Equal equal = (Equal) not.operand;
+        MayflyAssert.assertColumn("name", equal.leftSide);
+        MayflyAssert.assertString("jim", equal.rightSide);
     }
     
     public void testEvaluate() throws Exception {

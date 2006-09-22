@@ -9,23 +9,20 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
-import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class WhereTest extends TestCase {
 
     public void testWhere() throws Exception {
-        assertEquals(
-            new Where(
-                new Equal(new SingleColumn("f", "name"), new QuotedString("'steve'"))
-            ),
-            new Parser("f.name='steve'").parseWhere()
-        );
+        Equal where = (Equal) new Parser("f.name='steve'").parseWhere();
+        MayflyAssert.assertColumn("f", "name", where.leftSide);
+        MayflyAssert.assertString("steve", where.rightSide);
     }
 
     public void testSelect() throws Exception {
-        Where where = new Parser("name='steve'").parseWhere();
+        BooleanExpression where = new Parser("name='steve'").parseWhere();
 
         Row row1 = new Row(new TupleElement(new Column("name"), new StringCell("steve")));
         Row row2 = new Row(new TupleElement(new Column("name"), new StringCell("bob")));
@@ -35,7 +32,7 @@ public class WhereTest extends TestCase {
     }
     
     public void testNull() throws Exception {
-        Where where = new Where(new Equal(new SingleColumn("a"), new IntegerLiteral(5)));
+        BooleanExpression where = new Equal(new SingleColumn("a"), new IntegerLiteral(5));
         Row fiveRow = new Row(new TupleElement(new Column("a"), new LongCell(5)));
         Row nullRow = new Row(new TupleElement(new Column("a"), NullCell.INSTANCE));
         

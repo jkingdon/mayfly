@@ -5,7 +5,7 @@ import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
-import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.M;
 import net.sourceforge.mayfly.util.StringBuilder;
@@ -90,7 +90,7 @@ public class TableData {
         return newColumns;
     }
 
-    public UpdateTable update(Checker checker, List setClauses, Where where) {
+    public UpdateTable update(Checker checker, List setClauses, BooleanExpression where) {
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
@@ -131,7 +131,7 @@ public class TableData {
         }
     }
 
-    public UpdateTable delete(Where where, Checker checker) {
+    public UpdateTable delete(BooleanExpression where, Checker checker) {
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {

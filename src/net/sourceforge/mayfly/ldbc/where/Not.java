@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.ldbc.where;
 
 public class Not extends BooleanExpression {
 
-    private final BooleanExpression operand;
+    public final BooleanExpression operand;
 
     public Not(BooleanExpression operand) {
         this.operand = operand;

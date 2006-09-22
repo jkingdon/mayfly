@@ -2,11 +2,11 @@ package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Rows;
-import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 
 public class InnerJoin extends Join implements FromElement {
 
-    public InnerJoin(FromElement left, FromElement right, Where condition) {
+    public InnerJoin(FromElement left, FromElement right, BooleanExpression condition) {
         super(left, right, condition);
     }
 

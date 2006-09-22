@@ -8,8 +8,8 @@ import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.ldbc.where.Equal;
-import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 public class Cascade extends Action {
@@ -43,12 +43,10 @@ public class Cascade extends Action {
     }
 
     // Pull up this method?  Duplicates setValue, right?
-    private Where where(Cell oldValue, String referencerTable, String referencerColumn) {
-        return new Where(
-            new Equal(
-                new SingleColumn(referencerTable, referencerColumn),
-                new CellExpression(oldValue)
-            )
+    private BooleanExpression where(Cell oldValue, String referencerTable, String referencerColumn) {
+        return new Equal(
+            new SingleColumn(referencerTable, referencerColumn),
+            new CellExpression(oldValue)
         );
     }
 

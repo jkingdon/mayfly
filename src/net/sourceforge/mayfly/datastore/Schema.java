@@ -5,7 +5,7 @@ import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
-import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.util.ImmutableMap;
 
 import java.util.Iterator;
@@ -97,12 +97,12 @@ public class Schema {
     }
 
     public UpdateSchema update(Checker checker, String table, 
-        List setClauses, Where where) {
+        List setClauses, BooleanExpression where) {
         UpdateTable result = table(table).update(checker, setClauses, where);
         return replaceTable(table, result);
     }
 
-    public UpdateSchema delete(String table, Where where, Checker checker) {
+    public UpdateSchema delete(String table, BooleanExpression where, Checker checker) {
         UpdateTable result = table(table).delete(where, checker);
         ImmutableMap tablesAfterChecking =
             checker.store().schema(checker.schema()).tables;

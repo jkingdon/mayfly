@@ -17,7 +17,7 @@ import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.ldbc.what.What;
 import net.sourceforge.mayfly.ldbc.what.WhatElement;
-import net.sourceforge.mayfly.ldbc.where.Where;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.parser.Parser;
 
 import java.sql.ResultSet;
@@ -46,7 +46,7 @@ public class Select extends Command {
      */
     private final From from;
 
-    private final Where where;
+    private final BooleanExpression where;
 
     /**
      * Not yet immutable, because of {@link GroupByKeys}
@@ -57,11 +57,11 @@ public class Select extends Command {
 
     private final Limit limit;
 
-    public Select(What what, From from, Where where) {
+    public Select(What what, From from, BooleanExpression where) {
         this(what, from, where, new NoGroupBy(), new OrderBy(), Limit.NONE);
     }
 
-    public Select(What what, From from, Where where, Aggregator groupBy, OrderBy orderBy, Limit limit) {
+    public Select(What what, From from, BooleanExpression where, Aggregator groupBy, OrderBy orderBy, Limit limit) {
         this.what = what;
         this.from = from;
         this.where = where;

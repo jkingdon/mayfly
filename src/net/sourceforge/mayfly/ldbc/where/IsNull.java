@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.evaluation.Expression;
 
 public class IsNull extends BooleanExpression {
 
-    private final Expression expression;
+    public final Expression expression;
 
     public IsNull(Expression expression) {
         this.expression = expression;

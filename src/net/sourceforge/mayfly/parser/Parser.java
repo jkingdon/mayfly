@@ -76,7 +76,6 @@ import net.sourceforge.mayfly.ldbc.where.IsNull;
 import net.sourceforge.mayfly.ldbc.where.Not;
 import net.sourceforge.mayfly.ldbc.where.NotEqual;
 import net.sourceforge.mayfly.ldbc.where.Or;
-import net.sourceforge.mayfly.ldbc.where.Where;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.StringBuilder;
 
@@ -210,7 +209,7 @@ public class Parser {
         InsertTable table = parseInsertTable();
         expectAndConsume(TokenType.KEYWORD_set);
         List setClauses = parseSetClauseList();
-        Where where = parseOptionalWhere();
+        BooleanExpression where = parseOptionalWhere();
         return new Update(table, setClauses, where);
     }
     
@@ -218,7 +217,7 @@ public class Parser {
         expectAndConsume(TokenType.KEYWORD_delete);
         expectAndConsume(TokenType.KEYWORD_from);
         InsertTable table = parseInsertTable();
-        Where where = parseOptionalWhere();
+        BooleanExpression where = parseOptionalWhere();
         return new Delete(table, where);
     }
 
@@ -667,7 +666,7 @@ public class Parser {
         expectAndConsume(TokenType.KEYWORD_from);
         From from = parseFromItems();
         
-        Where where = parseOptionalWhere();
+        BooleanExpression where = parseOptionalWhere();
         
         Aggregator groupBy = parseGroupBy();
         
@@ -678,12 +677,12 @@ public class Parser {
         return new Select(what, from, where, groupBy, orderBy, limit);
     }
 
-    private Where parseOptionalWhere() {
+    private BooleanExpression parseOptionalWhere() {
         if (consumeIfMatches(TokenType.KEYWORD_where)) {
             return parseWhere();
         }
         else {
-            return Where.EMPTY;
+            return BooleanExpression.TRUE;
         }
     }
 
@@ -763,8 +762,8 @@ public class Parser {
         return left;
     }
 
-    public Where parseWhere() {
-        return new Where(parseCondition().asBoolean());
+    public BooleanExpression parseWhere() {
+        return parseCondition().asBoolean();
     }
 
     public ParserExpression parseCondition() {
@@ -1083,13 +1082,15 @@ public class Parser {
     }
 
     private SingleColumn parseColumnReference() {
-        String firstIdentifier = consumeIdentifier();
-        if (currentTokenType() == TokenType.PERIOD) {
-            expectAndConsume(TokenType.PERIOD);
-            String column = consumeIdentifier();
-            return new SingleColumn(firstIdentifier, column);
+        Token firstIdentifier = expectAndConsume(TokenType.IDENTIFIER);
+
+        if (consumeIfMatches(TokenType.PERIOD)) {
+            Token column = expectAndConsume(TokenType.IDENTIFIER);
+            return new SingleColumn(firstIdentifier.getText(), column.getText(),
+                firstIdentifier.location.combine(column.location)
+            );
         } else {
-            return new SingleColumn(firstIdentifier);
+            return new SingleColumn(firstIdentifier.getText(), firstIdentifier.location);
         }
     }
 
@@ -1114,14 +1115,14 @@ public class Parser {
                 expectAndConsume(TokenType.KEYWORD_cross);
                 expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
-                left = new InnerJoin(left, right, Where.EMPTY);
+                left = new InnerJoin(left, right, BooleanExpression.TRUE);
             }
             else if (currentTokenType() == TokenType.KEYWORD_inner) {
                 expectAndConsume(TokenType.KEYWORD_inner);
                 expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
                 expectAndConsume(TokenType.KEYWORD_on);
-                Where condition = parseWhere();
+                BooleanExpression condition = parseWhere();
                 left = new InnerJoin(left, right, condition);
             }
             else if (currentTokenType() == TokenType.KEYWORD_left) {
@@ -1132,7 +1133,7 @@ public class Parser {
                 expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
                 expectAndConsume(TokenType.KEYWORD_on);
-                Where condition = parseWhere();
+                BooleanExpression condition = parseWhere();
                 left = new LeftJoin(left, right, condition);
             }
             else {
