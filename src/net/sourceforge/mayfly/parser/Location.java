@@ -22,4 +22,12 @@ public class Location {
             startLineNumber, startColumn, right.endLineNumber, right.endColumn);
     }
 
+    public boolean knowStart() {
+        return startLineNumber != -1 && startColumn != -1;
+    }
+
+    public boolean knowEnd() {
+        return endLineNumber != -1 && endColumn != -1;
+    }
+
 }

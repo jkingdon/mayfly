@@ -8,6 +8,8 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.datastore.constraint.Action;
 import net.sourceforge.mayfly.datastore.constraint.Cascade;
 import net.sourceforge.mayfly.datastore.constraint.NoAction;
@@ -277,7 +279,15 @@ public class Parser {
             return null;
         }
         else {
-            return expression.evaluate(null);
+            return expression.evaluate(new Row(new TupleBuilder()) {
+                public Column findColumn(String tableOrAlias, String columnName) {
+                    throw new MayflyException(
+                        "values clause may not refer to column: " 
+                        + Column.displayName(tableOrAlias, columnName)
+                    );
+                }
+            }
+            );
         }
     }
 

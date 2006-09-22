@@ -235,6 +235,14 @@ public class ValueTest extends SqlTestCase {
         expectExecuteFailure("insert into foo (b, c) values (5, 7)", "no column b");
     }
     
+    public void testReferenceToColumn() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        expectExecuteFailure("insert into foo(a, b) values (5, a + 3)",
+            "values clause may not refer to column: a");
+        expectExecuteFailure("insert into foo(a) values (foo.b)", 
+            "values clause may not refer to column: foo.b"); 
+    }
+    
     public void testTooManyValues() throws Exception {
         execute("create table foo (a integer)");
         // Given a long list of column names, and a long list of values,
