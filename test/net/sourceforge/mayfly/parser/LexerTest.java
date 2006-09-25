@@ -32,17 +32,60 @@ public class LexerTest extends TestCase {
     }
     
     public void testSlashAndStar() throws Exception {
-        // At least for now, we don't recognize /* */ style comments,
-        // so this is simple
+        /*
+            For the moment, I'm assuming that flagging an
+            error on slash-star within a comment, as GCC
+            does for C, would be too disruptive (we don't
+            have any kind of warning capability).
+            But it might detect some cases where someone
+            comments out SQL which already has slash-star
+            comments in it.
+         */
+
         check(
             new TokenType[] {
                 TokenType.DIVIDE,
                 TokenType.ASTERISK,
+                TokenType.IDENTIFIER,
                 TokenType.END_OF_FILE,
             },
-            new String[] { "/", "*", null},
-            "/ *"
+            new String[] { "/", "*", "non_comment", null},
+            "/ * /**/ /* * */ /***/" +
+            "/* comments do not /* nest */ non_comment" +
+            "/* comment\n" +
+            "with\n" +
+            "newlines\n" +
+            "*\n" +
+            "*/"
         );
+    }
+    
+    public void testUnclosedComment() throws Exception {
+        try {
+            lex("/* unclosed comment");
+            fail();
+        }
+        catch (MayflyException e) {
+            /* It is customary to include line and column
+               numbers.  But is that only really needed
+               for structures that nest?
+             */
+            /* Do we want to say slash-star style comment? 
+               I'm not sure I can think of a wording ("slash-star",
+               "C-style", "multi-line", some combination of / * * /)
+               which helps more than it confuses.  */
+            assertEquals("unclosed comment", e.getMessage());
+        }
+    }
+    
+    public void testEndOfFileAfterStar() throws Exception {
+        try {
+            lex("/* unclosed comment *");
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("unclosed comment", e.getMessage());
+        }
     }
     
     public void testSql92Comments() throws Exception {
@@ -371,6 +414,29 @@ public class LexerTest extends TestCase {
             assertEquals(1, period.startColumn());
             assertEquals(2, period.endLineNumber());
             assertEquals(2, period.endColumn());
+        }
+        
+        {
+            Token endOfFile = (Token) tokens.get(1);
+            assertEquals(TokenType.END_OF_FILE, endOfFile.getType());
+            assertEquals(2, endOfFile.startLineNumber());
+            assertEquals(27, endOfFile.startColumn());
+            assertEquals(2, endOfFile.endLineNumber());
+            assertEquals(27, endOfFile.endColumn());
+        }
+    }
+    
+    public void testLineNumberAndSlashStarComment() throws Exception {
+        List tokens = lex("/* first comment\n  *///* another comment */");
+        assertEquals(2, tokens.size());
+        
+        {
+            Token slash = (Token) tokens.get(0);
+            assertEquals(TokenType.DIVIDE, slash.getType());
+            assertEquals(2, slash.startLineNumber());
+            assertEquals(5, slash.startColumn());
+            assertEquals(2, slash.endLineNumber());
+            assertEquals(6, slash.endColumn());
         }
         
         {

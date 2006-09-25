@@ -21,23 +21,15 @@ public class ParserException extends MayflyException {
      * avoid clutter in the (many) cases in which the
      * line number won't be helpful.
      */
-    private final int startLineNumber;
-    private final int startColumn;
-    private final int endLineNumber;
-    private final int endColumn;
+    public final Location location;
 
-    public ParserException(String message, 
-        int startLineNumber, int startColumn, 
-        int endLineNumber, int endColumn) {
+    public ParserException(String message, Location location) {
         super(message);
-        this.startLineNumber = startLineNumber;
-        this.startColumn = startColumn;
-        this.endLineNumber = endLineNumber;
-        this.endColumn = endColumn;
+        this.location = location;
     }
 
     public ParserException(String message) {
-        this(message, -1, -1, -1, -1);
+        this(message, Location.UNKNOWN);
     }
     
     public ParserException(String expected, Token actual) {
@@ -45,14 +37,11 @@ public class ParserException extends MayflyException {
             expected +
             " but got " +
             actual.describe(),
-            actual.startLineNumber(),
-            actual.startColumn(),
-            actual.endLineNumber(),
-            actual.endColumn());
+            actual.location);
     }
 
     public int startLineNumber() {
-        return startLineNumber;
+        return location.startLineNumber;
     }
 
     /**
@@ -64,15 +53,15 @@ public class ParserException extends MayflyException {
      * return 8.
      */
     public int startColumn() {
-        return startColumn;
+        return location.startColumn;
     }
 
     public int endLineNumber() {
-        return endLineNumber;
+        return location.endLineNumber;
     }
 
     public int endColumn() {
-        return endColumn;
+        return location.endColumn;
     }
 
 }

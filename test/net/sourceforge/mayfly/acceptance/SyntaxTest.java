@@ -136,5 +136,19 @@ public class SyntaxTest extends SqlTestCase {
         expectExecuteFailure("select x from foo limit 10 ofset 20", 
             "expected end of file but got ofset");
     }
+    
+    public void testComments() throws Exception {
+        execute("create table -- single-line comment\n" +
+            "foo (x integer) ");
+        String slashStarComment =
+            "insert into foo /* C-style \n" +
+            "comment */ (x) values (5)";
+        if (dialect.haveSlashStarComments()) {
+            execute(slashStarComment);
+        }
+        else {
+            expectExecuteFailure(slashStarComment, "unexpected character /");
+        }
+    }
 
 }

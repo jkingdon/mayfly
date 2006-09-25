@@ -11,6 +11,7 @@ import java.util.List;
 
 public class Lexer {
 
+    private static final int END_OF_FILE_CHARACTER = -1;
     private Reader sql;
     private int currentLine;
     private int currentColumn;
@@ -70,7 +71,7 @@ public class Lexer {
                             current = nextCharacter();
                             break;
                         }
-                        else if (current == -1) {
+                        else if (current == END_OF_FILE_CHARACTER) {
                             tokenLine = currentLine;
                             tokenColumn = currentColumn;
                             break;
@@ -83,7 +84,29 @@ public class Lexer {
             }
             else if (current == '/') {
                 current = nextCharacter();
-                addToken(tokens, TokenType.DIVIDE, "/");
+                if (current == '*') {
+                    while (true) {
+                        current = nextCharacter();
+                        if (current == '*') {
+                            current = nextCharacter();
+                            if (current == '/') {
+                                tokenLine = currentLine;
+                                tokenColumn = currentColumn;
+                                current = nextCharacter();
+                                break;
+                            }
+                            else if (current == END_OF_FILE_CHARACTER) {
+                                throw new MayflyException("unclosed comment");
+                            }
+                        }
+                        else if (current == END_OF_FILE_CHARACTER) {
+                            throw new MayflyException("unclosed comment");
+                        }
+                    }
+                }
+                else {
+                    addToken(tokens, TokenType.DIVIDE, "/");
+                }
             }
             else if (current == '*') {
                 current = nextCharacter();

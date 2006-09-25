@@ -326,6 +326,10 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean haveSlashStarComments() {
+        return true;
+    }
+
     public boolean haveTransactions() {
         /**
          * @internal

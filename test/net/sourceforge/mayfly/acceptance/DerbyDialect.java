@@ -79,7 +79,11 @@ public class DerbyDialect extends Dialect {
     public boolean quotedIdentifiersAreCaseSensitive() {
         return true;
     }
-    
+
+    public boolean haveSlashStarComments() {
+        return false;
+    }
+
     public boolean canConcatenateStringAndInteger() {
         return false;
     }
