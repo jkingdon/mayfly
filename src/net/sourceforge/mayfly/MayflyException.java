@@ -15,17 +15,17 @@ public class MayflyException extends RuntimeException {
 
     public MayflyException(String message) {
         super(message);
-        sqlException = new SQLException(message);
+        sqlException = new MayflySqlException(message);
     }
 
     public MayflyException(String message, Throwable cause) {
         super(message, cause);
-        sqlException = (SQLException) new SQLException(message).initCause(cause);
+        sqlException = new MayflySqlException(message, cause);
     }
 
     public MayflyException(Throwable cause) {
         super(cause);
-        sqlException = (SQLException) new SQLException(cause.getMessage()).initCause(cause);
+        sqlException = new MayflySqlException(cause);
     }
 
     public SQLException asSqlException() {

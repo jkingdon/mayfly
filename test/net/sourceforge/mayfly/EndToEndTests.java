@@ -2,6 +2,10 @@ package net.sourceforge.mayfly;
 
 import junitx.framework.ArrayAssert;
 
+import net.sourceforge.mayfly.acceptance.DataTypeTest;
+import net.sourceforge.mayfly.acceptance.MayflyDialect;
+import net.sourceforge.mayfly.acceptance.SqlTestCase;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
@@ -10,10 +14,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
-import net.sourceforge.mayfly.acceptance.DataTypeTest;
-import net.sourceforge.mayfly.acceptance.MayflyDialect;
-import net.sourceforge.mayfly.acceptance.SqlTestCase;
 
 /**
  * Tests that could be acceptance tests, but the behavior seems
@@ -107,7 +107,7 @@ public class EndToEndTests extends SqlTestCase {
         results.close();
     }
     
-    public void testBlogWithoutSize() throws Exception {
+    public void testBinaryStreamWithoutSize() throws Exception {
         execute("create table foo (x blob)");
 
         PreparedStatement insert = 
@@ -152,6 +152,43 @@ public class EndToEndTests extends SqlTestCase {
         catch (UnimplementedException expected) {
             assertEquals("Current_Timestamp is not implemented", 
                 expected.getMessage());
+        }
+    }
+    
+    public void xtestLineNumbersOnForeignKeyViolations() throws Exception {
+        /* Line numbers are (at least sometimes) provided by 
+         * Oracle in an all_errors table, by SQL Server in the
+         * SQLException#getMessage(), and by Sybase and Postgres
+         * in a subclass of SQLException.  The SQLException
+         * subclass seems logical.
+         */
+        execute("create table countries (id integer primary key, " +
+            "name varchar(255))");
+        execute("create table cities (name varchar(255), country integer, " +
+            "foreign key (country) references countries(id)" +
+            ")");
+
+        try {
+            execute("  insert into cities(name, country) values ('Dhaka', 3)  ");
+            fail("Did not find expected exception.\n" +
+                "expected message: " + "foreign key violation: countries has no id 3" + "\n" +
+                "command: " + "insert into cities(name, country) values ('Dhaka', 3)" + "\n"
+            );
+        }
+        catch (MayflySqlException expected) {
+            /* We're just trying to indicate the line number of the statement
+               which violated the constraint.  Pointing to the constraint itself
+               might be interesting too but that raises many more issues because
+               it was in a separate statement, so do we try to indicate a
+               file name?  Or the Java stack trace where the constraint was
+               created?  Constraint names, of course, are a more conventional
+               solution (although we might want solutions for people who
+               prefer not to use constraint names).  */
+            assertMessage("foreign key violation: countries has no id 3", expected);
+            assertEquals(1, expected.startLineNumber());
+            assertEquals(3, expected.startColumn());
+            assertEquals(1, expected.endLineNumber());
+            assertEquals(56, expected.endColumn());
         }
     }
 
