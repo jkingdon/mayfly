@@ -25,10 +25,6 @@ public class CountAll extends Expression {
         return new LongCell(0);
     }
 
-    public Cell findValue(int zeroBasedColumn, Row row) {
-        return row.byPosition(zeroBasedColumn);
-    }
-
     public String firstAggregate() {
         return displayName();
     }

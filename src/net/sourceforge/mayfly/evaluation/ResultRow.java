@@ -64,15 +64,19 @@ public class ResultRow {
         return (Element) elements.get(index);
     }
 
-    public SingleColumn findColumn(String target) {
+    public SingleColumn findColumn(String columnName) {
+        return findColumn(null, columnName);
+    }
+
+    public SingleColumn findColumn(String tableOrAlias, String columnName) {
         SingleColumn found = null;
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             Element element = (Element) iter.next();
             if (element.expression instanceof SingleColumn) {
                 SingleColumn candidate = (SingleColumn) element.expression;
-                if (candidate.matches(target)) {
+                if (candidate.matches(tableOrAlias, columnName)) {
                     if (found != null) {
-                        throw new MayflyException("ambiguous column " + target);
+                        throw new MayflyException("ambiguous column " + columnName);
                     }
                     else {
                         found = candidate;
@@ -81,24 +85,40 @@ public class ResultRow {
             }
         }
         if (found == null) {
-            throw new MayflyException("no column " + target);
+            throw new MayflyException("no column " + columnName);
         } else {
             return found;
         }
     }
     
     public Cell findValue(Expression target) {
+        Cell result = findValueOrNull(target);
+        if (result == null) {
+            throw new MayflyInternalException("Where did expression " + target.displayName() + " come from?");
+        }
+        else {
+            return result;
+        }
+    }
+
+    private Cell findValueOrNull(Expression target) {
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             Element element = (Element) iter.next();
             if (element.expression.sameExpression(target)) {
                 return element.value;
             }
         }
-        throw new MayflyInternalException("Where did expression " + target.displayName() + " come from?");
+        return null;
     }
 
     public Cell findValue(int zeroBasedColumn, Expression expression) {
-        return expression.findValue(zeroBasedColumn, row);
+        Cell result = findValueOrNull(expression);
+        if (result != null) {
+            return result;
+        }
+        else {
+            return expression.evaluate(row);
+        }
     }
     
     public static class Element {

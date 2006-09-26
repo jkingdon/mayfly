@@ -269,6 +269,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean valuesClauseCanReferToColumn() {
+        return false;
+    }
+
     public boolean canConcatenateStringAndInteger() {
         // Most databases seem to allow this.  I'm sure there
         // are larger issues/tradeoffs here (like "do what I

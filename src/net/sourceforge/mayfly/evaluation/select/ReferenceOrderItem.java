@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.ldbc.what.What;
 import net.sourceforge.mayfly.ldbc.what.WhatElement;
@@ -15,7 +16,7 @@ public class ReferenceOrderItem extends OrderItem {
         this.reference = reference;
     }
 
-    protected int compareAscending(final What what, Row first, Row second) {
+    protected int compareAscending(final What what, ResultRow first, ResultRow second) {
         int zeroBasedColumn = reference - 1;
 
         int size = what.size();

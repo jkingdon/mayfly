@@ -52,10 +52,6 @@ abstract public class Expression extends WhatElement {
         return right.firstAggregate();
     }
 
-    public Cell findValue(int zeroBasedColumn, Row row) {
-        return evaluate(row);
-    }
-
     public boolean matches(Column column) {
         return false;
     }

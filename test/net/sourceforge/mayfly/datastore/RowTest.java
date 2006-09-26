@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 
 public class RowTest extends TestCase {
 
@@ -81,36 +83,18 @@ public class RowTest extends TestCase {
         assertEquals(expected, row1.plus(row2));
     }
     
-    public void testByPosition() throws Exception {
-        Row row = new Row(
-            new TupleBuilder()
-                .append(new Column("x"), new LongCell(5))
-                .append(new PositionalHeader(43), new StringCell("hi"))
-                .append(new Column("y"), new StringCell("Chicago"))
-                .append(new PositionalHeader(7), new LongCell(77))
-        );
-        
-        assertEquals(new StringCell("hi"), row.byPosition(43));
-        assertEquals(new LongCell(77), row.byPosition(7));
-        try {
-            row.byPosition(3);
-            fail();
-        } catch (MayflyException e) {
-            // Would be nice if this was a MayflyInternalException, but I guess
-            // it isn't really important.
-            assertEquals("positional header #3 not found", e.getMessage());
-        }
-    }
-    
+   /**
+     * Replaced by {@link net.sourceforge.mayfly.evaluation.ResultRowTest#testFindColumn()}
+     */
     public void testFindColumn() throws Exception {
         Row row = new Row(
             new TupleBuilder()
                 .append(new Column("x"), new LongCell(5))
-                .append(new PositionalHeader(43), new StringCell("hi"))
+                .append(new PositionalHeader(new QuotedString("hi")), new StringCell("hi"))
                 .append(new Column("foo", "z"), new StringCell("Chicago"))
                 .append(new Column("bar", "z"), new StringCell("Chicago"))
                 .append(new Column("y"), new StringCell("Chicago"))
-                .append(new PositionalHeader(7), new LongCell(77))
+                .append(new PositionalHeader(new IntegerLiteral(77)), new LongCell(77))
         );
         
         assertEquals(new Column("y"), row.findColumn("y"));

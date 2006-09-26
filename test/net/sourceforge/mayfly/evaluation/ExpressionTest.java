@@ -5,9 +5,17 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.ldbc.where.Equal;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class ExpressionTest extends TestCase {
+
+    public void testWhere() throws Exception {
+        Equal where = (Equal) new Parser("f.name='steve'").parseWhere();
+        MayflyAssert.assertColumn("f", "name", where.leftSide);
+        MayflyAssert.assertString("steve", where.rightSide);
+    }
 
     public void testSameExpression() throws Exception {
         Expression one = (Expression) new Parser("x + y * z / 2 || 5").parseWhatElement();

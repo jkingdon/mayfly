@@ -7,7 +7,6 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
-import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.ValueObject;
 
@@ -50,7 +49,7 @@ public class Selected extends ValueObject implements Iterable {
         TupleBuilder builder = new TupleBuilder();
         for (int i = 0; i < expressions.size(); ++i) {
             Expression expression = (Expression) expressions.get(i);
-            builder.append(new PositionalHeader(i, expression), expression.aggregate(rows));
+            builder.appendExpression(expression, expression.aggregate(rows));
         }
         Row resultRow = new Row(builder);
         return new Rows(resultRow);

@@ -39,10 +39,6 @@ public abstract class AggregateExpression extends Expression {
         return column.evaluate(row);
     }
     
-    public Cell findValue(int zeroBasedColumn, Row row) {
-        return row.byPosition(zeroBasedColumn);
-    }
-
     public String firstAggregate() {
         return displayName();
     }

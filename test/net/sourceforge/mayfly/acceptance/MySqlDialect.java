@@ -38,6 +38,8 @@ public class MySqlDialect extends Dialect {
     }
     
     public boolean canQuoteIdentifiers() {
+        // We'd need to set ANSI mode, and check whether the JDBC driver
+        // even supports ANSI mode.
         return false;
     }
     
@@ -46,6 +48,7 @@ public class MySqlDialect extends Dialect {
     }
 
     public boolean verticalBarsMeanConcatenation() {
+        // We'd need to set ANSI mode.
         return false;
     }
     
@@ -123,6 +126,10 @@ public class MySqlDialect extends Dialect {
         return false;
     }
     
+    public boolean valuesClauseCanReferToColumn() {
+        return true;
+    }
+
     public boolean canHaveHavingWithoutGroupBy() {
         return true;
     }

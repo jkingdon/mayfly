@@ -6,7 +6,6 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.ldbc.what.CountAll;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 
@@ -19,7 +18,7 @@ public class ResultRowTest extends TestCase {
                     .appendColumnCell("foo", "y", new LongCell(5))
                     .appendColumnCell("foo", "x", new LongCell(5))
                     .appendColumnCell("foo", "z", new LongCell(5))
-                    .append(new PositionalHeader(3, null), new StringCell("hi"))
+                    .appendExpression(null, new StringCell("hi"))
                     .asRow()
             );
         SingleColumn column = row.findColumn("x");
@@ -83,7 +82,7 @@ public class ResultRowTest extends TestCase {
                 new TupleBuilder()
                     .appendColumnCell("foo", "x", new LongCell(5))
                     .appendColumnCell("bar", "x", new LongCell(6))
-                    .append(new PositionalHeader(3, new CountAll("count")), new LongCell(2))
+                    .appendExpression(new CountAll("count"), new LongCell(2))
                     .asRow()
             );
         LongCell barX = (LongCell) row.findValue(new SingleColumn("bar", "x"));

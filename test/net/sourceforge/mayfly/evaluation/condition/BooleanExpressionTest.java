@@ -2,6 +2,13 @@ package net.sourceforge.mayfly.evaluation.condition;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.StringCell;
+import net.sourceforge.mayfly.datastore.TupleElement;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.ldbc.what.CountAll;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.ldbc.what.WhatElement;
@@ -12,12 +19,32 @@ import net.sourceforge.mayfly.ldbc.where.In;
 import net.sourceforge.mayfly.ldbc.where.IsNull;
 import net.sourceforge.mayfly.ldbc.where.Not;
 import net.sourceforge.mayfly.ldbc.where.Or;
+import net.sourceforge.mayfly.parser.Parser;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BooleanExpressionTest extends TestCase {
     
+    public void testSelect() throws Exception {
+        BooleanExpression where = new Parser("name='steve'").parseWhere();
+
+        Row row1 = new Row(new TupleElement(new Column("name"), new StringCell("steve")));
+        Row row2 = new Row(new TupleElement(new Column("name"), new StringCell("bob")));
+
+        assertTrue(where.evaluate(row1));
+        assertFalse(where.evaluate(row2));
+    }
+    
+    public void testNull() throws Exception {
+        BooleanExpression where = new Equal(new SingleColumn("a"), new IntegerLiteral(5));
+        Row fiveRow = new Row(new TupleElement(new Column("a"), new LongCell(5)));
+        Row nullRow = new Row(new TupleElement(new Column("a"), NullCell.INSTANCE));
+        
+        assertTrue(where.evaluate(fiveRow));
+        assertFalse(where.evaluate(nullRow));
+    }
+
     public void testFirstAggregate() throws Exception {
         assertEquals(null, BooleanExpression.TRUE.firstAggregate());
         assertEquals(null, new Equal(new SingleColumn("x"), new SingleColumn("y")).firstAggregate());

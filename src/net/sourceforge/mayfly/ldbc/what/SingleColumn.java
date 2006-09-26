@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Location;
 
 public class SingleColumn extends Expression {
@@ -43,6 +44,11 @@ public class SingleColumn extends Expression {
         return row.cell(tableOrAlias, columnName);
     }
     
+    public Cell evaluate(ResultRow row) {
+        SingleColumn found = row.findColumn(tableOrAlias, columnName);
+        return row.findValue(found);
+    }
+
     public Column lookup(Row row) {
         return row.findColumn(tableOrAlias, columnName);
     }
@@ -64,11 +70,22 @@ public class SingleColumn extends Expression {
     }
     
     public boolean matches(String target) {
+        return matches(null, target);
+    }
+
+    public boolean matches(String tableOrAlias, String target) {
         if (target.indexOf('.') != -1) {
             throw new MayflyException("column name " + target + " should not contain a period");
         }
 
+        if (tableOrAlias != null && !matchesAliasOrTable(tableOrAlias)) {
+            return false;
+        }
         return this.columnName.equalsIgnoreCase(target);
+    }
+
+    public boolean matchesAliasOrTable(String tableOrAlias) {
+        return tableOrAlias.equalsIgnoreCase(this.tableOrAlias);
     }
 
     public boolean sameExpression(Expression other) {

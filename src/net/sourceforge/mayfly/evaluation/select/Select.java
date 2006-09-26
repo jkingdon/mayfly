@@ -128,9 +128,9 @@ public class Select extends Command {
 
         Rows afterWhere = (Rows) joinedRows.select(where);
 
-        Rows afterGrouping = groupBy.group(afterWhere, what, selected);
+        ResultRows afterGrouping = new ResultRows(groupBy.group(afterWhere, what, selected));
 
-        ResultRows sorted = new ResultRows(orderBy.sort(store, afterGrouping, what));
+        ResultRows sorted = orderBy.sort(store, afterGrouping, what);
         return limit.limit(sorted);
     }
 

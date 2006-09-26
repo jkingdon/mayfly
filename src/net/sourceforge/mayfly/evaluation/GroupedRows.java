@@ -7,7 +7,6 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
 import java.util.ArrayList;
@@ -86,7 +85,7 @@ public class GroupedRows {
             }
             else if (expression.firstAggregate() != null) {
                 Cell aggregated = expression.aggregate(rowsForKey);
-                builder.append(new PositionalHeader(i, expression), aggregated);
+                builder.appendExpression(expression, aggregated);
             }
             else {
                 throw new MayflyException(expression.displayName() + " is not aggregate or mentioned in GROUP BY");

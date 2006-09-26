@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.ldbc.where;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
@@ -32,7 +31,7 @@ public class OrTest extends TestCase {
     public void testEvaluate() throws Exception {
         Row row = new Row(
             new TupleBuilder()
-                .append(new Column("x"), new StringCell("foo"))
+                .appendColumnCell("x", new StringCell("foo"))
         );
         Equal compareWithFoo = new Equal(new SingleColumn("x"), new QuotedString("'foo'"));
         Equal compareWithXxx = new Equal(new SingleColumn("x"), new QuotedString("'xxx'"));

@@ -3,13 +3,13 @@ package net.sourceforge.mayfly.evaluation.select;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.ldbc.what.What;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.Iterable;
-import net.sourceforge.mayfly.util.L;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,17 +38,17 @@ public class OrderBy extends Aggregate {
         return elements.iterator();
     }
 
-    public Rows sort(final DataStore store, Rows rows, final What what) {
+    public ResultRows sort(final DataStore store, ResultRows rows, final What what) {
         if (isEmpty()) {
             return rows;
         }
 
-        List rowList = new L(rows);
+        List rowList = new ArrayList(rows.asList());
         Collections.sort(rowList, new Comparator() {
 
             public int compare(Object o1, Object o2) {
-                Row first = (Row) o1;
-                Row second = (Row) o2;
+                ResultRow first = (ResultRow) o1;
+                ResultRow second = (ResultRow) o2;
                 for (Iterator iter = elements.iterator(); iter.hasNext();) {
                     OrderItem item = (OrderItem) iter.next();
                     int comparison = item.compareRows(what, first, second);
@@ -60,7 +60,7 @@ public class OrderBy extends Aggregate {
             }
             
         });
-        return new Rows(new ImmutableList(rowList));
+        return new ResultRows(new ImmutableList(rowList));
     }
 
     public void check(Row dummyRow) {

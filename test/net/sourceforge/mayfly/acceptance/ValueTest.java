@@ -237,10 +237,19 @@ public class ValueTest extends SqlTestCase {
     
     public void testReferenceToColumn() throws Exception {
         execute("create table foo (a integer, b integer)");
-        expectExecuteFailure("insert into foo(a, b) values (5, a + 3)",
-            "values clause may not refer to column: a");
-        expectExecuteFailure("insert into foo(a) values (foo.b)", 
-            "values clause may not refer to column: foo.b"); 
+        String referToValueWeInsert = "insert into foo(a, b) values (5, a + 3)";
+        String referToUnsetColumn = "insert into foo(a) values (foo.b)";
+        if (dialect.valuesClauseCanReferToColumn()) {
+            execute(referToValueWeInsert);
+            execute(referToUnsetColumn);
+            assertResultSet(new String[] { "5, 8", "null, null" }, query("select a,b from foo"));
+        }
+        else {
+            expectExecuteFailure(referToValueWeInsert,
+                "values clause may not refer to column: a");
+            expectExecuteFailure(referToUnsetColumn, 
+                "values clause may not refer to column: foo.b"); 
+        }
     }
     
     public void testTooManyValues() throws Exception {

@@ -28,15 +28,6 @@ abstract public class BinaryOperator extends Expression {
         return combine(leftCell, rightCell);
     }
     
-    public Cell findValue(int zeroBasedColumn, Row row) {
-        if (firstAggregate() != null) {
-            return row.byPosition(zeroBasedColumn);
-        }
-        else {
-            return evaluate(row);
-        }
-    }
-    
     abstract protected Cell combine(Cell left, Cell right);
     
     public String firstColumn() {

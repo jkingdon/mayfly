@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.Iterable;
@@ -43,10 +42,6 @@ public class Row extends Aggregate {
         return cellFor(findColumn(tableOrAlias, column));
     }
     
-    public Cell byPosition(int position) {
-        return cellFor(new PositionalHeader(position));
-    }
-
     public Column findColumn(String columnName) {
         return findColumn(null, columnName);
     }
