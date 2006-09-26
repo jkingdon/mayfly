@@ -6,8 +6,8 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.ldbc.what.CountAll;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.evaluation.expression.CountAll;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 
 public class ResultRowTest extends TestCase {
     

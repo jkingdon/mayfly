@@ -1,8 +1,7 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.evaluation.what;
 
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.evaluation.what.Selected;
 
 public class AllColumnsFromTable extends WhatElement {
 

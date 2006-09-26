@@ -6,8 +6,8 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class GroupByKeysTest extends TestCase {

@@ -9,7 +9,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.ArrayList;

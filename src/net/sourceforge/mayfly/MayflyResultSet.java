@@ -4,8 +4,8 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 
 import org.joda.time.DateTimeZone;
 

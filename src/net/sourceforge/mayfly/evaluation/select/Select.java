@@ -15,8 +15,8 @@ import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.what.What;
-import net.sourceforge.mayfly.ldbc.what.WhatElement;
+import net.sourceforge.mayfly.evaluation.what.What;
+import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.parser.Parser;
 

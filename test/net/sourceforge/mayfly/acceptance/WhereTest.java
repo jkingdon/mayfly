@@ -236,7 +236,7 @@ public class WhereTest extends SqlTestCase {
 
     public void testInWithSubselect() throws Exception {
         if (!dialect.wishThisWereTrue()) {
-            // Needs fixing in LDBC grammar.
+            // No subselects
             return;
         }
 

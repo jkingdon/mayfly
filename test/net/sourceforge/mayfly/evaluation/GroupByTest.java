@@ -6,7 +6,7 @@ import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.Iterator;

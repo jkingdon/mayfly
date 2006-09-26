@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.evaluation.what;
 
 import junit.framework.TestCase;
 
@@ -7,8 +7,12 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.datastore.TupleElement;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.what.All;
+import net.sourceforge.mayfly.evaluation.what.AllColumnsFromTable;
 import net.sourceforge.mayfly.evaluation.what.Selected;
+import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class WhatTest extends TestCase {

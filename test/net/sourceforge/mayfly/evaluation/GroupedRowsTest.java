@@ -12,9 +12,9 @@ import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
-import net.sourceforge.mayfly.ldbc.what.WhatElement;
+import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.Arrays;

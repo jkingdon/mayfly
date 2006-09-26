@@ -3,8 +3,8 @@ package net.sourceforge.mayfly.evaluation.select;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.ResultRow;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
-import net.sourceforge.mayfly.ldbc.what.What;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
+import net.sourceforge.mayfly.evaluation.what.What;
 
 public class ColumnOrderItem extends OrderItem {
 

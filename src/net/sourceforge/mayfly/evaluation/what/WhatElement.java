@@ -1,9 +1,9 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.evaluation.what;
 
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.evaluation.what.Selected;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.Iterator;
@@ -15,7 +15,7 @@ import java.util.Iterator;
  * a subclass which wraps
  * an expression, rather than having {@link net.sourceforge.mayfly.evaluation.Expression}
  * inherit from us.  Then the distinction between {@link net.sourceforge.mayfly.evaluation.what.Selected}
- * and {@link net.sourceforge.mayfly.ldbc.what.What} would carry down
+ * and {@link net.sourceforge.mayfly.evaluation.what.What} would carry down
  * to here.
  */
 abstract public class WhatElement extends ValueObject {

@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.evaluation.expression;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.util.Collection;

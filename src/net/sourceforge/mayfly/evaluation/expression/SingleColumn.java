@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;

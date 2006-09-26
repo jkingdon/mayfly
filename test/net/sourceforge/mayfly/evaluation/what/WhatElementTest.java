@@ -1,16 +1,20 @@
-package net.sourceforge.mayfly.ldbc.what;
+package net.sourceforge.mayfly.evaluation.what;
 
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Count;
+import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.Divide;
 import net.sourceforge.mayfly.evaluation.expression.Maximum;
 import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
+import net.sourceforge.mayfly.evaluation.what.All;
+import net.sourceforge.mayfly.evaluation.what.AllColumnsFromTable;
 import net.sourceforge.mayfly.parser.Parser;
 
 public class WhatElementTest extends TestCase {

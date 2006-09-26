@@ -4,8 +4,8 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.MayflyAssert;
 

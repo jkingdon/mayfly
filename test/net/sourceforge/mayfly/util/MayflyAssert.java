@@ -4,9 +4,9 @@ import junit.framework.Assert;
 import junitx.framework.ObjectAssert;
 
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 
 public class MayflyAssert {
 

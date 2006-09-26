@@ -5,7 +5,6 @@ import java.util.Collection;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
 import net.sourceforge.mayfly.parser.Location;
 
 public class Sum extends AggregateExpression {

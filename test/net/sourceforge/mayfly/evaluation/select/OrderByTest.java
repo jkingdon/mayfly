@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.evaluation.select;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.ldbc.what.SingleColumn;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 
 public class OrderByTest extends TestCase {
 
