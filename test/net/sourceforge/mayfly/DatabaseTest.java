@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.acceptance.SqlTestCase;
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.parser.ParserException;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -123,7 +122,7 @@ public class DatabaseTest extends TestCase {
             database.executeScript(script);
             fail();
         }
-        catch (ParserException e) {
+        catch (MayflySqlException e) {
             assertEquals("expected data type but got NOT", e.getMessage());
             assertEquals(3, e.startLineNumber());
             assertEquals(7, e.startColumn());

@@ -360,6 +360,11 @@ public class ForeignKeyTest extends SqlTestCase {
         execute("insert into person (id, mother) values(2, 1)");
         expectExecuteFailure("insert into person (id, mother) values(3, 7)",
             "foreign key violation: person has no id 7");
+        
+        execute("insert into person(id, mother) values(10, 10)");
+        /* Are there extra self-reference cases?  Does the
+           delete check in update always work? */
+        // update person set id = 11, mother = 11 where id = 10
     }
     
     public void xtestCircularReference() throws Exception {
@@ -391,5 +396,6 @@ public class ForeignKeyTest extends SqlTestCase {
     // multiple referencing columns
     // multiple referencing columns where one is NULL (but others are not)
     // "references foo" (omitting the '(' column... ')')
+    // reference to something other than a primary key (an error, right?)
 
 }

@@ -4,7 +4,6 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
-import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
@@ -69,6 +68,18 @@ public class ForeignKey {
         Cell value = pickValue(proposedRow);
         if (!(value instanceof NullCell) &&
             !foundTable.hasValue(targetColumn, value)) {
+
+            /*
+               Check for the case in which the row we are in the
+               process of inserting satisfies the constraint.
+             */
+            if (targetTable.matches(referencerSchema, referencerTable)) {
+                Cell newPossibleTarget = proposedRow.cell(null, targetColumn);
+                if (newPossibleTarget.sqlEquals(value)) {
+                    return;
+                }
+            }
+
             throwInsertException(schema, value, location);
         }
     }
@@ -95,15 +106,8 @@ public class ForeignKey {
     }
 
     private Cell pickValue(Row proposedRow) {
-        Columns columns = proposedRow.columns();
-        for (int i = 0; i < columns .size(); ++i) {
-            Column column = columns.get(i);
-            if (column.matchesName(referencerColumn)) {
-                return proposedRow.cell(column);
-            }
-        }
-        throw new MayflyInternalException("Didn't find " + targetColumn + 
-            " in " + columns.toString());
+        Column column = proposedRow.columns().columnFromName(referencerColumn);
+        return proposedRow.cell(column);
     }
 
     public DataStore checkDelete(DataStore store, String schema, String table, 

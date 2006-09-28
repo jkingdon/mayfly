@@ -1,31 +1,11 @@
 package net.sourceforge.mayfly.parser;
 
-import java.sql.SQLException;
-
 import net.sourceforge.mayfly.MayflyException;
 
 public class ParserException extends MayflyException {
 
-    /**
-     * We keep track of where the error occurred.  It, of
-     * course, is available to Java code which has the
-     * {@link ParserException} (not yet carried over
-     * to the {@link SQLException}).  But how else
-     * should it be provided?  Maybe the start line number
-     * (not columns or end line number) in the message?  
-     * Or put it in the message
-     * only if it is not one (or only if the input is
-     * more than one line)?
-     * It isn't clear how to address both the desire
-     * to be informative, but also the desire to
-     * avoid clutter in the (many) cases in which the
-     * line number won't be helpful.
-     */
-    public final Location location;
-
     public ParserException(String message, Location location) {
-        super(message);
-        this.location = location;
+        super(message, location);
     }
 
     public ParserException(String message) {
