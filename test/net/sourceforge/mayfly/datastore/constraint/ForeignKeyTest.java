@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 public class ForeignKeyTest extends TestCase {
@@ -26,12 +27,14 @@ public class ForeignKeyTest extends TestCase {
                     .addRow("bar", ImmutableList.singleton("id"), ImmutableList.singleton(new LongCell(5)))
             );
         key.checkInsert(store, DataStore.ANONYMOUS_SCHEMA_NAME, "foo",
-            singleColumnRow("bar_id", new LongCell(5))
+            singleColumnRow("bar_id", new LongCell(5)),
+            Location.UNKNOWN
         );
 
         try {
             key.checkInsert(store, DataStore.ANONYMOUS_SCHEMA_NAME, "foo",
-                singleColumnRow("bar_id", new LongCell(55))
+                singleColumnRow("bar_id", new LongCell(55)),
+                Location.UNKNOWN
             );
             fail();
         }

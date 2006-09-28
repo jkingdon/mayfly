@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.datastore.constraint;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.Iterator;
@@ -36,10 +37,10 @@ public class Constraints {
     }
 
     public void checkInsert(
-        DataStore store, String schema, String table, Row proposedRow) {
+        DataStore store, String schema, String table, Row proposedRow, Location location) {
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
             ForeignKey constraint = (ForeignKey) iter.next();
-            constraint.checkInsert(store, schema, table, proposedRow);
+            constraint.checkInsert(store, schema, table, proposedRow, location);
         }
     }
 

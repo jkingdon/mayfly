@@ -195,15 +195,17 @@ public class Parser {
     }
 
     private Command parseInsert() {
+        Location start = currentToken().location;
+
         expectAndConsume(TokenType.KEYWORD_insert);
         expectAndConsume(TokenType.KEYWORD_into);
         InsertTable table = parseInsertTable();
 
         ImmutableList columnNames = parseOptionalColumnNames();
         
-        ImmutableList values = parseValueConstructor();
+        ValueList values = parseValueConstructor();
 
-        return new Insert(table, columnNames, values);
+        return new Insert(table, columnNames, values.values, start.combine(values.location));
     }
 
     private Command parseUpdate() {
@@ -258,9 +260,19 @@ public class Parser {
         expectAndConsume(TokenType.CLOSE_PAREN);
         return new ImmutableList(columnNames);
     }
+    
+    class ValueList {
+        public final ImmutableList values;
+        public final Location location;
 
-    private ImmutableList parseValueConstructor() {
-        expectAndConsume(TokenType.KEYWORD_values);
+        public ValueList(List values, Location location) {
+            this.values = new ImmutableList(values);
+            this.location = location;
+        }
+    }
+
+    private ValueList parseValueConstructor() {
+        Location start = expectAndConsume(TokenType.KEYWORD_values).location;
 
         List values = new ArrayList();
         expectAndConsume(TokenType.OPEN_PAREN);
@@ -268,8 +280,8 @@ public class Parser {
         do {
             values.add(parseAndEvaluate());
         } while (consumeIfMatches(TokenType.COMMA));
-        expectAndConsume(TokenType.CLOSE_PAREN);
-        return new ImmutableList(values);
+        Location end = expectAndConsume(TokenType.CLOSE_PAREN).location;
+        return new ValueList(values, start.combine(end));
     }
 
     private Cell parseAndEvaluate() {

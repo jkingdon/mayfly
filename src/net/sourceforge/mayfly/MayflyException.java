@@ -1,4 +1,6 @@
 package net.sourceforge.mayfly;
+import net.sourceforge.mayfly.parser.Location;
+
 import java.sql.SQLException;
 
 /**
@@ -11,21 +13,25 @@ import java.sql.SQLException;
  */
 public class MayflyException extends RuntimeException {
     
-    private SQLException sqlException;
+    private final SQLException sqlException;
 
     public MayflyException(String message) {
+        this(message, Location.UNKNOWN);
+    }
+
+    public MayflyException(String message, Location location) {
         super(message);
-        sqlException = new MayflySqlException(message);
+        sqlException = new MayflySqlException(message, location);
     }
 
     public MayflyException(String message, Throwable cause) {
         super(message, cause);
-        sqlException = new MayflySqlException(message, cause);
+        sqlException = new MayflySqlException(message, cause, Location.UNKNOWN);
     }
 
     public MayflyException(Throwable cause) {
         super(cause);
-        sqlException = new MayflySqlException(cause);
+        sqlException = new MayflySqlException(cause, Location.UNKNOWN);
     }
 
     public SQLException asSqlException() {

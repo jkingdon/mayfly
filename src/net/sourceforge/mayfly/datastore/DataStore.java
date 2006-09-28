@@ -104,15 +104,13 @@ public class DataStore {
         return schema(schema).tables();
     }
 
-    public DataStore addRow(String schema, String table, List columnNames, List values) {
-        Checker checker = new Checker(this, schema, table);
-
+    public DataStore addRow(String schema, String table, 
+        List columnNames, List values, Checker checker) {
         return replace(schema, 
             schema(schema).addRow(checker, table, columnNames, values));
     }
 
-    public DataStore addRow(String schema, String table, List values) {
-        Checker checker = new Checker(this, schema, table);
+    public DataStore addRow(String schema, String table, List values, Checker checker) {
         return replace(schema, schema(schema).addRow(checker, table, values));
     }
 

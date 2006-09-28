@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.TableReference;
+import net.sourceforge.mayfly.parser.Location;
 
 public class ForeignKey {
 
@@ -55,7 +56,7 @@ public class ForeignKey {
     }
 
     public void checkInsert(DataStore store, String schema, String table, 
-        Row proposedRow) {
+        Row proposedRow, Location location) {
 
         if (!referencerSchema.equalsIgnoreCase(schema) || 
             !referencerTable.equalsIgnoreCase(table)) {
@@ -68,17 +69,18 @@ public class ForeignKey {
         Cell value = pickValue(proposedRow);
         if (!(value instanceof NullCell) &&
             !foundTable.hasValue(targetColumn, value)) {
-            throwInsertException(schema, value);
+            throwInsertException(schema, value, location);
         }
     }
 
-    private void throwInsertException(String schema, Cell value) {
+    private void throwInsertException(String schema, Cell value, Location location) {
         String targetTableName = formatTableName(
             schema, targetTable.schema(), targetTable.tableName());
         throw new MayflyException("foreign key violation: " + targetTableName + 
             " has no " +
             targetColumn +
-            " " + value.asBriefString());
+            " " + value.asBriefString(),
+            location);
     }
 
     private String formatTableName(

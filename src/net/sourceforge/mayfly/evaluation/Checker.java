@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.parser.Location;
 
 /**
  * @internal
@@ -21,6 +22,7 @@ public class Checker {
     private final String schema;
     private final String table;
     private DataStore store;
+    private final Location location;
 
     /**
      * @internal
@@ -32,9 +34,14 @@ public class Checker {
      */
     public Checker(DataStore store, String evaluationSchema, 
         String evaluationTable) {
+        this(store, evaluationSchema, evaluationTable, Location.UNKNOWN);
+    }
+
+    public Checker(DataStore store, String evaluationSchema, String evaluationTable, Location location) {
         this.store = store;
         this.schema = evaluationSchema;
         this.table = evaluationTable;
+        this.location = location;
     }
 
     public void checkDelete(Row rowToDelete, Row replacementRow) {
@@ -42,7 +49,7 @@ public class Checker {
     }
 
     public void checkInsert(Constraints constraints, Row proposedRow) {
-        constraints.checkInsert(store, schema, table, proposedRow);
+        constraints.checkInsert(store, schema, table, proposedRow, location);
     }
 
     public void checkDropTable() {

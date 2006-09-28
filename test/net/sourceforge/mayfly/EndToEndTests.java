@@ -155,7 +155,7 @@ public class EndToEndTests extends SqlTestCase {
         }
     }
     
-    public void xtestLineNumbersOnForeignKeyViolations() throws Exception {
+    public void testLineNumbersOnForeignKeyViolations() throws Exception {
         /* Line numbers are (at least sometimes) provided by 
          * Oracle in an all_errors table, by SQL Server in the
          * SQLException#getMessage(), and by Sybase and Postgres
