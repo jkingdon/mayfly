@@ -36,6 +36,11 @@ public abstract class Dialect {
         }
     }
 
+    public void assertMessage(String expectedMessage, SQLException exception, 
+        int expectedStartLine, int expectedStartColumn, int expectedEndLine, int expectedEndColumn) {
+        assertMessage(expectedMessage, exception);
+    }
+
     private void printException(SQLException exception) {
         exception.printStackTrace(System.out);
         System.out.print("SQL state was: " + exception.getSQLState() + "\n");

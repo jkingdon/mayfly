@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.acceptance;
 import junit.framework.Assert;
 
 import net.sourceforge.mayfly.Database;
+import net.sourceforge.mayfly.MayflySqlException;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -29,6 +30,17 @@ public class MayflyDialect extends Dialect {
     
     public void assertMessage(String expectedMessage, SQLException exception) {
         Assert.assertEquals(expectedMessage, exception.getMessage());
+    }
+    
+    public void assertMessage(String expectedMessage, SQLException exception, 
+        int expectedStartLine, int expectedStartColumn, int expectedEndLine, int expectedEndColumn) {
+        super.assertMessage(expectedMessage, exception, expectedStartLine,
+                expectedStartColumn, expectedEndLine, expectedEndColumn);
+        MayflySqlException mayflyException = (MayflySqlException) exception;
+        Assert.assertEquals(expectedStartLine, mayflyException.startLineNumber());
+        Assert.assertEquals(expectedStartColumn, mayflyException.startColumn());
+        Assert.assertEquals(expectedEndLine, mayflyException.endLineNumber());
+        Assert.assertEquals(expectedEndColumn, mayflyException.endColumn());
     }
     
     public boolean expectMayflyBehavior() {

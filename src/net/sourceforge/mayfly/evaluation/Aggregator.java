@@ -10,7 +10,7 @@ import net.sourceforge.mayfly.evaluation.what.What;
  */
 public interface Aggregator {
 
-    public abstract Rows group(Rows rows, What what, Selected selected);
+    public abstract ResultRows group(Rows rows, What what, Selected selected);
 
     public abstract void check(Row dummyRow, Selected selected);
 

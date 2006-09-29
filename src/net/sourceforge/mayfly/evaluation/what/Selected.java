@@ -2,11 +2,10 @@ package net.sourceforge.mayfly.evaluation.what;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.ValueObject;
 
@@ -45,14 +44,13 @@ public class Selected extends ValueObject implements Iterable {
         return row.findValue(zeroBasedColumn, element);
     }
 
-    public Rows aggregate(Rows rows) {
-        TupleBuilder builder = new TupleBuilder();
+    public ResultRows aggregate(Rows rows) {
+        ResultRow result = new ResultRow();
         for (int i = 0; i < expressions.size(); ++i) {
             Expression expression = (Expression) expressions.get(i);
-            builder.appendExpression(expression, expression.aggregate(rows));
+            result = result.with(expression, expression.aggregate(rows));
         }
-        Row resultRow = new Row(builder);
-        return new Rows(resultRow);
+        return new ResultRows(result);
     }
 
     public int size() {

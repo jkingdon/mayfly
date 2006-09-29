@@ -31,6 +31,15 @@ public class ResultRow {
         this.elements = fromRow(row);
     }
 
+    public ResultRow() {
+        this(new ImmutableList());
+    }
+    
+    private ResultRow(ImmutableList elements) {
+        this.row = null;
+        this.elements = elements;
+    }
+
     private static ImmutableList fromRow(Row row) {
         List result = new ArrayList();
         for (Iterator iter = row.iterator(); iter.hasNext();) {
@@ -121,6 +130,10 @@ public class ResultRow {
         }
     }
     
+    public ResultRow with(Expression expression, Cell value) {
+        return new ResultRow(elements.with(new Element(expression, value)));
+    }
+
     public static class Element {
         public final Expression expression;
         public final Cell value;

@@ -168,28 +168,18 @@ public class EndToEndTests extends SqlTestCase {
             "foreign key (country) references countries(id)" +
             ")");
 
-        try {
-            execute("  insert into cities(name, country) values ('Dhaka', 3)  ");
-            fail("Did not find expected exception.\n" +
-                "expected message: " + "foreign key violation: countries has no id 3" + "\n" +
-                "command: " + "insert into cities(name, country) values ('Dhaka', 3)" + "\n"
-            );
-        }
-        catch (MayflySqlException expected) {
-            /* We're just trying to indicate the line number of the statement
-               which violated the constraint.  Pointing to the constraint itself
-               might be interesting too but that raises many more issues because
-               it was in a separate statement, so do we try to indicate a
-               file name?  Or the Java stack trace where the constraint was
-               created?  Constraint names, of course, are a more conventional
-               solution (although we might want solutions for people who
-               prefer not to use constraint names).  */
-            assertMessage("foreign key violation: countries has no id 3", expected);
-            assertEquals(1, expected.startLineNumber());
-            assertEquals(3, expected.startColumn());
-            assertEquals(1, expected.endLineNumber());
-            assertEquals(56, expected.endColumn());
-        }
+        /* We're just trying to indicate the line number of the statement
+        which violated the constraint.  Pointing to the constraint itself
+        might be interesting too but that raises many more issues because
+        it was in a separate statement, so do we try to indicate a
+        file name?  Or the Java stack trace where the constraint was
+        created?  Constraint names, of course, are a more conventional
+        solution (although we might want solutions for people who
+        prefer not to use constraint names).  */
+        expectExecuteFailure(
+            "  insert into cities(name, country) values ('Dhaka', 3)  ",
+            "foreign key violation: countries has no id 3",
+            1, 3/*54*/, 1, 56/*55*/);
     }
 
 }

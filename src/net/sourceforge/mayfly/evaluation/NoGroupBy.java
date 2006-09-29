@@ -11,11 +11,11 @@ import java.util.Iterator;
 
 public class NoGroupBy extends ValueObject implements Aggregator {
 
-    public Rows group(Rows rows, What what, Selected selected) {
+    public ResultRows group(Rows rows, What what, Selected selected) {
         if (isAggregate(selected)) {
             return selected.aggregate(rows);
         }
-        return rows;
+        return new ResultRows(rows);
     }
     
     private boolean isAggregate(Selected selected) {

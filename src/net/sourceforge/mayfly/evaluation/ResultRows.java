@@ -31,6 +31,10 @@ public class ResultRows {
         }
         return new ImmutableList(result);
     }
+    
+    public ResultRows(ResultRow singleRow) {
+        this(ImmutableList.singleton(singleRow));
+    }
 
     public ResultRows() {
         this(new ImmutableList());

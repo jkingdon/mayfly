@@ -172,10 +172,7 @@ public abstract class SqlTestCase extends TestCase {
     protected void expectQueryFailure(String sql, String expectedMessage) {
         try {
             query(sql);
-            fail("Did not find expected exception.\n" +
-                "expected message: " + expectedMessage + "\n" +
-                "command: " + sql + "\n"
-            );
+            failForMissingException(sql, expectedMessage);
         } catch (SQLException e) {
             assertMessage(expectedMessage, e);
         }
@@ -184,13 +181,29 @@ public abstract class SqlTestCase extends TestCase {
     protected void expectExecuteFailure(String sql, String expectedMessage) {
         try {
             execute(sql);
-            fail("Did not find expected exception.\n" +
-                "expected message: " + expectedMessage + "\n" +
-                "command: " + sql + "\n"
-            );
+            failForMissingException(sql, expectedMessage);
         } catch (SQLException expected) {
             assertMessage(expectedMessage, expected);
         }
+    }
+
+    protected void expectExecuteFailure(String sql, String expectedMessage, 
+        int expectedStartLine, int expectedStartColumn,
+        int expectedEndLine, int expectedEndColumn) {
+        try {
+            execute(sql);
+            failForMissingException(sql, expectedMessage);
+        } catch (SQLException expected) {
+            dialect.assertMessage(expectedMessage, expected, 
+                expectedStartLine, expectedStartColumn, expectedEndLine, expectedEndColumn);
+        }
+    }
+
+    public static void failForMissingException(String sql, String expectedMessage) {
+        fail("Did not find expected exception.\n" +
+            "expected message: " + expectedMessage + "\n" +
+            "command: " + sql + "\n"
+        );
     }
     
     public void createEmptySchema(String name) throws SQLException {

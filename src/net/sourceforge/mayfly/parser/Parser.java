@@ -269,29 +269,51 @@ public class Parser {
             this.values = new ImmutableList(values);
             this.location = location;
         }
+        
+        public ValueList(Location start) {
+            this(new ImmutableList(), start);
+        }
+
+        ValueList with(Value newValue) {
+            return new ValueList(values.with(newValue.value), this.location.combine(newValue.location));
+        }
+        
+        ValueList with(Location end) {
+            return new ValueList(values, this.location.combine(end));
+        }
+    }
+    
+    class Value {
+        public final Cell value;
+        public final Location location;
+
+        public Value(Cell value, Location location) {
+            this.value = value;
+            this.location = location;
+        }
     }
 
     private ValueList parseValueConstructor() {
         Location start = expectAndConsume(TokenType.KEYWORD_values).location;
 
-        List values = new ArrayList();
+        ValueList values = new ValueList(start);
         expectAndConsume(TokenType.OPEN_PAREN);
 
         do {
-            values.add(parseAndEvaluate());
+            values = values.with(parseAndEvaluate());
         } while (consumeIfMatches(TokenType.COMMA));
         Location end = expectAndConsume(TokenType.CLOSE_PAREN).location;
-        return new ValueList(values, start.combine(end));
+        return values.with(end);
     }
 
-    private Cell parseAndEvaluate() {
+    private Value parseAndEvaluate() {
         Expression expression = parseExpressionOrNull();
         if (expression == null) {
             // default value
-            return null;
+            return new Value(null, Location.UNKNOWN);
         }
         else {
-            return expression.evaluate(new Row(new TupleBuilder()) {
+            Cell cell = expression.evaluate(new Row(new TupleBuilder()) {
                 public Column findColumn(String tableOrAlias, String columnName) {
                     throw new MayflyException(
                         "values clause may not refer to column: " 
@@ -300,6 +322,7 @@ public class Parser {
                 }
             }
             );
+            return new Value(cell, expression.location);
         }
     }
 

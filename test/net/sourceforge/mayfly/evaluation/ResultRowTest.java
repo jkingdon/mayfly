@@ -91,5 +91,15 @@ public class ResultRowTest extends TestCase {
         LongCell count = (LongCell) row.findValue(new CountAll("Count"));
         assertEquals(2L, count.asLong());
     }
+    
+    public void testAdd() throws Exception {
+        ResultRow row = new ResultRow();
+        assertEquals(0, row.size());
+        
+        ResultRow biggerRow = row.with(new CountAll("count"), new LongCell(2));
+        assertEquals(1, biggerRow.size());
+        LongCell value = (LongCell) biggerRow.findValue(new CountAll("count"));
+        assertEquals(2L, value.asLong());
+    }
 
 }
