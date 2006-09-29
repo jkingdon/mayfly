@@ -1,9 +1,9 @@
 package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Location;
 
 public abstract class Literal extends Expression {
@@ -12,7 +12,7 @@ public abstract class Literal extends Expression {
         super(location);
     }
 
-    public final Cell evaluate(Row row) {
+    public final Cell evaluate(ResultRow row) {
         return valueAsCell();
     }
 

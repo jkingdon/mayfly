@@ -1,10 +1,10 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.UnimplementedCell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Location;
 
 public class UnimplementedExpression extends Expression {
@@ -17,10 +17,10 @@ public class UnimplementedExpression extends Expression {
     }
 
     public Cell aggregate(Rows rows) {
-        return evaluate(null);
+        return evaluate((ResultRow)null);
     }
 
-    public Cell evaluate(Row row) {
+    public Cell evaluate(ResultRow row) {
         return new UnimplementedCell(expression);
     }
 

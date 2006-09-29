@@ -3,6 +3,8 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.evaluation.Checker;
+import net.sourceforge.mayfly.evaluation.Value;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
@@ -31,28 +33,28 @@ public class TableData {
         this.rows = rows;
     }
 
-    public TableData addRow(Checker checker, List columnNames, List values) {
+    public TableData addRow(Checker checker, List columnNames, ValueList values) {
         Columns specified = findColumns(columnNames);
         specified.checkForDuplicates();
         
         return addRow(checker, specified, values);
     }
 
-    public TableData addRow(Checker checker, List values) {
+    public TableData addRow(Checker checker, ValueList values) {
         return addRow(checker, columns, values);
     }
 
     private TableData addRow(Checker checker,
-        Columns columnsToInsert, List values) {
+        Columns columnsToInsert, ValueList values) {
         if (columnsToInsert.size() != values.size()) {
             if (values.size() > columnsToInsert.size()) {
-                throw new MayflyException("Too many values.\n" + describeNamesAndValues(columnsToInsert, values));
+                throw makeException("Too many values.\n", columnsToInsert, values);
             } else {
-                throw new MayflyException("Too few values.\n" + describeNamesAndValues(columnsToInsert, values));
+                throw makeException("Too few values.\n", columnsToInsert, values);
             }
         }
         
-        M specifiedColumnToValue = columnsToInsert.zipper(new L(values));
+        M specifiedColumnToValue = columnsToInsert.zipper(new L(values.values));
         Columns newColumns = columns;
         
         TupleBuilder tuple = new TupleBuilder();
@@ -71,13 +73,19 @@ public class TableData {
         return new TableData(newColumns, constraints, (Rows) rows.with(newRow));
     }
 
+    private MayflyException makeException(String message, Columns columnsToInsert, ValueList values) {
+        return new MayflyException(
+            message + describeNamesAndValues(columnsToInsert, values.asCells()),
+            values.location);
+    }
+
     private Columns setColumn(M specifiedColumnToValue, Columns newColumns, 
         TupleBuilder tuple, Column column) {
         boolean isDefault;
         if (specifiedColumnToValue.containsKey(column)) {
-            Cell value = (Cell) specifiedColumnToValue.get(column);
-            isDefault = value == null;
-            Cell cell = isDefault ? column.defaultValue() : column.coerce(value);
+            Value value = (Value) specifiedColumnToValue.get(column);
+            isDefault = value.value == null;
+            Cell cell = isDefault ? column.defaultValue() : column.coerce(value.value);
             tuple.append(new TupleElement(column, cell));
         } else {
             isDefault = true;

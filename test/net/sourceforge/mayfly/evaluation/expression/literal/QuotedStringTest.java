@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.StringCell;
-import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Parser;
 
 public class QuotedStringTest extends TestCase {
@@ -16,13 +16,13 @@ public class QuotedStringTest extends TestCase {
     public void testValue() throws Exception {
         {
             StringCell cell = (StringCell) 
-                new QuotedString("'steve'").evaluate(null);
+                new QuotedString("'steve'").evaluate((ResultRow)null);
             assertEquals("steve", cell.asString());
         }
 
         {
             StringCell cell = (StringCell) 
-                new QuotedString("'a''''b'").evaluate(null);
+                new QuotedString("'a''''b'").evaluate((ResultRow)null);
             assertEquals("a''b", cell.asString());
         }
     }

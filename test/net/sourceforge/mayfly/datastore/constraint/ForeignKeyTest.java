@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
@@ -24,7 +25,7 @@ public class ForeignKeyTest extends TestCase {
                     .createTable("foo", ImmutableList.singleton("bar_id"))
 
                     .createTable("bar", ImmutableList.singleton("id"))
-                    .addRow("bar", ImmutableList.singleton("id"), ImmutableList.singleton(new LongCell(5)))
+                    .addRow("bar", ImmutableList.singleton("id"), ValueList.singleton(new LongCell(5)))
             );
         key.checkInsert(store, DataStore.ANONYMOUS_SCHEMA_NAME, "foo",
             singleColumnRow("bar_id", new LongCell(5)),
@@ -56,11 +57,11 @@ public class ForeignKeyTest extends TestCase {
             new DataStore(
                 new Schema()
                     .createTable("foo", ImmutableList.singleton("bar_id"))
-                    .addRow("foo", ImmutableList.singleton("bar_id"), ImmutableList.singleton(new LongCell(5)))
+                    .addRow("foo", ImmutableList.singleton("bar_id"), ValueList.singleton(new LongCell(5)))
 
                     .createTable("bar", ImmutableList.singleton("id"))
-                    .addRow("bar", ImmutableList.singleton("id"), ImmutableList.singleton(new LongCell(5)))
-                    .addRow("bar", ImmutableList.singleton("id"), ImmutableList.singleton(new LongCell(6)))
+                    .addRow("bar", ImmutableList.singleton("id"), ValueList.singleton(new LongCell(5)))
+                    .addRow("bar", ImmutableList.singleton("id"), ValueList.singleton(new LongCell(6)))
             );
         Row sixRow = singleColumnRow("id", new LongCell(6));
         key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "bar", sixRow, null);

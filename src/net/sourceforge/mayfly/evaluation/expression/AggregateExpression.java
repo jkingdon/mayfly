@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public abstract class AggregateExpression extends Expression {
         this(column, functionName, distinct, Location.UNKNOWN);
     }
 
-    public Cell evaluate(Row row) {
+    public Cell evaluate(ResultRow row) {
         /** This is just for checking; aggregation happens in {@link #aggregate(Rows)}. */
         return column.evaluate(row);
     }

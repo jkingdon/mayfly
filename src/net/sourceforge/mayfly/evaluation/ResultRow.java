@@ -94,7 +94,7 @@ public class ResultRow {
             }
         }
         if (found == null) {
-            throw new MayflyException("no column " + columnName);
+            throw new MayflyException("no column " + Column.displayName(tableOrAlias, columnName));
         } else {
             return found;
         }

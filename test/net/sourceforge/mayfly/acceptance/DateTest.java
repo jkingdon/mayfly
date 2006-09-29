@@ -68,7 +68,14 @@ public class DateTest extends SqlTestCase {
         assertFalse(results.next());
         results.close();
     }
-    
+
+    public void testNull() throws Exception {
+        execute("create table foo (start_date date, end_date date)");
+        execute("insert into foo (start_date) values (null)");
+        assertResultSet(new String[] { " null, null " }, 
+            query("select start_date, end_date from foo"));
+    }
+
     public void xtestTimestamp() throws Exception {
         // Need to figure out what hypersonic is doing
         // with timezones (I think it is just wrong; Derby

@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.evaluation.Checker;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
@@ -80,16 +81,16 @@ public class Schema {
         return tables.keySet();
     }
 
-    public Schema addRow(Checker checker, String table, List columnNames, List values) {
+    public Schema addRow(Checker checker, String table, List columnNames, ValueList values) {
         return new Schema(tables.with(lookUpTable(table), 
             table(table).addRow(checker, columnNames, values)));
     }
     
-    public Schema addRow(String table, List columnNames, List values) {
+    public Schema addRow(String table, List columnNames, ValueList values) {
         return addRow(new NullChecker(), table, columnNames, values);
     }
 
-    public Schema addRow(Checker checker, String table, List values) {
+    public Schema addRow(Checker checker, String table, ValueList values) {
         return new Schema(
             tables.with(
                 lookUpTable(table), 

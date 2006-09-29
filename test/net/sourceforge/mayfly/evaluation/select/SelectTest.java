@@ -7,7 +7,10 @@ import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.Value;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.what.Selected;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.L;
 
 public class SelectTest extends TestCase {
@@ -73,10 +76,10 @@ public class SelectTest extends TestCase {
             new DataStore(
                 new Schema()
                     .createTable("foo", new L().append("colA"))
-                    .addRow("foo", new L().append("colA"), new L().append(new StringCell("1a")))
+                    .addRow("foo", new L().append("colA"), ValueList.singleton(new StringCell("1a")))
 
                     .createTable("bar", new L().append("colX"))
-                    .addRow("bar", new L().append("colX"), new L().append(new StringCell("barXValue")))
+                    .addRow("bar", new L().append("colX"), ValueList.singleton(new StringCell("barXValue")))
                 );
 
 
@@ -102,8 +105,10 @@ public class SelectTest extends TestCase {
         assertRow("foo", "colA", "3a", "foo", "colB", "xx", rows.row(1));
     }
 
-    private L makeValues(String firstStringValue, String secondStringValue) {
-        return new L().append(new StringCell(firstStringValue)).append(new StringCell(secondStringValue));
+    private ValueList makeValues(String firstStringValue, String secondStringValue) {
+        return ValueList
+            .singleton(new StringCell(firstStringValue))
+            .with(new Value(new StringCell(secondStringValue), Location.UNKNOWN));
     }
 
 }

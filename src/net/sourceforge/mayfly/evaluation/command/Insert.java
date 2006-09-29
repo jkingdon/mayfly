@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation.command;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.Checker;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
@@ -10,7 +11,7 @@ public class Insert extends Command {
 
     public final InsertTable table;
     public final ImmutableList columnNames;
-    public final ImmutableList values;
+    public final ValueList values;
     public final Location location;
 
     /** @param values List of values to insert, 
@@ -18,17 +19,12 @@ public class Insert extends Command {
      * or null for the default value
      */
     public Insert(InsertTable table, 
-        ImmutableList columnNames, ImmutableList values,
+        ImmutableList columnNames, ValueList values,
         Location location) {
         this.table = table;
         this.columnNames = columnNames;
         this.values = values;
         this.location = location;
-    }
-
-    public Insert(InsertTable table, 
-        ImmutableList columnNames, ImmutableList values) {
-        this(table, columnNames, values, Location.UNKNOWN);
     }
 
     public String table() {

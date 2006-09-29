@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.datastore.types;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DateCell;
+import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.StringCell;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -15,6 +16,9 @@ public class DateDataType extends DataType {
     public Cell coerce(Cell value) {
         if (value instanceof StringCell) {
             return stringToDate(value.asString());
+        }
+        else if (value instanceof NullCell) {
+            return value;
         }
         else {
             throw new MayflyException("Attempt to store " + 

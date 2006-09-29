@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.evaluation.Checker;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
@@ -105,12 +106,12 @@ public class DataStore {
     }
 
     public DataStore addRow(String schema, String table, 
-        List columnNames, List values, Checker checker) {
+        List columnNames, ValueList values, Checker checker) {
         return replace(schema, 
             schema(schema).addRow(checker, table, columnNames, values));
     }
 
-    public DataStore addRow(String schema, String table, List values, Checker checker) {
+    public DataStore addRow(String schema, String table, ValueList values, Checker checker) {
         return replace(schema, schema(schema).addRow(checker, table, values));
     }
 

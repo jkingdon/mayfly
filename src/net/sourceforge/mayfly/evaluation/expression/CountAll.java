@@ -2,9 +2,9 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Location;
 
 public class CountAll extends Expression {
@@ -20,7 +20,7 @@ public class CountAll extends Expression {
         this(functionName, Location.UNKNOWN);
     }
 
-    public Cell evaluate(Row row) {
+    public Cell evaluate(ResultRow row) {
         /** This is just for checking; aggregation happens in {@link #aggregate(Rows)}. */
         return new LongCell(0);
     }

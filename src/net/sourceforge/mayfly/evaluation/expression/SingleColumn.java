@@ -40,10 +40,6 @@ public class SingleColumn extends Expression {
         this.columnName = columnName;
     }
 
-    public Cell evaluate(Row row) {
-        return row.cell(tableOrAlias, columnName);
-    }
-    
     public Cell evaluate(ResultRow row) {
         SingleColumn found = row.findColumn(tableOrAlias, columnName);
         return row.findValue(found);

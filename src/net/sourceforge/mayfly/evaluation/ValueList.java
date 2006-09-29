@@ -1,16 +1,24 @@
 package net.sourceforge.mayfly.evaluation;
 
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class ValueList {
-    private final ImmutableList values;
+
+    public static ValueList singleton(Cell cell) {
+        return new ValueList(ImmutableList.singleton(new Value(cell, Location.UNKNOWN)), Location.UNKNOWN);
+    }
+
+    public final ImmutableList values;
     public final Location location;
 
-    public ValueList(List values, Location location) {
-        this.values = new ImmutableList(values);
+    public ValueList(ImmutableList values, Location location) {
+        this.values = values;
         this.location = location;
     }
     
@@ -19,7 +27,7 @@ public class ValueList {
     }
 
     public ValueList with(Value newValue) {
-        return new ValueList(values.with(newValue.value), this.location.combine(newValue.location));
+        return new ValueList(values.with(newValue), this.location.combine(newValue.location));
     }
     
     public ValueList with(Location end) {
@@ -27,6 +35,20 @@ public class ValueList {
     }
 
     public ImmutableList asCells() {
-        return values;
+        List cells = new ArrayList();
+        for (Iterator iter = values.iterator(); iter.hasNext();) {
+            Value value = (Value) iter.next();
+            cells.add(value.value);
+        }
+        return new ImmutableList(cells);
     }
+
+    public int size() {
+        return values.size();
+    }
+
+    public Cell cell(int index) {
+        return ((Value)values.get(index)).value;
+    }
+
 }

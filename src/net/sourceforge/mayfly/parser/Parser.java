@@ -8,8 +8,6 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
-import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.datastore.constraint.Action;
 import net.sourceforge.mayfly.datastore.constraint.Cascade;
 import net.sourceforge.mayfly.datastore.constraint.NoAction;
@@ -24,6 +22,7 @@ import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupBy;
 import net.sourceforge.mayfly.evaluation.GroupItem;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.Command;
@@ -207,7 +206,7 @@ public class Parser {
         
         ValueList values = parseValueConstructor();
 
-        return new Insert(table, columnNames, values.asCells(), start.combine(values.location));
+        return new Insert(table, columnNames, values, start.combine(values.location));
     }
 
     private Command parseUpdate() {
@@ -283,8 +282,8 @@ public class Parser {
             return new Value(null, Location.UNKNOWN);
         }
         else {
-            Cell cell = expression.evaluate(new Row(new TupleBuilder()) {
-                public Column findColumn(String tableOrAlias, String columnName) {
+            Cell cell = expression.evaluate(new ResultRow() {
+                public SingleColumn findColumn(String tableOrAlias, String columnName) {
                     throw new MayflyException(
                         "values clause may not refer to column: " 
                         + Column.displayName(tableOrAlias, columnName)
@@ -534,7 +533,7 @@ public class Parser {
     private Cell parseDefaultClause(String name) {
         if (consumeIfMatches(TokenType.KEYWORD_default)) {
             Expression expression = parseDefaultValue(name);
-            return expression.evaluate(null);
+            return expression.evaluate((ResultRow)null);
         }
         else {
             return NullCell.INSTANCE;
@@ -544,7 +543,7 @@ public class Parser {
     private Cell parseOnUpdateValue(String columnName) {
         if (consumeIfMatches(TokenType.KEYWORD_on)) {
             expectAndConsume(TokenType.KEYWORD_update);
-            return parseDefaultValue(columnName).evaluate(null);
+            return parseDefaultValue(columnName).evaluate((ResultRow)null);
         }
         else {
             return null;
