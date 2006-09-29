@@ -24,6 +24,8 @@ import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupBy;
 import net.sourceforge.mayfly.evaluation.GroupItem;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.evaluation.Value;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.CreateSchema;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
@@ -205,7 +207,7 @@ public class Parser {
         
         ValueList values = parseValueConstructor();
 
-        return new Insert(table, columnNames, values.values, start.combine(values.location));
+        return new Insert(table, columnNames, values.asCells(), start.combine(values.location));
     }
 
     private Command parseUpdate() {
@@ -261,38 +263,6 @@ public class Parser {
         return new ImmutableList(columnNames);
     }
     
-    class ValueList {
-        public final ImmutableList values;
-        public final Location location;
-
-        public ValueList(List values, Location location) {
-            this.values = new ImmutableList(values);
-            this.location = location;
-        }
-        
-        public ValueList(Location start) {
-            this(new ImmutableList(), start);
-        }
-
-        ValueList with(Value newValue) {
-            return new ValueList(values.with(newValue.value), this.location.combine(newValue.location));
-        }
-        
-        ValueList with(Location end) {
-            return new ValueList(values, this.location.combine(end));
-        }
-    }
-    
-    class Value {
-        public final Cell value;
-        public final Location location;
-
-        public Value(Cell value, Location location) {
-            this.value = value;
-            this.location = location;
-        }
-    }
-
     private ValueList parseValueConstructor() {
         Location start = expectAndConsume(TokenType.KEYWORD_values).location;
 
