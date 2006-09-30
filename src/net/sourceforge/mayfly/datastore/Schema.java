@@ -34,6 +34,11 @@ public class Schema {
         return new Schema(tables.with(table, new TableData(columns, constraints)));
     }
 
+    public Schema addColumn(String table, Column newColumn) {
+        TableData oldTable = table(table);
+        return new Schema(tables.with(table, oldTable.addColumn(newColumn)));
+    }
+
     private void assertNoTable(String table) {
         String existingTable = lookUpTableOrNull(table);
         if (existingTable != null) {

@@ -260,4 +260,15 @@ public class TableData {
         constraints.checkDropTable(store, schema, table);
     }
 
+    public TableData addColumn(Column newColumn) {
+        if (columns.hasColumn(newColumn.columnName())) {
+            throw new MayflyException("column " + newColumn.columnName() + " already exists");
+        }
+        return new TableData(
+            (Columns) columns.with(newColumn), 
+            constraints,
+            rows.addColumn(newColumn)
+        );
+    }
+
 }

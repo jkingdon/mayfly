@@ -98,6 +98,16 @@ public class Columns extends Aggregate {
             return found;
         }
     }
+    
+    public boolean hasColumn(String name) {
+        for (Iterator iter = columns.iterator(); iter.hasNext(); ) {
+            Column column = (Column) iter.next();
+            if (column.matchesName(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     public void checkForDuplicates() {
         Set names = new HashSet();

@@ -9,7 +9,7 @@ import net.sourceforge.mayfly.util.ImmutableList;
 
 public class Insert extends Command {
 
-    public final InsertTable table;
+    public final UnresolvedTableReference table;
     public final ImmutableList columnNames;
     public final ValueList values;
     public final Location location;
@@ -18,7 +18,7 @@ public class Insert extends Command {
      * where each element is a {@link Cell}
      * or null for the default value
      */
-    public Insert(InsertTable table, 
+    public Insert(UnresolvedTableReference table, 
         ImmutableList columnNames, ValueList values,
         Location location) {
         this.table = table;

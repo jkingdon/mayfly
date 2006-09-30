@@ -33,5 +33,14 @@ public class Rows extends Aggregate {
     public int size() {
         return rows.size();
     }
+    
+    public Rows addColumn(Column newColumn) {
+        Rows result = new Rows();
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            result = (Rows) result.with(row.addColumn(newColumn));
+        }
+        return result;
+    }
 
 }

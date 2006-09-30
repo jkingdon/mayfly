@@ -186,5 +186,6 @@ public class SchemaTest extends SqlTestCase {
     // test mars.foo syntax (where is this legal?)
     // case insensitive on mars.foo
     // world?.col where ? is JDBC parameter (int or string)
+    // CREATE TABLE mars.foo ... - this actually is legal, and currently mishandled by mayfly.
 
 }

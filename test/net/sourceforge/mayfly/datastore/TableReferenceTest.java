@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.evaluation.command.InsertTable;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 public class TableReferenceTest extends TestCase {
@@ -12,7 +12,7 @@ public class TableReferenceTest extends TestCase {
             new Schema()
                 .createTable("FOO", ImmutableList.singleton("a"))
         );
-        InsertTable raw = new InsertTable("Foo");
+        UnresolvedTableReference raw = new UnresolvedTableReference("Foo");
         assertEquals("Foo", raw.tableName());
 
         TableReference reference = raw.resolve(
@@ -23,7 +23,7 @@ public class TableReferenceTest extends TestCase {
     
     public void testAdditionalTable() throws Exception {
         DataStore store = new DataStore(new Schema());
-        InsertTable raw = new InsertTable("Foo");
+        UnresolvedTableReference raw = new UnresolvedTableReference("Foo");
         assertEquals("Foo", raw.tableName());
 
         TableReference reference = raw.resolve(

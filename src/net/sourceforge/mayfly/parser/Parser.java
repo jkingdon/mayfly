@@ -25,15 +25,16 @@ import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
+import net.sourceforge.mayfly.evaluation.command.AddColumn;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.CreateSchema;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
 import net.sourceforge.mayfly.evaluation.command.Delete;
 import net.sourceforge.mayfly.evaluation.command.DropTable;
 import net.sourceforge.mayfly.evaluation.command.Insert;
-import net.sourceforge.mayfly.evaluation.command.InsertTable;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
 import net.sourceforge.mayfly.evaluation.command.Update;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
@@ -172,6 +173,10 @@ public class Parser {
                     currentToken());
             }
         }
+        else if (consumeIfMatches(TokenType.KEYWORD_alter)) {
+            expectAndConsume(TokenType.KEYWORD_table);
+            return parseAlterTable();
+        }
         else if (currentTokenType() == TokenType.KEYWORD_set) {
             return parseSetSchema();
         }
@@ -200,7 +205,7 @@ public class Parser {
 
         expectAndConsume(TokenType.KEYWORD_insert);
         expectAndConsume(TokenType.KEYWORD_into);
-        InsertTable table = parseInsertTable();
+        UnresolvedTableReference table = parseTableReference();
 
         ImmutableList columnNames = parseOptionalColumnNames();
         
@@ -211,7 +216,7 @@ public class Parser {
 
     private Command parseUpdate() {
         expectAndConsume(TokenType.KEYWORD_update);
-        InsertTable table = parseInsertTable();
+        UnresolvedTableReference table = parseTableReference();
         expectAndConsume(TokenType.KEYWORD_set);
         List setClauses = parseSetClauseList();
         BooleanExpression where = parseOptionalWhere();
@@ -221,7 +226,7 @@ public class Parser {
     private Command parseDelete() {
         expectAndConsume(TokenType.KEYWORD_delete);
         expectAndConsume(TokenType.KEYWORD_from);
-        InsertTable table = parseInsertTable();
+        UnresolvedTableReference table = parseTableReference();
         BooleanExpression where = parseOptionalWhere();
         return new Delete(table, where);
     }
@@ -386,6 +391,21 @@ public class Parser {
         }
     }
 
+    private Command parseAlterTable() {
+        UnresolvedTableReference table = parseTableReference();
+        expectAndConsume(TokenType.KEYWORD_add);
+        
+        // optional according to SQL92 but does anyone omit it?
+        expectAndConsume(TokenType.KEYWORD_column);
+
+        CreateTable constraintCollector = new CreateTable(table.tableName());
+        Column newColumn = parseColumnDefinition(constraintCollector);
+        if (constraintCollector.hasConstraints()) {
+            throw new MayflyException("constraints are not yet supported in ALTER TABLE");
+        }
+        return new AddColumn(table, newColumn);
+    }
+
     void parseTableElement(CreateTable table) {
         if (currentTokenType() == TokenType.IDENTIFIER) {
             table.addColumn(parseColumnDefinition(table));
@@ -433,7 +453,7 @@ public class Parser {
         expectAndConsume(TokenType.CLOSE_PAREN);
 
         expectAndConsume(TokenType.KEYWORD_references);
-        InsertTable targetTable = parseInsertTable();
+        UnresolvedTableReference targetTable = parseTableReference();
         expectAndConsume(TokenType.OPEN_PAREN);
         String targetColumn = consumeIdentifier();
         expectAndConsume(TokenType.CLOSE_PAREN);
@@ -1123,7 +1143,7 @@ public class Parser {
             return fromElement;
         }
 
-        FromElement left = parseTableReference();
+        FromElement left = parseFromTable();
         while (true) {
             if (currentTokenType() == TokenType.KEYWORD_cross) {
                 expectAndConsume(TokenType.KEYWORD_cross);
@@ -1156,7 +1176,7 @@ public class Parser {
         }
     }
 
-    public FromTable parseTableReference() {
+    public FromTable parseFromTable() {
         String firstIdentifier = consumeIdentifier();
         String table;
         if (currentTokenType() == TokenType.PERIOD) {
@@ -1174,14 +1194,14 @@ public class Parser {
         }
     }
     
-    public InsertTable parseInsertTable() {
+    public UnresolvedTableReference parseTableReference() {
         String first = consumeIdentifier();
         if (consumeIfMatches(TokenType.PERIOD)) {
             String table = consumeIdentifier();
-            return new InsertTable(first, table);
+            return new UnresolvedTableReference(first, table);
         }
         else {
-            return new InsertTable(first);
+            return new UnresolvedTableReference(first);
         }
     }
 

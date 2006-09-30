@@ -45,13 +45,13 @@ public class ParserTest extends TestCase {
 
     public void testIdentifier() throws Exception {
         Parser parser = new Parser("foo");
-        parser.parseTableReference();
+        parser.parseFromTable();
         assertEquals("", parser.remainingTokens());
     }
     
     public void testRemainingTokens() throws Exception {
         Parser parser = new Parser("foo inner");
-        parser.parseTableReference();
+        parser.parseFromTable();
         assertEquals("INNER", parser.remainingTokens());
     }
     
@@ -60,7 +60,7 @@ public class ParserTest extends TestCase {
     }
     
     public void testSchemaDotTable() throws Exception {
-        new Parser("mars.foo").parseTableReference();
+        new Parser("mars.foo").parseFromTable();
     }
 
     public void testDotIdentifier() throws Exception {
@@ -69,13 +69,13 @@ public class ParserTest extends TestCase {
     
     public void testSchemaDotTableAlias() throws Exception {
         Parser parser = new Parser("mars.foo f");
-        parser.parseTableReference();
+        parser.parseFromTable();
         assertEquals("", parser.remainingTokens());
     }
 
     public void testTableAlias() throws Exception {
         Parser parser = new Parser("foo f");
-        parser.parseTableReference();
+        parser.parseFromTable();
         assertEquals("", parser.remainingTokens());
     }
 
@@ -617,7 +617,7 @@ public class ParserTest extends TestCase {
 
     private void expectFailure(String sql, String expectedMessage) {
         try {
-            new Parser(sql).parseTableReference();
+            new Parser(sql).parseFromTable();
             fail();
         } catch (ParserException e) {
             assertEquals(expectedMessage, e.getMessage());

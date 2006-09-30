@@ -460,4 +460,8 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean addingColumnCountsAsAffectedRow() {
+        return false;
+    }
+
 }

@@ -96,7 +96,7 @@ public class CreateTable extends Command {
         L result = new L();
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
             UnresolvedForeignKey key = (UnresolvedForeignKey) iter.next();
-            InsertTable targetTable = key.targetTable;
+            UnresolvedTableReference targetTable = key.targetTable;
             result.add(
                 new ForeignKey(
                     schema,
@@ -144,7 +144,7 @@ public class CreateTable extends Command {
     }
 
     public void addForeignKeyConstraint(String referencingColumn, 
-        InsertTable targetTable, String targetColumn, 
+        UnresolvedTableReference targetTable, String targetColumn, 
         Action onDelete, Action onUpdate) {
         foreignKeyConstraints.add(
             new UnresolvedForeignKey(
@@ -152,15 +152,23 @@ public class CreateTable extends Command {
             ));
     }
     
+    public boolean hasConstraints() {
+        return 
+            primaryKeyColumns != null || 
+            !uniqueConstraints.isEmpty() || 
+            !notNullConstraints.isEmpty() || 
+            !foreignKeyConstraints.isEmpty();
+    }
+    
     static class UnresolvedForeignKey {
         final String referencingColumn;
-        final InsertTable targetTable;
+        final UnresolvedTableReference targetTable;
         final String targetColumn;
         final Action onDelete;
         final Action onUpdate;
 
         public UnresolvedForeignKey(String referencingColumn, 
-            InsertTable targetTable, String targetColumn, 
+            UnresolvedTableReference targetTable, String targetColumn, 
             Action onDelete, Action onUpdate) {
             this.referencingColumn = referencingColumn;
             this.targetTable = targetTable;

@@ -204,5 +204,9 @@ public class MySqlDialect extends Dialect {
     public boolean datesAreOff() {
         return true;
     }
+    
+    public boolean addingColumnCountsAsAffectedRow() {
+        return true;
+    }
 
 }

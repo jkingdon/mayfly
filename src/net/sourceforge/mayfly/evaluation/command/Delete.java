@@ -5,10 +5,10 @@ import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 
 public class Delete extends Command {
 
-    private final InsertTable table;
+    private final UnresolvedTableReference table;
     private final BooleanExpression where;
 
-    public Delete(InsertTable table, BooleanExpression where) {
+    public Delete(UnresolvedTableReference table, BooleanExpression where) {
         this.table = table;
         this.where = where;
     }

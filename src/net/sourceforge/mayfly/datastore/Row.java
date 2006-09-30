@@ -121,4 +121,8 @@ public class Row extends Aggregate {
                "\tcells:\t" + cells;
     }
 
+    public Row addColumn(Column newColumn) {
+        return new Row(elements.with(new TupleElement(newColumn, newColumn.defaultValue())));
+    }
+
 }

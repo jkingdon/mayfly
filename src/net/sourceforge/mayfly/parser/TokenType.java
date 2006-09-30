@@ -38,13 +38,16 @@ public class TokenType {
     public static final TokenType BANG_EQUAL = new TokenType("'!='");
     public static final TokenType SEMICOLON = new TokenType("';'");
 
+    public static final TokenType KEYWORD_add = registerKeyword("add");
     public static final TokenType KEYWORD_all = registerKeyword("all");
+    public static final TokenType KEYWORD_alter = registerKeyword("alter");
     public static final TokenType KEYWORD_and = registerKeyword("and");
     public static final TokenType KEYWORD_asc = registerKeyword("asc");
     public static final TokenType KEYWORD_authorization = registerKeyword("authorization");
     public static final TokenType KEYWORD_avg = registerKeyword("avg");
     public static final TokenType KEYWORD_by = registerKeyword("by");
     public static final TokenType KEYWORD_character = registerKeyword("character");
+    public static final TokenType KEYWORD_column = registerKeyword("column");
     public static final TokenType KEYWORD_constraint = registerKeyword("constraint");
     public static final TokenType KEYWORD_count = registerKeyword("count");
     public static final TokenType KEYWORD_create = registerKeyword("create");

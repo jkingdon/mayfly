@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.evaluation.command;
 
-import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.util.ValueObject;
@@ -10,19 +9,17 @@ import net.sourceforge.mayfly.util.ValueObject;
  * A raw table reference out of the parser (that is, we
  * have not yet applied the default schema nor checked
  * that the table exists, nor canonicalized the table name).
- * 
- * Should probably be renamed to UnresolvedTableReference.
  */
-public class InsertTable extends ValueObject {
+public class UnresolvedTableReference extends ValueObject {
 
     private final String tableName;
     private final String schema;
 
-    public InsertTable(String tableName) {
+    public UnresolvedTableReference(String tableName) {
         this(null, tableName);
     }
 
-    public InsertTable(String schema, String tableName) {
+    public UnresolvedTableReference(String schema, String tableName) {
         this.schema = schema;
         this.tableName = tableName;
     }
@@ -35,18 +32,6 @@ public class InsertTable extends ValueObject {
         return schema == null ? defaultSchema : schema;
     }
     
-    public String schema() {
-        assertSchemaIsResolved();
-        return schema;
-    }
-
-    public void assertSchemaIsResolved() {
-        if (schema == null) {
-            throw new MayflyInternalException(
-                "schema should have already been resolved against the default schema");
-        }
-    }
-
     public TableReference resolve(DataStore store, String defaultSchema,
         String additionalTable) {
         if (defaultSchema == null) {
