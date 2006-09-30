@@ -85,22 +85,24 @@ public class Lexer {
             else if (current == '/') {
                 current = nextCharacter();
                 if (current == '*') {
+                    boolean gotStar = false;
                     while (true) {
                         current = nextCharacter();
                         if (current == '*') {
+                            gotStar = true;
+                        }
+                        else if (gotStar && current == '/') {
+                            tokenLine = currentLine;
+                            tokenColumn = currentColumn;
                             current = nextCharacter();
-                            if (current == '/') {
-                                tokenLine = currentLine;
-                                tokenColumn = currentColumn;
-                                current = nextCharacter();
-                                break;
-                            }
-                            else if (current == END_OF_FILE_CHARACTER) {
-                                throw new MayflyException("unclosed comment");
-                            }
+                            break;
                         }
                         else if (current == END_OF_FILE_CHARACTER) {
-                            throw new MayflyException("unclosed comment");
+                            throw new MayflyException("unclosed comment",
+                                tokenLocation());
+                        }
+                        else {
+                            gotStar = false;
                         }
                     }
                 }
@@ -254,11 +256,14 @@ public class Lexer {
      */
     private void addToken(List tokens, TokenType tokenType, String text) {
         tokens.add(
-            new TextToken(tokenType, text, 
-                tokenLine, tokenColumn, previousLine, previousColumn)
+            new TextToken(tokenType, text, tokenLocation())
         );
         tokenLine = currentLine;
         tokenColumn = currentColumn;
+    }
+
+    private Location tokenLocation() {
+        return new Location(tokenLine, tokenColumn, previousLine, previousColumn);
     }
     
     /**

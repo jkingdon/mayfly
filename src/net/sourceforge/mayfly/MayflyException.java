@@ -58,5 +58,9 @@ public class MayflyException extends RuntimeException {
     public MayflySqlException asSqlException() {
         return sqlException;
     }
+    
+    public Location location() {
+        return location;
+    }
 
 }

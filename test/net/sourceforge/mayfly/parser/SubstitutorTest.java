@@ -35,7 +35,7 @@ public class SubstitutorTest extends TestCase {
     }
 
     private Token makeToken(TokenType tokenType) {
-        return new TextToken(tokenType, null, -1, -1, -1 ,-1);
+        return new TextToken(tokenType, null, Location.UNKNOWN);
     }
     
     public void testString() throws Exception {

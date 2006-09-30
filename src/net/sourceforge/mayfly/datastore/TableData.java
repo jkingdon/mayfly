@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.M;
 import net.sourceforge.mayfly.util.StringBuilder;
@@ -65,7 +66,7 @@ public class TableData {
                 specifiedColumnToValue, newColumns, tuple, column);
         }
         Row newRow = new Row(tuple);
-        constraints.check(rows, newRow);
+        constraints.check(rows, newRow, values.location);
         if (checker != null) {
             checker.checkInsert(constraints, newRow);
         }
@@ -113,7 +114,7 @@ public class TableData {
                 }
                 setOnUpdateColumns(mapper);
                 Row newRow = mapper.asRow();
-                constraints.check(newRows, newRow);
+                constraints.check(newRows, newRow, Location.UNKNOWN);
                 checker.checkInsert(constraints, newRow);
                 checker.checkDelete(row, newRow);
 
@@ -121,7 +122,7 @@ public class TableData {
                 ++rowsAffected;
             }
             else {
-                constraints.check(newRows, row);
+                constraints.check(newRows, row, Location.UNKNOWN);
                 newRows = (Rows) newRows.with(row);
             }
 

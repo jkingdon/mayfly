@@ -262,7 +262,8 @@ public class ValueTest extends SqlTestCase {
             "Too many values.\n" +
             "Columns and values were:\n" +
             "a 5\n" +
-            "(none) 7\n"
+            "(none) 7\n",
+            1, 21, 1, 34
         );
     }
     
@@ -276,7 +277,8 @@ public class ValueTest extends SqlTestCase {
             "Too few values.\n" +
             "Columns and values were:\n" +
             "a 5\n" +
-            "b (none)\n"
+            "b (none)\n",
+            1, 24, 1, 34
         );
     }
     
@@ -296,7 +298,7 @@ public class ValueTest extends SqlTestCase {
             assertResultList(new String[] { " 5, null " }, query("select * from foo"));
         }
     }
-
+    
     public void testDuplicateColumnName() throws Exception {
         execute("create table foo (Id integer)");
         expectExecuteFailure("insert into foo (Id, Id) values (5, 7)", "duplicate column Id");

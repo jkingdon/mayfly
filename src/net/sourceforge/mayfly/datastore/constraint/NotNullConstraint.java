@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.parser.Location;
 
 public class NotNullConstraint extends Constraint {
 
@@ -15,10 +16,12 @@ public class NotNullConstraint extends Constraint {
         this.column = column;
     }
 
-    public void check(Rows existingRows, Row proposedRow) {
+    public void check(Rows existingRows, Row proposedRow, Location location) {
         Cell proposedCell = proposedRow.cell(column);
         if (proposedCell instanceof NullCell) {
-            throw new MayflyException("column " + column.columnName() + " cannot be null");
+            throw new MayflyException(
+                "column " + column.columnName() + " cannot be null",
+                location);
         }
     }
 

@@ -25,14 +25,14 @@ public class Constraints {
         this(null, new ImmutableList(), new ImmutableList());
     }
 
-    public void check(Rows rows, Row newRow) {
+    public void check(Rows rows, Row newRow, Location location) {
         if (primaryKey != null) {
-            primaryKey.check(rows, newRow);
+            primaryKey.check(rows, newRow, location);
         }
         
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
-            constraint.check(rows, newRow);
+            constraint.check(rows, newRow, location);
         }
     }
 

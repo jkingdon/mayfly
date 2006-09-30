@@ -12,13 +12,6 @@ abstract public class Token {
         this(type, oldToken.location);
     }
 
-    protected Token(TokenType type, 
-        int startLineNumber, int startColumn, int endLineNumber, int endColumn) {
-        this(type, new Location(
-            startLineNumber, startColumn, endLineNumber, endColumn)
-        );
-    }
-    
     protected Token(TokenType type, Location location) {
         this.type = type;
         this.location = location;

@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public abstract class NotNullOrUnique extends Constraint {
         }
     }
 
-    public void check(Rows existingRows, Row proposedRow) {
+    public void check(Rows existingRows, Row proposedRow, Location location) {
         List proposedValues = collectProposedValues(proposedRow);
 
         for (Iterator iter = existingRows.iterator(); iter.hasNext();) {

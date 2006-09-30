@@ -46,45 +46,50 @@ public class LexerTest extends TestCase {
             new TokenType[] {
                 TokenType.DIVIDE,
                 TokenType.ASTERISK,
-                TokenType.IDENTIFIER,
                 TokenType.END_OF_FILE,
             },
-            new String[] { "/", "*", "non_comment", null},
-            "/ * /**/ /* * */ /***/" +
-            "/* comments do not /* nest */ non_comment" +
-            "/* comment\n" +
+            new String[] { "/", "*", null},
+            "/ *"
+        );
+        // /***/
+        
+        checkComment("a/**/b");
+        checkComment("a/* * */b");
+        checkComment("/* comments do not /* nest */ a b");
+        checkComment(
+            "a /* comment\n" +
             "with\n" +
             "newlines\n" +
             "*\n" +
-            "*/"
-        );
+            "*/b");
+        checkComment("a/***/b");
+        checkComment("a/****/b");
+
+        checkUnclosed(" /*/ ", 1, 2, 1, 6);
+        checkUnclosed("  /* unclosed comment", 1, 3, 1, 22);
+        checkUnclosed("\n/* unclosed comment *", 2, 1, 2, 22);
+    }
+
+    private void checkComment(String string) {
+        check(new TokenType[] {
+            TokenType.IDENTIFIER, TokenType.IDENTIFIER, TokenType.END_OF_FILE },
+            new String[] { "a", "b", null },
+            string
+            );
     }
     
-    public void testUnclosedComment() throws Exception {
+    private void checkUnclosed(String input, 
+        int startLineNumber, int startColumn, int endLineNumber, int endColumn) {
         try {
-            lex("/* unclosed comment");
-            fail();
-        }
-        catch (MayflyException e) {
-            /* It is customary to include line and column
-               numbers.  But is that only really needed
-               for structures that nest?
-             */
-            /* Do we want to say slash-star style comment? 
-               I'm not sure I can think of a wording ("slash-star",
-               "C-style", "multi-line", some combination of / * * /)
-               which helps more than it confuses.  */
-            assertEquals("unclosed comment", e.getMessage());
-        }
-    }
-    
-    public void testEndOfFileAfterStar() throws Exception {
-        try {
-            lex("/* unclosed comment *");
+            lex(input);
             fail();
         }
         catch (MayflyException e) {
             assertEquals("unclosed comment", e.getMessage());
+            assertEquals(startLineNumber, e.location().startLineNumber);
+            assertEquals(startColumn, e.location().startColumn);
+            assertEquals(endLineNumber, e.location().endLineNumber);
+            assertEquals(endColumn, e.location().endColumn);
         }
     }
     

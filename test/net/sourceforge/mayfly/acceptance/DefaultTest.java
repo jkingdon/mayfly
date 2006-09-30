@@ -25,7 +25,10 @@ public class DefaultTest extends SqlTestCase {
                 query("select id, x, description from foo"));
         }
         else {
-            expectExecuteFailure(sql, "column x cannot be null");
+            /* Perhaps would be better if the location were the whole statement,
+               but this is a good start.
+             */
+            expectExecuteFailure(sql, "column x cannot be null", 1, 21, 1, 30);
         }
     }
 
