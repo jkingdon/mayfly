@@ -18,11 +18,11 @@ import java.util.List;
 public abstract class SqlTestCase extends TestCase {
 
     protected Dialect dialect =
-        //new MayflyDialect()
+        new MayflyDialect()
         //new HypersonicDialect()
         //new MySqlDialect()
         //new MySql4Dialect()
-        new PostgresDialect()
+        //new PostgresDialect()
         //new DerbyDialect()
         ;
 
