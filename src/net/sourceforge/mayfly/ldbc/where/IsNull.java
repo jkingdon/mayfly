@@ -2,8 +2,8 @@ package net.sourceforge.mayfly.ldbc.where;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 
 public class IsNull extends BooleanExpression {
 
@@ -13,8 +13,7 @@ public class IsNull extends BooleanExpression {
         this.expression = expression;
     }
 
-    public boolean evaluate(Object rowObject) {
-        Row row = (Row) rowObject;
+    public boolean evaluate(ResultRow row) {
         Cell cell = expression.evaluate(row);
         return cell instanceof NullCell;
     }

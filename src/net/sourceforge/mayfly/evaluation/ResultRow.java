@@ -18,16 +18,13 @@ import java.util.List;
 
 /**
  * @internal
- * Intention is that this will evolve into a mapping
- * from Expression to Cell, basically.
+ * Mapping from Expression to Cell.
  */
 public class ResultRow {
     
-    private final Row row;
     private final ImmutableList elements;
 
     public ResultRow(Row row) {
-        this.row = row;
         this.elements = fromRow(row);
     }
 
@@ -36,7 +33,6 @@ public class ResultRow {
     }
     
     private ResultRow(ImmutableList elements) {
-        this.row = null;
         this.elements = elements;
     }
 
@@ -71,6 +67,14 @@ public class ResultRow {
 
     public Element element(int index) {
         return (Element) elements.get(index);
+    }
+    
+    public Cell cell(int index) {
+        return element(index).value;
+    }
+    
+    public Expression expression(int index) {
+        return element(index).expression;
     }
 
     public SingleColumn findColumn(String columnName) {
@@ -126,10 +130,14 @@ public class ResultRow {
             return result;
         }
         else {
-            return expression.evaluate(row);
+            return expression.evaluate(this);
         }
     }
     
+    public ResultRow withColumn(String tableOrAlias, String columnName, Cell cell) {
+        return with(new SingleColumn(tableOrAlias, columnName), cell);
+    }
+
     public ResultRow with(Expression expression, Cell value) {
         return new ResultRow(elements.with(new Element(expression, value)));
     }

@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.ldbc.where;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.Iterator;
@@ -18,8 +18,7 @@ public class In extends BooleanExpression {
         this.expressions = new ImmutableList(expressions);
     }
 
-    public boolean evaluate(Object rowObject) {
-        Row row = (Row) rowObject;
+    public boolean evaluate(ResultRow row) {
         Cell leftSideValue = leftSide.evaluate(row);
 
         for (Iterator iter = expressions.iterator(); iter.hasNext();) {

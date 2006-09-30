@@ -58,7 +58,7 @@ public class GroupedRows {
         return (Rows) groups.get(keys);
     }
 
-    public Rows ungroup(Selected selected) {
+    public ResultRows ungroup(Selected selected) {
         Rows result = new Rows();
 
         Iterator iter = groups.keySet().iterator();
@@ -67,7 +67,7 @@ public class GroupedRows {
             result = (Rows) result.with(rowForKey(keys, getRows(keys), selected));
         }
 
-        return result;
+        return new ResultRows(result);
     }
 
     private Row rowForKey(GroupByCells cells, Rows rowsForKey, Selected selected) {

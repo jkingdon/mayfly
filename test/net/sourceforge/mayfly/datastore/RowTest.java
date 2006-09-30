@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.datastore;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 
@@ -90,11 +89,11 @@ public class RowTest extends TestCase {
         Row row = new Row(
             new TupleBuilder()
                 .append(new Column("x"), new LongCell(5))
-                .append(new PositionalHeader(new QuotedString("hi")), new StringCell("hi"))
+                .appendExpression(new QuotedString("hi"), new StringCell("hi"))
                 .append(new Column("foo", "z"), new StringCell("Chicago"))
                 .append(new Column("bar", "z"), new StringCell("Chicago"))
                 .append(new Column("y"), new StringCell("Chicago"))
-                .append(new PositionalHeader(new IntegerLiteral(77)), new LongCell(77))
+                .appendExpression(new IntegerLiteral(77), new LongCell(77))
         );
         
         assertEquals(new Column("y"), row.findColumn("y"));

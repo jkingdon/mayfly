@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.ldbc.where;
 
+import net.sourceforge.mayfly.evaluation.ResultRow;
+
 
 public class Not extends BooleanExpression {
 
@@ -9,7 +11,7 @@ public class Not extends BooleanExpression {
         this.operand = operand;
     }
 
-    public boolean evaluate(Object row) {
+    public boolean evaluate(ResultRow row) {
         return !operand.evaluate(row);
     }
 

@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.ldbc.where;
 
+import net.sourceforge.mayfly.evaluation.ResultRow;
+
 
 public class Or extends BooleanExpression {
 
@@ -11,7 +13,7 @@ public class Or extends BooleanExpression {
         this.rightSide = rightSide;
     }
 
-    public boolean evaluate(Object row) {
+    public boolean evaluate(ResultRow row) {
         return leftSide.evaluate(row) || rightSide.evaluate(row);
     }
 

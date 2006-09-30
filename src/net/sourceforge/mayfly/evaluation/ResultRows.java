@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.ArrayList;
@@ -54,6 +55,21 @@ public class ResultRows {
     
     public ImmutableList asList() {
         return rows;
+    }
+
+    public ResultRows with(ResultRow row) {
+        return new ResultRows(rows.with(row));
+    }
+
+    public ResultRows select(BooleanExpression condition) {
+        ResultRows selected = new ResultRows();
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            ResultRow row = (ResultRow) iter.next();
+            if (condition.evaluate(row)) {
+                selected = selected.with(row);
+            }
+        }
+        return selected;
     }
 
 }

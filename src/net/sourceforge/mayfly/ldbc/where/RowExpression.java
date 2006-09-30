@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.ldbc.where;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 
 abstract public class RowExpression extends BooleanExpression {
 
@@ -14,9 +14,7 @@ abstract public class RowExpression extends BooleanExpression {
         this.rightSide = rightSide;
     }
 
-    public boolean evaluate(Object rowObject) {
-        Row row = (Row) rowObject;
-
+    public boolean evaluate(ResultRow row) {
         return compare(leftSide.evaluate(row), rightSide.evaluate(row));
     }
 

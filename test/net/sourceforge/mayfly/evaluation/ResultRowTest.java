@@ -13,14 +13,12 @@ public class ResultRowTest extends TestCase {
     
     public void testFindColumn() throws Exception {
         ResultRow row = 
-            new ResultRow(
-                new TupleBuilder()
-                    .appendColumnCell("foo", "y", new LongCell(5))
-                    .appendColumnCell("foo", "x", new LongCell(5))
-                    .appendColumnCell("foo", "z", new LongCell(5))
-                    .appendExpression(null, new StringCell("hi"))
-                    .asRow()
-            );
+            new ResultRow()
+                .withColumn("foo", "y", new StringCell("hi"))
+                .withColumn("foo", "x", new LongCell(5))
+                .withColumn("foo", "z", new LongCell(5))
+                .with(new CountAll("count"), new LongCell(15))
+                ;
         SingleColumn column = row.findColumn("x");
         assertEquals("foo", column.tableOrAlias());
         assertEquals("x", column.columnName());

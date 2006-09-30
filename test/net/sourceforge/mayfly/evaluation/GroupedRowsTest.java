@@ -6,12 +6,9 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.expression.Average;
-import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
@@ -46,19 +43,18 @@ public class GroupedRowsTest extends TestCase {
             )
         );
         
-        Rows rows = groupedRows.ungroup(new Selected(ImmutableList.singleton(new SingleColumn("player"))));
-        
-        Rows expected = new Rows(
-            new ImmutableList()
-                .with(new Row(new TupleBuilder()
-                    .appendColumnCell("player", new StringCell("Ganguly"))
-                ))
-                .with(new Row(new TupleBuilder()
-                    .appendColumnCell("player", new StringCell("Tendulkar"))
-                ))
+        ResultRows rows = groupedRows.ungroup(
+            new Selected(ImmutableList.singleton(new SingleColumn("player")))
         );
+        assertEquals(2, rows.size());
 
-        assertEquals(expected, rows);
+        ResultRow row0 = rows.row(0);
+        assertEquals(1, row0.size());
+        assertColumn("player", new StringCell("Ganguly"), row0, 0);
+
+        ResultRow row1 = rows.row(1);
+        assertEquals(1, row1.size());
+        assertColumn("player", new StringCell("Tendulkar"), row1, 0);
     }
 
     public void testMultiple() throws Exception {
@@ -99,7 +95,7 @@ public class GroupedRowsTest extends TestCase {
         );
         
         Average averageExpression = new Average(new SingleColumn("score"), "avg", false);
-        Rows rows = groupedRows.ungroup(
+        ResultRows rows = groupedRows.ungroup(
             new Selected(Arrays.asList(new WhatElement[] {
                 new SingleColumn("player"),
                 new SingleColumn("year"),
@@ -108,35 +104,33 @@ public class GroupedRowsTest extends TestCase {
         );
         
         assertEquals(3, rows.size());
-        Row row0 = (Row) rows.element(0);
-        Row row1 = (Row) rows.element(1);
-        Row row2 = (Row) rows.element(2);
+        ResultRow row0 = rows.row(0);
+        ResultRow row1 = rows.row(1);
+        ResultRow row2 = rows.row(2);
         
         checkRow(new LongCell(40), "Ganguly", 2004, row0, averageExpression);
         checkRow(new LongCell(0), "Ganguly", 2005, row1, averageExpression);
         checkRow(new LongCell(80), "Tendulkar", 2004, row2, averageExpression);
     }
 
-    private void checkRow(LongCell expectedAverage, String expectedPlayer, int expectedYear, Row row, Average averageExpression) {
+    private void checkRow(LongCell expectedAverage, String expectedPlayer, 
+        int expectedYear, ResultRow row, Average averageExpression) {
         assertEquals(3, row.size());
         assertExpression(averageExpression, expectedAverage, row, 0);
         assertColumn("player", new StringCell(expectedPlayer), row, 1);
         assertColumn("year", new LongCell(expectedYear), row, 2);
     }
 
-    private void assertColumn(String expectedColumnName, Cell expectedCell, Row row, int position) {
-        TupleElement expressionAndValue = (TupleElement) row.element(position);
-        Column header = (Column) expressionAndValue.header();
+    private void assertColumn(String expectedColumnName, Cell expectedCell, ResultRow row, int position) {
+        SingleColumn header = (SingleColumn) row.expression(position);
         assertNull(header.tableOrAlias());
         assertEquals(expectedColumnName, header.columnName());
-        assertEquals(expectedCell, expressionAndValue.cell());
+        assertEquals(expectedCell, row.cell(position));
     }
 
-    private void assertExpression(Expression expected, Cell expectedCell, Row row0, int position) {
-        TupleElement expressionAndValue = (TupleElement) row0.element(position);
-        PositionalHeader header = (PositionalHeader) expressionAndValue.header();
-        assertTrue(header.expression.sameExpression(expected));
-        assertEquals(expectedCell, expressionAndValue.cell());
+    private void assertExpression(Expression expected, Cell expectedCell, ResultRow row, int position) {
+        assertTrue(row.expression(position).sameExpression(expected));
+        assertEquals(expectedCell, row.cell(position));
     }
 
     private GroupByKeys keysForColumn(String columnName) {
