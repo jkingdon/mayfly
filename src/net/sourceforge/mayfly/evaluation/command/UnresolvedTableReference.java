@@ -17,6 +17,9 @@ public class UnresolvedTableReference extends ValueObject {
 
     public UnresolvedTableReference(String tableName) {
         this(null, tableName);
+        if (tableName == null) {
+            throw new NullPointerException();
+        }
     }
 
     public UnresolvedTableReference(String schema, String tableName) {
@@ -24,6 +27,16 @@ public class UnresolvedTableReference extends ValueObject {
         this.tableName = tableName;
     }
 
+    /**
+     * @internal
+     * Generally callers will want to resolve the table first, and then
+     * consult the resolved table.  So this method might be a bit of a special case.
+     * (One issue: we might want the original capitalization
+     * for error messages, but either (a) we could have TableReference
+     * remember both original and canonical, or (b) canonical is
+     * probably OK for messages; it is just forcing everything to
+     * upper or lower case which we consider kind of unfriendly).
+     */
     public String tableName() {
         return tableName;
     }
@@ -38,7 +51,7 @@ public class UnresolvedTableReference extends ValueObject {
             throw new NullPointerException("Default schema shouldn't be null");
         }
         
-        String schemaToUse = schema == null ? defaultSchema : schema;
+        String schemaToUse = schema(defaultSchema);
 
         if (tableName.equalsIgnoreCase(additionalTable)) {
             return new TableReference(schemaToUse, additionalTable);
