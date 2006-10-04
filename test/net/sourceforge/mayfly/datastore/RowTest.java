@@ -8,9 +8,6 @@ import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 
 public class RowTest extends TestCase {
 
-
-    //TODO: need to establish column order somehow
-
     public void testCell() throws Exception {
         Row row = new Row(
             new TupleBuilder()
@@ -123,6 +120,33 @@ public class RowTest extends TestCase {
             new StringCell("a"), 
             new Row.GetCell().transform(new TupleElement(new Column("colA"), new StringCell("a")))
         );
+    }
+    
+    public void testDropColumn() throws Exception {
+        Row row = new TupleBuilder()
+            .appendColumnCellContents("a", 7)
+            .appendColumnCellContents("b", 9)
+            .asRow();
+        
+        Row newRow = row.dropColumn("B");
+        
+        assertEquals(1, newRow.size());
+        LongCell cell = (LongCell) newRow.cell(new Column("A"));
+        assertEquals(7, cell.asLong());
+    }
+    
+    public void testDropColumnNonexistent() throws Exception {
+        Row row = new TupleBuilder()
+            .appendColumnCellContents("a", 7)
+            .asRow();
+        
+        try {
+            row.dropColumn("B");
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("no column B", e.getMessage());
+        }
     }
     
 }

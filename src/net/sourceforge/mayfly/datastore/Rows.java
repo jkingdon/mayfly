@@ -43,4 +43,13 @@ public class Rows extends Aggregate {
         return result;
     }
 
+    public Rows dropColumn(String column) {
+        Rows result = new Rows();
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            result = (Rows) result.with(row.dropColumn(column));
+        }
+        return result;
+    }
+
 }

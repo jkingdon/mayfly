@@ -1,25 +1,24 @@
 package net.sourceforge.mayfly.evaluation.command;
 
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.TableReference;
 
-public class AddColumn extends Command {
+public class DropColumn extends Command {
 
-    private final Column newColumn;
     private final UnresolvedTableReference table;
+    private final String column;
 
-    public AddColumn(UnresolvedTableReference table, Column newColumn) {
-        this.newColumn = newColumn;
+    public DropColumn(UnresolvedTableReference table, String column) {
         this.table = table;
+        this.column = column;
     }
 
     public UpdateStore update(DataStore store, String defaultSchema) {
         TableReference reference = table.resolve(store, defaultSchema, null);
         
         Schema existing = store.schema(reference.schema());
-        Schema updatedSchema = existing.addColumn(reference.tableName(), newColumn);
+        Schema updatedSchema =  existing.dropColumn(reference.tableName(), column);
         return new UpdateStore(store.replace(reference.schema(), updatedSchema), 0);
     }
 

@@ -133,4 +133,24 @@ public class Columns extends Aggregate {
         return new Columns(new ImmutableList(result));
     }
 
+    public Columns without(String target) {
+        boolean found = false;
+        List result = new ArrayList();
+        for (Iterator iter = iterator(); iter.hasNext(); ) {
+            Column column = (Column) iter.next();
+            if (column.matchesName(target)) {
+                found = true;
+            }
+            else {
+                result.add(column);
+            }
+        }
+        if (found) {
+            return new Columns(new ImmutableList(result));
+        }
+        else {
+            throw new MayflyException("no column " + target);
+        }
+    }
+
 }

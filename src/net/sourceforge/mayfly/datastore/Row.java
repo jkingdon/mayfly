@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.Iterable;
@@ -122,7 +123,27 @@ public class Row extends Aggregate {
     }
 
     public Row addColumn(Column newColumn) {
-        return new Row(elements.with(new TupleElement(newColumn, newColumn.defaultValue())));
+        return new Row(elements.with(new TupleElement(newColumn, newColumn.newColumnValue())));
+    }
+
+    public Row dropColumn(String columnName) {
+        boolean found = false;
+        TupleBuilder newRow = new TupleBuilder();
+        for (Iterator iter = elements.iterator(); iter.hasNext();) {
+            TupleElement element = (TupleElement) iter.next();
+            if (element.column().matchesName(columnName)) {
+                found = true;
+            }
+            else {
+                newRow.append(element);
+            }
+        }
+        if (found) {
+            return newRow.asRow();
+        }
+        else {
+            throw new MayflyException("no column " + columnName);
+        }
     }
 
 }

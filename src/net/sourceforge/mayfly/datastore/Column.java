@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public class Column extends ValueObject implements CellHeader {
@@ -13,19 +14,27 @@ public class Column extends ValueObject implements CellHeader {
     private final Cell onUpdateValue;
     private final boolean isAutoIncrement;
     private final DataType type;
+    
+    /** This will probably want to be a subclass of
+     * {@link net.sourceforge.mayfly.datastore.constraint.Constraint}
+     * once we implement named constraints.  But we can
+     * worry about that then.
+     */
+    private final boolean isNotNull;
 
     public Column(String table, String name, Cell defaultValue, Cell onUpdateValue,
-        boolean isAutoIncrement, DataType type) {
+        boolean isAutoIncrement, DataType type, boolean isNotNull) {
         this.tableOrAlias = table;
         this.columnName = name;
         this.defaultValue = defaultValue;
         this.onUpdateValue = onUpdateValue;
         this.isAutoIncrement = isAutoIncrement;
         this.type = type;
+        this.isNotNull = isNotNull;
     }
 
     public Column(String table, String columnName) {
-        this(table, columnName, NullCell.INSTANCE, null, false, new DefaultDataType());
+        this(table, columnName, NullCell.INSTANCE, null, false, new DefaultDataType(), false);
     }
 
     public Column(String column) {
@@ -82,7 +91,7 @@ public class Column extends ValueObject implements CellHeader {
     public Column afterAutoIncrement() {
         Cell newDefault = new LongCell(defaultValue.asLong() + 1L);
         return new Column(tableOrAlias, columnName, newDefault, onUpdateValue,
-            isAutoIncrement, type);
+            isAutoIncrement, type, isNotNull);
     }
 
     /**
@@ -90,6 +99,27 @@ public class Column extends ValueObject implements CellHeader {
      */
     public Cell coerce(Cell value) {
         return type.coerce(value);
+    }
+
+    /**
+     * Check not null constraint.  Maybe could be combined with
+     * coerce?
+     */
+    public void check(Cell proposedCell, Location location) {
+        if (isNotNull && proposedCell instanceof NullCell) {
+            throw new MayflyException(
+                "column " + columnName() + " cannot be null",
+                location);
+        }
+    }
+
+    public Cell newColumnValue() {
+        if (isNotNull && defaultValue instanceof NullCell) {
+            throw new MayflyException(
+                "no default value for column " + columnName(),
+                Location.UNKNOWN);
+        }
+        return defaultValue();
     }
 
     public boolean hasOnUpdateValue() {

@@ -27,7 +27,7 @@ public class TableData {
         this(columns, constraints, new Rows());
     }
     
-    private TableData(Columns columns, Constraints constraints, Rows rows) {
+    TableData(Columns columns, Constraints constraints, Rows rows) {
         this.constraints = constraints;
         columns.checkForDuplicates();
         this.columns = columns;
@@ -83,16 +83,18 @@ public class TableData {
     private Columns setColumn(M specifiedColumnToValue, Columns newColumns, 
         TupleBuilder tuple, Column column) {
         boolean isDefault;
+        Cell cell;
         if (specifiedColumnToValue.containsKey(column)) {
             Value value = (Value) specifiedColumnToValue.get(column);
             isDefault = value.value == null;
-            Cell cell = isDefault ? column.defaultValue() : column.coerce(value.value);
-            tuple.append(new TupleElement(column, cell));
+            cell = isDefault ? column.defaultValue() : column.coerce(value.value);
         } else {
             isDefault = true;
-            tuple.append(new TupleElement(column, column.defaultValue()));
+            cell = column.defaultValue();
         }
         
+        tuple.append(new TupleElement(column, cell));
+
         if (isDefault && column.isAutoIncrement()) {
             newColumns = newColumns.replace(column.afterAutoIncrement());
         }
@@ -268,6 +270,14 @@ public class TableData {
             (Columns) columns.with(newColumn), 
             constraints,
             rows.addColumn(newColumn)
+        );
+    }
+
+    public TableData dropColumn(String column) {
+        return new TableData(
+            columns.without(column),
+            constraints,
+            rows.dropColumn(column)
         );
     }
 

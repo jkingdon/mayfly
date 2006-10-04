@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
+import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
@@ -33,6 +34,15 @@ public class Constraints {
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
             constraint.check(rows, newRow, location);
+        }
+        
+        checkNotNull(newRow, location);
+    }
+
+    private void checkNotNull(Row newRow, Location location) {
+        for (Iterator iter = newRow.columns().iterator(); iter.hasNext();) {
+            Column column = (Column) iter.next();
+            column.check(newRow.cell(column), location);
         }
     }
 

@@ -399,6 +399,27 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean addingColumnCountsAsAffectedRow() {
+        return false;
+    }
+
+    /**
+     * Does adding a column with ALTER TABLE require there
+     * to be a default value even if there are no rows?
+     * True is kind of a bogus setting - there is no need
+     * for such a default value to make the add column
+     * work, and perhaps requiring a value to be
+     * specified (that is, no default) is what is desired
+     * for subsequent statements beyond the ALTER TABLE.
+     */
+    public boolean notNullRequiresDefault() {
+        return false;
+    }
+
+    public boolean haveDropColumn() {
+        return true;
+    }
+
     public boolean defaultValueCanBeExpression() {
         // Who does this besides postgres?
 
@@ -459,9 +480,5 @@ public abstract class Dialect {
     public boolean datesAreOff() {
         return false;
     }
-
-    public boolean addingColumnCountsAsAffectedRow() {
-        return false;
-    }
-
+    
 }

@@ -30,6 +30,7 @@ import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.CreateSchema;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
 import net.sourceforge.mayfly.evaluation.command.Delete;
+import net.sourceforge.mayfly.evaluation.command.DropColumn;
 import net.sourceforge.mayfly.evaluation.command.DropTable;
 import net.sourceforge.mayfly.evaluation.command.Insert;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
@@ -393,17 +394,27 @@ public class Parser {
 
     private Command parseAlterTable() {
         UnresolvedTableReference table = parseTableReference();
-        expectAndConsume(TokenType.KEYWORD_add);
-        
-        // optional according to SQL92 but does anyone omit it?
-        expectAndConsume(TokenType.KEYWORD_column);
+        if (consumeIfMatches(TokenType.KEYWORD_drop)) {
+            // optional according to SQL92 but does anyone omit it?
+            expectAndConsume(TokenType.KEYWORD_column);
 
-        CreateTable constraintCollector = new CreateTable(table.tableName());
-        Column newColumn = parseColumnDefinition(constraintCollector);
-        if (constraintCollector.hasConstraints()) {
-            throw new MayflyException("constraints are not yet supported in ALTER TABLE");
+            String column = consumeIdentifier();
+            return new DropColumn(table, column);
         }
-        return new AddColumn(table, newColumn);
+        else if (consumeIfMatches(TokenType.KEYWORD_add)) {
+            // optional according to SQL92 but does anyone omit it?
+            expectAndConsume(TokenType.KEYWORD_column);
+    
+            CreateTable constraintCollector = new CreateTable(table.tableName());
+            Column newColumn = parseColumnDefinition(constraintCollector);
+            if (constraintCollector.hasConstraints()) {
+                throw new MayflyException("constraints are not yet supported in ALTER TABLE");
+            }
+            return new AddColumn(table, newColumn);
+        }
+        else {
+            throw new ParserException("alter table action", currentToken());
+        }
     }
 
     void parseTableElement(CreateTable table) {
@@ -544,10 +555,10 @@ public class Parser {
             defaultValue = new LongCell(1);
         }
 
-        parseColumnConstraints(table, name);
+        boolean isNotNull = parseColumnConstraints(table, name);
 
         return new Column(table.table(), name, defaultValue, onUpdateValue,
-            isAutoIncrement, parsed.type);
+            isAutoIncrement, parsed.type, isNotNull);
     }
 
     private Cell parseDefaultClause(String name) {
@@ -600,7 +611,8 @@ public class Parser {
         }
     }
 
-    private void parseColumnConstraints(CreateTable table, String column) {
+    private boolean parseColumnConstraints(CreateTable table, String column) {
+        boolean isNotNull = false;
         while (true) {
             if (consumeIfMatches(TokenType.KEYWORD_primary)) {
                 expectAndConsume(TokenType.KEYWORD_key);
@@ -611,12 +623,13 @@ public class Parser {
             }
             else if (consumeIfMatches(TokenType.KEYWORD_not)) {
                 expectAndConsume(TokenType.KEYWORD_null);
-                table.addNotNullConstraint(column);
+                isNotNull = true;
             }
             else {
                 break;
             }
         }
+        return isNotNull;
     }
 
     ParsedDataType parseDataType() {

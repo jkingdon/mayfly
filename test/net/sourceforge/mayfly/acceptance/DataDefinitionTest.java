@@ -1,5 +1,10 @@
 package net.sourceforge.mayfly.acceptance;
 
+/**
+ * Tests of creating and dropping tables.
+ * Also see {@link net.sourceforge.mayfly.acceptance.AddColumnTest}
+ * and {@link net.sourceforge.mayfly.acceptance.DropColumnTest}.
+ */
 public class DataDefinitionTest extends SqlTestCase {
 
     public void testDuplicateColumnName() throws Exception {
@@ -46,5 +51,8 @@ public class DataDefinitionTest extends SqlTestCase {
             execute("create table foo (x integer)");
         }
     }
+    
+    // TODO: DROP TABLE where there is a foreign key referencing
+    // the table.
 
 }

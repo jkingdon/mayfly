@@ -8,7 +8,6 @@ import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.constraint.Action;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
-import net.sourceforge.mayfly.datastore.constraint.NotNullConstraint;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 import net.sourceforge.mayfly.datastore.constraint.UniqueConstraint;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -24,7 +23,6 @@ public class CreateTable extends Command {
     private Columns columns;
     private List primaryKeyColumns;
     private List /* <List<String>> */ uniqueConstraints = new ArrayList();
-    private List notNullConstraints = new ArrayList();
     private List foreignKeyConstraints = new ArrayList();
 
     public CreateTable(String table, List columnNames) {
@@ -54,7 +52,6 @@ public class CreateTable extends Command {
         DataStore store, String schema) {
         ImmutableList constraints = ImmutableList.fromIterable(
             uniqueConstraints()
-            .plus(notNullConstraints())
         );
         return new Constraints(primaryKey(), constraints, 
             
@@ -83,15 +80,6 @@ public class CreateTable extends Command {
         return result;
     }
     
-    private L notNullConstraints() {
-        L result = new L();
-        for (Iterator iter = notNullConstraints.iterator(); iter.hasNext();) {
-            String columnName = (String) iter.next();
-            result.add(new NotNullConstraint(columns.columnFromName(columnName)));
-        }
-        return result;
-    }
-
     private L foreignKeyConstraints(DataStore store, String schema) {
         L result = new L();
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
@@ -139,10 +127,6 @@ public class CreateTable extends Command {
         uniqueConstraints.add(columns);
     }
 
-    public void addNotNullConstraint(String column) {
-        notNullConstraints.add(column);
-    }
-
     public void addForeignKeyConstraint(String referencingColumn, 
         UnresolvedTableReference targetTable, String targetColumn, 
         Action onDelete, Action onUpdate) {
@@ -152,11 +136,14 @@ public class CreateTable extends Command {
             ));
     }
     
+    /**
+     * Does not include NOT NULL constraints, since they are stored
+     * with the {@link Column} rather than separately.
+     */
     public boolean hasConstraints() {
         return 
             primaryKeyColumns != null || 
             !uniqueConstraints.isEmpty() || 
-            !notNullConstraints.isEmpty() || 
             !foreignKeyConstraints.isEmpty();
     }
     

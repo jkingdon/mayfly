@@ -133,6 +133,14 @@ public class DerbyDialect extends Dialect {
         return false;
     }
     
+    public boolean notNullRequiresDefault() {
+        return true;
+    }
+
+    public boolean haveDropColumn() {
+        return false;
+    }
+    
     public boolean haveSql200xAutoIncrement() {
         return true;
     }

@@ -73,7 +73,8 @@ public class PrimaryKeyTest extends SqlTestCase {
     public void testNotNull() throws Exception {
         // Not a primary key, but related enough to put in the same test file
         execute("create table foo (x integer not null)");
-        expectExecuteFailure("insert into foo(x) values(null)", "column x cannot be null");
+        expectExecuteFailure("insert into foo(x) values(null)",
+            "column x cannot be null", 1, 20, 1, 32);
     }
     
 }

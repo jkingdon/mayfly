@@ -32,20 +32,28 @@ public class AddColumnTest extends SqlTestCase {
         execute("insert into foo(a) values(5)");
 
         String noDefault = "alter table foo add column b integer not null";
-        if (!dialect.wishThisWereTrue()) {
-            expectExecuteFailure(noDefault,
-                "constraints are not yet supported in ALTER TABLE");
-        }
-        else if (dialect.notNullImpliesDefaults()) {
+        if (dialect.notNullImpliesDefaults()) {
             execute(noDefault);
             assertResultSet(new String[] { " 5, 0 " }, query("select a, b from foo"));
         }
         else {
             expectExecuteFailure(noDefault,
                 // "violation of not null constraint" or something might also be OK
-                "no default value for b");
+                "no default value for column b");
             execute("alter table foo add column b integer default 7 not null");
             assertResultSet(new String[] { " 5, 7 " }, query("select a, b from foo"));
+        }
+    }
+    
+    public void testNotNullButNoRows() throws Exception {
+        execute("create table foo(a integer)");
+        String noDefault = "alter table foo add column b integer not null";
+        if (dialect.notNullRequiresDefault()) {
+            expectExecuteFailure(noDefault, "no default value for column b");
+        }
+        else {
+            execute(noDefault);
+            execute("insert into foo(a, b) values (5, 7)");
         }
     }
 
