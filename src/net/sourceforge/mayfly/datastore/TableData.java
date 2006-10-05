@@ -29,6 +29,9 @@ public class TableData {
     
     TableData(Columns columns, Constraints constraints, Rows rows) {
         this.constraints = constraints;
+        if (constraints == null) {
+            throw new NullPointerException("constraints is required");
+        }
         columns.checkForDuplicates();
         this.columns = columns;
         this.rows = rows;
@@ -276,7 +279,7 @@ public class TableData {
     public TableData dropColumn(String column) {
         return new TableData(
             columns.without(column),
-            constraints,
+            constraints.dropColumn(column),
             rows.dropColumn(column)
         );
     }

@@ -420,6 +420,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean canDropLastColumn() {
+        return false;
+    }
+
     public boolean defaultValueCanBeExpression() {
         // Who does this besides postgres?
 

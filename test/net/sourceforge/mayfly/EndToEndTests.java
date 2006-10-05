@@ -182,4 +182,21 @@ public class EndToEndTests extends SqlTestCase {
             1, 3/*54*/, 1, 56/*55*/);
     }
 
+    /*
+       It might be interesting to see what other databases do.
+       But for now I'm just wanting to make sure that Mayfly's
+       data structures don't end up in an inconsistent state.
+     */
+    public void testMultipleColumnPrimaryKey() throws Exception {
+        if (!dialect.haveDropColumn()) {
+            return;
+        }
+
+        execute("create table foo(a integer, b integer, c integer, " +
+            "primary key(a, c) )");
+        expectExecuteFailure("alter table foo drop column a", 
+            "attempt to drop column a from multi-column primary key a,c");
+        execute("alter table foo drop column b");
+    }
+    
 }

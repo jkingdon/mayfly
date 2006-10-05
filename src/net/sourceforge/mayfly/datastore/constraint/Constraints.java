@@ -7,13 +7,15 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class Constraints {
 
-    private final PrimaryKey primaryKey;
-    private final ImmutableList constraints;
-    private final ImmutableList foreignKeyConstraints;
+    public final PrimaryKey primaryKey;
+    public final ImmutableList constraints;
+    public final ImmutableList foreignKeyConstraints;
 
     public Constraints(PrimaryKey primaryKey, ImmutableList constraints,
         ImmutableList foreignKeyConstraints) {
@@ -70,6 +72,29 @@ public class Constraints {
             ForeignKey constraint = (ForeignKey) iter.next();
             constraint.checkDropTable(store, schema, table);
         }
+    }
+
+    public Constraints dropColumn(String column) {
+        PrimaryKey key = primaryKey;
+        if (primaryKey != null) {
+            boolean keep = primaryKey.checkDropColumn(column);
+            if (!keep) {
+                key = null;
+            }
+        }
+        
+        List newConstraints = new ArrayList();
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
+            if (constraint.checkDropColumn(column)) {
+                newConstraints.add(constraint);
+            }
+        }
+
+        return new Constraints(
+            key, 
+            new ImmutableList(newConstraints), 
+            foreignKeyConstraints);
     }
 
 }

@@ -146,6 +146,9 @@ public class Columns extends Aggregate {
             }
         }
         if (found) {
+            if (result.isEmpty()) {
+                throw new MayflyException("attempt to drop the last column: " + target);
+            }
             return new Columns(new ImmutableList(result));
         }
         else {

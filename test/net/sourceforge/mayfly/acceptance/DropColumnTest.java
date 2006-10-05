@@ -42,10 +42,39 @@ public class DropColumnTest extends SqlTestCase {
         assertResultSet(new String[] { " 5 " }, query("select * from foo"));
     }
     
+    public void testLastColumn() throws Exception {
+        if (!dialect.haveDropColumn()) {
+            return;
+        }
+
+        execute("create table foo(a integer)");
+        String dropLastColumn = "alter table foo drop column a";
+        String insertRow = "insert into foo values(5)";
+        if (dialect.canDropLastColumn()) {
+            execute(dropLastColumn);
+            expectExecuteFailure(insertRow, "no column a");
+        }
+        else {
+            expectExecuteFailure(dropLastColumn, 
+                "attempt to drop the last column: a");
+            execute(insertRow);
+            assertResultSet(new String[] { " 5 " }, 
+                query("select * from foo"));
+        }
+    }
+    
+    public void testSingleColumnPrimaryKey() throws Exception {
+        if (!dialect.haveDropColumn()) {
+            return;
+        }
+
+        execute("create table foo(a integer, b integer, primary key(a) )");
+        execute("alter table foo drop column a");
+    }
+    
     // foreign key references column
     // unique or primary key constraint 
     //   (multi-column) references column
-    // dropping last column of a table
     // CASCADE (means also drop foreign keys or views which reference the column)
 
 }

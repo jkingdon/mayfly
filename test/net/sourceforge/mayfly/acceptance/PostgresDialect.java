@@ -151,6 +151,10 @@ public class PostgresDialect extends Dialect {
         return false;
     }
     
+    public boolean canDropLastColumn() {
+        return true;
+    }
+    
     public boolean defaultValueCanBeExpression() {
         return true;
     }

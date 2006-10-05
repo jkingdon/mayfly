@@ -87,5 +87,17 @@ public abstract class NotNullOrUnique extends Constraint {
     protected abstract void checkForNull(Column column, Cell proposedCell);
 
     protected abstract String description();
+    
+    public boolean checkDropColumn(String column) {
+        if (columns.hasColumn(column)) {
+            if (columns.size() > 1) {
+                throw new MayflyException(
+                    "attempt to drop column " + column + 
+                    " from multi-column " + constraintName());
+            }
+            return false;
+        }
+        return true;
+    }
 
 }
