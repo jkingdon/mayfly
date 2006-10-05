@@ -89,7 +89,7 @@ public class MayflyDialect extends Dialect {
      * @internal
      * Stuff to work on.
      */
-    boolean wishThisWereTrue() {
+    public boolean wishThisWereTrue() {
         return false;
     }
 

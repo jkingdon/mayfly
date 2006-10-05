@@ -188,15 +188,35 @@ public class EndToEndTests extends SqlTestCase {
        data structures don't end up in an inconsistent state.
      */
     public void testMultipleColumnPrimaryKey() throws Exception {
-        if (!dialect.haveDropColumn()) {
-            return;
-        }
-
         execute("create table foo(a integer, b integer, c integer, " +
             "primary key(a, c) )");
         expectExecuteFailure("alter table foo drop column a", 
             "attempt to drop column a from multi-column primary key a,c");
         execute("alter table foo drop column b");
+    }
+    
+    /*
+      It might be interesting to see what other databases do.
+      But for now I'm just wanting to make sure that Mayfly's
+      data structures don't end up in an inconsistent state.
+    */
+    public void testForeignKey() throws Exception {
+        if (!dialect.wishThisWereTrue()) {
+            return;
+        }
+
+        execute("create table currency(id integer, name varchar(255))");
+        execute("create table balance(" +
+            "amount decimal(10,3), " +
+            "currency integer, " +
+            "foreign key(currency) references currency(id)" +
+            ")");
+        expectExecuteFailure("alter table currency drop column id", 
+            "the column id is referenced by a foreign key in table balance, column currency");
+        expectExecuteFailure("alter table balance drop column currency", 
+            "mayfly does not currently allow dropping a column with a foreign key " +
+            "(table balance, column currency)");
+        execute("alter table currency drop column name");
     }
     
 }

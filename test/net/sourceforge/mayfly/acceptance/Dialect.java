@@ -102,7 +102,7 @@ public abstract class Dialect {
      * which is desired for Mayfly.  So for non-Mayfly databases, there is no 
      * "wish" to be marked.
      */
-    boolean wishThisWereTrue() {
+    public boolean wishThisWereTrue() {
         return true;
     }
     
