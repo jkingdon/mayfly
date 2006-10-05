@@ -180,4 +180,15 @@ public class DataStore {
         }
     }
 
+    public UpdateStore dropColumn(TableReference table, String column) {
+        for (Iterator iter = schemas.values().iterator(); iter.hasNext();) {
+            Schema potentialReferencer = (Schema) iter.next();
+            potentialReferencer.checkDropColumn(table, column);
+        }
+
+        Schema existing = schema(table.schema());
+        Schema updatedSchema = existing.dropColumn(table, column);
+        return new UpdateStore(replace(table.schema(), updatedSchema), 0);
+    }
+
 }

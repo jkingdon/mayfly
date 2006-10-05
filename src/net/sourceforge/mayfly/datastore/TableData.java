@@ -276,12 +276,22 @@ public class TableData {
         );
     }
 
-    public TableData dropColumn(String column) {
+    public TableData dropColumn(TableReference table, String column) {
         return new TableData(
             columns.without(column),
-            constraints.dropColumn(column),
+            constraints.dropColumn(table, column),
             rows.dropColumn(column)
         );
+    }
+
+    /** 
+     * @internal
+     * Check for whether this table has any foreign keys which
+     * reference the other column specified by the parameters.
+     * If so, throw an exception.
+     */
+    public void checkDropColumn(TableReference table, String column) {
+        constraints.checkDropColumn(table, column);
     }
 
 }

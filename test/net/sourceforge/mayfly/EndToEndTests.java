@@ -201,10 +201,6 @@ public class EndToEndTests extends SqlTestCase {
       data structures don't end up in an inconsistent state.
     */
     public void testForeignKey() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
-
         execute("create table currency(id integer, name varchar(255))");
         execute("create table balance(" +
             "amount decimal(10,3), " +
@@ -217,6 +213,7 @@ public class EndToEndTests extends SqlTestCase {
             "mayfly does not currently allow dropping a column with a foreign key " +
             "(table balance, column currency)");
         execute("alter table currency drop column name");
+        execute("alter table balance drop column amount");
     }
     
 }

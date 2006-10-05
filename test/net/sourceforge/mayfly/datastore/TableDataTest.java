@@ -20,7 +20,7 @@ public class TableDataTest extends TestCase {
         TableData table = new TableData(
             columns, new Constraints(), rows);
         
-        TableData newTable = table.dropColumn("B");
+        TableData newTable = table.dropColumn(null, "B");
         
         assertEquals(1, newTable.columns().size());
         

@@ -39,9 +39,20 @@ public class Schema {
         return new Schema(tables.with(table, oldTable.addColumn(newColumn)));
     }
 
-    public Schema dropColumn(String table, String column) {
-        TableData oldTable = table(table);
-        return new Schema(tables.with(table, oldTable.dropColumn(column)));
+    public Schema dropColumn(TableReference table, String column) {
+        TableData oldTable = table(table.tableName());
+        return new Schema(
+            tables.with(
+                table.tableName(), 
+                oldTable.dropColumn(table, column)
+            ));
+    }
+
+    public void checkDropColumn(TableReference table, String column) {
+        for (Iterator iter = tables.values().iterator(); iter.hasNext();) {
+            TableData potentialReferencer = (TableData) iter.next();
+            potentialReferencer.checkDropColumn(table, column);
+        }
     }
 
     private void assertNoTable(String table) {

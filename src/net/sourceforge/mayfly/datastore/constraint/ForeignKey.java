@@ -57,12 +57,7 @@ public class ForeignKey {
     public void checkInsert(DataStore store, String schema, String table, 
         Row proposedRow, Location location) {
 
-        if (!referencerSchema.equalsIgnoreCase(schema) || 
-            !referencerTable.equalsIgnoreCase(table)) {
-            throw new MayflyInternalException(
-                "I'm confused about what tables foreign key constraints" +
-                " are attached to");
-        }
+        checkWeAreInTheRightPlace(schema, table);
 
         TableData foundTable = store.table(targetTable);
         Cell value = pickValue(proposedRow);
@@ -81,6 +76,15 @@ public class ForeignKey {
             }
 
             throwInsertException(schema, value, location);
+        }
+    }
+
+    private void checkWeAreInTheRightPlace(String schema, String table) {
+        if (!referencerSchema.equalsIgnoreCase(schema) || 
+            !referencerTable.equalsIgnoreCase(table)) {
+            throw new MayflyInternalException(
+                "I'm confused about what tables foreign key constraints" +
+                " are attached to");
         }
     }
 
@@ -153,6 +157,34 @@ public class ForeignKey {
 
     private boolean tableIsMyTarget(String schema, String table) {
         return targetTable.matches(schema, table);
+    }
+
+    /**
+     * @returns should we keep this key?
+     */
+    public boolean checkDropReferencerColumn(TableReference table, String column) {
+        checkWeAreInTheRightPlace(table.schema(), table.tableName());
+        if (column.equalsIgnoreCase(referencerColumn)) {
+            // I think we just need to return false to make this
+            // work.  Need to write that test.
+            throw new MayflyException(
+                "mayfly does not currently allow dropping a " +
+                "column with a foreign key (table " +
+                referencerTable + ", column " + referencerColumn + ")");
+        }
+        return true;
+    }
+
+    public void checkDropTargetColumn(TableReference table, String column) {
+        if (tableIsMyTarget(table.schema(), table.tableName()) &&
+            column.equalsIgnoreCase(targetColumn)) {
+            throw new MayflyException("the column " + column + 
+                " is referenced by a foreign key in table " + 
+                //formatTableName(defaultSchema, referencerSchema, referencerTable)
+                referencerTable +
+                ", column " + referencerColumn
+                );
+        }
     }
 
 }

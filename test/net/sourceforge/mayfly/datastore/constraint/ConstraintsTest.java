@@ -15,7 +15,7 @@ public class ConstraintsTest extends TestCase {
             new ImmutableList()
         );
         
-        Constraints newConstraints = constraints.dropColumn("id");
+        Constraints newConstraints = constraints.dropColumn(null, "id");
         assertNull(newConstraints.primaryKey);
         assertEquals(0, newConstraints.constraints.size());
     }

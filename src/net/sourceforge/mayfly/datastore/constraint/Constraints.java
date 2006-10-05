@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
@@ -15,13 +16,13 @@ public class Constraints {
 
     public final PrimaryKey primaryKey;
     public final ImmutableList constraints;
-    public final ImmutableList foreignKeyConstraints;
+    public final ImmutableList foreignKeys;
 
     public Constraints(PrimaryKey primaryKey, ImmutableList constraints,
-        ImmutableList foreignKeyConstraints) {
+        ImmutableList foreignKeys) {
         this.primaryKey = primaryKey;
         this.constraints = constraints;
-        this.foreignKeyConstraints = foreignKeyConstraints;
+        this.foreignKeys = foreignKeys;
     }
 
     public Constraints() {
@@ -50,7 +51,7 @@ public class Constraints {
 
     public void checkInsert(
         DataStore store, String schema, String table, Row proposedRow, Location location) {
-        for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
+        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey constraint = (ForeignKey) iter.next();
             constraint.checkInsert(store, schema, table, proposedRow, location);
         }
@@ -59,7 +60,7 @@ public class Constraints {
     public DataStore checkDelete(
         DataStore store, String schema, String table, 
         Row rowToDelete, Row replacementRow) {
-        for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
+        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey constraint = (ForeignKey) iter.next();
             store = constraint.checkDelete(store, schema, table, 
                 rowToDelete, replacementRow);
@@ -68,13 +69,20 @@ public class Constraints {
     }
 
     public void checkDropTable(DataStore store, String schema, String table) {
-        for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
+        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
             ForeignKey constraint = (ForeignKey) iter.next();
             constraint.checkDropTable(store, schema, table);
         }
     }
 
-    public Constraints dropColumn(String column) {
+    public Constraints dropColumn(TableReference table, String column) {
+        return new Constraints(
+            filterPrimaryKeyForDropColumn(column), 
+            filterConstraintsForDropColumn(column), 
+            filterForeignKeysForDropColumn(table, column));
+    }
+
+    private PrimaryKey filterPrimaryKeyForDropColumn(String column) {
         PrimaryKey key = primaryKey;
         if (primaryKey != null) {
             boolean keep = primaryKey.checkDropColumn(column);
@@ -82,7 +90,10 @@ public class Constraints {
                 key = null;
             }
         }
-        
+        return key;
+    }
+
+    private ImmutableList filterConstraintsForDropColumn(String column) {
         List newConstraints = new ArrayList();
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
@@ -90,11 +101,26 @@ public class Constraints {
                 newConstraints.add(constraint);
             }
         }
+        return new ImmutableList(newConstraints);
+    }
 
-        return new Constraints(
-            key, 
-            new ImmutableList(newConstraints), 
-            foreignKeyConstraints);
+    private ImmutableList filterForeignKeysForDropColumn(
+        TableReference table, String column) {
+        List keys = new ArrayList();
+        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
+            ForeignKey key = (ForeignKey) iter.next();
+            if (key.checkDropReferencerColumn(table, column)) {
+                keys.add(key);
+            }
+        }
+        return new ImmutableList(keys);
+    }
+
+    public void checkDropColumn(TableReference table, String column) {
+        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
+            ForeignKey key = (ForeignKey) iter.next();
+            key.checkDropTargetColumn(table, column);
+        }
     }
 
 }
