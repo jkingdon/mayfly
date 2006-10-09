@@ -3,10 +3,7 @@ package net.sourceforge.mayfly.evaluation;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
 import java.util.ArrayList;
@@ -18,7 +15,7 @@ import java.util.Map;
 public class GroupedRows {
     
     private Map groups = new LinkedHashMap();
-    private List/*<Column>*/ keyColumns = null;
+    private List/*<Expression>*/ keyColumns = null;
     private GroupByKeys keys;
 
     public int groupCount() {
@@ -26,22 +23,24 @@ public class GroupedRows {
     }
 
     public void add(GroupByKeys keys, Row row) {
+        ResultRow resultRow = new ResultRow(row);
+
         GroupByCells cells = keys.evaluate(row);
-        addRowToGroup(cells, row);
+        addRowToGroup(cells, resultRow);
         this.keys = keys;
-        this.keyColumns = keys.columns(row);
+        this.keyColumns = keys.expressions(row);
     }
 
-    private void addRowToGroup(GroupByCells keys, Row row) {
-        Rows start;
+    private void addRowToGroup(GroupByCells keys, ResultRow resultRow) {
+        ResultRows start;
         if (groups.containsKey(keys)) {
-            start = (Rows) groups.get(keys);
+            start = (ResultRows) groups.get(keys);
         }
         else {
-            start = new Rows();
+            start = new ResultRows();
         }
         
-        Rows modified = (Rows) start.with(row);
+        ResultRows modified = start.with(resultRow);
         groups.put(keys, modified);
     }
 
@@ -54,58 +53,65 @@ public class GroupedRows {
         return firstKeys.iterator();
     }
 
-    public Rows getRows(GroupByCells keys) {
-        return (Rows) groups.get(keys);
+    public ResultRows getRows(GroupByCells keys) {
+        return (ResultRows) groups.get(keys);
     }
 
     public ResultRows ungroup(Selected selected) {
-        Rows result = new Rows();
+        ResultRows result = new ResultRows();
 
         Iterator iter = groups.keySet().iterator();
         while (iter.hasNext()) {
             GroupByCells keys = (GroupByCells) iter.next();
-            result = (Rows) result.with(rowForKey(keys, getRows(keys), selected));
+            result = result.with(
+                rowForKey(keys, getRows(keys), selected));
         }
 
-        return new ResultRows(result);
+        return result;
     }
 
-    private Row rowForKey(GroupByCells cells, Rows rowsForKey, Selected selected) {
-        TupleBuilder builder = new TupleBuilder();
-        addColumnsForWhat(rowsForKey, selected, builder);
-        addColumnsForKeys(cells, selected, builder);
-        return new Row(builder);
+    private ResultRow rowForKey(
+        GroupByCells cells, ResultRows rowsForKey, Selected selected) {
+        ResultRow result = new ResultRow();
+        result = addColumnsForWhat(rowsForKey, selected, result);
+        result = addColumnsForKeys(cells, selected, result);
+        return result;
     }
 
-    private void addColumnsForWhat(Rows rowsForKey, Selected selected, TupleBuilder builder) {
+    private ResultRow addColumnsForWhat(
+        ResultRows rowsForKey, Selected selected, ResultRow accumulator) {
         for (int i = 0; i < selected.size(); ++i) {
             Expression expression = selected.element(i);
             if (keys.containsExpresion(expression)) {
-                /** Just let {@link #addColumnsForKeys(Map, TupleBuilder)} add it. */
+                /** Just let addColumnsForKeys add it. */
             }
             else if (expression.firstAggregate() != null) {
                 Cell aggregated = expression.aggregate(rowsForKey);
-                builder.appendExpression(expression, aggregated);
+                accumulator = accumulator.with(expression, aggregated);
             }
             else {
-                throw new MayflyException(expression.displayName() + " is not aggregate or mentioned in GROUP BY");
+                throw new MayflyException(
+                    expression.displayName() + 
+                    " is not aggregate or mentioned in GROUP BY"
+                );
             }
         }
+        return accumulator;
     }
 
-    private void addColumnsForKeys(GroupByCells cells, Selected selected, TupleBuilder builder) {
+    private ResultRow addColumnsForKeys(
+        GroupByCells cells, Selected selected, ResultRow accumulator) {
         if (keys.keyCount() != cells.size()) {
             throw new MayflyInternalException(
-                "have " + keyColumns.size() + " columns but " + cells.size() + " values");
+                "have " + keyColumns.size() + 
+                " columns but " + cells.size() + " values");
         }
         for (int i = 0; i < cells.size(); ++i) {
-            builder.append((Column) keyColumns.get(i), cells.get(i));
+            Cell cell = cells.get(i);
+            Expression expression = (Expression) keyColumns.get(i);
+            accumulator = accumulator.with(expression, cell);
         }
+        return accumulator;
     }
-
-//    private CellHeader makePositionalHeader(Selected selected, int keyIndex) {
-//        Expression expression = keys.get(keyIndex).expression();
-//        return new ExpressionHeader(expression);
-//    }
 
 }

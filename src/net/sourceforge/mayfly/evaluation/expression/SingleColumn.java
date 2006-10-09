@@ -5,9 +5,9 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.parser.Location;
 
 public class SingleColumn extends Expression {
@@ -49,8 +49,9 @@ public class SingleColumn extends Expression {
         return row.findColumn(tableOrAlias, columnName);
     }
 
-    public Cell aggregate(Rows rows) {
-        throw new MayflyInternalException("shouldn't combine aggregate and column expressions");
+    public Cell aggregate(ResultRows rows) {
+        throw new MayflyInternalException(
+            "shouldn't combine aggregate and column expressions");
     }
 
     public String firstColumn() {

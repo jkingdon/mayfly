@@ -1,9 +1,9 @@
 package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.parser.Location;
 
 public abstract class Literal extends Expression {
@@ -16,7 +16,7 @@ public abstract class Literal extends Expression {
         return valueAsCell();
     }
 
-    public final Cell aggregate(Rows rows) {
+    public final Cell aggregate(ResultRows rows) {
         return valueAsCell();
     }
     

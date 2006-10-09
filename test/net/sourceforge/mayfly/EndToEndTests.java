@@ -150,8 +150,11 @@ public class EndToEndTests extends SqlTestCase {
             fail();
         }
         catch (UnimplementedException expected) {
-            assertEquals("Current_Timestamp is not implemented", 
+            // Either one of these would be OK.
+            assertEquals("data type timestamp is not implemented", 
                 expected.getMessage());
+//            assertEquals("Current_Timestamp is not implemented", 
+//                expected.getMessage());
         }
     }
     

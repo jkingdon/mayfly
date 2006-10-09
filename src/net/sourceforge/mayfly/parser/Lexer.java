@@ -40,9 +40,8 @@ public class Lexer {
 
     public List tokens() {
         List tokens = new ArrayList();
-        tokenLine = currentLine;
-        tokenColumn = currentColumn;
         int current = nextCharacter();
+        markTokenStart();
         while (true) {
             if (current == '.') {
                 current = nextCharacter();
@@ -66,14 +65,12 @@ public class Lexer {
                     while (true) {
                         current = nextCharacter();
                         if (current == '\n') {
-                            tokenLine = currentLine;
-                            tokenColumn = currentColumn;
                             current = nextCharacter();
+                            markTokenStart();
                             break;
                         }
                         else if (current == END_OF_FILE_CHARACTER) {
-                            tokenLine = currentLine;
-                            tokenColumn = currentColumn;
+                            markTokenStart();
                             break;
                         }
                     }
@@ -92,9 +89,8 @@ public class Lexer {
                             gotStar = true;
                         }
                         else if (gotStar && current == '/') {
-                            tokenLine = currentLine;
-                            tokenColumn = currentColumn;
                             current = nextCharacter();
+                            markTokenStart();
                             break;
                         }
                         else if (current == END_OF_FILE_CHARACTER) {
@@ -206,9 +202,8 @@ public class Lexer {
             }
             else if (current == ' ' || current == '\t' || current == '\n' || 
                 current == '\r') {
-                tokenLine = currentLine;
-                tokenColumn = currentColumn;
                 current = nextCharacter();
+                markTokenStart();
             }
             else if (current == -1) {
                 addEndOfFile(tokens);
@@ -258,8 +253,12 @@ public class Lexer {
         tokens.add(
             new TextToken(tokenType, text, tokenLocation())
         );
-        tokenLine = currentLine;
-        tokenColumn = currentColumn;
+        markTokenStart();
+    }
+
+    private void markTokenStart() {
+        tokenLine = previousLine;
+        tokenColumn = previousColumn;
     }
 
     private Location tokenLocation() {
@@ -273,8 +272,7 @@ public class Lexer {
      */
     private void addEndOfFile(List tokens) {
         tokens.add(
-            new EndOfFileToken(previousLine,
-                previousColumn)
+            new EndOfFileToken(previousLine, previousColumn)
         );
     }
 

@@ -28,12 +28,13 @@ public class QuotedStringTest extends TestCase {
     }
     
     public void testSameExpression() throws Exception {
-        assertTrue(new QuotedString("foo").sameExpression(
-            new QuotedString("foo")));
+        assertTrue(new QuotedString("'foo'").sameExpression(
+            new QuotedString("'foo'")));
+
         // Check that comparison is with equals, not ==
         assertTrue(
-            new QuotedString("foo").sameExpression(
-                new QuotedString(new String("foo"))));
+            new QuotedString("'foo'").sameExpression(
+                new QuotedString(new String("'foo'"))));
     }
 
 }

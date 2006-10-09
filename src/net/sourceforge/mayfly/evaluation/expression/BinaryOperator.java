@@ -2,9 +2,9 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 
 abstract public class BinaryOperator extends Expression {
 
@@ -23,7 +23,7 @@ abstract public class BinaryOperator extends Expression {
         return combine(leftCell, rightCell);
     }
 
-    public Cell aggregate(Rows rows) {
+    public Cell aggregate(ResultRows rows) {
         Cell leftCell = left.aggregate(rows);
         Cell rightCell = right.aggregate(rows);
         return combine(leftCell, rightCell);

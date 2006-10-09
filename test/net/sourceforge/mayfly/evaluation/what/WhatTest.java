@@ -31,10 +31,10 @@ public class WhatTest extends TestCase {
         Selected selected = original.selected(dummyRow);
         
         assertEquals(4, selected.size());
-        MayflyAssert.assertColumn("bar", "a", (SingleColumn) selected.element(0)); // Or null, "a"
-        MayflyAssert.assertColumn("foo", "x", (SingleColumn) selected.element(1));
-        MayflyAssert.assertColumn("foo", "y", (SingleColumn) selected.element(2));
-        MayflyAssert.assertColumn("bar", "b", (SingleColumn) selected.element(3));
+        MayflyAssert.assertColumn("bar", "a", selected.element(0)); // Or null, "a"
+        MayflyAssert.assertColumn("foo", "x", selected.element(1));
+        MayflyAssert.assertColumn("foo", "y", selected.element(2));
+        MayflyAssert.assertColumn("bar", "b", selected.element(3));
     }
     
     public void testSelectedDegenerateCase() throws Exception {

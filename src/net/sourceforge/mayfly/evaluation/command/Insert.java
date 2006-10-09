@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.evaluation.command;
 
-import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.ValueList;
@@ -14,10 +13,6 @@ public class Insert extends Command {
     public final ValueList values;
     public final Location location;
 
-    /** @param values List of values to insert, 
-     * where each element is a {@link Cell}
-     * or null for the default value
-     */
     public Insert(UnresolvedTableReference table, 
         ImmutableList columnNames, ValueList values,
         Location location) {

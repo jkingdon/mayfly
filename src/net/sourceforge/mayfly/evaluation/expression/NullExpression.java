@@ -2,9 +2,9 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCell;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.parser.Location;
 
 public class NullExpression extends Expression {
@@ -17,7 +17,7 @@ public class NullExpression extends Expression {
         return NullCell.INSTANCE;
     }
 
-    public Cell aggregate(Rows rows) {
+    public Cell aggregate(ResultRows rows) {
         return NullCell.INSTANCE;
     }
 

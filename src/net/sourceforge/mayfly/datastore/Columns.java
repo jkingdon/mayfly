@@ -32,6 +32,11 @@ public class Columns extends Aggregate {
         return new Columns(columnList.asImmutable());
     }
 
+    public static Columns singleton(Column column) {
+        return new Columns(
+            ImmutableList.fromArray(new Column[] { column }));
+    }
+
 
     private final ImmutableList columns;
 
@@ -120,15 +125,21 @@ public class Columns extends Aggregate {
     }
 
     public Columns replace(Column replacement) {
+        boolean found = false;
         List result = new ArrayList();
         for (Iterator iter = iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
-            if (column.matches(replacement.tableOrAlias(), replacement.columnName())) {
+            if (column.matchesName(replacement.columnName())) {
                 result.add(replacement);
+                found = true;
             }
             else {
                 result.add(column);
             }
+        }
+        if (!found) {
+            throw new MayflyException(
+                "no column " + replacement.columnName());
         }
         return new Columns(new ImmutableList(result));
     }

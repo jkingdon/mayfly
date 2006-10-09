@@ -20,6 +20,21 @@ public class PerformanceTest extends SqlTestCase {
         insertSomeData();
         dropTables();
         long end = System.currentTimeMillis();
+        if (false) {
+            System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");
+        }
+    }
+    
+    public void xtestLotsOfRows() throws Exception {
+        //  547 ms for 1000 rows
+        //13000 ms for 10000 rows
+        execute("create table foo(x integer, y integer, z integer, w varchar(50))");
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 1000; ++i) {
+            execute("insert into foo(x, y, w) values (" + 
+                i + ", " + i % 100 + ", " + "'string " + i + "')");
+        }
+        long end = System.currentTimeMillis();
         System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");
     }
     

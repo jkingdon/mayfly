@@ -33,6 +33,7 @@ import net.sourceforge.mayfly.evaluation.command.Delete;
 import net.sourceforge.mayfly.evaluation.command.DropColumn;
 import net.sourceforge.mayfly.evaluation.command.DropTable;
 import net.sourceforge.mayfly.evaluation.command.Insert;
+import net.sourceforge.mayfly.evaluation.command.ModifyColumn;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
@@ -268,7 +269,7 @@ public class Parser {
         return new ImmutableList(columnNames);
     }
     
-    private ValueList parseValueConstructor() {
+    ValueList parseValueConstructor() {
         Location start = expectAndConsume(TokenType.KEYWORD_values).location;
 
         ValueList values = new ValueList(start);
@@ -405,16 +406,35 @@ public class Parser {
             // optional according to SQL92 but does anyone omit it?
             expectAndConsume(TokenType.KEYWORD_column);
     
-            CreateTable constraintCollector = new CreateTable(table.tableName());
-            Column newColumn = parseColumnDefinition(constraintCollector);
-            if (constraintCollector.hasConstraints()) {
-                throw new MayflyException("constraints are not yet supported in ALTER TABLE");
-            }
+            Column newColumn = parseColumnDisallowingMostConstraints(table);
             return new AddColumn(table, newColumn);
+        }
+        else if (consumeNonReservedWordIfMatches("modify")) {
+            expectAndConsume(TokenType.KEYWORD_column);
+            Column newColumn = parseColumnDisallowingMostConstraints(table);
+            return new ModifyColumn(table, newColumn);
         }
         else {
             throw new ParserException("alter table action", currentToken());
         }
+    }
+
+    /**
+     * @internal
+     * Parse column and throw exception if a constraint is
+     * present.
+     * The exceptions are constraints which are stored in
+     * the {@link Column} itself (currently NOT NULL).
+     */
+    private Column parseColumnDisallowingMostConstraints(
+        UnresolvedTableReference table) {
+        CreateTable constraintCollector = new CreateTable(table.tableName());
+        Column newColumn = parseColumnDefinition(constraintCollector);
+        if (constraintCollector.hasConstraints()) {
+            throw new MayflyException(
+                "constraints are not yet supported in ALTER TABLE");
+        }
+        return newColumn;
     }
 
     void parseTableElement(CreateTable table) {

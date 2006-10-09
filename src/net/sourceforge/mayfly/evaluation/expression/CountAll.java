@@ -2,9 +2,9 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.parser.Location;
 
 public class CountAll extends Expression {
@@ -33,7 +33,7 @@ public class CountAll extends Expression {
         return functionName + "(*)";
     }
 
-    public Cell aggregate(Rows rows) {
+    public Cell aggregate(ResultRows rows) {
         return new LongCell(rows.size());
     }
     

@@ -7,18 +7,25 @@ import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class InsertTest extends TestCase {
     
     public void testParse() throws Exception {
-        Insert insert = (Insert) Command.fromSql("insert into foo (a, b) values (5, 'Value')");
+        Insert insert = (Insert) Command.fromSql(
+            "insert into foo (a, b) values (5, 'Value')");
         assertEquals("some-default", insert.table.schema("some-default"));
         assertEquals("foo", insert.table.tableName());
         assertEquals(ImmutableList.fromArray(new String[] {"a", "b"}), insert.columnNames);
 
+        MayflyAssert.assertLocation(24, 43, insert.values.location);
+
         assertEquals(2, insert.values.size());
+        MayflyAssert.assertLocation(32, 33, insert.values.location(0));
         LongCell five = (LongCell) insert.values.cell(0);
         assertEquals(5, five.asLong());
+
+        MayflyAssert.assertLocation(35, 42, insert.values.location(1));
         StringCell string = (StringCell) insert.values.cell(1);
         assertEquals("Value", string.asString());
     }

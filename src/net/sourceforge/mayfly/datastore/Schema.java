@@ -55,6 +55,13 @@ public class Schema {
         }
     }
 
+    public Schema modifyColumn(TableReference table, Column newColumn) {
+        String tableName = table.tableName();
+        TableData oldTable = table(tableName);
+        return new Schema(
+            tables.with(tableName, oldTable.modifyColumn(newColumn)));
+    }
+
     private void assertNoTable(String table) {
         String existingTable = lookUpTableOrNull(table);
         if (existingTable != null) {

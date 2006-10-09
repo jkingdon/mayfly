@@ -51,4 +51,8 @@ public class ValueList {
         return ((Value)values.get(index)).value;
     }
 
+    public Location location(int index) {
+        return ((Value)values.get(index)).location;
+    }
+
 }

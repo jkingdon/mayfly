@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.datastore.constraint.NoAction;
 import net.sourceforge.mayfly.datastore.constraint.SetDefault;
 import net.sourceforge.mayfly.datastore.constraint.SetNull;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
@@ -312,8 +313,8 @@ public class ParserTest extends TestCase {
         /* Should be 2,15.  But that turns out to be hard (how to
            modify the ParserExpression with the right location,
            or some such). 
-           I don't understand why it is getting 4 instead of 3. */  
-        checkExpression(Plus.class, 4, 13, " (-5 + 8 / 2 ) ");
+           */  
+        checkExpression(Plus.class, 3, 13, " (-5 + 8 / 2 ) ");
 
         checkExpression(Maximum.class, 2, 11, " max ( x ) ");
         checkExpression(Minimum.class, 2, 11, " min ( x ) ");
@@ -342,7 +343,7 @@ public class ParserTest extends TestCase {
         assertEquals(5, expression.location.endLineNumber);
         assertEquals(74, expression.location.endColumn);
     }
-
+    
     private void checkExpression(Class expectedClass, 
         int expectedStartColumn, int expectedEndColumn, String input) {
 
@@ -350,12 +351,26 @@ public class ParserTest extends TestCase {
         Expression expression = parser.parseExpressionOrNull();
         MayflyAssert.assertInstanceOf(expectedClass, expression);
 
-        assertEquals(expectedStartColumn, expression.location.startColumn);
-        assertEquals(expectedEndColumn, expression.location.endColumn);
-        assertEquals(1, expression.location.startLineNumber);
-        assertEquals(1, expression.location.endLineNumber);
+        MayflyAssert.assertLocation(
+            expectedStartColumn, expectedEndColumn, expression.location);
     }
-    
+
+    public void testValueConstructor() throws Exception {
+        Parser parser = new Parser("  values ( 33 , null ) ");
+        ValueList values = parser.parseValueConstructor();
+        MayflyAssert.assertLocation(3, 23, values.location);
+        MayflyAssert.assertLocation(12, 14, values.location(0));
+        MayflyAssert.assertLocation(17, 21, values.location(1));
+    }
+
+    public void testValueConstructorNoSpaces() throws Exception {
+        Parser parser = new Parser("values(5,'Value')");
+        ValueList values = parser.parseValueConstructor();
+        MayflyAssert.assertLocation(1, 18, values.location);
+        MayflyAssert.assertLocation(8, 9, values.location(0));
+        MayflyAssert.assertLocation(10, 17, values.location(1));
+    }
+
     public void testSingleColumnAsWhat() throws Exception {
         Parser parser = new Parser("select a from foo");
         parser.parseSelect();

@@ -191,4 +191,10 @@ public class DataStore {
         return new UpdateStore(replace(table.schema(), updatedSchema), 0);
     }
 
+    public UpdateStore modifyColumn(TableReference table, Column newColumn) {
+        Schema existing = schema(table.schema());
+        Schema updatedSchema = existing.modifyColumn(table, newColumn);
+        return new UpdateStore(replace(table.schema(), updatedSchema), 0);
+    }
+
 }

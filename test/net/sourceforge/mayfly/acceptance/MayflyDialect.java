@@ -57,10 +57,6 @@ public class MayflyDialect extends Dialect {
         return word.equalsIgnoreCase("if");
     }
     
-    public boolean canGroupByExpression() {
-        return wishThisWereTrue();
-    }
-    
     public boolean canGroupByColumnAlias() {
         /** We don't implement column aliases yet.  {@see ResultTest#testAs()}. */
         return wishThisWereTrue();

@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 import java.util.Iterator;
 
@@ -40,29 +41,23 @@ public class GroupByTest extends TestCase {
         assertEquals(new LongCell(8), iterator.next());
         assertFalse(iterator.hasNext());
         
-        Rows sevenActual = grouped.getRows(new GroupByCells(new LongCell(7)));
-        Rows sevenExpected = new Rows(
-            new ImmutableList()
-                .with(new Row(new TupleBuilder()
-                    .appendColumnCell("a", new LongCell(7))
-                    .appendColumnCell("b", new LongCell(50))
-                ))
-                .with(new Row(new TupleBuilder()
-                    .appendColumnCell("a", new LongCell(7))
-                    .appendColumnCell("b", new LongCell(51))
-                ))
-        );
-        assertEquals(sevenExpected, sevenActual);
+        ResultRows sevenRows = 
+            grouped.getRows(new GroupByCells(new LongCell(7)));
 
-        Rows eightActual = grouped.getRows(new GroupByCells(new LongCell(8)));
-        Rows eightExpected = new Rows(
-            new ImmutableList()
-                .with(new Row(new TupleBuilder()
-                    .appendColumnCell("a", new LongCell(8))
-                    .appendColumnCell("b", new LongCell(52))
-                ))
-        );
-        assertEquals(eightExpected, eightActual);
+        assertEquals(2, sevenRows.size());
+        expectRow(7, 50, sevenRows.row(0));
+        expectRow(7, 51, sevenRows.row(1));
+
+        ResultRows eightRows =
+            grouped.getRows(new GroupByCells(new LongCell(8)))
+        ;
+        assertEquals(1, eightRows.size());
+        expectRow(8, 52, eightRows.row(0));
+    }
+
+    private void expectRow(int expectedA, int expectedB, ResultRow fifty) {
+        MayflyAssert.assertColumn("a", expectedA, fifty, 0);
+        MayflyAssert.assertColumn("b", expectedB, fifty, 1);
     }
 
     public void testMutiple() throws Exception {
@@ -97,27 +92,22 @@ public class GroupByTest extends TestCase {
         assertEquals(new LongCell(8), iterator.next());
         assertFalse(iterator.hasNext());
         
-        Rows seven50Actual = grouped.getRows(new GroupByCells(new LongCell(7), new LongCell(50)));
-        Rows seven50Expected = new Rows(
-            new ImmutableList()
-                .with(new Row(new TupleBuilder()
-                    .appendColumnCell("a", new LongCell(7))
-                    .appendColumnCell("b", new LongCell(50))
-                    .appendColumnCell("c", new LongCell(400))
-                ))
-        );
-        assertEquals(seven50Expected, seven50Actual);
+        ResultRows seven50 = 
+            grouped.getRows(new GroupByCells(new LongCell(7), new LongCell(50)))
+        ;
+        assertEquals(1, seven50.size());
+        ResultRow seven50Row = seven50.row(0);
+        MayflyAssert.assertColumn("a", 7, seven50Row, 0);
+        MayflyAssert.assertColumn("b", 50, seven50Row, 1);
+        MayflyAssert.assertColumn("c", 400, seven50Row, 2);
 
-        Rows seven51Actual = grouped.getRows(new GroupByCells(new LongCell(7), new LongCell(51)));
-        Rows seven51Expected = new Rows(
-            new ImmutableList()
-                .with(new Row(new TupleBuilder()
-                    .appendColumnCell("a", new LongCell(7))
-                    .appendColumnCell("b", new LongCell(51))
-                    .appendColumnCell("c", new LongCell(400))
-                ))
-        );
-        assertEquals(seven51Expected, seven51Actual);
+        ResultRows seven51 =
+            grouped.getRows(new GroupByCells(new LongCell(7), new LongCell(51)))
+        ;
+        ResultRow seven51Row = seven51.row(0);
+        MayflyAssert.assertColumn("a", 7, seven51Row, 0);
+        MayflyAssert.assertColumn("b", 51, seven51Row, 1);
+        MayflyAssert.assertColumn("c", 400, seven51Row, 2);
     }
 
 }

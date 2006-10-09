@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
+import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ValueObject;
 
@@ -20,7 +21,7 @@ public class Column extends ValueObject implements CellHeader {
      * once we implement named constraints.  But we can
      * worry about that then.
      */
-    private final boolean isNotNull;
+    public final boolean isNotNull;
 
     public Column(String table, String name, Cell defaultValue, Cell onUpdateValue,
         boolean isAutoIncrement, DataType type, boolean isNotNull) {
@@ -97,20 +98,13 @@ public class Column extends ValueObject implements CellHeader {
     /**
      * Coerce to the type of this column.
      */
-    public Cell coerce(Cell value) {
-        return type.coerce(value);
-    }
-
-    /**
-     * Check not null constraint.  Maybe could be combined with
-     * coerce?
-     */
-    public void check(Cell proposedCell, Location location) {
-        if (isNotNull && proposedCell instanceof NullCell) {
+    public Cell coerce(Cell value, Location location) {
+        if (isNotNull && value instanceof NullCell) {
             throw new MayflyException(
                 "column " + columnName() + " cannot be null",
                 location);
         }
+        return type.coerce(new Value(value, location));
     }
 
     public Cell newColumnValue() {

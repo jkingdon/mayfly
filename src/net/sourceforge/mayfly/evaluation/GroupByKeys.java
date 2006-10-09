@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,6 +23,15 @@ public class GroupByKeys extends ValueObject {
             columns.add(item.column().lookup(row));
         }
         return columns;
+    }
+
+    List expressions(Row row) {
+        List columns = new ArrayList();
+        for (Iterator iter = items.iterator(); iter.hasNext();) {
+            GroupItem item = (GroupItem) iter.next();
+            columns.add(item.expression());
+        }
+        return Collections.unmodifiableList(columns);
     }
 
     public GroupByCells evaluate(Row row) {

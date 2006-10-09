@@ -53,6 +53,10 @@ public class ResultRows {
         return (ResultRow) rows.get(index);
     }
     
+    public Iterator iterator() {
+        return rows.iterator();
+    }
+
     public ImmutableList asList() {
         return rows;
     }

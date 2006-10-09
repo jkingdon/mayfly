@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.expression.literal;
 
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.Expression;
@@ -15,6 +16,10 @@ public class QuotedString extends Literal {
     public QuotedString(String stringInQuotes, Location location) {
         super(location);
         this.stringInQuotes = stringInQuotes;
+        if (!stringInQuotes.endsWith("'") || !stringInQuotes.startsWith("'")) {
+            throw new MayflyInternalException(
+                "String " + stringInQuotes + " should be in quotes");
+        }
     }
 
     public String stringWithoutQuotes() {

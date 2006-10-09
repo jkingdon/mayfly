@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.parser.Location;
 
 public class SetClause {
 
@@ -25,10 +26,10 @@ public class SetClause {
 
     public Cell value(Row row, Column column) {
         if (value == null) {
-            return column.defaultValue();
+            return column.coerce(column.defaultValue(), Location.UNKNOWN);
         }
         else {
-            return value.evaluate(row);
+            return column.coerce(value.evaluate(row), value.location);
         }
     }
 

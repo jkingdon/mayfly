@@ -8,7 +8,9 @@ import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.Selector;
 import net.sourceforge.mayfly.util.Transformer;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class Row extends Aggregate {
 
@@ -51,8 +53,27 @@ public class Row extends Aggregate {
         return headers().thatAreColumns().columnFromName(tableOrAlias, columnName);
     }
 
+    /**
+     * @internal
+     * This method, and the whole concept of having rows refer to
+     * columns, is broken.  We don't want to have to re-write all
+     * the rows every time that we MODIFY COLUMN or change the
+     * auto-increment value (currently stored in the column).
+     * Instead, call {@link #columnNames()} and then look up
+     * the columns with {@link TableData#findColumn(String)}.
+     */
     public Columns columns() {
         return new Columns(ImmutableList.fromIterable(headers()));
+    }
+    
+    public ImmutableList columnNames() {
+        List found = new ArrayList();
+        for (int i = 0; i < elements.size(); ++i) {
+            TupleElement element = (TupleElement) elements.get(i);
+            Column column = element.column();
+            found.add(column.columnName());
+        }
+        return new ImmutableList(found);
     }
 
     public Columns columnsForTable(String aliasOrTable) {

@@ -136,6 +136,10 @@ public class HypersonicDialect extends Dialect {
     public boolean canDropLastColumn() {
         return true;
     }
+    
+    public boolean haveModifyColumn() {
+        return false;
+    }
 
     public boolean haveIdentity() {
         return true;

@@ -86,7 +86,7 @@ public class RowTest extends TestCase {
         Row row = new Row(
             new TupleBuilder()
                 .append(new Column("x"), new LongCell(5))
-                .appendExpression(new QuotedString("hi"), new StringCell("hi"))
+                .appendExpression(new QuotedString("'hi'"), new StringCell("hi"))
                 .append(new Column("foo", "z"), new StringCell("Chicago"))
                 .append(new Column("bar", "z"), new StringCell("Chicago"))
                 .append(new Column("y"), new StringCell("Chicago"))

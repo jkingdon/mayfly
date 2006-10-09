@@ -15,7 +15,8 @@ public class GroupByTest extends SqlTestCase {
         if (!dialect.canGroupByColumnAlias()) {
             return;
         }
-        assertResultList(new String[] { " 'Dickens' " }, query("select author as dude from books group by dude"));
+        assertResultList(new String[] { " 'Dickens' " }, 
+            query("select author as dude from books group by dude"));
     }
     
     public void testGroupByExpression() throws Exception {
@@ -24,40 +25,53 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into people(birthdate, age) values (1714, 33)");
         
         String sql = "select birthdate + age from people group by birthdate + age";
-        if (groupByExpressionMissing()) {
-            expectQueryFailure(sql, "GROUP BY expression (as opposed to column) is not implemented");
+        if (!dialect.canGroupByExpression()) {
+            expectQueryFailure(sql, 
+                "GROUP BY expression (as opposed to column) is not implemented");
             return;
         }
         assertResultList(new String[] { " 1747 " }, query(sql));
 
-        assertResultList(new String[] { " 1747 " }, 
-            query("select birthdate + age + 0 from people group by birthdate + age"));
+        String needsSmartExpressionComparator = 
+            "select birthdate + age + 0 from people group by birthdate + age";
+        if (dialect.expectMayflyBehavior()) {
+            expectQueryFailure(needsSmartExpressionComparator, 
+                "expression is not aggregate or mentioned in GROUP BY");
+        }
+        else {
+            assertResultList(new String[] { " 1747 " }, 
+                query(needsSmartExpressionComparator));
+        }
 
+        if (!dialect.canGroupByColumnAlias()) {
+            return;
+        }
         assertResultList(new String[] { " 1747 " }, 
-            query("select birthdate + age as deathdate from people group by deathdate"));
+            query("select birthdate + age as deathdate " +
+                "from people group by deathdate"));
     }
 
-    private boolean groupByExpressionMissing() {
-        return !dialect.canGroupByExpression();
-    }
-    
     public void testGroupByExpressionError() throws Exception {
-        if (groupByExpressionMissing()) {
+        if (!dialect.canGroupByExpression()) {
             return;
         }
 
         execute("create table people (birthdate integer, age integer)");
         
-        String selectColumnNotGrouped = "select age from people group by birthdate + age";
+        String selectColumnNotGrouped = 
+            "select age from people group by birthdate + age";
 
-        String expressionWhichMakesNoSense = "select birthdate - age from people group by birthdate + age";
+        String expressionWhichMakesNoSense = 
+            "select birthdate - age from people group by birthdate + age";
 
         if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression()) {
             expectQueryFailure(
                 selectColumnNotGrouped, 
                 "age is not aggregate or mentioned in GROUP BY"
             );
-            expectQueryFailure(expressionWhichMakesNoSense, null);
+            expectQueryFailure(expressionWhichMakesNoSense,
+                "expression is not aggregate or mentioned in GROUP BY"
+            );
         }
         else {
             // This only gets worse if there is data - these databases return
@@ -69,7 +83,9 @@ public class GroupByTest extends SqlTestCase {
 
         String expressionWhichCouldMakeSense = "select birthdate + age + 0 from people group by birthdate + age";
         if (dialect.expectMayflyBehavior()) {
-            expectQueryFailure(expressionWhichCouldMakeSense, null);
+            expectQueryFailure(expressionWhichCouldMakeSense,
+                "expression is not aggregate or mentioned in GROUP BY"
+            );
         }
         else {
             assertResultSet(new String[] { }, query(expressionWhichCouldMakeSense));
@@ -413,7 +429,7 @@ public class GroupByTest extends SqlTestCase {
     }
 
     public void testAliasesAndExpression() throws Exception {
-        if (groupByExpressionMissing()) {
+        if (!dialect.canGroupByExpression()) {
             return;
         }
 

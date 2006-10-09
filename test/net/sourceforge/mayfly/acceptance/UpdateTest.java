@@ -22,6 +22,14 @@ public class UpdateTest extends SqlTestCase {
         assertResultSet(new String[] { " null " }, query("select a from foo"));
     }
     
+    public void testViolateNotNull() throws Exception {
+        execute("create table foo (a integer not null)");
+        execute("insert into foo(a) values (7)");
+        expectExecuteFailure(
+            "update foo set a = null", "column a cannot be null");
+        assertResultSet(new String[] { " 7 " }, query("select a from foo"));
+    }
+    
     public void testCaseInsensitive() throws Exception {
         execute("create table foo (a integer)");
         execute("insert into foo(a) values (7)");

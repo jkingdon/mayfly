@@ -141,6 +141,10 @@ public class DerbyDialect extends Dialect {
         return false;
     }
     
+    public boolean haveModifyColumn() {
+        return false;
+    }
+
     public boolean haveSql200xAutoIncrement() {
         return true;
     }

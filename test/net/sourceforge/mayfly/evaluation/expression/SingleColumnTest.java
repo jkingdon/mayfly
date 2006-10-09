@@ -2,22 +2,19 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.parser.Parser;
 
 public class SingleColumnTest extends TestCase {
 
     public void testRowTransform() throws Exception {
-        Row row = new Row(
-            new TupleBuilder()
-                .appendColumnCellContents("colA", "1")
-                .appendColumnCellContents("colB", "2")
-        );
+        ResultRow row = new ResultRow()
+            .withColumn("colA", "1")
+            .withColumn("colB", "2")
+        ;
 
         assertEquals(new StringCell("1"), new SingleColumn("colA").evaluate(row));
         assertEquals(new StringCell("2"), new SingleColumn("colB").evaluate(row));

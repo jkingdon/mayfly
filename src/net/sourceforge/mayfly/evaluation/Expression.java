@@ -40,7 +40,11 @@ abstract public class Expression extends WhatElement {
         return evaluate(new ResultRow(row));
     }
 
-    abstract public Cell aggregate(Rows rows);
+    abstract public Cell aggregate(ResultRows rows);
+
+    public Cell aggregate(Rows rows) {
+        return aggregate(new ResultRows(rows));
+    }
 
     abstract public boolean sameExpression(Expression other);
 

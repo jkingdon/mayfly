@@ -66,13 +66,12 @@ public class TableData {
         while (iter.hasNext()) {
             Column column = (Column) iter.next();
             newColumns = setColumn(
-                specifiedColumnToValue, newColumns, tuple, column);
+                specifiedColumnToValue, newColumns, tuple, column, 
+                values.location);
         }
         Row newRow = new Row(tuple);
         constraints.check(rows, newRow, values.location);
-        if (checker != null) {
-            checker.checkInsert(constraints, newRow);
-        }
+        checker.checkInsert(constraints, newRow);
 
         return new TableData(newColumns, constraints, (Rows) rows.with(newRow));
     }
@@ -84,16 +83,18 @@ public class TableData {
     }
 
     private Columns setColumn(M specifiedColumnToValue, Columns newColumns, 
-        TupleBuilder tuple, Column column) {
+        TupleBuilder tuple, Column column, Location location) {
         boolean isDefault;
         Cell cell;
         if (specifiedColumnToValue.containsKey(column)) {
             Value value = (Value) specifiedColumnToValue.get(column);
             isDefault = value.value == null;
-            cell = isDefault ? column.defaultValue() : column.coerce(value.value);
+            cell = column.coerce(
+                isDefault ? column.defaultValue() : value.value, 
+                value.location);
         } else {
             isDefault = true;
-            cell = column.defaultValue();
+            cell = column.coerce(column.defaultValue(), location);
         }
         
         tuple.append(new TupleElement(column, cell));
@@ -104,7 +105,8 @@ public class TableData {
         return newColumns;
     }
 
-    public UpdateTable update(Checker checker, List setClauses, BooleanExpression where) {
+    public UpdateTable update(Checker checker, List setClauses, 
+        BooleanExpression where) {
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
@@ -244,10 +246,23 @@ public class TableData {
     }
 
     public boolean hasValue(String column, Cell value) {
-        Column foundColumn = columns.columnFromName(column);
+        return hasValue(columns.columnFromName(column), value);
+    }
+
+    private boolean hasValue(Column column, Cell value) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
-            if (row.cell(foundColumn).sqlEquals(value)) {
+            if (row.cell(column).sqlEquals(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasNull(Column column) {
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            if (row.cell(column) instanceof NullCell) {
                 return true;
             }
         }
@@ -267,7 +282,8 @@ public class TableData {
 
     public TableData addColumn(Column newColumn) {
         if (columns.hasColumn(newColumn.columnName())) {
-            throw new MayflyException("column " + newColumn.columnName() + " already exists");
+            throw new MayflyException(
+                "column " + newColumn.columnName() + " already exists");
         }
         return new TableData(
             (Columns) columns.with(newColumn), 
@@ -292,6 +308,23 @@ public class TableData {
      */
     public void checkDropColumn(TableReference table, String column) {
         constraints.checkDropColumn(table, column);
+    }
+
+    public TableData modifyColumn(Column newColumn) {
+        Column oldColumn = columns.columnFromName(newColumn.columnName());
+        if (!oldColumn.isNotNull && newColumn.isNotNull) {
+            // Check the constraint that we're adding
+            if (hasNull(oldColumn)) {
+                throw new MayflyException(
+                    "cannot make column " + newColumn.columnName() + 
+                    " NOT NULL because it contains null values");
+            }
+        }
+        return new TableData(
+            columns.replace(newColumn),
+            constraints,
+            rows
+        );
     }
 
 }

@@ -5,10 +5,9 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
-import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ public abstract class AggregateExpression extends Expression {
         return functionName + "(" + (distinct ? "distinct " : "") + column.displayName() + ")";
     }
 
-    public Cell aggregate(Rows rows) {
+    public Cell aggregate(ResultRows rows) {
         Collection values = findValues(rows);
         return aggregate(values);
     }
@@ -99,7 +98,7 @@ public abstract class AggregateExpression extends Expression {
         throw new MayflyInternalException("Override this for min/max");
     }
 
-    private Collection findValues(Rows rows) {
+    private Collection findValues(ResultRows rows) {
         Collection values;
         if (distinct) {
             values = new HashSet();
@@ -109,7 +108,7 @@ public abstract class AggregateExpression extends Expression {
         }
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            Row row = (Row) iter.next();
+            ResultRow row = (ResultRow) iter.next();
             Cell cell = evaluate(row);
             if (!(cell instanceof NullCell)) {
                 values.add(cell);

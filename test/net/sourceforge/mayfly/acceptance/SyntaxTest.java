@@ -104,6 +104,10 @@ public class SyntaxTest extends SqlTestCase {
         checkReserved("serial");
         checkReserved("identity");
         checkReserved("auto_increment");
+
+        // Part of ALTER TABLE foo MODIFY COLUMN,
+        // which isn't in SQL92
+        checkReserved("modify");
     }
 
     private void checkReserved(String word) throws Exception {

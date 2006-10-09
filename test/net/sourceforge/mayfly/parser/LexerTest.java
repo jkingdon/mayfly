@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.parser;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -86,13 +87,12 @@ public class LexerTest extends TestCase {
         }
         catch (MayflyException e) {
             assertEquals("unclosed comment", e.getMessage());
-            assertEquals(startLineNumber, e.location().startLineNumber);
-            assertEquals(startColumn, e.location().startColumn);
-            assertEquals(endLineNumber, e.location().endLineNumber);
-            assertEquals(endColumn, e.location().endColumn);
+            MayflyAssert.assertLocation(
+                startLineNumber, startColumn, endLineNumber, endColumn, 
+                e.location());
         }
     }
-    
+
     public void testSql92Comments() throws Exception {
         check(
             new TokenType[] {
@@ -415,19 +415,13 @@ public class LexerTest extends TestCase {
         {
             Token period = (Token) tokens.get(0);
             assertEquals(TokenType.PERIOD, period.getType());
-            assertEquals(2, period.startLineNumber());
-            assertEquals(1, period.startColumn());
-            assertEquals(2, period.endLineNumber());
-            assertEquals(2, period.endColumn());
+            MayflyAssert.assertLocation(2, 1, 2, 2, period.location);
         }
         
         {
             Token endOfFile = (Token) tokens.get(1);
             assertEquals(TokenType.END_OF_FILE, endOfFile.getType());
-            assertEquals(2, endOfFile.startLineNumber());
-            assertEquals(27, endOfFile.startColumn());
-            assertEquals(2, endOfFile.endLineNumber());
-            assertEquals(27, endOfFile.endColumn());
+            MayflyAssert.assertLocation(2, 27, 2, 27, endOfFile.location);
         }
     }
     
@@ -438,19 +432,13 @@ public class LexerTest extends TestCase {
         {
             Token slash = (Token) tokens.get(0);
             assertEquals(TokenType.DIVIDE, slash.getType());
-            assertEquals(2, slash.startLineNumber());
-            assertEquals(5, slash.startColumn());
-            assertEquals(2, slash.endLineNumber());
-            assertEquals(6, slash.endColumn());
+            MayflyAssert.assertLocation(2, 5, 2, 6, slash.location);
         }
         
         {
             Token endOfFile = (Token) tokens.get(1);
             assertEquals(TokenType.END_OF_FILE, endOfFile.getType());
-            assertEquals(2, endOfFile.startLineNumber());
-            assertEquals(27, endOfFile.startColumn());
-            assertEquals(2, endOfFile.endLineNumber());
-            assertEquals(27, endOfFile.endColumn());
+            MayflyAssert.assertLocation(2, 27, 2, 27, endOfFile.location);
         }
     }
     
@@ -460,10 +448,21 @@ public class LexerTest extends TestCase {
         
         Token string = (Token) tokens.get(0);
         assertEquals(TokenType.QUOTED_STRING, string.getType());
-        assertEquals(1, string.startLineNumber());
-        assertEquals(1, string.startColumn());
-        assertEquals(1, string.endLineNumber());
-        assertEquals(9, string.endColumn());
+        MayflyAssert.assertLocation(1, 1, 1, 9, string.location);
+    }
+    
+    public void testColumnNumberWithNumberToken() throws Exception {
+        List tokens = lex("(5");
+        assertEquals(3, tokens.size());
+        MayflyAssert.assertLocation(1, 1, 1, 2, ((Token)tokens.get(0)).location);
+        MayflyAssert.assertLocation(1, 2, 1, 3, ((Token)tokens.get(1)).location);
+    }
+    
+    public void testColumnNumberSingleCharacterTokens() throws Exception {
+        List tokens = lex("((");
+        assertEquals(3, tokens.size());
+        MayflyAssert.assertLocation(1, 1, 1, 2, ((Token)tokens.get(0)).location);
+        MayflyAssert.assertLocation(1, 2, 1, 3, ((Token)tokens.get(1)).location);
     }
     
     private void check(TokenType[] expectedTypes, String[] expectedTexts, 

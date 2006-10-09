@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.CellHeader;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
@@ -136,6 +137,14 @@ public class ResultRow {
     
     public ResultRow withColumn(String tableOrAlias, String columnName, Cell cell) {
         return with(new SingleColumn(tableOrAlias, columnName), cell);
+    }
+
+    public ResultRow withColumn(String column, String cellValue) {
+        return withColumn(column, new StringCell(cellValue));
+    }
+
+    public ResultRow withColumn(String columnName, Cell cell) {
+        return with(new SingleColumn(columnName), cell);
     }
 
     public ResultRow with(Expression expression, Cell value) {
