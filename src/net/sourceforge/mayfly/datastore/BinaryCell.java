@@ -14,6 +14,14 @@ public class BinaryCell extends Cell {
         this.data = array;
     }
 
+    public BinaryCell(byte[] array) {
+        this.data = new ImmutableByteArray(array);
+    }
+
+    public BinaryCell(byte singleByte) {
+        this(new byte[] { singleByte });
+    }
+
     public String asBriefString() {
         return "binary data";
     }

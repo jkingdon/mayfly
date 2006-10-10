@@ -174,6 +174,28 @@ public class DataTypeTest extends SqlTestCase {
         assertFalse(results.next());
         results.close();
     }
+    
+    public void testSetShort() throws Exception {
+        execute("create table foo(x bigint)");
+        PreparedStatement insert = 
+            connection.prepareStatement("insert into foo(x) values(?)");
+        insert.setByte(1, Byte.MIN_VALUE);
+        insert.executeUpdate();
+        
+        insert.setShort(1, Short.MIN_VALUE);
+        insert.executeUpdate();
+        
+        insert.setInt(1, Integer.MIN_VALUE);
+        insert.executeUpdate();
+        
+        insert.setLong(1, Long.MIN_VALUE);
+        insert.executeUpdate();
+        
+        assertResultSet(
+            new String[] { " -128 ", " -32768", 
+                " -2147483648 ", " -9223372036854775808 " }, 
+            query("select x from foo"));
+    }
 
     private void checkType(boolean expectType, String typeName, String sampleValue) 
     throws SQLException {

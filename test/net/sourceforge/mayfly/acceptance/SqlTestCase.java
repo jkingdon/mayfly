@@ -133,7 +133,7 @@ public abstract class SqlTestCase extends TestCase {
                 if (strings.get(column - 1)) {
                     value = results.getString(column);
                 } else {
-                    value = new Integer(results.getInt(column));
+                    value = new Long(results.getLong(column));
                 }
 
                 if (results.wasNull()) {
@@ -168,7 +168,7 @@ public abstract class SqlTestCase extends TestCase {
                     row.append(null);
                 } else {
                     strings.clear(j);
-                    row.append(new Integer(Integer.parseInt(cell)));
+                    row.append(new Long(cell));
                 }
             }
             expected.add(row);

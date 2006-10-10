@@ -43,7 +43,8 @@ public class JdbcPreparedStatement implements PreparedStatement {
     private final int parameterCount;
     private BitSet parameterSpecified;
 
-    JdbcPreparedStatement(String sql, MayflyConnection mayflyConnection) throws SQLException {
+    JdbcPreparedStatement(String sql, MayflyConnection mayflyConnection) 
+    throws SQLException {
         this.mayflyConnection = mayflyConnection;
 
         try {
@@ -106,15 +107,19 @@ public class JdbcPreparedStatement implements PreparedStatement {
         throw new UnimplementedException();
     }
 
-    public void setByte(int parameterIndex, byte value) throws SQLException {
-        throw new UnimplementedException();
+    public void setByte(int oneBased, byte value) throws SQLException {
+        setParameter(oneBased, new Long(value));
     }
 
-    public void setShort(int parameterIndex, short value) throws SQLException {
-        throw new UnimplementedException();
+    public void setShort(int oneBased, short value) throws SQLException {
+        setParameter(oneBased, new Long(value));
     }
 
     public void setInt(int oneBased, int value) throws SQLException {
+        setParameter(oneBased, new Long(value));
+    }
+
+    public void setLong(int oneBased, long value) throws SQLException {
         setParameter(oneBased, new Long(value));
     }
 
@@ -131,10 +136,6 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
         parameters.set(zeroBased, value);
         parameterSpecified.set(zeroBased);
-    }
-
-    public void setLong(int parameterIndex, long value) throws SQLException {
-        throw new UnimplementedException();
     }
 
     public void setFloat(int parameterIndex, float value) throws SQLException {
