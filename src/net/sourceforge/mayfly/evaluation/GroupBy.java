@@ -23,22 +23,28 @@ public class GroupBy extends ValueObject implements Aggregator {
     }
     
     public GroupedRows makeGroupedRows(Rows rows) {
+        return makeGroupedRows(new ResultRows(rows));
+    }
+
+    private GroupedRows makeGroupedRows(ResultRows resultRows) {
         GroupedRows grouped = new GroupedRows();
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            Row row = (Row) iter.next();
+        for (Iterator iter = resultRows.iterator(); iter.hasNext();) {
+            ResultRow row = (ResultRow) iter.next();
             grouped.add(keys, row);
         }
         return grouped;
     }
 
-    public ResultRows group(Rows rows, What what, Selected selected) {
+    public ResultRows group(ResultRows rows, What what, Selected selected) {
         ResultRows resultOfGrouping = makeGroupedRows(rows).ungroup(selected);
         return resultOfGrouping.select(having);
     }
     
     public void check(Row dummyRow, Selected selected) {
+        ResultRow dummyResultRow = new ResultRow(dummyRow);
+
         keys.resolve(dummyRow);
-        makeGroupedRows(new Rows(dummyRow)).ungroup(selected);
+        makeGroupedRows(new ResultRows(dummyResultRow)).ungroup(selected);
     }
 
 }

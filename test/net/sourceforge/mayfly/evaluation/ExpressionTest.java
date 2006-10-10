@@ -34,7 +34,9 @@ public class ExpressionTest extends TestCase {
 
         String expectedString = "foo.x + 5 * avg( foo.x ) - count ( * )";
         Expression expected = new Parser(expectedString).parseExpression().asNonBoolean();
-        assertTrue("expected " + expectedString + " but was:" + resolved.toString(), expected.sameExpression(resolved));
+        assertTrue(
+            "expected " + expectedString + " but was:" + resolved.toString(), 
+            expected.sameExpression(resolved));
     }
     
 }

@@ -69,6 +69,7 @@ import net.sourceforge.mayfly.evaluation.select.OrderBy;
 import net.sourceforge.mayfly.evaluation.select.OrderItem;
 import net.sourceforge.mayfly.evaluation.select.ReferenceOrderItem;
 import net.sourceforge.mayfly.evaluation.select.Select;
+import net.sourceforge.mayfly.evaluation.what.AliasedExpression;
 import net.sourceforge.mayfly.evaluation.what.All;
 import net.sourceforge.mayfly.evaluation.what.AllColumnsFromTable;
 import net.sourceforge.mayfly.evaluation.what.What;
@@ -290,7 +291,7 @@ public class Parser {
         }
         else {
             Cell cell = expression.evaluate(new ResultRow() {
-                public SingleColumn findColumn(String tableOrAlias, String columnName) {
+                public Expression findColumn(String tableOrAlias, String columnName) {
                     throw new MayflyException(
                         "values clause may not refer to column: " 
                         + Column.displayName(tableOrAlias, columnName)
@@ -778,7 +779,12 @@ public class Parser {
             return new AllColumnsFromTable(firstIdentifier);
         }
         
-        return parseExpression().asNonBoolean();
+        Expression expression = parseExpression().asNonBoolean();
+        if (consumeIfMatches(TokenType.KEYWORD_as)) {
+            String aliasedColumn = consumeIdentifier();
+            return new AliasedExpression(aliasedColumn, expression);
+        }
+        return expression;
     }
 
     public ParserExpression parseExpression() {

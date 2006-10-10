@@ -3,11 +3,8 @@ package net.sourceforge.mayfly.evaluation;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.LongCell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.Selected;
@@ -20,27 +17,23 @@ public class GroupedRowsTest extends TestCase {
     
     public void testUngroup() throws Exception {
         GroupedRows groupedRows = new GroupedRows();
-        Column player = new Column("player");
         groupedRows.add(
             keysForColumn("player"),
-            new Row(new TupleBuilder()
-                .append(player, new StringCell("Ganguly"))
-                .appendColumnCell("score", new LongCell(35))
-            )
+            new ResultRow()
+                .withColumn("player", new StringCell("Ganguly"))
+                .withColumn("score", new LongCell(35))
         );
         groupedRows.add(
             keysForColumn("player"),
-            new Row(new TupleBuilder()
-                .append(player, new StringCell("Ganguly"))
-                .appendColumnCell("score", new LongCell(45))
-            )
+            new ResultRow()
+                .withColumn("player", new StringCell("Ganguly"))
+                .withColumn("score", new LongCell(45))
         );
         groupedRows.add(
             keysForColumn("player"),
-            new Row(new TupleBuilder()
-                .append(player, new StringCell("Tendulkar"))
-                .appendColumnCell("score", new LongCell(80))
-            )
+            new ResultRow()
+                .withColumn("player", new StringCell("Tendulkar"))
+                .withColumn("score", new LongCell(80))
         );
         
         ResultRows rows = groupedRows.ungroup(
@@ -59,39 +52,33 @@ public class GroupedRowsTest extends TestCase {
 
     public void testMultiple() throws Exception {
         GroupedRows groupedRows = new GroupedRows();
-        Column player = new Column("player");
-        Column year = new Column("year");
         groupedRows.add(
             keysForColumns("player", "year"),
-            new Row(new TupleBuilder()
-                .append(player, new StringCell("Ganguly"))
-                .append(year, new LongCell(2004))
-                .appendColumnCell("score", new LongCell(35))
-            )
+            new ResultRow()
+                .withColumn("player", new StringCell("Ganguly"))
+                .withColumn("year", new LongCell(2004))
+                .withColumn("score", new LongCell(35))
         );
         groupedRows.add(
             keysForColumns("player", "year"),
-            new Row(new TupleBuilder()
-                .append(player, new StringCell("Ganguly"))
-                .append(year, new LongCell(2004))
-                .appendColumnCell("score", new LongCell(45))
-            )
+            new ResultRow()
+                .withColumn("player", new StringCell("Ganguly"))
+                .withColumn("year", new LongCell(2004))
+                .withColumn("score", new LongCell(45))
         );
         groupedRows.add(
             keysForColumns("player", "year"),
-            new Row(new TupleBuilder()
-                .append(player, new StringCell("Ganguly"))
-                .append(year, new LongCell(2005))
-                .appendColumnCell("score", new LongCell(0))
-            )
+            new ResultRow()
+                .withColumn("player", new StringCell("Ganguly"))
+                .withColumn("year", new LongCell(2005))
+                .withColumn("score", new LongCell(0))
         );
         groupedRows.add(
             keysForColumns("player", "year"),
-            new Row(new TupleBuilder()
-                .append(player, new StringCell("Tendulkar"))
-                .append(year, new LongCell(2004))
-                .appendColumnCell("score", new LongCell(80))
-            )
+            new ResultRow()
+                .withColumn("player", new StringCell("Tendulkar"))
+                .withColumn("year", new LongCell(2004))
+                .withColumn("score", new LongCell(80))
         );
         
         Average averageExpression = new Average(new SingleColumn("score"), "avg", false);

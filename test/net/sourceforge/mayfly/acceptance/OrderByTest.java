@@ -90,6 +90,25 @@ public class OrderByTest extends SqlTestCase {
         }
     }
     
+    public void testOrderByExpressionWithColumnAlias() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo(a, b) values (5, 30)");
+        execute("insert into foo(a, b) values (8, 40)");
+        execute("insert into foo(a, b) values (3, 50)");
+
+        String sql = "select a + b as total from foo order by total";
+
+        if (dialect.canOrderByExpression() && dialect.haveColumnAlias()) {
+            assertResultList(new String[] { "35", "48", "53", }, query(sql));
+        }
+        else {
+            expectQueryFailure(sql, 
+                "This feature is not yet implemented in Mayfly"
+                //"no column total"
+            );
+        }
+    }
+    
     public void testOrderByNumericReference() throws Exception {
         execute("create table foo (a integer, b integer)");
         execute("insert into foo(a, b) values (5, 30)");
@@ -100,13 +119,15 @@ public class OrderByTest extends SqlTestCase {
 
         assertResultList(new String[] { "2", "3", "4", "5", "8" }, query("select a from foo order by 1"));
         assertResultList(new String[] { "8", "5", "4", "3", "2" }, query("select a from foo order by 1 desc"));
-        expectQueryFailure("select a from foo order by 0", "ORDER BY 0 must be in range 1 to 1");
+        expectQueryFailure("select a from foo order by 0", 
+            "ORDER BY 0 must be in range 1 to 1");
 
         // Does negative mean something?
         //        expectQueryFailure("select a from foo order by -1", "ORDER BY -1 must be in range 1 to 1");
         //expectQueryFailure("select a from foo order by -1", "expected identifier but got '-'");
 
-        expectQueryFailure("select a from foo order by 2", "ORDER BY 2 must be in range 1 to 1");
+        expectQueryFailure("select a from foo order by 2", 
+            "ORDER BY 2 must be in range 1 to 1");
     }
     
     public void testOrderByNumericReferenceWithAsterisks() throws Exception {
@@ -141,7 +162,7 @@ public class OrderByTest extends SqlTestCase {
         }
     }
     
-    public void testOrderByWithAlias() throws Exception {
+    public void testOrderByWithTableAlias() throws Exception {
         execute("create table places (id integer, parent integer, name varchar(255))");
         execute("insert into places(id, parent, name) values(10, 1, 'B')");
         execute("insert into places(id, parent, name) values(1, 20, 'A')");

@@ -78,12 +78,12 @@ public class ResultRow {
         return element(index).expression;
     }
 
-    public SingleColumn findColumn(String columnName) {
+    public Expression findColumn(String columnName) {
         return findColumn(null, columnName);
     }
 
-    public SingleColumn findColumn(String tableOrAlias, String columnName) {
-        SingleColumn found = null;
+    public Expression findColumn(String tableOrAlias, String columnName) {
+        Expression found = null;
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             Element element = (Element) iter.next();
             if (element.expression instanceof SingleColumn) {
@@ -108,7 +108,8 @@ public class ResultRow {
     public Cell findValue(Expression target) {
         Cell result = findValueOrNull(target);
         if (result == null) {
-            throw new MayflyInternalException("Where did expression " + target.displayName() + " come from?");
+            throw new MayflyInternalException(
+                "Where did expression " + target.displayName() + " come from?");
         }
         else {
             return result;
@@ -118,7 +119,7 @@ public class ResultRow {
     private Cell findValueOrNull(Expression target) {
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             Element element = (Element) iter.next();
-            if (element.expression.sameExpression(target)) {
+            if (target.matches(element.expression)) {
                 return element.value;
             }
         }

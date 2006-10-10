@@ -126,8 +126,8 @@ public class Select extends Command {
             joinedRows = (Rows) joinedRows.cartesianJoin(table.tableContents(store, currentSchema));
         }
 
-        Rows afterWhere = (Rows) joinedRows.select(where);
-
+        ResultRows afterWhere = new ResultRows((Rows) joinedRows.select(where));
+        
         ResultRows afterGrouping = groupBy.group(afterWhere, what, selected);
 
         ResultRows sorted = orderBy.sort(store, afterGrouping, what);

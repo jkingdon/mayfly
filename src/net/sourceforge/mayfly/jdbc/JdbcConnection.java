@@ -66,7 +66,7 @@ public class JdbcConnection implements Connection {
     }
 
     public DatabaseMetaData getMetaData() throws SQLException {
-        throw new UnimplementedException();
+        return new JdbcMetaData();
     }
 
     public void setReadOnly(boolean readOnly) throws SQLException {
@@ -90,7 +90,7 @@ public class JdbcConnection implements Connection {
     }
 
     public int getTransactionIsolation() throws SQLException {
-        throw new UnimplementedException();
+        return TRANSACTION_NONE;
     }
 
     public SQLWarning getWarnings() throws SQLException {

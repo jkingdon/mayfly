@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.evaluation.what;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
@@ -44,7 +43,7 @@ public class Selected extends ValueObject implements Iterable {
         return row.findValue(zeroBasedColumn, element);
     }
 
-    public ResultRows aggregate(Rows rows) {
+    public ResultRows aggregate(ResultRows rows) {
         ResultRow result = new ResultRow();
         for (int i = 0; i < expressions.size(); ++i) {
             Expression expression = (Expression) expressions.get(i);

@@ -82,13 +82,21 @@ public abstract class SqlTestCase extends TestCase {
         dialect.assertMessage(expectedMessage, exception);
     }
 
-    public static void assertResultSet(String[] rowsAsStrings, ResultSet results) throws SQLException {
+    /**
+     * Like {@link #assertResultList(String[], ResultSet)} but using a set instead
+     * of a list.  This has two big consequences: (1) order is not important
+     * (this matters when testing ORDER BY and similar features), and (2) duplicates
+     * are removed (this matters when testing DISTINCT and similar features).
+     */
+    public static void assertResultSet(String[] rowsAsStrings, ResultSet results) 
+    throws SQLException {
         Collection expected = new HashSet();
         HashSet actual = new HashSet();
         assertResults(rowsAsStrings, results, expected, actual);
     }
 
-    public static void assertResultList(String[] rowsAsStrings, ResultSet results) throws SQLException {
+    public static void assertResultList(String[] rowsAsStrings, ResultSet results) 
+    throws SQLException {
         Collection expected = new ArrayList();
         ArrayList actual = new ArrayList();
         assertResults(rowsAsStrings, results, expected, actual);

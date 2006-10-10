@@ -56,12 +56,7 @@ public class MayflyDialect extends Dialect {
         // other languages.
         return word.equalsIgnoreCase("if");
     }
-    
-    public boolean canGroupByColumnAlias() {
-        /** We don't implement column aliases yet.  {@see ResultTest#testAs()}. */
-        return wishThisWereTrue();
-    }
-    
+        
     public boolean willReadUncommitted() {
         /** It isn't clear that there is any way to just
            dip our toes into this water.  It seems like

@@ -88,6 +88,7 @@ public class JdbcDriver implements Driver {
     }
     </pre>
      * @param dataStore The initial contents of the database.
+     * @return A JDBC URL which you can use to access the database.
      */
     public static String create(DataStore dataStore) {
         return getMayflyDriver().createInDriver(dataStore);

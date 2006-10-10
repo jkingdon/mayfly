@@ -7,6 +7,9 @@ import net.sourceforge.mayfly.util.ValueObject;
 
 public class GroupItem extends ValueObject {
 
+    /**
+     * Not yet immutable, because of {@link #resolve(Row)}.
+     */
     private Expression expression;
 
     public GroupItem(Expression expression) {

@@ -256,7 +256,25 @@ public class WhereTest extends SqlTestCase {
             },
             query("select b from foo where foo.a in (select c from bar)")
         );
-
+    }
+    
+    public void testReferToColumnAlias() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        execute("insert into foo(a, b) values(3, 10)");
+        execute("insert into foo(a, b) values(7, 20)");
+        String sql = "select a + b as a_and_b from foo where a_and_b < 20";
+        if (dialect.whereCanReferToColumnAlias()) {
+            assertResultSet(
+                new String[] { " 13 " }, 
+                query(sql)
+            );
+        }
+        else {
+            expectQueryFailure(sql, 
+                "This feature is not yet implemented in Mayfly"
+                //"no column a_and_b"
+            );
+        }
     }
 
 }

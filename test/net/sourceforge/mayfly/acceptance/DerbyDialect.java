@@ -95,6 +95,10 @@ public class DerbyDialect extends Dialect {
     public boolean canGroupByColumnAlias() {
         return false;
     }
+    
+    public boolean whereCanReferToColumnAlias() {
+        return false;
+    }
 
     public boolean canOrderByExpression() {
         return true;

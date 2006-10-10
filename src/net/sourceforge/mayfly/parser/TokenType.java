@@ -42,6 +42,7 @@ public class TokenType {
     public static final TokenType KEYWORD_all = registerKeyword("all");
     public static final TokenType KEYWORD_alter = registerKeyword("alter");
     public static final TokenType KEYWORD_and = registerKeyword("and");
+    public static final TokenType KEYWORD_as = registerKeyword("as");
     public static final TokenType KEYWORD_asc = registerKeyword("asc");
     public static final TokenType KEYWORD_authorization = registerKeyword("authorization");
     public static final TokenType KEYWORD_avg = registerKeyword("avg");

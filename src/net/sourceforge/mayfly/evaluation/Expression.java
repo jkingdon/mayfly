@@ -64,4 +64,8 @@ abstract public class Expression extends WhatElement {
         return false;
     }
 
+    public final boolean matches(Expression expression) {
+        return expression.sameExpression(this);
+    }
+
 }

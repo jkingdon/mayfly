@@ -25,7 +25,7 @@ public class GroupByKeys extends ValueObject {
         return columns;
     }
 
-    List expressions(Row row) {
+    List expressions() {
         List columns = new ArrayList();
         for (Iterator iter = items.iterator(); iter.hasNext();) {
             GroupItem item = (GroupItem) iter.next();
@@ -34,7 +34,7 @@ public class GroupByKeys extends ValueObject {
         return Collections.unmodifiableList(columns);
     }
 
-    public GroupByCells evaluate(Row row) {
+    public GroupByCells evaluate(ResultRow row) {
         GroupByCells keyCells = new GroupByCells();
         for (Iterator iter = items.iterator(); iter.hasNext();) {
             GroupItem item = (GroupItem) iter.next();

@@ -12,6 +12,8 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -27,7 +29,9 @@ import java.sql.ResultSet;
 public class EndToEndTests extends SqlTestCase {
     
     public void testThisIsMayfly() throws Exception {
-        assertTrue("When testing a non-mayfly database, please just run the tests in the acceptance package",
+        assertTrue(
+            "When testing a non-mayfly database, " +
+                "please just run the tests in the acceptance package",
             dialect instanceof MayflyDialect);
     }
 
@@ -135,7 +139,7 @@ public class EndToEndTests extends SqlTestCase {
             execute("insert into foo(x) values('something')");
             fail();
         }
-        catch (UnimplementedException expected) {
+        catch (MayflySqlException expected) {
             assertEquals("data type timestamp is not implemented", 
                 expected.getMessage());
         }
@@ -149,7 +153,7 @@ public class EndToEndTests extends SqlTestCase {
             assertResultSet(new String[] { "0" }, query("select x from foo"));
             fail();
         }
-        catch (UnimplementedException expected) {
+        catch (MayflySqlException expected) {
             // Either one of these would be OK.
             assertEquals("data type timestamp is not implemented", 
                 expected.getMessage());
@@ -217,6 +221,23 @@ public class EndToEndTests extends SqlTestCase {
             "(table balance, column currency)");
         execute("alter table currency drop column name");
         execute("alter table balance drop column amount");
+    }
+    
+    public void testTransactionLevel() throws Exception {
+        // TODO: What does "NONE" mean?  Check JDBC documentation.
+        assertEquals(
+            Connection.TRANSACTION_NONE,
+            connection.getTransactionIsolation());
+    }
+    
+    /* It is pretty clear that there are many differences
+       between databases with respect to how DatabaseMetaData
+       behaves (see the hypersonic source, for example). 
+       So although moving this to acceptance is probably
+       a good idea, I'm not doing it right now. */
+    public void testMetaData() throws Exception {
+        DatabaseMetaData metaData = connection.getMetaData();
+        assertFalse(metaData.supportsUnion());
     }
     
 }

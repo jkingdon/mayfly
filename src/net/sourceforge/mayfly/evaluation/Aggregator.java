@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.What;
 
@@ -10,7 +9,7 @@ import net.sourceforge.mayfly.evaluation.what.What;
  */
 public interface Aggregator {
 
-    public abstract ResultRows group(Rows rows, What what, Selected selected);
+    public abstract ResultRows group(ResultRows rows, What what, Selected selected);
 
     public abstract void check(Row dummyRow, Selected selected);
 

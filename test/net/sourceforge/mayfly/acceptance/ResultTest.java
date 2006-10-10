@@ -87,7 +87,7 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testAs() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
+        if (!dialect.haveColumnAlias()) {
             return;
         }
 

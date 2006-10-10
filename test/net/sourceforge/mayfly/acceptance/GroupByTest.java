@@ -81,7 +81,8 @@ public class GroupByTest extends SqlTestCase {
             assertResultSet(new String[] { }, query(expressionWhichMakesNoSense));
         }
 
-        String expressionWhichCouldMakeSense = "select birthdate + age + 0 from people group by birthdate + age";
+        String expressionWhichCouldMakeSense = 
+            "select birthdate + age + 0 from people group by birthdate + age";
         if (dialect.expectMayflyBehavior()) {
             expectQueryFailure(expressionWhichCouldMakeSense,
                 "expression is not aggregate or mentioned in GROUP BY"
@@ -130,7 +131,8 @@ public class GroupByTest extends SqlTestCase {
                 " 'Bowman', 'Other Title', 1 ",
                 " 'Bowman', 'Practical SQL', 2 ", 
             },
-            query("select author, title, count(*) from books group by author, title order by title")
+            query("select author, title, count(*) from books " +
+                "group by author, title order by title")
         );
 
         assertResultList(
@@ -138,7 +140,8 @@ public class GroupByTest extends SqlTestCase {
                 " 'Bowman', 'Other Title', 1 ",
                 " 'Bowman', 'Practical SQL', 2 ", 
             },
-            query("select author, title, count(author) from books group by author, title order by title")
+            query("select author, title, count(author) from books " +
+                "group by author, title order by title")
         );
     }
     
@@ -148,10 +151,12 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into books(author, title) values ('Bowman', 'Other Title')");
         execute("insert into books(author, title) values ('Gang Of Four', 'Design Patterns')");
         
-        String notAggegateOrGrouped = "select author, title, count(*) from books group by author order by author";
+        String notAggegateOrGrouped = 
+            "select author, title, count(*) from books group by author order by author";
 
         if (dialect.errorIfNotAggregateOrGrouped()) {
-            expectQueryFailure(notAggegateOrGrouped, "title is not aggregate or mentioned in GROUP BY");
+            expectQueryFailure(notAggegateOrGrouped, 
+                "title is not aggregate or mentioned in GROUP BY");
         } else {
             // MySQL seems to supply some random row for the title.
             // That seems fishy.

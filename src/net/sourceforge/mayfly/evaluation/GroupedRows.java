@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.evaluation;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
 import java.util.ArrayList;
@@ -22,13 +21,13 @@ public class GroupedRows {
         return groups.size();
     }
 
-    public void add(GroupByKeys keys, Row row) {
-        ResultRow resultRow = new ResultRow(row);
+    public void add(GroupByKeys keys, ResultRow row) {
+        ResultRow resultRow = row;
 
-        GroupByCells cells = keys.evaluate(row);
+        GroupByCells cells = keys.evaluate(resultRow);
         addRowToGroup(cells, resultRow);
         this.keys = keys;
-        this.keyColumns = keys.expressions(row);
+        this.keyColumns = keys.expressions();
     }
 
     private void addRowToGroup(GroupByCells keys, ResultRow resultRow) {

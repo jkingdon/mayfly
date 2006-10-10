@@ -227,10 +227,6 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean canGroupByColumnAlias() {
-        return true;
-    }
-
     public boolean canOrderByExpression() {
         return false;
     }
@@ -488,5 +484,17 @@ public abstract class Dialect {
     public boolean datesAreOff() {
         return false;
     }
+
+    public boolean haveColumnAlias() {
+        return wishThisWereTrue();
+    }
     
+    public boolean whereCanReferToColumnAlias() {
+        return haveColumnAlias();
+    }
+    
+    public boolean canGroupByColumnAlias() {
+        return haveColumnAlias();
+    }
+
 }

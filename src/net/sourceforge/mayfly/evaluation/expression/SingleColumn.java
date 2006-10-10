@@ -41,7 +41,7 @@ public class SingleColumn extends Expression {
     }
 
     public Cell evaluate(ResultRow row) {
-        SingleColumn found = row.findColumn(tableOrAlias, columnName);
+        Expression found = row.findColumn(tableOrAlias, columnName);
         return row.findValue(found);
     }
 
@@ -125,5 +125,5 @@ public class SingleColumn extends Expression {
     public String columnName() {
         return columnName;
     }
-
+    
 }

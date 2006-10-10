@@ -19,7 +19,7 @@ public class ResultRowTest extends TestCase {
                 .withColumn("foo", "z", new LongCell(5))
                 .with(new CountAll("count"), new LongCell(15))
                 ;
-        SingleColumn column = row.findColumn("x");
+        SingleColumn column = (SingleColumn) row.findColumn("x");
         assertEquals("foo", column.tableOrAlias());
         assertEquals("x", column.columnName());
     }
@@ -76,13 +76,10 @@ public class ResultRowTest extends TestCase {
     
     public void testFindValue() throws Exception {
         ResultRow row = 
-            new ResultRow(
-                new TupleBuilder()
-                    .appendColumnCell("foo", "x", new LongCell(5))
-                    .appendColumnCell("bar", "x", new LongCell(6))
-                    .appendExpression(new CountAll("count"), new LongCell(2))
-                    .asRow()
-            );
+            new ResultRow()
+                .withColumn("foo", "x", new LongCell(5))
+                .withColumn("bar", "x", new LongCell(6))
+                .with(new CountAll("count"), new LongCell(2));
         LongCell barX = (LongCell) row.findValue(new SingleColumn("bar", "x"));
         assertEquals(6L, barX.asLong());
 

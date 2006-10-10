@@ -7,10 +7,10 @@ package net.sourceforge.mayfly;
  * what features to work on unless people tell us which ones they
  * would find most useful.
  */
-public class UnimplementedException extends RuntimeException {
+public class UnimplementedException extends MayflyException {
 
     public UnimplementedException() {
-        super();
+        super("This feature is not yet implemented in Mayfly");
     }
 
     public UnimplementedException(String message) {
