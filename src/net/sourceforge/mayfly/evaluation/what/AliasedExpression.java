@@ -35,11 +35,15 @@ public class AliasedExpression extends Expression {
     }
 
     public Cell evaluate(ResultRow row) {
-        throw new UnimplementedException();
+        return expression.evaluate(row);
     }
 
     public boolean sameExpression(Expression other) {
         throw new UnimplementedException();
+    }
+    
+    public boolean matches(String columnName) {
+        return alias.equalsIgnoreCase(columnName);
     }
 
 }

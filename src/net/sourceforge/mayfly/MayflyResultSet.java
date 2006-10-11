@@ -2,7 +2,6 @@ package net.sourceforge.mayfly;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCell;
-import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
@@ -201,8 +200,7 @@ public final class MayflyResultSet extends ResultSetStub {
 
     private Cell cellFromName(String columnName) throws SQLException {
         try {
-            Expression column = currentRow().findColumn(columnName);
-            Cell cell = currentRow().findValue(column);
+            Cell cell = selected.evaluate(columnName, currentRow());
             wasNull = cell instanceof NullCell;
             return cell;
         } catch (MayflyException e) {

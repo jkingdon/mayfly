@@ -68,4 +68,8 @@ abstract public class Expression extends WhatElement {
         return expression.sameExpression(this);
     }
 
+    public boolean matches(String columnName) {
+        return false;
+    }
+
 }

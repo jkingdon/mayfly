@@ -43,6 +43,28 @@ public class Selected extends ValueObject implements Iterable {
         return row.findValue(zeroBasedColumn, element);
     }
 
+    public Cell evaluate(String columnName, ResultRow row) {
+        Cell found = null;
+        for (int i = 0; i < expressions.size(); ++i) {
+            Expression expression = (Expression) expressions.get(i);
+            if (expression.matches(columnName)) {
+                if (found != null) {
+                    throw new MayflyException("ambiguous column " + columnName);
+                }
+                else {
+                    found = expression.evaluate(row);
+                }
+            }
+        }
+
+        if (found == null) {
+            throw new MayflyException("no column " + columnName);
+        }
+        else {
+            return found;
+        }
+    }
+
     public ResultRows aggregate(ResultRows rows) {
         ResultRow result = new ResultRow();
         for (int i = 0; i < expressions.size(); ++i) {

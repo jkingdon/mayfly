@@ -87,15 +87,27 @@ public class ResultTest extends SqlTestCase {
     }
     
     public void testAs() throws Exception {
-        if (!dialect.haveColumnAlias()) {
-            return;
-        }
-
         execute("CREATE TABLE foo (A INTEGER)");
         execute("INSERT INTO foo (A) values (5)");
         ResultSet results = query("select a + 4 as total from foo");
         assertTrue(results.next());
         assertEquals(9, results.getInt("total"));
+        results.close();
+    }
+    
+    public void testAsIsThereButNotReferenced() throws Exception {
+        execute("CREATE TABLE foo (A INTEGER)");
+        execute("INSERT INTO foo (A) values (5)");
+        ResultSet results = query("select a as total from foo");
+        assertTrue(results.next());
+        try {
+            results.getInt("a");
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage("no column a", e);
+        }
+        assertEquals(5, results.getInt(1));
         results.close();
     }
     

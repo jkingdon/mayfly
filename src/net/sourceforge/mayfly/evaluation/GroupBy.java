@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.evaluation;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.util.ValueObject;
 
@@ -35,7 +34,7 @@ public class GroupBy extends ValueObject implements Aggregator {
         return grouped;
     }
 
-    public ResultRows group(ResultRows rows, What what, Selected selected) {
+    public ResultRows group(ResultRows rows, Selected selected) {
         ResultRows resultOfGrouping = makeGroupedRows(rows).ungroup(selected);
         return resultOfGrouping.select(having);
     }

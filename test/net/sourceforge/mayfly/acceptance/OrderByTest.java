@@ -102,10 +102,7 @@ public class OrderByTest extends SqlTestCase {
             assertResultList(new String[] { "35", "48", "53", }, query(sql));
         }
         else {
-            expectQueryFailure(sql, 
-                "This feature is not yet implemented in Mayfly"
-                //"no column total"
-            );
+            expectQueryFailure(sql, "no column total");
         }
     }
     

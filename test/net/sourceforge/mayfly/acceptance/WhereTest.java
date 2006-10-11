@@ -270,10 +270,7 @@ public class WhereTest extends SqlTestCase {
             );
         }
         else {
-            expectQueryFailure(sql, 
-                "This feature is not yet implemented in Mayfly"
-                //"no column a_and_b"
-            );
+            expectQueryFailure(sql, "no column a_and_b");
         }
     }
 
