@@ -230,14 +230,4 @@ public class EndToEndTests extends SqlTestCase {
             connection.getTransactionIsolation());
     }
     
-    /* It is pretty clear that there are many differences
-       between databases with respect to how DatabaseMetaData
-       behaves (see the hypersonic source, for example). 
-       So although moving this to acceptance is probably
-       a good idea, I'm not doing it right now. */
-    public void testMetaData() throws Exception {
-        DatabaseMetaData metaData = connection.getMetaData();
-        assertFalse(metaData.supportsUnion());
-    }
-    
 }

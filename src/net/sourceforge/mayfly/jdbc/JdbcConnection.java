@@ -14,6 +14,18 @@ import java.sql.Savepoint;
 import java.sql.Statement;
 import java.util.Map;
 
+/**
+ * @internal
+ * The responsibility of this class is to handle the various
+ * methods of JDBC, including the uninteresting ones.
+ * 
+ * The responsibility of {@link MayflyConnection} is to
+ * deal with the meat of a connection - auto-commit flag,
+ * execution, etc.
+ * 
+ * At least, I (kingdon) don't remember/see any other reason for
+ * separating them.
+ */
 public class JdbcConnection implements Connection {
 
     private MayflyConnection mayflyConnection;
@@ -27,18 +39,22 @@ public class JdbcConnection implements Connection {
     }
 
     public Statement createStatement() throws SQLException {
+        checkClosed();
         return new JdbcStatement(mayflyConnection);
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
+        checkClosed();
         return new JdbcPreparedStatement(sql, mayflyConnection);
     }
 
     public CallableStatement prepareCall(String sql) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public String nativeSQL(String sql) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
@@ -58,127 +74,165 @@ public class JdbcConnection implements Connection {
         mayflyConnection.rollback();
     }
 
+    /**
+     * @internal
+     * In some cases this will make the {@link Database}
+     * available for garbage collection.
+     */
     public void close() throws SQLException {
+        mayflyConnection = null;
     }
 
     public boolean isClosed() throws SQLException {
-        throw new UnimplementedException();
+        return mayflyConnection == null;
     }
 
     public DatabaseMetaData getMetaData() throws SQLException {
+        checkClosed();
         return new JdbcMetaData();
     }
 
     public void setReadOnly(boolean readOnly) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public boolean isReadOnly() throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public void setCatalog(String catalog) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public String getCatalog() throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public void setTransactionIsolation(int level) throws SQLException {
+        checkClosed();
         // Not sure what we should do with this.
     }
 
     public int getTransactionIsolation() throws SQLException {
+        checkClosed();
         return TRANSACTION_NONE;
     }
 
     public SQLWarning getWarnings() throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public void clearWarnings() throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public Statement createStatement(int resultSetType, int resultSetConcurrency)
             throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public PreparedStatement prepareStatement(String sql, int resultSetType,
             int resultSetConcurrency) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public CallableStatement prepareCall(String sql, int resultSetType,
             int resultSetConcurrency) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public Map getTypeMap() throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public void setTypeMap(Map map) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public void setHoldability(int holdability) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public int getHoldability() throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public Savepoint setSavepoint() throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public Savepoint setSavepoint(String name) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public void rollback(Savepoint savepoint) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public void releaseSavepoint(Savepoint savepoint) throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public Statement createStatement(int resultSetType,
             int resultSetConcurrency, int resultSetHoldability)
             throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public PreparedStatement prepareStatement(String sql, int resultSetType,
             int resultSetConcurrency, int resultSetHoldability)
             throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public CallableStatement prepareCall(String sql, int resultSetType,
             int resultSetConcurrency, int resultSetHoldability)
             throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public PreparedStatement prepareStatement(String sql, int autoGeneratedKeys)
             throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public PreparedStatement prepareStatement(String sql, int[] columnIndexes)
             throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
     }
 
     public PreparedStatement prepareStatement(String sql, String[] columnNames)
             throws SQLException {
+        checkClosed();
         throw new UnimplementedException();
+    }
+
+    private void checkClosed() throws SQLException {
+        if (mayflyConnection == null) {
+            throw new SQLException("connection is closed");
+        }
     }
 
 }

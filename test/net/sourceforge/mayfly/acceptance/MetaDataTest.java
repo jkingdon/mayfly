@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -8,12 +9,22 @@ import java.sql.Statement;
  * limited to reflect what is portable against various JDBC drivers.
  * For now, it is merely limited by what we've gotten around to
  * implementing.  Which, at the time of writing, is nothing.
+ * 
+ * As for the general question of how portable DatabaseMetaData is,
+ * there are issues.  See Hypersonic sources for example.
  */
 public class MetaDataTest extends SqlTestCase {
 
-    public void testNothing() {
+    public void testMetaData() throws Exception {
+        DatabaseMetaData metaData = connection.getMetaData();
+        if (!dialect.wishThisWereTrue()) {
+            assertFalse(metaData.supportsUnion());
+        }
+        else {
+            assertTrue(metaData.supportsUnion());
+        }
     }
-
+ 
     public void xtestNoTables() throws Exception {
         // not sure about null vs "" for schema, catalog.
         // But null is clearly what hypersonic wants for "across all schemas/catalogs".

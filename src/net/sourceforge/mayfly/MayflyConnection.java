@@ -19,6 +19,9 @@ import java.util.Set;
  * A connection has state, like the auto-commit flag, the current schema,
  * etc.  This class holds that state and also is able to
  * perform various operations on the database.
+ * 
+ * This class is just for callers within Mayfly; external callers
+ * should have a {@link net.sourceforge.mayfly.jdbc.JdbcConnection}.
  */
 public class MayflyConnection {
 

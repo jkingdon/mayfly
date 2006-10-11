@@ -120,7 +120,45 @@ public class JdbcTest extends TestCase {
         connection.close();
     }
     
-    private void query(String jdbcUrl, String[] expectedResults, String sql) throws SQLException {
+    public void testIsClosed() throws Exception {
+        Database database = new Database();
+        Connection connection = database.openConnection();
+        Connection secondConnection = database.openConnection();
+        assertFalse(connection.isClosed());
+        connection.close();
+        assertTrue(connection.isClosed());
+        
+        // multiple close calls have no effect
+        connection.close();
+        assertTrue(connection.isClosed());
+        
+        assertFalse(secondConnection.isClosed());
+    }
+    
+    public void testOperationsOnClosedConnection() throws Exception {
+        Database database = new Database();
+        Connection connection = database.openConnection();
+        connection.close();
+
+        try {
+            connection.createStatement();
+            fail();
+        }
+        catch (SQLException e) {
+            assertEquals("connection is closed", e.getMessage());
+        }
+
+        try {
+            connection.prepareStatement("even syntax errors not detected");
+            fail();
+        }
+        catch (SQLException e) {
+            assertEquals("connection is closed", e.getMessage());
+        }
+    }
+    
+    private void query(String jdbcUrl, String[] expectedResults, String sql) 
+    throws SQLException {
         Connection connection = DriverManager.getConnection(jdbcUrl);
         Statement statement = connection.createStatement();
         SqlTestCase.assertResultSet(expectedResults, statement.executeQuery(sql));
@@ -128,7 +166,8 @@ public class JdbcTest extends TestCase {
         connection.close();
     }
 
-    private void update(String jdbcUrl, int expectedRowsAffected, String sql) throws SQLException {
+    private void update(String jdbcUrl, int expectedRowsAffected, String sql) 
+    throws SQLException {
         Connection connection = DriverManager.getConnection(jdbcUrl);
         Statement statement = connection.createStatement();
         assertEquals(expectedRowsAffected, statement.executeUpdate(sql));
