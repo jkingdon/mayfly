@@ -124,12 +124,11 @@ public class JdbcConnection implements Connection {
 
     public SQLWarning getWarnings() throws SQLException {
         checkClosed();
-        throw new UnimplementedException();
+        return null;
     }
 
     public void clearWarnings() throws SQLException {
         checkClosed();
-        throw new UnimplementedException();
     }
 
     public Statement createStatement(int resultSetType, int resultSetConcurrency)
