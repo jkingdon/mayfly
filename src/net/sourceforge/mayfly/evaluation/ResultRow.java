@@ -12,6 +12,7 @@ import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -116,7 +117,7 @@ public class ResultRow {
         }
     }
 
-    private Cell findValueOrNull(Expression target) {
+    public Cell findValueOrNull(Expression target) {
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             Element element = (Element) iter.next();
             if (target.matches(element.expression)) {
@@ -126,7 +127,7 @@ public class ResultRow {
         return null;
     }
 
-    public Cell findValue(int zeroBasedColumn, Expression expression) {
+    public Cell findOrEvaluate(Expression expression) {
         Cell result = findValueOrNull(expression);
         if (result != null) {
             return result;
@@ -150,6 +151,20 @@ public class ResultRow {
 
     public ResultRow with(Expression expression, Cell value) {
         return new ResultRow(elements.with(new Element(expression, value)));
+    }
+    
+    public String toString() {
+        StringBuilder out = new StringBuilder();
+        out.append("Result Row:\n");
+        for (int i = 0; i < elements.size(); ++i) {
+            Element element = (Element) elements.get(i);
+            out.append("  ");
+            out.append(element.expression.displayName());
+            out.append(" = ");
+            out.append(element.value.displayName());
+            out.append("\n");
+        }
+        return out.toString();
     }
 
     public static class Element {

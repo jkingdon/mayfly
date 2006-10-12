@@ -33,8 +33,17 @@ public abstract class AggregateExpression extends Expression {
         this(column, functionName, distinct, Location.UNKNOWN);
     }
 
+    /** 
+     @internal
+     This is just for checking; aggregation happens in 
+     {@link #aggregate(Rows)}. */
     public Cell evaluate(ResultRow row) {
-        /** This is just for checking; aggregation happens in {@link #aggregate(Rows)}. */
+        return NullCell.INSTANCE;
+//        Cell cell = row.findValueOrNull(this);
+//        return cell == null ? new LongCell(30) : cell;
+    }
+    
+    public Cell evaluateColumn(ResultRow row) {
         return column.evaluate(row);
     }
     
@@ -109,7 +118,7 @@ public abstract class AggregateExpression extends Expression {
 
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ResultRow row = (ResultRow) iter.next();
-            Cell cell = evaluate(row);
+            Cell cell = evaluateColumn(row);
             if (!(cell instanceof NullCell)) {
                 values.add(cell);
             }
@@ -120,7 +129,8 @@ public abstract class AggregateExpression extends Expression {
     public boolean sameExpression(Expression other) {
         if (getClass().equals(other.getClass())) {
             AggregateExpression otherExpression = (AggregateExpression) other;
-            return column.sameExpression(otherExpression.column) && distinct == otherExpression.distinct;
+            return column.sameExpression(otherExpression.column) && 
+                distinct == otherExpression.distinct;
         }
         else {
             return false;

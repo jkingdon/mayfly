@@ -110,13 +110,17 @@ public class GroupByTest extends SqlTestCase {
     
     public void testGroupByAndAggregate() throws Exception {
         execute("create table books (author varchar(255), title varchar(255))");
-        execute("insert into books(author, title) values ('Bowman', 'Practical SQL')");
-        execute("insert into books(author, title) values ('Bowman', 'Other Title')");
-        execute("insert into books(author, title) values ('Gang Of Four', 'Design Patterns')");
+        execute("insert into books(author, title) " +
+            "values ('Bowman', 'Practical SQL')");
+        execute("insert into books(author, title) " +
+            "values ('Bowman', 'Other Title')");
+        execute("insert into books(author, title) " +
+            "values ('Gang Of Four', 'Design Patterns')");
         
         assertResultList(
             new String[] { " 'Bowman', 2 ", " 'Gang Of Four', 1 " },
-            query("select author, count(title) from books group by author order by author")
+            query("select author, count(title) from books " +
+                "group by author order by author")
         );
     }
     
@@ -182,25 +186,23 @@ public class GroupByTest extends SqlTestCase {
         }
     }
     
-    public void testGroupByAggregate() throws Exception {
-        // select pub_id, sum(price) from titles group by pub_id, sum(price)
+    public void xtestGroupByAggregate() throws Exception {
         // Might have to go back to 
         // The Practical SQL Handbook; Using Structured Query Language, 2nd edition.
         // to remember why you'd group by an aggregate.
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
+        // This particular example isn't making sense.
         execute("create table books (pub_id integer, price integer)");
         execute("insert into books (pub_id, price) values (1, 1995)");
         execute("insert into books (pub_id, price) values (1, 2995)");
         execute("insert into books (pub_id, price) values (2, 2195)");
+        assertResultSet(new String[] { "1 4990", "2 2195" }, 
+            query("select pub_id, sum(price) " +
+                "from books group by pub_id, sum(price)"));
     }
     
-    public void testGroupByAggregateViaAlias() throws Exception {
+    public void xtestGroupByAggregateViaAlias() throws Exception {
         // select pub_id, sum(price) as total from titles group by pub_id, total
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
+        // see above
     }
     
     public void testGroupByNull() throws Exception {
@@ -285,17 +287,20 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testHavingIsSelectedExpression() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
-
         execute("create table foo (x integer, y integer, z integer)");
         execute("insert into foo(x, y, z) values (1, 10, 200)");
         execute("insert into foo(x, y, z) values (3, 10, 300)");
         execute("insert into foo(x, y, z) values (7, 20, 400)");
         execute("insert into foo(x, y, z) values (9, 20, 400)");
         
-        assertResultList(new String[] { " 2 " }, query("select avg(x) from foo group by y having avg(x) < 5"));
+        String sql = "select avg(x) from foo group by y having avg(x) < 5";
+        if (dialect.wishThisWereTrue()) {
+            assertResultList(new String[] { " 2 " }, query(sql));
+        }
+        else {
+            // buggy mayfly behavior...
+            assertResultList(new String[] { " 2 ", " 8 " }, query(sql));
+        }
     }
     
     public void testHavingIsKeyExpression() throws Exception {

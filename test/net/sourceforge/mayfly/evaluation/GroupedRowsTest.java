@@ -115,8 +115,9 @@ public class GroupedRowsTest extends TestCase {
         assertEquals(expectedCell, row.cell(position));
     }
 
-    private void assertExpression(Expression expected, Cell expectedCell, ResultRow row, int position) {
-        assertTrue(row.expression(position).sameExpression(expected));
+    private void assertExpression(Expression expected, Cell expectedCell, 
+        ResultRow row, int position) {
+        assertTrue(expected.sameExpression(row.expression(position)));
         assertEquals(expectedCell, row.cell(position));
     }
 

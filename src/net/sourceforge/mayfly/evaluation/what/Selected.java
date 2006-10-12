@@ -40,7 +40,7 @@ public class Selected extends ValueObject implements Iterable {
             throw new MayflyException("no column " + oneBasedColumn);
         }
         Expression element = (Expression) expressions.get(zeroBasedColumn);
-        return row.findValue(zeroBasedColumn, element);
+        return row.findOrEvaluate(element);
     }
 
     public Cell evaluate(String columnName, ResultRow row) {
