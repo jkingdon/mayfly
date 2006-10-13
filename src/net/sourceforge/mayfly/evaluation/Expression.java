@@ -48,8 +48,12 @@ abstract public class Expression extends WhatElement {
 
     abstract public boolean sameExpression(Expression other);
 
-    public Expression resolveAndReturn(Row row) {
+    public Expression resolve(ResultRow row) {
         return this;
+    }
+    
+    public final Expression resolveAndReturn(Row row) {
+        return resolve(new ResultRow(row));
     }
 
     public static String firstAggregate(Expression left, Expression right) {

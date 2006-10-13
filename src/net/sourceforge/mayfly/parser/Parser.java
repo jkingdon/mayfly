@@ -291,7 +291,9 @@ public class Parser {
         }
         else {
             Cell cell = expression.evaluate(new ResultRow() {
-                public Expression findColumn(String tableOrAlias, String columnName) {
+                public SingleColumn findColumn(
+                    String tableOrAlias, String columnName,
+                    Location location) {
                     throw new MayflyException(
                         "values clause may not refer to column: " 
                         + Column.displayName(tableOrAlias, columnName)

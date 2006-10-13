@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
@@ -59,7 +58,7 @@ abstract public class BinaryOperator extends Expression {
         }
     }
     
-    public abstract Expression resolveAndReturn(Row row);
+    public abstract Expression resolve(ResultRow row);
     
     public Expression left() {
         return left;

@@ -40,7 +40,7 @@ public class WhatTest extends TestCase {
     public void testSelectedDegenerateCase() throws Exception {
         What original = new What().add(new IntegerLiteral(7));
         Selected expected = new Selected().add(new IntegerLiteral(7));
-        assertEquals(expected, original.selected(null));
+        assertEquals(expected, original.selected(new Row()));
     }
     
     public void testSelectedAll() throws Exception {

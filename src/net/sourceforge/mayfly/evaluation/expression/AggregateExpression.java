@@ -21,7 +21,8 @@ public abstract class AggregateExpression extends Expression {
     protected final String functionName;
     protected final boolean distinct;
 
-    protected AggregateExpression(SingleColumn column, String functionName, boolean distinct, 
+    protected AggregateExpression(SingleColumn column, String functionName, 
+        boolean distinct, 
         Location location) {
         super(location);
         this.column = column;
@@ -29,14 +30,18 @@ public abstract class AggregateExpression extends Expression {
         this.distinct = distinct;
     }
 
-    protected AggregateExpression(SingleColumn column, String functionName, boolean distinct) {
+    protected AggregateExpression(SingleColumn column, String functionName, 
+        boolean distinct) {
         this(column, functionName, distinct, Location.UNKNOWN);
     }
 
     /** 
-     @internal
-     This is just for checking; aggregation happens in 
-     {@link #aggregate(Rows)}. */
+      @internal
+      This is just for checking; aggregation happens in 
+      {@link #aggregate(Rows)}. 
+
+      It also is called in evaluating a HAVING condition,
+      although that part doesn't work yet. */
     public Cell evaluate(ResultRow row) {
         return NullCell.INSTANCE;
 //        Cell cell = row.findValueOrNull(this);

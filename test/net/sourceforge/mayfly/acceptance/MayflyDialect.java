@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
 import junit.framework.Assert;
+import junit.framework.AssertionFailedError;
 
 import net.sourceforge.mayfly.Database;
 import net.sourceforge.mayfly.MayflySqlException;
@@ -37,10 +38,28 @@ public class MayflyDialect extends Dialect {
         super.assertMessage(expectedMessage, exception, expectedStartLine,
                 expectedStartColumn, expectedEndLine, expectedEndColumn);
         MayflySqlException mayflyException = (MayflySqlException) exception;
-        Assert.assertEquals(expectedStartLine, mayflyException.startLineNumber());
-        Assert.assertEquals(expectedStartColumn, mayflyException.startColumn());
-        Assert.assertEquals(expectedEndLine, mayflyException.endLineNumber());
-        Assert.assertEquals(expectedEndColumn, mayflyException.endColumn());
+        assertLocation(expectedStartLine, 
+            mayflyException.startLineNumber(), mayflyException);
+        assertLocation(expectedStartColumn, 
+            mayflyException.startColumn(), mayflyException);
+        assertLocation(expectedEndLine, 
+            mayflyException.endLineNumber(), mayflyException);
+        assertLocation(expectedEndColumn, 
+            mayflyException.endColumn(), mayflyException);
+    }
+
+    private void assertLocation(int expected, int actual, 
+        Exception exception) throws AssertionFailedError {
+        /* The point is we want to see exception so we can proceed
+           directly to debugging why it doesn't know about the
+           location.  The cause seems like an expedient (if
+           perhaps klugy) way to get that. */
+        if (expected != actual) {
+            throw (AssertionFailedError)new AssertionFailedError(
+                "location wrong: expected " + expected + 
+                " but got " + actual)
+            .initCause(exception);
+        }
     }
     
     public boolean expectMayflyBehavior() {

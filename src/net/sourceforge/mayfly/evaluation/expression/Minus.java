@@ -2,8 +2,8 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 
 public class Minus extends BinaryOperator {
 
@@ -15,8 +15,8 @@ public class Minus extends BinaryOperator {
         return new LongCell(left.asLong() - right.asLong());
     }
 
-    public Expression resolveAndReturn(Row row) {
-        return new Minus(left.resolveAndReturn(row), right.resolveAndReturn(row));
+    public Expression resolve(ResultRow row) {
+        return new Minus(left.resolve(row), right.resolve(row));
     }
 
 }

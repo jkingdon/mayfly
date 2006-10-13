@@ -11,6 +11,7 @@ import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.StringBuilder;
 
@@ -80,18 +81,21 @@ public class ResultRow {
     }
 
     public Expression findColumn(String columnName) {
-        return findColumn(null, columnName);
+        return findColumn(null, columnName, Location.UNKNOWN);
     }
 
-    public Expression findColumn(String tableOrAlias, String columnName) {
-        Expression found = null;
+    public SingleColumn findColumn(String tableOrAlias, String columnName,
+        Location location) {
+        SingleColumn found = null;
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             Element element = (Element) iter.next();
             if (element.expression instanceof SingleColumn) {
                 SingleColumn candidate = (SingleColumn) element.expression;
                 if (candidate.matches(tableOrAlias, columnName)) {
                     if (found != null) {
-                        throw new MayflyException("ambiguous column " + columnName);
+                        throw new MayflyException(
+                            "ambiguous column " + columnName,
+                            location);
                     }
                     else {
                         found = candidate;
@@ -100,7 +104,9 @@ public class ResultRow {
             }
         }
         if (found == null) {
-            throw new MayflyException("no column " + Column.displayName(tableOrAlias, columnName));
+            throw new MayflyException(
+                "no column " + Column.displayName(tableOrAlias, columnName),
+                location);
         } else {
             return found;
         }
@@ -118,9 +124,10 @@ public class ResultRow {
     }
 
     public Cell findValueOrNull(Expression target) {
+        Expression resolved = target.resolve(this);
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             Element element = (Element) iter.next();
-            if (target.matches(element.expression)) {
+            if (resolved.matches(element.expression)) {
                 return element.value;
             }
         }

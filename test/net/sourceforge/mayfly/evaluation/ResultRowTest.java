@@ -6,8 +6,11 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.CountAll;
+import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 
 public class ResultRowTest extends TestCase {
     
@@ -95,6 +98,38 @@ public class ResultRowTest extends TestCase {
         assertEquals(1, biggerRow.size());
         LongCell value = (LongCell) biggerRow.findValue(new CountAll("count"));
         assertEquals(2L, value.asLong());
+    }
+    
+    public void testLookUpNeedsColumnResolution() throws Exception {
+        ResultRow row = new ResultRow()
+            .with(new SingleColumn("foo", "x"), new LongCell(7));
+        LongCell cell = (LongCell) row.findValueOrNull(new SingleColumn("x"));
+        assertEquals(7L, cell.asLong());
+    }
+
+    public void testLookUpNeedsDeepColumnResolution() throws Exception {
+        ResultRow row = new ResultRow()
+            .with(
+                new Plus(
+                    new IntegerLiteral(6), 
+                    new Average(
+                        new SingleColumn("foo", "x"),
+                        "AVG",
+                        false)
+                ), 
+                new LongCell(7)
+            )
+            .withColumn("foo", "x", new LongCell(77));
+        LongCell cell = (LongCell) row.findValueOrNull(
+            new Plus(
+                new IntegerLiteral(6),
+                new Average(
+                    new SingleColumn("x"),
+                    "avg",
+                    false)
+            )
+        );
+        assertEquals(7L, cell.asLong());
     }
 
 }

@@ -37,6 +37,12 @@ public class ExpressionTest extends TestCase {
         assertTrue(
             "expected " + expectedString + " but was:" + resolved.toString(), 
             expected.sameExpression(resolved));
+
+        // And one should not be mutated
+        assertFalse(
+            "expected unchanged but was:" + one.toString(), 
+            expected.sameExpression(one)
+        );
     }
     
 }

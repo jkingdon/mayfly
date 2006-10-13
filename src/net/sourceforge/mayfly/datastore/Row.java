@@ -15,6 +15,10 @@ import java.util.List;
 public class Row extends Aggregate {
 
     private final ImmutableList elements;
+    
+    public Row() {
+        this(new ImmutableList());
+    }
 
     public Row(TupleElement element) {
         this(ImmutableList.singleton(element));

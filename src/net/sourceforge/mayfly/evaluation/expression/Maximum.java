@@ -3,8 +3,8 @@ package net.sourceforge.mayfly.evaluation.expression;
 import java.util.Collection;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Location;
 
 public class Maximum extends AggregateExpression {
@@ -25,8 +25,8 @@ public class Maximum extends AggregateExpression {
         return candidate.compareTo(bestSoFar) > 0;
     }
 
-    public Expression resolveAndReturn(Row row) {
-        return new Maximum((SingleColumn) column.resolveAndReturn(row), functionName, distinct);
+    public Expression resolve(ResultRow row) {
+        return new Maximum((SingleColumn) column.resolve(row), functionName, distinct);
     }
 
 }

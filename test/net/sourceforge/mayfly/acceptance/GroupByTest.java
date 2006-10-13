@@ -344,7 +344,8 @@ public class GroupByTest extends SqlTestCase {
             assertResultList(new String[] { "3" }, query(havingWithoutGroupBy));
         }
         else {
-            expectQueryFailure(havingWithoutGroupBy, "can't specify HAVING without GROUP BY");
+            expectQueryFailure(havingWithoutGroupBy, 
+                "can't specify HAVING without GROUP BY");
         }
     }
     
@@ -430,12 +431,25 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into foo(a) values(6)");
         execute("insert into foo(a) values(10)");
         
-        String selectOk = "select f.*, avg(g.a) from foo f, foo g group by f.a having f.a < 10 order by f.a";
+        String selectOk = "select f.*, avg(g.a) from foo f, foo g " +
+            "group by f.a having f.a < 10 order by f.a";
         
-        assertResultSet(new String[] {
-            "6, 8",
-        }, query(selectOk)
-        );
+        assertResultSet(new String[] { "6, 8" }, query(selectOk));
+    }
+    
+    public void testBadColumnInHaving() throws Exception {
+        execute("create table foo(a integer)");
+        if (dialect.wishThisWereTrue()) {
+            expectQueryFailure(
+                "select * from foo group by a having b < 10", 
+                "no column b",
+                1, 37, 1, 38);
+        }
+        execute("insert into foo(a) values(6)");
+        expectQueryFailure(
+            "select * from foo group by a having b < 10", 
+            "no column b",
+            1, 37, 1, 38);
     }
 
     public void testAliasesAndExpression() throws Exception {
@@ -447,7 +461,8 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into foo(a) values(6)");
         execute("insert into foo(a) values(10)");
         
-        String selectOk = "select 5+f.a, avg(g.a) from foo f, foo g group by 5 + f.a";
+        String selectOk = "select 5+f.a, avg(g.a) from foo f, foo g " +
+            "group by 5 + f.a";
         
         assertResultSet(new String[] {
             "11, 8",

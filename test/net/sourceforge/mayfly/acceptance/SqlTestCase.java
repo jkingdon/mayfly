@@ -186,6 +186,18 @@ public abstract class SqlTestCase extends TestCase {
         }
     }
 
+    protected void expectQueryFailure(String sql, String expectedMessage, 
+        int expectedStartLine, int expectedStartColumn,
+        int expectedEndLine, int expectedEndColumn) {
+        try {
+            query(sql);
+            failForMissingException(sql, expectedMessage);
+        } catch (SQLException expected) {
+            dialect.assertMessage(expectedMessage, expected, 
+                expectedStartLine, expectedStartColumn, expectedEndLine, expectedEndColumn);
+        }
+    }
+
     protected void expectExecuteFailure(String sql, String expectedMessage) {
         try {
             execute(sql);

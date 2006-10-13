@@ -41,12 +41,16 @@ public class SingleColumn extends Expression {
     }
 
     public Cell evaluate(ResultRow row) {
-        Expression found = row.findColumn(tableOrAlias, columnName);
+        Expression found = row.findColumn(tableOrAlias, columnName, location);
         return row.findValue(found);
     }
 
     public Column lookup(Row row) {
         return row.findColumn(tableOrAlias, columnName);
+    }
+    
+    public SingleColumn lookup(ResultRow row) {
+        return row.findColumn(tableOrAlias, columnName, location);
     }
 
     public Cell aggregate(ResultRows rows) {
@@ -105,13 +109,14 @@ public class SingleColumn extends Expression {
         }
     }
     
-    public Expression resolveAndReturn(Row row) {
+    public Expression resolve(ResultRow row) {
         if (tableOrAlias == null) {
-            Column column = lookup(row);
-            if (column.tableOrAlias() == null) {
-                throw new NullPointerException();
-            }
-            return new SingleColumn(column.tableOrAlias(), originalTableOrAlias, columnName);
+            SingleColumn column = lookup(row);
+//            if (column.tableOrAlias() == null) {
+//                throw new NullPointerException();
+//            }
+            return new SingleColumn(column.tableOrAlias(), 
+                originalTableOrAlias, columnName);
         }
         else {
             return this;
