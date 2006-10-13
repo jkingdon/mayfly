@@ -37,22 +37,20 @@ public class MayflyException extends RuntimeException {
 
     public MayflyException(String message, Location location) {
         super(message);
-        sqlException = new MayflySqlException(message, location);
         this.location = location;
+        sqlException = new MayflySqlException(this);
     }
 
     public MayflyException(String message, Throwable cause) {
         super(message, cause);
-        Location location = Location.UNKNOWN;
-        sqlException = new MayflySqlException(message, cause, location);
-        this.location = location;
+        this.location = Location.UNKNOWN;
+        sqlException = new MayflySqlException(this);
     }
 
     public MayflyException(Throwable cause) {
         super(cause);
-        Location location = Location.UNKNOWN;
-        sqlException = new MayflySqlException(cause, location);
-        this.location = location;
+        this.location = Location.UNKNOWN;
+        sqlException = new MayflySqlException(this);
     }
 
     public MayflySqlException asSqlException() {

@@ -4,7 +4,6 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.jdbc.JdbcConnection;
-import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.parser.Parser;
 
 import java.io.IOException;
@@ -107,7 +106,7 @@ public class Database {
             } catch (IOException e) {
                 // Location should probably be where we stopped
                 // reading, which I guess is always end of file.
-                throw new MayflySqlException(e, Location.UNKNOWN);
+                throw new MayflyException(e).asSqlException();
             }
         }
     }

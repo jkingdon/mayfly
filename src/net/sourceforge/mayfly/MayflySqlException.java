@@ -13,22 +13,13 @@ import java.sql.SQLException;
 public class MayflySqlException extends SQLException {
 
     private final Location location;
+    private final MayflyException runtimeException;
 
-    public MayflySqlException(String message, Location location) {
-        super(message);
-        this.location = location;
-    }
-
-    public MayflySqlException(String message, Throwable cause, Location location) {
-        super(message);
-        initCause(cause);
-        this.location = location;
-    }
-
-    public MayflySqlException(Throwable cause, Location location) {
-        super(cause.getMessage());
-        initCause(cause);
-        this.location = location;
+    MayflySqlException(MayflyException runtimeException) {
+        super(runtimeException.getMessage());
+        initCause(runtimeException.getCause());
+        this.runtimeException = runtimeException;
+        this.location = runtimeException.location;
     }
 
     /**
@@ -70,6 +61,25 @@ public class MayflySqlException extends SQLException {
      */
     public int endColumn() {
         return location.endColumn;
+    }
+
+    /**
+     * In many cases it may be useful to throw an SQLException
+     * through code which is not declared <tt>throws SQLException</tt>.
+     * 
+     * The usual approach, which has the virtue of not being
+     * Mayfly-specific, is to wrap the SQLException in a
+     * RuntimeException:
+     * <tt>&nbsp;&nbsp;&nbsp;&nbsp;throw new RuntimeException(sqlException);</tt>
+     * That works well, although the stack traces are harder
+     * to read because of the wrapping.
+     * 
+     * This method also provides a RuntimeException, but it
+     * is not wrapped (it shows essentially the same stack
+     * trace as the checked exception itself).
+     */
+    public RuntimeException asRuntimeException() {
+        return runtimeException;
     }
 
 }

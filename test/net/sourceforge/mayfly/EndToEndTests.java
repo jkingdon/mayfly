@@ -15,15 +15,15 @@ import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Tests that could be acceptance tests, but the behavior seems
  * so unimportant that I don't really feel like testing
  * every other database to see what it does.
  * 
- * However, we want some kind of test (mayfly only), because
- * we want little/no code in mayfly that doesn't have a test.
- * Hence this class of mayfly-only end to end tests.
+ * Also includes some tests which are end-to-end but rely
+ * on Mayfly-specific features like {@link MayflySqlException}.
  */
 public class EndToEndTests extends SqlTestCase {
     
@@ -227,6 +227,22 @@ public class EndToEndTests extends SqlTestCase {
         assertEquals(
             Connection.TRANSACTION_NONE,
             connection.getTransactionIsolation());
+    }
+    
+    public void testExceptionAsRuntime() throws Exception {
+        try {
+            query("select * from foo");
+            fail();
+        }
+        catch (SQLException checkedException) {
+            assertEquals("no table foo", checkedException.getMessage());
+            MayflySqlException mayflyException = 
+                (MayflySqlException) checkedException;
+
+            RuntimeException unchecked = mayflyException.asRuntimeException();
+            assertEquals("no table foo", unchecked.getMessage());
+            assertNull(unchecked.getCause());
+        }
     }
     
 }

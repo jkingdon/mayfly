@@ -17,12 +17,4 @@ public class UnimplementedException extends MayflyException {
         super(message);
     }
 
-    public UnimplementedException(Throwable cause) {
-        super(cause);
-    }
-
-    public UnimplementedException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
 }
