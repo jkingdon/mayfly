@@ -25,9 +25,19 @@ public class UpdateTest extends SqlTestCase {
     public void testViolateNotNull() throws Exception {
         execute("create table foo (a integer not null)");
         execute("insert into foo(a) values (7)");
-        expectExecuteFailure(
-            "update foo set a = null", "column a cannot be null");
-        assertResultSet(new String[] { " 7 " }, query("select a from foo"));
+        String setToNull = "update foo set a = null";
+        // This kind of goes beyond "not null implies defaults",
+        // but it is also a MySQL quirk: sometimes null doesn't
+        // mean null.
+        if (!dialect.notNullImpliesDefaults()) {
+            expectExecuteFailure(
+                setToNull, "column a cannot be null");
+            assertResultSet(new String[] { " 7 " }, query("select a from foo"));
+        }
+        else {
+            execute(setToNull);
+            assertResultSet(new String[] { " 0 " }, query("select a from foo"));
+        }
     }
     
     public void testCaseInsensitive() throws Exception {

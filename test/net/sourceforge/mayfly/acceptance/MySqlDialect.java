@@ -134,6 +134,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
 
+    public boolean whereCanReferToColumnAlias() {
+        return false;
+    }
+
     public boolean canGetValueViaExpressionName() {
         return true;
     }

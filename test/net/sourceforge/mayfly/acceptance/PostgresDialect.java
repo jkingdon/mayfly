@@ -82,6 +82,10 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    public boolean whereCanReferToColumnAlias() {
+        return false;
+    }
+
     // True for postgres 8.0.7, false for postgres 8.1.4
 //    public boolean canHaveHavingWithoutGroupBy() {
 //        return true;
@@ -148,6 +152,10 @@ public class PostgresDialect extends Dialect {
     }
 
     public boolean haveDropTableIfExistsFoo() {
+        return false;
+    }
+    
+    public boolean haveModifyColumn() {
         return false;
     }
     
