@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
+import org.joda.time.DateMidnight;
+
 import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -34,7 +36,6 @@ public class DateTest extends SqlTestCase {
             results.close();
         }
         
-        // TODO: without a calendar.
         // TODO: setDate, calendar and non-calendar
         // TODO: getObject
         // TODO: getDate on non-date
@@ -72,10 +73,42 @@ public class DateTest extends SqlTestCase {
     public void testNull() throws Exception {
         execute("create table foo (start_date date, end_date date)");
         execute("insert into foo (start_date) values (null)");
+        
+        // In this case we are reading as ints (or strings, I forget)
         assertResultSet(new String[] { " null, null " }, 
             query("select start_date, end_date from foo"));
+        
+        // More interesting is to read as dates
+        ResultSet results = query("select start_date, end_date from foo");
+        assertTrue(results.next());
+        assertNull(results.getDate("start_date"));
+        Calendar utc = Calendar.getInstance(TimeZone.getTimeZone("GMT"));
+        assertNull(results.getDate(2, utc));
+        assertFalse(results.next());
     }
     
+    public void testGetDateNoCalendar() throws Exception {
+        execute("create table foo (start_date date, end_date date)");
+        execute("insert into foo (start_date, end_date) " +
+            "values ('2003-11-27', '2003-11-29')");
+
+        ResultSet results = query("select start_date, end_date from foo");
+        assertTrue(results.next());
+
+        long november27testMachineTimeZone = 
+            new DateMidnight(2003, 11, 27).getMillis();
+        assertEquals(november27testMachineTimeZone,
+            results.getDate(1).getTime());
+
+        long november29testMachineTimeZone = 
+            new DateMidnight(2003, 11, 29).getMillis();
+        assertEquals(november29testMachineTimeZone, 
+            results.getDate("end_date").getTime());
+
+        assertFalse(results.next());
+        results.close();
+    }
+
     public void xtestTimestamp() throws Exception {
         // Need to figure out what hypersonic is doing
         // with timezones (I think it is just wrong; Derby

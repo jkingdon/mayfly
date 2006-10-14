@@ -1,5 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
+import org.joda.time.DateTimeZone;
+
+import java.sql.Date;
 import java.sql.SQLException;
 
 import net.sourceforge.mayfly.MayflyException;
@@ -36,6 +39,10 @@ public class NullCell extends Cell {
         return null;
     }
     
+    public Date asDate(DateTimeZone zone) throws SQLException {
+        return null;
+    }
+
     public String displayName() {
         return "null value";
     }
