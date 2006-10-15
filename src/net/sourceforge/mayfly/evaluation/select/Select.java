@@ -113,15 +113,6 @@ public class Select extends Command {
         return (Row) joinedRows.element(0);
     }
 
-    private FromElement soleFromElement() {
-        if (from.size() != 1) {
-            throw new MayflyInternalException("optimizer left us " + from.size() + " elements");
-        }
-
-        FromElement element = (FromElement) from.element(0);
-        return element;
-    }
-
     ResultRows query(DataStore store, String currentSchema, Selected selected) {
         FromElement element = soleFromElement();
         Rows joinedRows = element.tableContents(store, currentSchema);
@@ -134,13 +125,22 @@ public class Select extends Command {
         return limit.limit(sorted);
     }
 
+    private FromElement soleFromElement() {
+        if (from.size() != 1) {
+            throw new MayflyInternalException("optimizer left us " + from.size() + " elements");
+        }
+
+        FromElement element = (FromElement) from.element(0);
+        return element;
+    }
+
     public UpdateStore update(DataStore store, String schema) {
         throw new MayflyException(UPDATE_MESSAGE);
     }
 
     public void optimize() {
-        // x y z -> join(x, y) z
         while (from.size() > 1) {
+            // x y z -> join(x, y) z
             FromElement first = (FromElement) from.element(0);
             FromElement second = (FromElement) from.element(1);
             

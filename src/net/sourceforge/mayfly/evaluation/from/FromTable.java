@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.from;
 
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
@@ -17,12 +18,15 @@ public class FromTable extends ValueObject implements FromElement {
     public final String alias;
 
     public FromTable(String tableName) {
-        this(tableName, null);
+        this(tableName, tableName);
     }
 
     public FromTable(String tableName, String alias) {
         this.tableName = tableName;
         this.alias = alias;
+        if (alias == null) {
+            throw new MayflyInternalException("need a table alias");
+        }
     }
 
     public Rows tableContents(DataStore store, String currentSchema) {
@@ -34,23 +38,15 @@ public class FromTable extends ValueObject implements FromElement {
     }
 
     private Rows applyAlias(Rows storedRows) {
-        if (alias == null) {
-            return storedRows;
-        } else {
-            return applyAlias(alias, storedRows);
-        }
-    }
-
-    private Rows applyAlias(String alias, Rows storedRows) {
         L rows = new L();
         for (Iterator iter = storedRows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
-            rows.add(applyAlias(alias, row));
+            rows.add(applyAlias(row));
         }
         return new Rows(rows.asImmutable());
     }
 
-    private Row applyAlias(String alias, Row row) {
+    private Row applyAlias(Row row) {
         TupleBuilder newTuples = new TupleBuilder();
         for (Iterator iter = row.iterator(); iter.hasNext(); ) {
             TupleElement entry = (TupleElement) iter.next();

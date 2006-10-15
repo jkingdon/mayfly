@@ -18,7 +18,9 @@ public abstract class Join extends ValueObject implements FromElement {
     }
 
     public Rows dummyRows(DataStore store, String currentSchema) {
-        Rows dummyRows = (Rows) left.dummyRows(store, currentSchema).cartesianJoin(right.dummyRows(store, currentSchema));
+        Rows dummyRows = 
+            (Rows) left.dummyRows(store, currentSchema)
+                .cartesianJoin(right.dummyRows(store, currentSchema));
         dummyRows.select(condition);
         return dummyRows;
     }
