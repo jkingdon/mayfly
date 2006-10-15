@@ -35,4 +35,12 @@ public class From extends Aggregate {
         return this;
     }
 
+    public void remove(int index) {
+        fromElements.remove(index);
+    }
+
+    public void add(int index, FromElement element) {
+        fromElements.add(index, element);
+    }
+
 }

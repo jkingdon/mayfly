@@ -22,5 +22,13 @@ public abstract class Join extends ValueObject implements FromElement {
         dummyRows.select(condition);
         return dummyRows;
     }
+    
+    public FromElement right() {
+        return right;
+    }
+    
+    public FromElement left() {
+        return left;
+    }
 
 }

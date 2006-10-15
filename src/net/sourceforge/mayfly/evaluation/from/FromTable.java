@@ -13,8 +13,8 @@ import java.util.Iterator;
 
 public class FromTable extends ValueObject implements FromElement {
 
-    private String tableName;
-    private String alias;
+    public final String tableName;
+    public final String alias;
 
     public FromTable(String tableName) {
         this(tableName, null);

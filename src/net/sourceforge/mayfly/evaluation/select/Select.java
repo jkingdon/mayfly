@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.MayflyResultSet;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
@@ -14,6 +15,7 @@ import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
+import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
@@ -75,6 +77,7 @@ public class Select extends Command {
     }
 
     public ResultSet select(final DataStore store, String currentSchema) {
+        optimize();
         Row dummyRow = dummyRow(store, currentSchema);
         Selected selected = what.selected(dummyRow);
         check(store, selected, dummyRow);
@@ -102,29 +105,26 @@ public class Select extends Command {
     }
 
     private Row dummyRow(final DataStore store, String currentSchema) {
-        Iterator iterator = from.iterator();
-
-        FromElement firstTable = (FromElement) iterator.next();
-        Rows joinedRows = firstTable.dummyRows(store, currentSchema);
-        while (iterator.hasNext()) {
-            FromElement table = (FromElement) iterator.next();
-            joinedRows = (Rows)joinedRows.cartesianJoin(table.dummyRows(store, currentSchema));
-        }
+        FromElement element = soleFromElement();
+        Rows joinedRows = element.dummyRows(store, currentSchema);
         if (joinedRows.size() != 1) {
             throw new RuntimeException("internal error: got " + joinedRows.size());
         }
         return (Row) joinedRows.element(0);
     }
 
-    ResultRows query(DataStore store, String currentSchema, Selected selected) {
-        Iterator iterator = from.iterator();
-
-        FromElement firstTable = (FromElement) iterator.next();
-        Rows joinedRows = firstTable.tableContents(store, currentSchema);
-        while (iterator.hasNext()) {
-            FromElement table = (FromElement) iterator.next();
-            joinedRows = (Rows) joinedRows.cartesianJoin(table.tableContents(store, currentSchema));
+    private FromElement soleFromElement() {
+        if (from.size() != 1) {
+            throw new MayflyInternalException("optimizer left us " + from.size() + " elements");
         }
+
+        FromElement element = (FromElement) from.element(0);
+        return element;
+    }
+
+    ResultRows query(DataStore store, String currentSchema, Selected selected) {
+        FromElement element = soleFromElement();
+        Rows joinedRows = element.tableContents(store, currentSchema);
 
         ResultRows afterWhere = new ResultRows((Rows) joinedRows.select(where));
         
@@ -136,6 +136,19 @@ public class Select extends Command {
 
     public UpdateStore update(DataStore store, String schema) {
         throw new MayflyException(UPDATE_MESSAGE);
+    }
+
+    public void optimize() {
+        // x y z -> join(x, y) z
+        while (from.size() > 1) {
+            FromElement first = (FromElement) from.element(0);
+            FromElement second = (FromElement) from.element(1);
+            
+            InnerJoin explicitJoin = new InnerJoin(first, second, BooleanExpression.TRUE);
+            from.remove(0);
+            from.remove(0);
+            from.add(0, explicitJoin);
+        }
     }
 
 }

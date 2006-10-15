@@ -9,6 +9,8 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
+import net.sourceforge.mayfly.evaluation.from.FromTable;
+import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.L;
@@ -68,7 +70,9 @@ public class SelectTest extends TestCase {
     }
 
     private ResultRows query(DataStore store, String sql) {
-        return Select.selectFromSql(sql).query(store, DataStore.ANONYMOUS_SCHEMA_NAME, new Selected());
+        Select select = Select.selectFromSql(sql);
+        select.optimize();
+        return select.query(store, DataStore.ANONYMOUS_SCHEMA_NAME, new Selected());
     }
 
     public void testSmallerJoin() throws Exception {
@@ -109,6 +113,31 @@ public class SelectTest extends TestCase {
         return ValueList
             .singleton(new StringCell(firstStringValue))
             .with(new Value(new StringCell(secondStringValue), Location.UNKNOWN));
+    }
+    
+    public void testMakeJoinsExplicit() throws Exception {
+        Select select = (Select) Select.fromSql("select * from foo, bar");
+        select.optimize();
+        assertEquals(1, select.from().size());
+        InnerJoin join = (InnerJoin) select.from().element(0);
+
+        assertEquals("foo", ((FromTable) join.left()).tableName);
+        assertEquals("bar", ((FromTable) join.right()).tableName);
+    }
+
+    public void testLeftAssociative() throws Exception {
+        // At least for now, we don't try to pick the optimal order of
+        // joins; we just take the listed order in a left-associative way.
+        Select select = (Select) Select.fromSql("select * from foo, bar, baz");
+        select.optimize();
+        assertEquals(1, select.from().size());
+        InnerJoin join = (InnerJoin) select.from().element(0);
+
+        InnerJoin firstJoin = (InnerJoin) join.left();
+        assertEquals("foo", ((FromTable) firstJoin.left()).tableName);
+        assertEquals("bar", ((FromTable) firstJoin.right()).tableName);
+
+        assertEquals("baz", ((FromTable) join.right()).tableName);
     }
 
 }

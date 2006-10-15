@@ -11,7 +11,9 @@ public class InnerJoin extends Join implements FromElement {
     }
 
     public Rows tableContents(DataStore store, String currentSchema) {
-        Rows unfiltered = (Rows) left.tableContents(store, currentSchema).cartesianJoin(right.tableContents(store, currentSchema));
+        Rows unfiltered = 
+            (Rows) left.tableContents(store, currentSchema)
+                .cartesianJoin(right.tableContents(store, currentSchema));
         return (Rows) unfiltered.select(condition);
     }
 
