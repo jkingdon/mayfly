@@ -9,7 +9,6 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
-import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -54,10 +53,6 @@ public class ResultRow {
             Column column = (Column) header;
             String tableOrAlias = column.tableOrAlias();
             return new SingleColumn(tableOrAlias, column.columnName());
-        }
-        else if (header instanceof PositionalHeader) {
-            PositionalHeader positional = (PositionalHeader) header;
-            return positional.expression;
         }
         else {
             throw new UnimplementedException();

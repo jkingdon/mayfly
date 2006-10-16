@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.evaluation.Expression;
-import net.sourceforge.mayfly.evaluation.expression.PositionalHeader;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 
@@ -18,10 +16,6 @@ public class TupleBuilder {
         return append(new TupleElement(column, cell));
     }
     
-    public TupleBuilder appendExpression(Expression expression, Cell cell) {
-        return append(new PositionalHeader(expression), cell);
-    }
-
     public TupleBuilder appendColumnCellContents(String tableName, String columnName, String cellValue) {
         return appendColumnCell(tableName, columnName, new StringCell(cellValue));
     }

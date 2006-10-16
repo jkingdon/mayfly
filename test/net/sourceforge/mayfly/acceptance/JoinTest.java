@@ -168,7 +168,7 @@ public class JoinTest extends SqlTestCase {
         execute("insert into bar(b) values(9)");
 
         String sql = "select * from foo t, bar t";
-        if (dialect.allowDuplicateTableInQuery() || !dialect.wishThisWereTrue()) {
+        if (dialect.allowDuplicateTableInQuery()) {
             assertResultSet(new String[] { " 5, 9 " }, query(sql));
         }
         else {
@@ -183,13 +183,11 @@ public class JoinTest extends SqlTestCase {
         execute("insert into bar(a) values(9)");
 
         String sql = "select * from foo t, bar t";
-        if (!dialect.wishThisWereTrue()) {
-            expectQueryFailure(sql, "ambiguous column a");
-        }
-        else
         if (dialect.allowDuplicateTableInQuery()) {
-            // This seems particularly buggy/strange - the database
-            // simply seems confused about which a is being selected.
+            /**
+             * Presumably the same buggyness/strangeness as
+             * {@link Dialect#detectsAmbiguousColumns()}.
+             */
             assertResultSet(new String[] { " 5, 5 " }, query(sql));
         }
         else {

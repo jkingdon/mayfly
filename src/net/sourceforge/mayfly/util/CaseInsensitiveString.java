@@ -6,6 +6,9 @@ public class CaseInsensitiveString {
     
     public CaseInsensitiveString(String contents) {
         this.delegate = contents;
+        if (contents == null) {
+            throw new NullPointerException();
+        }
     }
 
     public String toString() {

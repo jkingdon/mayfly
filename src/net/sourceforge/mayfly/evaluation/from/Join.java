@@ -19,8 +19,8 @@ public abstract class Join extends ValueObject implements FromElement {
 
     public Row dummyRow(DataStore store, String currentSchema) {
         Row dummyRow = 
-            (Row) left.dummyRow(store, currentSchema)
-                .plus(right.dummyRow(store, currentSchema));
+            left.dummyRow(store, currentSchema)
+                .combine(right.dummyRow(store, currentSchema));
         condition.evaluate(dummyRow);
         return dummyRow;
     }
