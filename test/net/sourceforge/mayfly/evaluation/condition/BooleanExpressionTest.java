@@ -12,13 +12,6 @@ import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
-import net.sourceforge.mayfly.ldbc.where.And;
-import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
-import net.sourceforge.mayfly.ldbc.where.Equal;
-import net.sourceforge.mayfly.ldbc.where.In;
-import net.sourceforge.mayfly.ldbc.where.IsNull;
-import net.sourceforge.mayfly.ldbc.where.Not;
-import net.sourceforge.mayfly.ldbc.where.Or;
 import net.sourceforge.mayfly.parser.Parser;
 
 import java.util.ArrayList;

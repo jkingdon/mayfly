@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
-import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.M;

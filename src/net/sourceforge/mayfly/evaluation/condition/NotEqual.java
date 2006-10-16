@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc.where;
+package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.evaluation.Expression;
 

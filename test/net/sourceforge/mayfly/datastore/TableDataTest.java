@@ -7,8 +7,8 @@ import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
+import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
-import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.Collections;

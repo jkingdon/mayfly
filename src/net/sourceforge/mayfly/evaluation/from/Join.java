@@ -2,14 +2,14 @@ package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public abstract class Join extends ValueObject implements FromElement {
 
-    protected final FromElement right;
-    protected final BooleanExpression condition;
-    protected final FromElement left;
+    public final FromElement right;
+    public final BooleanExpression condition;
+    public final FromElement left;
 
     protected Join(FromElement left, FromElement right, BooleanExpression condition) {
         this.left = left;
@@ -23,14 +23,6 @@ public abstract class Join extends ValueObject implements FromElement {
                 .combine(right.dummyRow(store, currentSchema));
         condition.evaluate(dummyRow);
         return dummyRow;
-    }
-    
-    public FromElement right() {
-        return right;
-    }
-    
-    public FromElement left() {
-        return left;
     }
 
 }

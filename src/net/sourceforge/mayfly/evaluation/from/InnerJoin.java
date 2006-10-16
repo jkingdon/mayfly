@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Rows;
-import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
 
 public class InnerJoin extends Join implements FromElement {
 

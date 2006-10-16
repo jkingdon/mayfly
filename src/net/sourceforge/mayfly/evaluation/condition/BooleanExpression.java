@@ -1,4 +1,4 @@
-package net.sourceforge.mayfly.ldbc.where;
+package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Row;
@@ -8,16 +8,7 @@ import net.sourceforge.mayfly.util.ValueObject;
 
 public abstract class BooleanExpression extends ValueObject implements Selector {
 
-    public static final BooleanExpression TRUE = new BooleanExpression() {
-        public boolean evaluate(ResultRow candidate) {
-            return true;
-        }
-
-        public String firstAggregate() {
-            return null;
-        }
-
-    };
+    public static final BooleanExpression TRUE = new True();
 
     final public boolean evaluate(Object row) {
         if (row instanceof ResultRow) {

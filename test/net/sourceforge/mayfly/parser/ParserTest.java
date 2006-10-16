@@ -11,6 +11,8 @@ import net.sourceforge.mayfly.datastore.constraint.SetNull;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
+import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Greater;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Count;
@@ -30,8 +32,6 @@ import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.LongLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
-import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
-import net.sourceforge.mayfly.ldbc.where.Greater;
 import net.sourceforge.mayfly.util.ImmutableByteArray;
 import net.sourceforge.mayfly.util.MayflyAssert;
 

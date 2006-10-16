@@ -1,9 +1,10 @@
-package net.sourceforge.mayfly.ldbc.where;
+package net.sourceforge.mayfly.evaluation.condition;
 
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.condition.Greater;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.parser.Parser;

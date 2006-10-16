@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.ldbc.where.Equal;
+import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.MayflyAssert;
 

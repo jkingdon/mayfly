@@ -3,9 +3,9 @@ package net.sourceforge.mayfly.evaluation;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
-import net.sourceforge.mayfly.ldbc.where.Equal;
 
 public class ResultRowsTest extends TestCase {
     

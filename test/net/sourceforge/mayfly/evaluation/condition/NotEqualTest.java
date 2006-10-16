@@ -1,7 +1,9 @@
-package net.sourceforge.mayfly.ldbc.where;
+package net.sourceforge.mayfly.evaluation.condition;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.evaluation.condition.Equal;
+import net.sourceforge.mayfly.evaluation.condition.Not;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.MayflyAssert;
 

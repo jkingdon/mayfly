@@ -6,7 +6,7 @@ import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
-import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
 import net.sourceforge.mayfly.util.ImmutableMap;
 
 import java.util.Iterator;

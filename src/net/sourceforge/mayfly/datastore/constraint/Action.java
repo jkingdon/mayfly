@@ -6,9 +6,9 @@ import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
+import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
-import net.sourceforge.mayfly.ldbc.where.Equal;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 public abstract class Action {

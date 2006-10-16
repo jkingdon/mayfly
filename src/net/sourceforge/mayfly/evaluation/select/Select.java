@@ -12,13 +12,13 @@ import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
+import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
-import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.parser.Parser;
 
 import java.sql.ResultSet;
@@ -47,7 +47,7 @@ public class Select extends Command {
      */
     private final From from;
 
-    private final BooleanExpression where;
+    public final BooleanExpression where;
 
     /**
      * Not yet immutable, because of {@link GroupByKeys}

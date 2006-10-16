@@ -2,8 +2,8 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.Iterator;

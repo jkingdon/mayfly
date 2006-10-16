@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.select;
 
 import junit.framework.TestCase;
+import junitx.framework.ObjectAssert;
 
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
@@ -9,11 +10,14 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
+import net.sourceforge.mayfly.evaluation.condition.Equal;
+import net.sourceforge.mayfly.evaluation.condition.True;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.L;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class SelectTest extends TestCase {
 
@@ -118,11 +122,10 @@ public class SelectTest extends TestCase {
     public void testMakeJoinsExplicit() throws Exception {
         Select select = (Select) Select.fromSql("select * from foo, bar");
         select.optimize();
-        assertEquals(1, select.from().size());
-        InnerJoin join = (InnerJoin) select.from().element(0);
+        InnerJoin join = (InnerJoin) select.from().soleElement();
 
-        assertEquals("foo", ((FromTable) join.left()).tableName);
-        assertEquals("bar", ((FromTable) join.right()).tableName);
+        assertEquals("foo", ((FromTable) join.left).tableName);
+        assertEquals("bar", ((FromTable) join.right).tableName);
     }
 
     public void testLeftAssociative() throws Exception {
@@ -130,14 +133,27 @@ public class SelectTest extends TestCase {
         // joins; we just take the listed order in a left-associative way.
         Select select = (Select) Select.fromSql("select * from foo, bar, baz");
         select.optimize();
-        assertEquals(1, select.from().size());
-        InnerJoin join = (InnerJoin) select.from().element(0);
+        InnerJoin join = (InnerJoin) select.from().soleElement();
 
-        InnerJoin firstJoin = (InnerJoin) join.left();
-        assertEquals("foo", ((FromTable) firstJoin.left()).tableName);
-        assertEquals("bar", ((FromTable) firstJoin.right()).tableName);
+        InnerJoin firstJoin = (InnerJoin) join.left;
+        assertEquals("foo", ((FromTable) firstJoin.left).tableName);
+        assertEquals("bar", ((FromTable) firstJoin.right).tableName);
 
-        assertEquals("baz", ((FromTable) join.right()).tableName);
+        assertEquals("baz", ((FromTable) join.right).tableName);
+    }
+    
+    public void notimplemented_testTransformWhereToOn() throws Exception {
+        Select select = (Select) Select.fromSql(
+            "select * from foo, bar, baz where foo.id = bar.id");
+        select.optimize();
+        InnerJoin join = (InnerJoin) select.from().soleElement();
+        InnerJoin firstJoin = (InnerJoin) join.left;
+
+        Equal on = (Equal) firstJoin.condition;
+        MayflyAssert.assertColumn("foo", "id", on.leftSide);
+        MayflyAssert.assertColumn("bar", "id", on.rightSide);
+        
+        ObjectAssert.assertInstanceOf(True.class, select.where);
     }
 
 }

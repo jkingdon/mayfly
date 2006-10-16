@@ -46,7 +46,8 @@ public class From extends Aggregate {
 
     public FromElement soleElement() {
         if (size() != 1) {
-            throw new MayflyInternalException("optimizer left us " + size() + " elements");
+            throw new MayflyInternalException(
+                "optimizer left us " + size() + " elements");
         }
     
         return (FromElement) element(0);

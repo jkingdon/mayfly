@@ -1,10 +1,14 @@
-package net.sourceforge.mayfly.ldbc.where;
+package net.sourceforge.mayfly.evaluation.condition;
 
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
+import net.sourceforge.mayfly.evaluation.condition.Equal;
+import net.sourceforge.mayfly.evaluation.condition.IsNull;
+import net.sourceforge.mayfly.evaluation.condition.Not;
+import net.sourceforge.mayfly.evaluation.condition.Or;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
