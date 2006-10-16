@@ -134,6 +134,10 @@ public abstract class Dialect {
         return !onIsRestrictedToJoinsTables();
     }
 
+    public boolean allowDuplicateTableInQuery() {
+        return false;
+    }
+    
     public boolean detectsSyntaxErrorsInPrepareStatement() {
         return true;
     }

@@ -38,7 +38,7 @@ public class LeftJoin extends Join implements FromElement {
             }
             
             if (!haveJoinedThisLeftRow) {
-                Row nullRightRow = (Row) right.dummyRows(store, currentSchema).element(0);
+                Row nullRightRow = right.dummyRow(store, currentSchema);
                 Row withNulls = (Row) leftRow.plus(nullRightRow);
                 joinResult.append(withNulls);
             }

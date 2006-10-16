@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.MayflyResultSet;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
@@ -89,7 +88,7 @@ public class Select extends Command {
             Expression element = (Expression) iter.next();
             element.evaluate(dummyRow);
         }
-
+        
         new Rows(dummyRow).select(where);
         String firstAggregate = where.firstAggregate();
         if (firstAggregate != null) {
@@ -105,16 +104,12 @@ public class Select extends Command {
     }
 
     private Row dummyRow(final DataStore store, String currentSchema) {
-        FromElement element = soleFromElement();
-        Rows joinedRows = element.dummyRows(store, currentSchema);
-        if (joinedRows.size() != 1) {
-            throw new RuntimeException("internal error: got " + joinedRows.size());
-        }
-        return (Row) joinedRows.element(0);
+        FromElement element = from.soleElement();
+        return element.dummyRow(store, currentSchema);
     }
 
     ResultRows query(DataStore store, String currentSchema, Selected selected) {
-        FromElement element = soleFromElement();
+        FromElement element = from.soleElement();
         Rows joinedRows = element.tableContents(store, currentSchema);
 
         ResultRows afterWhere = new ResultRows((Rows) joinedRows.select(where));
@@ -123,15 +118,6 @@ public class Select extends Command {
 
         ResultRows sorted = orderBy.sort(store, afterGrouping, what);
         return limit.limit(sorted);
-    }
-
-    private FromElement soleFromElement() {
-        if (from.size() != 1) {
-            throw new MayflyInternalException("optimizer left us " + from.size() + " elements");
-        }
-
-        FromElement element = (FromElement) from.element(0);
-        return element;
     }
 
     public UpdateStore update(DataStore store, String schema) {

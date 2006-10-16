@@ -33,7 +33,7 @@ public class FromTable extends ValueObject implements FromElement {
         return applyAlias(store.table(currentSchema, tableName).rows());
     }
 
-    public Rows dummyRows(DataStore store, String currentSchema) {
+    public Row dummyRow(DataStore store, String currentSchema) {
         return applyAlias(store.table(currentSchema, tableName).dummyRows());
     }
 

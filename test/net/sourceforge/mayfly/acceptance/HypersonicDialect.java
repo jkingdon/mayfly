@@ -36,6 +36,10 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
+    public boolean allowDuplicateTableInQuery() {
+        return true;
+    }
+    
     public boolean rightHandArgumentToJoinCanBeJoin(boolean withParentheses) {
         return false;
     }

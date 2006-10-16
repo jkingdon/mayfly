@@ -160,6 +160,42 @@ public class JoinTest extends SqlTestCase {
         execute("create table foo (a integer)");
         expectQueryFailure("select * from foo left outer join foo on 1 = 1", "ambiguous column a");
     }
+    
+    public void testDuplicateAliasWithDifferingColumnNames() throws Exception {
+        execute("create table foo(a integer)");
+        execute("create table bar(b integer)");
+        execute("insert into foo(a) values(5)");
+        execute("insert into bar(b) values(9)");
+
+        String sql = "select * from foo t, bar t";
+        if (dialect.allowDuplicateTableInQuery() || !dialect.wishThisWereTrue()) {
+            assertResultSet(new String[] { " 5, 9 " }, query(sql));
+        }
+        else {
+            expectQueryFailure(sql, "duplicate table name or alias t");
+        }
+    }
+
+    public void testDuplicateAliasWithSameColumnNames() throws Exception {
+        execute("create table foo(a integer)");
+        execute("create table bar(a integer)");
+        execute("insert into foo(a) values(5)");
+        execute("insert into bar(a) values(9)");
+
+        String sql = "select * from foo t, bar t";
+        if (!dialect.wishThisWereTrue()) {
+            expectQueryFailure(sql, "ambiguous column a");
+        }
+        else
+        if (dialect.allowDuplicateTableInQuery()) {
+            // This seems particularly buggy/strange - the database
+            // simply seems confused about which a is being selected.
+            assertResultSet(new String[] { " 5, 5 " }, query(sql));
+        }
+        else {
+            expectQueryFailure(sql, "duplicate table name or alias t");
+        }
+    }
 
     public void testCrossJoin() throws Exception {
         // Hypersonic, Derby, and to a certain extent MySQL, treat CROSS JOIN as being
@@ -284,10 +320,7 @@ public class JoinTest extends SqlTestCase {
             query("select foo.a, bar.a from foo, bar inner join types on bar.a = type")
         );
 
-        // Which raises the question of whether the ON is really any different from the WHERE.
-        // Hypersonic seems to say no, at least in the following case:
-        // (I would think mayfly should reject this kind of usage, but what does SQL92 and/or
-        // common practice say? - I think they say it should work ;-()
+        // A similar case:
         String onReachesOutOfJoinedColumnsQuery = 
             "select foo.a, bar.a from bar, foo inner join types on bar.a = type";
         if (dialect.onCanMentionOutsideTable()) {
@@ -303,7 +336,8 @@ public class JoinTest extends SqlTestCase {
         String ambiguousIfOneConsidersTablesMentionedAfterJoin =
             "select foo.a, bar.a from bar inner join types on a = type, foo";
         if (dialect.considerTablesMentionedAfterJoin()) {
-            expectQueryFailure(ambiguousIfOneConsidersTablesMentionedAfterJoin, "ambiguous column a");
+            expectQueryFailure(ambiguousIfOneConsidersTablesMentionedAfterJoin, 
+                "ambiguous column a");
         } else {
             assertResultSet(
                 new String[] { " 5, 9 " },

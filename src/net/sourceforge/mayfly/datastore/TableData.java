@@ -210,7 +210,7 @@ public class TableData {
         return specified;
     }
     
-    public Rows dummyRows() {
+    public Row dummyRows() {
 
         TupleBuilder tuple = new TupleBuilder();
         for (int i = 0; i < columns.size(); ++i) {
@@ -222,7 +222,7 @@ public class TableData {
             );
         }
 
-        return new Rows(new Row(tuple));
+        return new Row(tuple);
     }
 
     public Column findColumn(String columnName) {

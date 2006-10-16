@@ -1,7 +1,7 @@
 package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.ldbc.where.BooleanExpression;
 import net.sourceforge.mayfly.util.ValueObject;
 
@@ -17,12 +17,12 @@ public abstract class Join extends ValueObject implements FromElement {
         this.condition = condition;
     }
 
-    public Rows dummyRows(DataStore store, String currentSchema) {
-        Rows dummyRows = 
-            (Rows) left.dummyRows(store, currentSchema)
-                .cartesianJoin(right.dummyRows(store, currentSchema));
-        dummyRows.select(condition);
-        return dummyRows;
+    public Row dummyRow(DataStore store, String currentSchema) {
+        Row dummyRow = 
+            (Row) left.dummyRow(store, currentSchema)
+                .plus(right.dummyRow(store, currentSchema));
+        condition.evaluate(dummyRow);
+        return dummyRow;
     }
     
     public FromElement right() {

@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.from;
 
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.L;
@@ -41,6 +42,14 @@ public class From extends Aggregate {
 
     public void add(int index, FromElement element) {
         fromElements.add(index, element);
+    }
+
+    public FromElement soleElement() {
+        if (size() != 1) {
+            throw new MayflyInternalException("optimizer left us " + size() + " elements");
+        }
+    
+        return (FromElement) element(0);
     }
 
 }
