@@ -12,6 +12,7 @@ import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.condition.Equal;
+import net.sourceforge.mayfly.evaluation.condition.Or;
 import net.sourceforge.mayfly.evaluation.condition.True;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
@@ -215,6 +216,32 @@ public class SelectTest extends TestCase {
             DataStore.ANONYMOUS_SCHEMA_NAME);
         assertEquals(3, dummyRow.size());
         MayflyAssert.assertColumn("foo", "id", dummyRow, 0);
+    }
+    
+    public void xtestMoveLeftSideOfAnd() throws Exception {
+        Select select = (Select) Select.fromSql(
+            "select * from foo, bar, baz " +
+            "where foo.id = bar.id and (bar.id = 5 or baz.id = 7)");
+        select.optimize(
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("id"))
+                .createTable("bar", ImmutableList.singleton("id"))
+                .createTable("baz", ImmutableList.singleton("id"))
+            ),
+            DataStore.ANONYMOUS_SCHEMA_NAME);
+
+        InnerJoin join = (InnerJoin) select.from().soleElement();
+        InnerJoin firstJoin = (InnerJoin) join.left;
+
+        Equal on = (Equal) firstJoin.condition;
+        MayflyAssert.assertColumn("foo", "id", on.leftSide);
+        MayflyAssert.assertColumn("bar", "id", on.rightSide);
+
+        Or remainingWhere = (Or) select.where;
+        Equal barEquals5 = (Equal) remainingWhere.leftSide;
+        MayflyAssert.assertColumn("bar", "id", barEquals5.leftSide);
+        Equal bazEquals7 = (Equal) remainingWhere.rightSide;
+        MayflyAssert.assertColumn("baz", "id", bazEquals7.leftSide);
     }
     
 }

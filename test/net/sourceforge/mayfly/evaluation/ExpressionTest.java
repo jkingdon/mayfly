@@ -45,4 +45,35 @@ public class ExpressionTest extends TestCase {
         );
     }
     
+    public void xtestCheck() throws Exception {
+        ResultRow row = new ResultRow()
+            .withColumn("foo", "a", NullCell.INSTANCE)
+            .withColumn("bar", "a", NullCell.INSTANCE);
+
+        check("foo.a = bar.a", row);
+        check("foo.a = bar.a and (bar.a < 5 or foo.a <> bar.a)", row);
+
+        try {
+            check("baz.a = 7", row);
+            fail();
+        }
+        catch (NoColumn e) {
+            assertEquals("no column baz.a", e.getMessage());
+        }
+
+        try {
+            check("foo.a = bar.a and (bar.a = 5 or baz.a = 7)", row);
+            fail();
+        }
+        catch (NoColumn e) {
+            assertEquals("no column baz.a", e.getMessage());
+        }
+    }
+
+    private void check(String expressionString, ResultRow row) {
+        Expression expression = (Expression) 
+            new Parser(expressionString).parseWhatElement();
+        expression.evaluate(row);
+    }
+    
 }
