@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupByKeys;
+import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.Command;
@@ -27,7 +28,8 @@ import java.util.List;
 
 public class Select extends Command {
 
-    private static final String UPDATE_MESSAGE = "SELECT is only available with query, not update";
+    private static final String UPDATE_MESSAGE = 
+        "SELECT is only available with query, not update";
 
     public static Select selectFromSql(String sql) {
         return new Parser(sql).parseQuery();
@@ -47,7 +49,7 @@ public class Select extends Command {
      */
     private final From from;
 
-    public final BooleanExpression where;
+    public BooleanExpression where;
 
     /**
      * Not yet immutable, because of {@link GroupByKeys}
@@ -76,7 +78,7 @@ public class Select extends Command {
     }
 
     public ResultSet select(final DataStore store, String currentSchema) {
-        optimize();
+        optimize(store, currentSchema);
         Row dummyRow = dummyRow(store, currentSchema);
         Selected selected = what.selected(dummyRow);
         check(store, selected, dummyRow);
@@ -125,15 +127,80 @@ public class Select extends Command {
     }
 
     public void optimize() {
+        optimize(null, null);
+    }
+
+    /**
+     * Currently this method makes joins explicit and also moves
+     * conditions from WHERE to ON.  The whole thing would probably
+     * be cleaner if those were separated.  The second step
+     * would be optional (for those tests currently passing in
+     * null for store) and the {@link #dummyRow(int, DataStore, String)}
+     * method could make use of the joins which were built up
+     * in the first step.
+     */
+    public void optimize(DataStore store, String currentSchema) {
+        if (store != null) {
+            Row fullDummyRow = dummyRow(0, store, currentSchema);
+            where.evaluate(fullDummyRow);
+        }
+
         while (from.size() > 1) {
             // x y z -> join(x, y) z
             FromElement first = (FromElement) from.element(0);
             FromElement second = (FromElement) from.element(1);
             
-            InnerJoin explicitJoin = new InnerJoin(first, second, BooleanExpression.TRUE);
+            BooleanExpression on = 
+                moveWhereToOn(first, second, store, currentSchema);
+            InnerJoin explicitJoin = new InnerJoin(first, second, on);
+
             from.remove(0);
             from.remove(0);
             from.add(0, explicitJoin);
+        }
+    }
+
+    Row dummyRow(int index, DataStore store, String currentSchema) {
+        FromElement element = (FromElement) from.element(index);
+        Row dummyRow = element.dummyRow(store, currentSchema);
+        if (index >= from.size() - 1) {
+            return dummyRow;
+        }
+        else {
+            return dummyRow.combine(
+                dummyRow(index + 1, store, currentSchema));
+        }
+    }
+
+    private BooleanExpression moveWhereToOn(
+        FromElement first, FromElement second,
+        DataStore store, String currentSchema) {
+        if (store == null) {
+            // For convenience in tests.
+            return BooleanExpression.TRUE;
+        }
+
+        if (canMove(where, first, second, store, currentSchema)) {
+            BooleanExpression conditionToMove = where;
+            where = BooleanExpression.TRUE;
+            return conditionToMove;
+        }
+        else {
+            return BooleanExpression.TRUE;
+        }
+    }
+
+    static boolean canMove(BooleanExpression condition, 
+        FromElement first, FromElement second, 
+        DataStore store, String currentSchema) {
+        InnerJoin join = new InnerJoin(first, second, BooleanExpression.TRUE);
+        Row partialDummyRow = join.dummyRow(store, currentSchema);
+        try {
+            condition.evaluate(partialDummyRow);
+            return true;
+        }
+        catch (NoColumn e) {
+            return false;
         }
     }
 

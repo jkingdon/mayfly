@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -170,7 +171,7 @@ public class Row extends Aggregate {
             return newRow.asRow();
         }
         else {
-            throw new MayflyException("no column " + columnName);
+            throw new NoColumn(columnName);
         }
     }
 

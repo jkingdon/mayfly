@@ -1,6 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.evaluation.NoColumn;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.Iterable;
@@ -98,7 +100,7 @@ public class Columns extends Aggregate {
             }
         }
         if (found == null) {
-            throw new MayflyException("no column " + Column.displayName(tableOrAlias, columnName));
+            throw new NoColumn(tableOrAlias, columnName, Location.UNKNOWN);
         } else {
             return found;
         }
@@ -138,8 +140,7 @@ public class Columns extends Aggregate {
             }
         }
         if (!found) {
-            throw new MayflyException(
-                "no column " + replacement.columnName());
+            throw new NoColumn(replacement.columnName());
         }
         return new Columns(new ImmutableList(result));
     }
@@ -163,7 +164,7 @@ public class Columns extends Aggregate {
             return new Columns(new ImmutableList(result));
         }
         else {
-            throw new MayflyException("no column " + target);
+            throw new NoColumn(target);
         }
     }
 

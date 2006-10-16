@@ -76,11 +76,42 @@ public class JoinTest extends SqlTestCase {
         if (dialect.detectsAmbiguousColumns()) {
             expectQueryFailure(ambiguousColumnNameQuery, "ambiguous column A");
         } else {
-            // This is the hypersonic behavior.  It seems too "guess what I meant"-ish
-            // for mayfly.
             assertResultSet(new String[] {"5"}, query(ambiguousColumnNameQuery));
             assertResultSet(new String[] {"9"}, query("select A from bar, foo"));
         }
+    }
+    
+    public void testAmbiguousEvenWithJoins() throws Exception {
+        // The main point here is that the query optimizer shouldn't
+        // "optimize" a to be foo.a
+        execute("create table foo (a integer)");
+        execute("create table bar (b integer)");
+        execute("create table baz (a integer)");
+        String sql = "select * from foo, bar, baz where a = 5";
+        if (dialect.detectsAmbiguousColumns()) {
+            expectQueryFailure(sql, "ambiguous column a");
+        }
+        else {
+            assertResultSet(new String[] { }, query(sql));
+        }
+    }
+    
+    public void testNeedThirdTable() throws Exception {
+        // The main point here is that the query optimizer
+        // cannot join tables foo and bar first, and also
+        // apply the where on that first join.
+        execute("create table foo (a integer)");
+        execute("create table bar (b integer)");
+        execute("create table baz (a integer)");
+        
+        execute("insert into foo(a) values (3)");
+        execute("insert into bar(b) values (4)");
+        execute("insert into baz(a) values (5)");
+        execute("insert into baz(a) values (6)");
+
+        assertResultSet(
+            new String[] { " 3, 4, 5 " }, 
+            query("select * from foo, bar, baz where baz.a = 5"));
     }
 
     public void testAlias() throws Exception {
@@ -151,16 +182,6 @@ public class JoinTest extends SqlTestCase {
             query("select * from foo child left outer join foo parent on child.parent = parent.id"));
     }
     
-    public void xtestAmbiguousColumnViaJoin() throws Exception {
-        // So the case here is that there are two copies of foo.a.
-        // and the "*" picks them up, or something?  This might be worth
-        // looking into more.  I'm not really sure what is going on,
-        // whether it should be an error, and what error message makes
-        // sense.
-        execute("create table foo (a integer)");
-        expectQueryFailure("select * from foo left outer join foo on 1 = 1", "ambiguous column a");
-    }
-    
     public void testDuplicateAliasWithDifferingColumnNames() throws Exception {
         execute("create table foo(a integer)");
         execute("create table bar(b integer)");
@@ -195,6 +216,21 @@ public class JoinTest extends SqlTestCase {
         }
     }
 
+    /**
+     * Basically the same case as 
+     * {@link #testDuplicateAliasWithSameColumnNames()}.
+     */
+    public void testAmbiguousColumnViaJoin() throws Exception {
+        execute("create table foo (a integer)");
+        String sql = "select * from foo left outer join foo on 1 = 1";
+        if (dialect.allowDuplicateTableInQuery()) {
+            assertResultSet(new String[] { }, query(sql));
+        }
+        else {
+            expectQueryFailure(sql, "duplicate table name or alias foo");
+        }
+    }
+    
     public void testCrossJoin() throws Exception {
         // Hypersonic, Derby, and to a certain extent MySQL, treat CROSS JOIN as being
         // just like INNER JOIN.  Mayfly, Oracle, and Postgres hew more closely

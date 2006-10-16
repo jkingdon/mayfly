@@ -5,6 +5,7 @@ import junitx.framework.ObjectAssert;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
@@ -51,6 +52,13 @@ public class MayflyAssert {
         ResultRow row, int index) {
         assertColumn(expectedColumn, row.expression(index));
         assertLong(expectedValue, row.cell(index));
+    }
+
+    public static void assertColumn(
+        String table, String expectedColumn,
+        Row row, int index) {
+        ResultRow resultRow = new ResultRow(row);
+        assertColumn(table, expectedColumn, resultRow.expression(index));
     }
 
     public static void assertLocation(

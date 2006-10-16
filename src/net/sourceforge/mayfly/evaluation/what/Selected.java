@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation.what;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.util.Iterable;
@@ -58,7 +59,7 @@ public class Selected extends ValueObject implements Iterable {
         }
 
         if (found == null) {
-            throw new MayflyException("no column " + columnName);
+            throw new NoColumn(columnName);
         }
         else {
             return found;

@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import junitx.framework.ObjectAssert;
 
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
@@ -12,10 +13,12 @@ import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.evaluation.condition.True;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.parser.Location;
+import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
@@ -142,10 +145,17 @@ public class SelectTest extends TestCase {
         assertEquals("baz", ((FromTable) join.right).tableName);
     }
     
-    public void notimplemented_testTransformWhereToOn() throws Exception {
+    public void testTransformWhereToOn() throws Exception {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz where foo.id = bar.id");
-        select.optimize();
+        select.optimize(
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("id"))
+                .createTable("bar", ImmutableList.singleton("id"))
+                .createTable("baz", ImmutableList.singleton("id"))
+            ),
+            DataStore.ANONYMOUS_SCHEMA_NAME);
+
         InnerJoin join = (InnerJoin) select.from().soleElement();
         InnerJoin firstJoin = (InnerJoin) join.left;
 
@@ -155,5 +165,56 @@ public class SelectTest extends TestCase {
         
         ObjectAssert.assertInstanceOf(True.class, select.where);
     }
-
+    
+    public void testCanMove() throws Exception {
+        assertTrue(Select.canMove(
+            new Equal(
+                new SingleColumn("foo", "a"), 
+                new SingleColumn("b")), 
+            new FromTable("foo"), new FromTable("bar"), 
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("a"))
+                .createTable("bar", ImmutableList.singleton("b"))), 
+            DataStore.ANONYMOUS_SCHEMA_NAME));
+    }
+    
+    public void testCannotMoveNoColumn() throws Exception {
+        assertFalse(Select.canMove(
+            new Equal(
+                new SingleColumn("foo", "a"), 
+                new SingleColumn("c")), 
+            new FromTable("foo"), new FromTable("bar"), 
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("a"))
+                .createTable("bar", ImmutableList.singleton("b"))), 
+            DataStore.ANONYMOUS_SCHEMA_NAME));
+    }
+    
+    public void testCannotMoveNoTable() throws Exception {
+        assertFalse(Select.canMove(
+            new Equal(
+                new SingleColumn("foo", "a"), 
+                new SingleColumn("baz", "c")), 
+            new FromTable("foo"), new FromTable("bar"), 
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("a"))
+                .createTable("bar", ImmutableList.singleton("b"))), 
+            DataStore.ANONYMOUS_SCHEMA_NAME));
+    }
+    
+    public void testFullDummyRow() throws Exception {
+        Select select = (Select) Select.fromSql(
+            "select * from foo, bar, baz");
+        Row dummyRow = select.dummyRow(
+            0,
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("id"))
+                .createTable("bar", ImmutableList.singleton("id"))
+                .createTable("baz", ImmutableList.singleton("id"))
+            ),
+            DataStore.ANONYMOUS_SCHEMA_NAME);
+        assertEquals(3, dummyRow.size());
+        MayflyAssert.assertColumn("foo", "id", dummyRow, 0);
+    }
+    
 }

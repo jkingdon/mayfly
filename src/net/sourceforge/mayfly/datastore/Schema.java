@@ -26,10 +26,14 @@ public class Schema {
     }
 
     public Schema createTable(String table, List columnNames) {
-        return createTable(table, Columns.fromColumnNames(table, columnNames), new Constraints());
+        return createTable(
+            table, 
+            Columns.fromColumnNames(table, columnNames), 
+            new Constraints());
     }
 
-    public Schema createTable(String table, Columns columns, Constraints constraints) {
+    public Schema createTable(
+        String table, Columns columns, Constraints constraints) {
         assertNoTable(table);
         return new Schema(tables.with(table, new TableData(columns, constraints)));
     }
