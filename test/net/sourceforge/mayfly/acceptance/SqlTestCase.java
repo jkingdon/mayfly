@@ -20,6 +20,7 @@ public abstract class SqlTestCase extends TestCase {
     protected Dialect dialect =
         new MayflyDialect()
         //new HypersonicDialect()
+        //new SmallSqlDialect()
         //new MySqlDialect()
         //new MySql4Dialect()
         //new PostgresDialect()
