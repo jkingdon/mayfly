@@ -14,7 +14,7 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
@@ -50,7 +50,7 @@ public class Select extends Command {
      */
     private final From from;
 
-    public BooleanExpression where;
+    public Condition where;
 
     /**
      * Not immutable, because of {@link GroupByKeys}
@@ -61,11 +61,11 @@ public class Select extends Command {
 
     private final Limit limit;
 
-    public Select(What what, From from, BooleanExpression where) {
+    public Select(What what, From from, Condition where) {
         this(what, from, where, new NoGroupBy(), new OrderBy(), Limit.NONE);
     }
 
-    public Select(What what, From from, BooleanExpression where, Aggregator groupBy, OrderBy orderBy, Limit limit) {
+    public Select(What what, From from, Condition where, Aggregator groupBy, OrderBy orderBy, Limit limit) {
         this.what = what;
         this.from = from;
         this.where = where;
@@ -151,7 +151,7 @@ public class Select extends Command {
             FromElement first = (FromElement) from.element(0);
             FromElement second = (FromElement) from.element(1);
             
-            BooleanExpression on = 
+            Condition on = 
                 moveWhereToOn(first, second, store, currentSchema);
             InnerJoin explicitJoin = new InnerJoin(first, second, on);
 
@@ -173,32 +173,32 @@ public class Select extends Command {
         }
     }
 
-    private BooleanExpression moveWhereToOn(
+    private Condition moveWhereToOn(
         FromElement first, FromElement second,
         DataStore store, String currentSchema) {
         if (store == null) {
             // For convenience in tests.
-            return BooleanExpression.TRUE;
+            return Condition.TRUE;
         }
 
         if (canMove(where, first, second, store, currentSchema)) {
-            BooleanExpression conditionToMove = where;
-            where = BooleanExpression.TRUE;
+            Condition conditionToMove = where;
+            where = Condition.TRUE;
             return conditionToMove;
         }
         else {
-            return BooleanExpression.TRUE;
+            return Condition.TRUE;
         }
     }
 
-    static boolean canMove(BooleanExpression condition, 
+    static boolean canMove(Condition condition, 
         FromElement first, FromElement second, 
         DataStore store, String currentSchema) {
         if (condition.firstAggregate() != null) {
             return false;
         }
 
-        InnerJoin join = new InnerJoin(first, second, BooleanExpression.TRUE);
+        InnerJoin join = new InnerJoin(first, second, Condition.TRUE);
         Row partialDummyRow = join.dummyRow(store, currentSchema);
         try {
             condition.check(new ResultRow(partialDummyRow));

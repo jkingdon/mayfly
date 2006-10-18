@@ -6,7 +6,7 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
@@ -43,7 +43,7 @@ public class Cascade extends Action {
     }
 
     // Pull up this method?  Duplicates setValue, right?
-    private BooleanExpression where(Cell oldValue, String referencerTable, String referencerColumn) {
+    private Condition where(Cell oldValue, String referencerTable, String referencerColumn) {
         return new Equal(
             new SingleColumn(referencerTable, referencerColumn),
             new CellExpression(oldValue)

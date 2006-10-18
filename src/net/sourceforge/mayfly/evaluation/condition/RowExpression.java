@@ -4,7 +4,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
-abstract public class RowExpression extends BooleanExpression {
+abstract public class RowExpression extends Condition {
 
     public final Expression leftSide;
     public final Expression rightSide;

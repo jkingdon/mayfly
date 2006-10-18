@@ -3,11 +3,11 @@ package net.sourceforge.mayfly.evaluation.condition;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
 
-public class And extends BooleanExpression {
-    public final BooleanExpression leftSide;
-    public final BooleanExpression rightSide;
+public class And extends Condition {
+    public final Condition leftSide;
+    public final Condition rightSide;
 
-    public And(BooleanExpression leftSide, BooleanExpression rightSide) {
+    public And(Condition leftSide, Condition rightSide) {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
     }

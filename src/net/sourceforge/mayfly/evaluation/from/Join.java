@@ -2,16 +2,16 @@ package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public abstract class Join extends ValueObject implements FromElement {
 
     public final FromElement right;
-    public final BooleanExpression condition;
+    public final Condition condition;
     public final FromElement left;
 
-    protected Join(FromElement left, FromElement right, BooleanExpression condition) {
+    protected Join(FromElement left, FromElement right, Condition condition) {
         this.left = left;
         this.right = right;
         this.condition = condition;

@@ -6,9 +6,9 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.util.Selector;
 import net.sourceforge.mayfly.util.ValueObject;
 
-public abstract class BooleanExpression extends ValueObject implements Selector {
+public abstract class Condition extends ValueObject implements Selector {
 
-    public static final BooleanExpression TRUE = new True();
+    public static final Condition TRUE = new True();
 
     final public boolean evaluate(Object row) {
         if (row instanceof ResultRow) {
@@ -26,7 +26,7 @@ public abstract class BooleanExpression extends ValueObject implements Selector 
 
     abstract public String firstAggregate();
 
-    public String firstAggregate(BooleanExpression left, BooleanExpression right) {
+    public String firstAggregate(Condition left, Condition right) {
         String firstInLeft = left.firstAggregate();
         if (firstInLeft != null) {
             return firstInLeft;

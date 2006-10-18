@@ -5,7 +5,7 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
-public class IsNull extends BooleanExpression {
+public class IsNull extends Condition {
 
     public final Expression expression;
 

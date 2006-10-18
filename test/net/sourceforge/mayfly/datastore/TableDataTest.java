@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.util.ImmutableList;
 
@@ -68,7 +68,7 @@ public class TableDataTest extends TestCase {
         UpdateTable update = table.update(new NullChecker(), 
             Collections.singletonList(
                 new SetClause("a", new QuotedString("'2004-02-29'"))), 
-            BooleanExpression.TRUE);
+            Condition.TRUE);
         assertEquals(1, update.rowsAffected());
         TableData newTable = update.table();
         Row newRow = (Row) newTable.rows().element(0);

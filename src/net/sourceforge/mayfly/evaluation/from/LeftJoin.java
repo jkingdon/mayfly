@@ -3,14 +3,14 @@ package net.sourceforge.mayfly.evaluation.from;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.util.L;
 
 import java.util.Iterator;
 
 public class LeftJoin extends Join implements FromElement {
 
-    public LeftJoin(FromElement left, FromElement right, BooleanExpression condition) {
+    public LeftJoin(FromElement left, FromElement right, Condition condition) {
         super(left, right, condition);
     }
 

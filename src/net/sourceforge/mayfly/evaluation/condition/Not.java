@@ -3,11 +3,11 @@ package net.sourceforge.mayfly.evaluation.condition;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
 
-public class Not extends BooleanExpression {
+public class Not extends Condition {
 
-    public final BooleanExpression operand;
+    public final Condition operand;
 
-    public Not(BooleanExpression operand) {
+    public Not(Condition operand) {
         this.operand = operand;
     }
 

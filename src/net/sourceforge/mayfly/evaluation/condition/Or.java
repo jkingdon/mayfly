@@ -2,12 +2,12 @@ package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
-public class Or extends BooleanExpression {
+public class Or extends Condition {
 
-    public final BooleanExpression leftSide;
-    public final BooleanExpression rightSide;
+    public final Condition leftSide;
+    public final Condition rightSide;
 
-    public Or(BooleanExpression leftSide, BooleanExpression rightSide) {
+    public Or(Condition leftSide, Condition rightSide) {
         this.leftSide = leftSide;
         this.rightSide = rightSide;
     }

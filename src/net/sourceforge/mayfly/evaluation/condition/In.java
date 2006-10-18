@@ -8,7 +8,7 @@ import net.sourceforge.mayfly.util.ImmutableList;
 import java.util.Iterator;
 import java.util.List;
 
-public class In extends BooleanExpression {
+public class In extends Condition {
 
     public final Expression leftSide;
     public final ImmutableList expressions;

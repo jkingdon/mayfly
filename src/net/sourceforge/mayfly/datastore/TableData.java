@@ -7,7 +7,7 @@ import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.M;
@@ -106,7 +106,7 @@ public class TableData {
     }
 
     public UpdateTable update(Checker checker, List setClauses, 
-        BooleanExpression where) {
+        Condition where) {
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
@@ -147,7 +147,7 @@ public class TableData {
         }
     }
 
-    public UpdateTable delete(BooleanExpression where, Checker checker) {
+    public UpdateTable delete(Condition where, Checker checker) {
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {

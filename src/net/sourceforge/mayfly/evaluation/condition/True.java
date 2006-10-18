@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
-public class True extends BooleanExpression {
+public class True extends Condition {
     public boolean evaluate(ResultRow candidate) {
         return true;
     }

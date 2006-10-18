@@ -6,7 +6,7 @@ import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableMap;
 
@@ -127,14 +127,14 @@ public class DataStore {
     }
 
     public UpdateStore update(String schema, String table, 
-        List setClauses, BooleanExpression where) {
+        List setClauses, Condition where) {
         Checker checker = new Checker(this, schema, table);
         UpdateSchema result = 
             schema(schema).update(checker, table, setClauses, where);
         return replaceSchema(schema, result);
     }
 
-    public UpdateStore delete(String schema, String table, BooleanExpression where) {
+    public UpdateStore delete(String schema, String table, Condition where) {
         Checker checker = new Checker(this, schema, table);
         UpdateSchema result = schema(schema).delete(table, where, checker);
         

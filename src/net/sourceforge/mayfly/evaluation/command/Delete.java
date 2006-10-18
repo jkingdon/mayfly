@@ -1,14 +1,14 @@
 package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 
 public class Delete extends Command {
 
     private final UnresolvedTableReference table;
-    private final BooleanExpression where;
+    private final Condition where;
 
-    public Delete(UnresolvedTableReference table, BooleanExpression where) {
+    public Delete(UnresolvedTableReference table, Condition where) {
         this.table = table;
         this.where = where;
     }

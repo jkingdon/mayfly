@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.util.ValueObject;
 
@@ -11,13 +11,13 @@ import java.util.Iterator;
 public class GroupBy extends ValueObject implements Aggregator {
     
     private GroupByKeys keys = new GroupByKeys();
-    private BooleanExpression having = BooleanExpression.TRUE;
+    private Condition having = Condition.TRUE;
 
     public void add(GroupItem item) {
         keys.add(item);
     }
 
-    public void setHaving(BooleanExpression having) {
+    public void setHaving(Condition having) {
         this.having = having;
     }
     

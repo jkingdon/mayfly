@@ -11,7 +11,7 @@ import net.sourceforge.mayfly.datastore.constraint.SetNull;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
-import net.sourceforge.mayfly.evaluation.condition.BooleanExpression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.condition.Greater;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
@@ -252,7 +252,7 @@ public class ParserTest extends TestCase {
     
     public void testCondition() throws Exception {
         Parser parser = new Parser("(y + z / 10) < 60");
-        BooleanExpression condition = parser.parseCondition().asBoolean();
+        Condition condition = parser.parseCondition().asBoolean();
         assertEquals("", parser.remainingTokens());
         
         Greater greater = (Greater) condition;

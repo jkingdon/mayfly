@@ -19,10 +19,10 @@ import net.sourceforge.mayfly.parser.Parser;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class BooleanExpressionTest extends TestCase {
+public class ConditionTest extends TestCase {
     
     public void testSelect() throws Exception {
-        BooleanExpression where = new Parser("name='steve'").parseWhere();
+        Condition where = new Parser("name='steve'").parseWhere();
 
         Row row1 = new Row(new TupleElement(new Column("name"), new StringCell("steve")));
         Row row2 = new Row(new TupleElement(new Column("name"), new StringCell("bob")));
@@ -32,7 +32,7 @@ public class BooleanExpressionTest extends TestCase {
     }
     
     public void testNull() throws Exception {
-        BooleanExpression where = new Equal(new SingleColumn("a"), new IntegerLiteral(5));
+        Condition where = new Equal(new SingleColumn("a"), new IntegerLiteral(5));
         Row fiveRow = new Row(new TupleElement(new Column("a"), new LongCell(5)));
         Row nullRow = new Row(new TupleElement(new Column("a"), NullCell.INSTANCE));
         
@@ -41,7 +41,7 @@ public class BooleanExpressionTest extends TestCase {
     }
 
     public void testFirstAggregate() throws Exception {
-        assertEquals(null, BooleanExpression.TRUE.firstAggregate());
+        assertEquals(null, Condition.TRUE.firstAggregate());
         assertEquals(null, new Equal(new SingleColumn("x"), new SingleColumn("y")).firstAggregate());
         assertEquals("count(*)", new Equal(new CountAll("count"), new SingleColumn("y")).firstAggregate());
         assertEquals("count(*)", new IsNull(new CountAll("count")).firstAggregate());
@@ -56,8 +56,8 @@ public class BooleanExpressionTest extends TestCase {
         );
 
         assertEquals("count(*)", new Not(new IsNull(new CountAll("count"))).firstAggregate());
-        assertEquals("count(*)", new Or(new IsNull(new CountAll("count")), BooleanExpression.TRUE).firstAggregate());
-        assertEquals("count(*)", new And(BooleanExpression.TRUE, new IsNull(new CountAll("count"))).firstAggregate());
+        assertEquals("count(*)", new Or(new IsNull(new CountAll("count")), Condition.TRUE).firstAggregate());
+        assertEquals("count(*)", new And(Condition.TRUE, new IsNull(new CountAll("count"))).firstAggregate());
     }
 
     public void testCheck() throws Exception {
@@ -77,7 +77,7 @@ public class BooleanExpressionTest extends TestCase {
         assertNoBaz("bar.a in (3, baz.a)", row);
         assertNoBaz("baz.a is null", row);
         
-        BooleanExpression.TRUE.check(row);
+        Condition.TRUE.check(row);
     }
 
     private void assertNoBaz(String sql, ResultRow row) {
@@ -92,7 +92,7 @@ public class BooleanExpressionTest extends TestCase {
 
     private void check(String expressionString, ResultRow row) {
         Parser parser = new Parser(expressionString);
-        BooleanExpression condition = parser.parseCondition().asBoolean();
+        Condition condition = parser.parseCondition().asBoolean();
         assertEquals("", parser.remainingTokens());
         condition.check(row);
     }
