@@ -45,4 +45,44 @@ public class SmallSqlDialect extends Dialect {
         }
 */    }
     
+    public boolean detectsAmbiguousColumns() {
+        return false;
+    }
+    
+    public boolean allowDuplicateTableInQuery() {
+        return true;
+    }
+    
+    public boolean stringComparisonsAreCaseInsensitive() {
+        return true;
+    }
+    
+    public boolean notRequiresBoolean() {
+        return false;
+    }
+    
+    public boolean disallowNullOnRightHandSideOfIn() {
+        return false;
+    }
+    
+    public boolean whereCanReferToColumnAlias() {
+        return false;
+    }
+    
+    public boolean haveModifyColumn() {
+        return false;
+    }
+    
+    public boolean haveUpdateDefault() {
+        return false;
+    }
+    
+    public boolean haveLimit() {
+        return false;
+    }
+    
+    public boolean schemasMissing() {
+        return true;
+    }
+    
 }

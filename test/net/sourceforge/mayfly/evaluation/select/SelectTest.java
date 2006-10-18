@@ -265,7 +265,7 @@ public class SelectTest extends TestCase {
         MayflyAssert.assertColumn("foo", "id", dummyRow, 0);
     }
     
-    public void xtestMoveLeftSideOfAnd() throws Exception {
+    public void testMoveLeftSideOfAnd() throws Exception {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz " +
             "where foo.id = bar.id and (bar.id = 5 or baz.id = 7)");
@@ -284,11 +284,13 @@ public class SelectTest extends TestCase {
         MayflyAssert.assertColumn("foo", "id", on.leftSide);
         MayflyAssert.assertColumn("bar", "id", on.rightSide);
 
-        Or remainingWhere = (Or) select.where;
-        Equal barEquals5 = (Equal) remainingWhere.leftSide;
+        Or movedToLastJoin = (Or) join.condition;
+        Equal barEquals5 = (Equal) movedToLastJoin.leftSide;
         MayflyAssert.assertColumn("bar", "id", barEquals5.leftSide);
-        Equal bazEquals7 = (Equal) remainingWhere.rightSide;
+        Equal bazEquals7 = (Equal) movedToLastJoin.rightSide;
         MayflyAssert.assertColumn("baz", "id", bazEquals7.leftSide);
+        
+        ObjectAssert.assertInstanceOf(True.class, select.where);
     }
     
 }

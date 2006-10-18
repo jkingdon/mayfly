@@ -14,6 +14,7 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
+import net.sourceforge.mayfly.evaluation.condition.And;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
@@ -185,6 +186,17 @@ public class Select extends Command {
             Condition conditionToMove = where;
             where = Condition.TRUE;
             return conditionToMove;
+        }
+        else if (where instanceof And) {
+            And and = (And) where;
+            if (canMove(and.leftSide, first, second, store, currentSchema)) {
+                Condition conditionToMove = and.leftSide;
+                where = and.rightSide;
+                return conditionToMove;
+            }
+            else {
+                return Condition.TRUE;
+            }
         }
         else {
             return Condition.TRUE;
