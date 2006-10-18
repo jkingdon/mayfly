@@ -34,4 +34,6 @@ public abstract class BooleanExpression extends ValueObject implements Selector 
         return right.firstAggregate();
     }
 
+    abstract public void check(ResultRow row);
+
 }

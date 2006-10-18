@@ -21,5 +21,9 @@ public class IsNull extends BooleanExpression {
     public String firstAggregate() {
         return expression.firstAggregate();
     }
+    
+    public void check(ResultRow row) {
+        expression.check(row);
+    }
 
 }

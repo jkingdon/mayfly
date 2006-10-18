@@ -123,6 +123,10 @@ public class SingleColumn extends Expression {
         }
     }
     
+    public void check(ResultRow row) {
+        lookup(row);
+    }
+    
     public String tableOrAlias() {
         return tableOrAlias;
     }

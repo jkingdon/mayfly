@@ -39,6 +39,9 @@ abstract public class Expression extends WhatElement {
     public Cell evaluate(Row row) {
         return evaluate(new ResultRow(row));
     }
+    
+    public void check(ResultRow row) {
+    }
 
     abstract public Cell aggregate(ResultRows rows);
 

@@ -47,5 +47,13 @@ public class In extends BooleanExpression {
         
         return null;
     }
+    
+    public void check(ResultRow row) {
+        leftSide.check(row);
+        for (int i = 0; i < expressions.size(); ++i) {
+            Expression expression = (Expression) expressions.get(i);
+            expression.check(row);
+        }
+    }
 
 }

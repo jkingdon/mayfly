@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
-
 public class Or extends BooleanExpression {
 
     public final BooleanExpression leftSide;
@@ -19,6 +18,11 @@ public class Or extends BooleanExpression {
 
     public String firstAggregate() {
         return firstAggregate(leftSide, rightSide);
+    }
+    
+    public void check(ResultRow row) {
+        leftSide.check(row);
+        rightSide.check(row);
     }
 
 }

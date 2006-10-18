@@ -13,11 +13,28 @@ public class And extends BooleanExpression {
     }
 
     public boolean evaluate(ResultRow row) {
+        /*
+         * We currently implement this as a short-circuited evaluation.
+         * 
+         * Apparently in SQL an implementation is allowed to short
+         * circuit, but not required to and not forbidden to rearrange
+         * the expression.
+         * 
+         * As for what side effects would make it matter, divide
+         * by zero is a classic case.  That's one which depends on
+         * the data, rather than a row-independent error like 
+         * syntax error, ambiguous column, etc.
+         */
         return leftSide.evaluate(row) && rightSide.evaluate(row);
     }
 
     public String firstAggregate() {
         return firstAggregate(leftSide, rightSide);
+    }
+    
+    public void check(ResultRow row) {
+        leftSide.check(row);
+        rightSide.check(row);
     }
 
 }

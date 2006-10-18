@@ -229,10 +229,12 @@ public class ParserTest extends TestCase {
             new Parser("f 5").parseWhere();
             fail();
         } catch (ParserException e) {
-            // This would be a nice message, as would "expected boolean but got f" or some such.
+            /* This would be a nice message, as would 
+               "expected boolean but got f" or some such. */
 //            assertEquals("expected boolean operator but got 5", e.getMessage());
-            assertEquals("expected boolean expression but got " +
-                "non-boolean expression", e.getMessage());
+            assertEquals(
+                "expected boolean expression but got non-boolean expression", 
+                e.getMessage());
         }
     }
     
@@ -267,26 +269,36 @@ public class ParserTest extends TestCase {
     }
 
     public void testExpectedBooleanGotNonBoolean() throws Exception {
-        Parser parser = new Parser("5 + x");
+        lookForConditionGetExpression("5 + x");
+    }
+
+    private void lookForConditionGetExpression(String sql) {
         try {
-            parser.parseCondition().asBoolean();
+            new Parser(sql).parseCondition().asBoolean();
             fail();
         } catch (ParserException e) {
             // Would be really nice to say what is going on with a more specific error message
 //            assertEquals("expected boolean expression but got 5 + x", e.getMessage());
-            assertEquals("expected boolean expression but got " +
-                "non-boolean expression", e.getMessage());
+            assertEquals(
+                "expected boolean expression but got non-boolean expression", 
+                e.getMessage());
         }
     }
     
     public void testExpectedNonBooleanGotBoolean() throws Exception {
-        Parser parser = new Parser("5 = x");
+        lookForExpressionGetCondition("5 = x");
+        lookForExpressionGetCondition(
+            "foo.a = bar.a and (bar.a < 5 or foo.a <> bar.a)");
+    }
+
+    private void lookForExpressionGetCondition(String sql) {
         try {
-            parser.parseCondition().asNonBoolean();
+            new Parser(sql).parseCondition().asNonBoolean();
             fail();
         } catch (ParserException e) {
-            assertEquals("expected non-boolean expression but got " +
-                "boolean expression", e.getMessage());
+            assertEquals(
+                "expected non-boolean expression but got boolean expression", 
+                e.getMessage());
 //          assertEquals("expected non-boolean expression but got 5 = x", e.getMessage());
         }
     }

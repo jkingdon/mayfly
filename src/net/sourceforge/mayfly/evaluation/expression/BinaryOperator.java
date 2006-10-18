@@ -60,6 +60,11 @@ abstract public class BinaryOperator extends Expression {
     
     public abstract Expression resolve(ResultRow row);
     
+    public void check(ResultRow row) {
+        left.check(row);
+        right.check(row);
+    }
+
     public Expression left() {
         return left;
     }

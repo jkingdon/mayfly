@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupByKeys;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.NoGroupBy;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
@@ -40,22 +41,22 @@ public class Select extends Command {
     }
 
     /**
-     * Not yet immutable, because of {@link What#add(WhatElement)}
+     * Not immutable, because of {@link What#add(WhatElement)}
      */
     private final What what;
 
     /**
-     * Not yet immutable, because of {@link From#add(FromElement)}
+     * Not immutable, because of {@link From#add(FromElement)}
      */
     private final From from;
 
     public BooleanExpression where;
 
     /**
-     * Not yet immutable, because of {@link GroupByKeys}
+     * Not immutable, because of {@link GroupByKeys}
      */
     private final Aggregator groupBy;
-    /** Not yet immutable */
+    /** Not immutable */
     private final OrderBy orderBy;
 
     private final Limit limit;
@@ -193,10 +194,14 @@ public class Select extends Command {
     static boolean canMove(BooleanExpression condition, 
         FromElement first, FromElement second, 
         DataStore store, String currentSchema) {
+        if (condition.firstAggregate() != null) {
+            return false;
+        }
+
         InnerJoin join = new InnerJoin(first, second, BooleanExpression.TRUE);
         Row partialDummyRow = join.dummyRow(store, currentSchema);
         try {
-            condition.evaluate(partialDummyRow);
+            condition.check(new ResultRow(partialDummyRow));
             return true;
         }
         catch (NoColumn e) {

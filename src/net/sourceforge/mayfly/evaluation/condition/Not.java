@@ -18,5 +18,9 @@ public class Not extends BooleanExpression {
     public String firstAggregate() {
         return operand.firstAggregate();
     }
+    
+    public void check(ResultRow row) {
+        operand.check(row);
+    }
 
 }

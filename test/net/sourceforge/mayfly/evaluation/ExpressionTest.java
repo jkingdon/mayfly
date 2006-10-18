@@ -45,16 +45,16 @@ public class ExpressionTest extends TestCase {
         );
     }
     
-    public void xtestCheck() throws Exception {
+    public void testCheck() throws Exception {
         ResultRow row = new ResultRow()
             .withColumn("foo", "a", NullCell.INSTANCE)
             .withColumn("bar", "a", NullCell.INSTANCE);
 
-        check("foo.a = bar.a", row);
-        check("foo.a = bar.a and (bar.a < 5 or foo.a <> bar.a)", row);
+        check("foo.a + bar.a", row);
+        check("foo.a + bar.a * (bar.a / 5 - foo.a * bar.a)", row);
 
         try {
-            check("baz.a = 7", row);
+            check("baz.a", row);
             fail();
         }
         catch (NoColumn e) {
@@ -62,7 +62,15 @@ public class ExpressionTest extends TestCase {
         }
 
         try {
-            check("foo.a = bar.a and (bar.a = 5 or baz.a = 7)", row);
+            check("baz.a || 'hi'", row);
+            fail();
+        }
+        catch (NoColumn e) {
+            assertEquals("no column baz.a", e.getMessage());
+        }
+
+        try {
+            check("foo.a + bar.a * (bar.a / 5 - foo.a * baz.a)", row);
             fail();
         }
         catch (NoColumn e) {
@@ -71,9 +79,10 @@ public class ExpressionTest extends TestCase {
     }
 
     private void check(String expressionString, ResultRow row) {
-        Expression expression = (Expression) 
-            new Parser(expressionString).parseWhatElement();
-        expression.evaluate(row);
+        Parser parser = new Parser(expressionString);
+        Expression expression = (Expression) parser.parseWhatElement();
+        assertEquals("", parser.remainingTokens());
+        expression.check(row);
     }
     
 }

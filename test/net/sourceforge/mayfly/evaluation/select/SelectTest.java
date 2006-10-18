@@ -14,7 +14,9 @@ import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.evaluation.condition.Or;
 import net.sourceforge.mayfly.evaluation.condition.True;
+import net.sourceforge.mayfly.evaluation.expression.Maximum;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
+import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
@@ -196,6 +198,51 @@ public class SelectTest extends TestCase {
             new Equal(
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("baz", "c")), 
+            new FromTable("foo"), new FromTable("bar"), 
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("a"))
+                .createTable("bar", ImmutableList.singleton("b"))), 
+            DataStore.ANONYMOUS_SCHEMA_NAME));
+    }
+    
+    public void testCheckComplexExpressionUnmovable() throws Exception {
+        assertFalse(Select.canMove(
+            new Or(
+                new Equal(new IntegerLiteral(5), new IntegerLiteral(5)),
+                new Equal(
+                    new SingleColumn("foo", "a"), 
+                    new SingleColumn("baz", "c"))
+            ), 
+            new FromTable("foo"), new FromTable("bar"), 
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("a"))
+                .createTable("bar", ImmutableList.singleton("b"))), 
+            DataStore.ANONYMOUS_SCHEMA_NAME));
+    }
+    
+    public void testCheckComplexExpressionMovable() throws Exception {
+        assertTrue(Select.canMove(
+            new Or(
+                new Equal(new IntegerLiteral(5), new IntegerLiteral(5)),
+                new Equal(
+                    new SingleColumn("foo", "a"), 
+                    new SingleColumn("bar", "b"))
+            ), 
+            new FromTable("foo"), new FromTable("bar"), 
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("a"))
+                .createTable("bar", ImmutableList.singleton("b"))), 
+            DataStore.ANONYMOUS_SCHEMA_NAME));
+    }
+    
+    public void testCannotMoveAggregate() throws Exception {
+        // The problem is that we don't yet have fully functional
+        // machinery for taking max(a) and knowing that "a" is
+        // foo.a and not some other a.
+        assertFalse(Select.canMove(
+            new Equal(
+                new Maximum(new SingleColumn("a"), "max", false),
+                new IntegerLiteral(5)), 
             new FromTable("foo"), new FromTable("bar"), 
             new DataStore(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))

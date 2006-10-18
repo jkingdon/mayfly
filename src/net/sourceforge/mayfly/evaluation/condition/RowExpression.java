@@ -23,5 +23,10 @@ abstract public class RowExpression extends BooleanExpression {
     public String firstAggregate() {
         return Expression.firstAggregate(leftSide, rightSide);
     }
+    
+    public void check(ResultRow row) {
+        leftSide.check(row);
+        rightSide.check(row);
+    }
 
 }

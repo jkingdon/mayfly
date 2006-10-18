@@ -8,6 +8,8 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
+import net.sourceforge.mayfly.evaluation.NoColumn;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
@@ -58,4 +60,41 @@ public class BooleanExpressionTest extends TestCase {
         assertEquals("count(*)", new And(BooleanExpression.TRUE, new IsNull(new CountAll("count"))).firstAggregate());
     }
 
+    public void testCheck() throws Exception {
+        ResultRow row = new ResultRow()
+            .withColumn("foo", "a", NullCell.INSTANCE)
+            .withColumn("bar", "a", NullCell.INSTANCE);
+
+        check("foo.a = bar.a", row);
+        check("foo.a = bar.a and (bar.a < 5 or foo.a <> bar.a)", row);
+
+        assertNoBaz("baz.a = 7", row);
+
+        assertNoBaz("foo.a = bar.a and (bar.a = 5 or baz.a = 7)", row);
+        assertNoBaz("not baz.a = foo.a", row);
+
+        assertNoBaz("baz.a in (3, 4)", row);
+        assertNoBaz("bar.a in (3, baz.a)", row);
+        assertNoBaz("baz.a is null", row);
+        
+        BooleanExpression.TRUE.check(row);
+    }
+
+    private void assertNoBaz(String sql, ResultRow row) {
+        try {
+            check(sql, row);
+            fail();
+        }
+        catch (NoColumn e) {
+            assertEquals("no column baz.a", e.getMessage());
+        }
+    }
+
+    private void check(String expressionString, ResultRow row) {
+        Parser parser = new Parser(expressionString);
+        BooleanExpression condition = parser.parseCondition().asBoolean();
+        assertEquals("", parser.remainingTokens());
+        condition.check(row);
+    }
+    
 }

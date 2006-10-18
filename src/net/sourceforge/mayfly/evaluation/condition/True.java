@@ -10,4 +10,8 @@ public class True extends BooleanExpression {
     public String firstAggregate() {
         return null;
     }
+    
+    public void check(ResultRow row) {
+    }
+
 }
