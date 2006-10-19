@@ -11,7 +11,9 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
+import net.sourceforge.mayfly.evaluation.condition.And;
 import net.sourceforge.mayfly.evaluation.condition.Equal;
+import net.sourceforge.mayfly.evaluation.condition.Greater;
 import net.sourceforge.mayfly.evaluation.condition.Or;
 import net.sourceforge.mayfly.evaluation.condition.True;
 import net.sourceforge.mayfly.evaluation.expression.Maximum;
@@ -289,6 +291,59 @@ public class SelectTest extends TestCase {
         MayflyAssert.assertColumn("bar", "id", barEquals5.leftSide);
         Equal bazEquals7 = (Equal) movedToLastJoin.rightSide;
         MayflyAssert.assertColumn("baz", "id", bazEquals7.leftSide);
+        
+        ObjectAssert.assertInstanceOf(True.class, select.where);
+    }
+    
+    public void testMoveRightSideOfAnd() throws Exception {
+        Select select = (Select) Select.fromSql(
+            "select * from foo, bar, baz " +
+            "where foo.id = baz.id and (bar.id = 5 or foo.id = 7)");
+        select.optimize(
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("id"))
+                .createTable("bar", ImmutableList.singleton("id"))
+                .createTable("baz", ImmutableList.singleton("id"))
+            ),
+            DataStore.ANONYMOUS_SCHEMA_NAME);
+
+        InnerJoin join = (InnerJoin) select.from().soleElement();
+        InnerJoin firstJoin = (InnerJoin) join.left;
+
+        Or on = (Or) firstJoin.condition;
+        MayflyAssert.assertColumn("bar", "id", ((Equal)on.leftSide).leftSide);
+        MayflyAssert.assertColumn("foo", "id", ((Equal)on.rightSide).leftSide);
+
+        Equal movedToLastJoin = (Equal) join.condition;
+        MayflyAssert.assertColumn("foo", "id", movedToLastJoin.leftSide);
+        MayflyAssert.assertColumn("baz", "id", movedToLastJoin.rightSide);
+        
+        ObjectAssert.assertInstanceOf(True.class, select.where);
+    }
+    
+    public void testMoveAlmostEverything() throws Exception {
+        Select select = (Select) Select.fromSql(
+            "select * from foo, bar, baz " +
+            "where foo.id = bar.id and bar.id > 5 and baz.id = 9 and foo.id > 7");
+        select.optimize(
+            new DataStore(new Schema()
+                .createTable("foo", ImmutableList.singleton("id"))
+                .createTable("bar", ImmutableList.singleton("id"))
+                .createTable("baz", ImmutableList.singleton("id"))
+            ),
+            DataStore.ANONYMOUS_SCHEMA_NAME);
+
+        InnerJoin join = (InnerJoin) select.from().soleElement();
+        InnerJoin firstJoin = (InnerJoin) join.left;
+
+        And on = (And) firstJoin.condition;
+        MayflyAssert.assertColumn("foo", "id", ((Greater)on.leftSide).leftSide);
+        And secondLevel = (And) on.rightSide;
+        MayflyAssert.assertColumn("foo", "id", ((Equal)secondLevel.leftSide).leftSide);
+        MayflyAssert.assertColumn("bar", "id", ((Greater)secondLevel.rightSide).leftSide);
+
+        Equal movedToLastJoin = (Equal) join.condition;
+        MayflyAssert.assertColumn("baz", "id", movedToLastJoin.leftSide);
         
         ObjectAssert.assertInstanceOf(True.class, select.where);
     }

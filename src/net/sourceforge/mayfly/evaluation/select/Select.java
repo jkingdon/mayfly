@@ -16,6 +16,7 @@ import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.condition.And;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.condition.True;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
@@ -182,25 +183,44 @@ public class Select extends Command {
             return Condition.TRUE;
         }
 
-        if (canMove(where, first, second, store, currentSchema)) {
-            Condition conditionToMove = where;
-            where = Condition.TRUE;
-            return conditionToMove;
+        MoveResult result = new MoveResult();
+        moveToResult(first, second, store, currentSchema, result, where);
+        where = result.nonMovable;
+        return result.toBeMoved;
+    }
+
+    private void moveToResult(FromElement first, FromElement second, 
+        DataStore store, String currentSchema, 
+        final MoveResult moveResult, Condition toAnalyze) {
+        if (canMove(toAnalyze, first, second, store, currentSchema)) {
+            moveResult.toBeMoved = makeAnd(toAnalyze, moveResult.toBeMoved);
         }
-        else if (where instanceof And) {
-            And and = (And) where;
-            if (canMove(and.leftSide, first, second, store, currentSchema)) {
-                Condition conditionToMove = and.leftSide;
-                where = and.rightSide;
-                return conditionToMove;
-            }
-            else {
-                return Condition.TRUE;
-            }
+        else if (toAnalyze instanceof And) {
+            And and = (And) toAnalyze;
+            moveToResult(first, second, store, currentSchema, moveResult, and.leftSide);
+            moveToResult(first, second, store, currentSchema, moveResult, and.rightSide);
         }
         else {
-            return Condition.TRUE;
+            moveResult.nonMovable = toAnalyze;
         }
+    }
+    
+    private Condition makeAnd(Condition left, Condition right) {
+        // Turn "foo and true" into "foo" (mainly to make unit tests easier).
+        if (left instanceof True) {
+            return right;
+        }
+        else if (right instanceof True) {
+            return left;
+        }
+        else {
+            return new And(left, right);
+        }
+    }
+
+    static class MoveResult {
+        Condition toBeMoved = Condition.TRUE;
+        Condition nonMovable = Condition.TRUE;
     }
 
     static boolean canMove(Condition condition, 
