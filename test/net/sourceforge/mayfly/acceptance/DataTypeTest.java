@@ -373,5 +373,19 @@ public class DataTypeTest extends SqlTestCase {
         assertFalse(results.next());
         results.close();
     }
+    
+    public void testNumberAsBinary() throws Exception {
+        execute("create table foo(x integer)");
+        execute("insert into foo(x) values(1)");
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+        try {
+            results.getBytes(1);
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage("attempt to read number 1 as binary data", e);
+        }
+    }
 
 }

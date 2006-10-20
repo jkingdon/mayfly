@@ -21,32 +21,32 @@ public abstract class Cell extends ValueObject {
       */
     public byte asByte() throws SQLException {
         throw new SQLException(
-            "Attempt to read " + displayName() + " as a byte");
+            "attempt to read " + displayName() + " as a byte");
     }
 
     public short asShort() throws SQLException {
         throw new SQLException(
-            "Attempt to read " + displayName() + " as a short");
+            "attempt to read " + displayName() + " as a short");
     }
 
     public int asInt() throws SQLException {
         throw new SQLException(
-            "Attempt to read " + displayName() + " as an int");
+            "attempt to read " + displayName() + " as an int");
     }
 
     public long asLong() throws MayflyException {
         throw new MayflyException(
-            "Attempt to read " + displayName() + " as a long");
+            "attempt to read " + displayName() + " as a long");
     }
 
     public Object asObject() {
         throw new UnimplementedException(
-            "Attempt to read " + displayName() + " as an object");
+            "attempt to read " + displayName() + " as an object");
     }
 
     public String asString() {
         throw new MayflyException(
-            "Attempt to read " + displayName() + " as a string");
+            "attempt to read " + displayName() + " as a string");
     }
     
     public String toString() {
@@ -66,7 +66,7 @@ public abstract class Cell extends ValueObject {
     }
 
     public java.sql.Date asDate(DateTimeZone zone) throws SQLException {
-        throw new SQLException("Attempt to read " + displayName() + " as a date");
+        throw new SQLException("attempt to read " + displayName() + " as a date");
     }
 
     /**
@@ -76,17 +76,17 @@ public abstract class Cell extends ValueObject {
       */
     public double asDouble() throws SQLException {
         throw new SQLException(
-            "Attempt to read " + displayName() + " as a double");
+            "attempt to read " + displayName() + " as a double");
     }
 
     public InputStream asBinaryStream() throws SQLException {
         throw new SQLException(
-            "Attempt to read " + displayName() + " as binary data");
+            "attempt to read " + displayName() + " as binary data");
     }
 
     public byte[] asBytes() throws SQLException {
         throw new SQLException(
-            "Attempt to read " + displayName() + " as binary data");
+            "attempt to read " + displayName() + " as binary data");
     }
 
     abstract public int compareTo(Cell otherCell);
