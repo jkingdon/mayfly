@@ -11,12 +11,15 @@ import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.parser.Location;
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @internal
@@ -141,12 +144,8 @@ public class ResultRow {
         return with(new SingleColumn(tableOrAlias, columnName), cell);
     }
 
-    public ResultRow withColumn(String column, String cellValue) {
-        return withColumn(column, new StringCell(cellValue));
-    }
-
-    public ResultRow withColumn(String columnName, Cell cell) {
-        return with(new SingleColumn(columnName), cell);
+    public ResultRow withColumn(String tableOrAlias, String column, String value) {
+        return withColumn(tableOrAlias, column, new StringCell(value));
     }
 
     public ResultRow with(Expression expression, Cell value) {
@@ -172,6 +171,19 @@ public class ResultRow {
         public final Cell value;
 
         public Element(Expression expression, Cell value) {
+            /* This is probably where we want to go eventually.
+               But we need to work through things like how
+               we convert a Row to a ResultRow (do we even
+               need to do that, outside applyAlias, beyond
+               the transition phase)?  There are also issues
+               with group-by keys.
+            if (expression instanceof SingleColumn) {
+                // might also want to recurse to make sure all
+                // sub-expressions are resolved.  But this will
+                // do for now.
+                ((SingleColumn)expression).assertIsResolved();
+            }
+            */
             this.expression = expression;
             this.value = value;
         }
@@ -180,6 +192,36 @@ public class ResultRow {
             return (SingleColumn)expression;
         }
         
+    }
+
+    /**
+     * Return a new row which has all the columns from two input
+     * rows.
+     */
+    public ResultRow combine(ResultRow right) {
+        Set leftTableNames = new HashSet();
+
+        List result = new ArrayList();
+        Iterator leftIterator = elements.iterator();
+        while (leftIterator.hasNext()) {
+            Element element = (Element) leftIterator.next();
+            leftTableNames.add(new CaseInsensitiveString(
+                element.column().tableOrAlias()));
+            result.add(element);
+        }
+
+        Iterator rightIterator = right.elements.iterator();
+        while (rightIterator.hasNext()) {
+            Element element = (Element) rightIterator.next();
+            String tableOrAlias = element.column().tableOrAlias();
+            if (leftTableNames.contains(new CaseInsensitiveString(tableOrAlias))) {
+                throw new MayflyException(
+                    "duplicate table name or alias " + tableOrAlias);
+            }
+            result.add(element);
+        }
+
+        return new ResultRow(new ImmutableList(result));
     }
 
 }

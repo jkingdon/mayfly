@@ -135,4 +135,12 @@ public class SingleColumn extends Expression {
         return columnName;
     }
     
+    public void assertIsResolved() {
+        if (tableOrAlias == null) {
+            throw new MayflyInternalException(
+                "column " + displayName() + 
+                " should have been resolved to a table/alias");
+        }
+    }
+    
 }

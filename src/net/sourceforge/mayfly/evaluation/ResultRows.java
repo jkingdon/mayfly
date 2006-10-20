@@ -76,4 +76,16 @@ public class ResultRows {
         return selected;
     }
 
+    public ResultRows join(ResultRows right) {
+        List result = new ArrayList();
+        for (Iterator leftIterator = iterator(); leftIterator.hasNext();) {
+            ResultRow leftRow = (ResultRow) leftIterator.next();
+            for (Iterator rightIterator = right.iterator(); rightIterator.hasNext();) {
+                ResultRow rightRow = (ResultRow) rightIterator.next();
+                result.add(leftRow.combine(rightRow));
+            }
+        }
+        return new ResultRows(new ImmutableList(result));
+    }
+
 }

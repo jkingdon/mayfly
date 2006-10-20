@@ -6,6 +6,7 @@ import junitx.framework.ObjectAssert;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
@@ -55,6 +56,20 @@ public class MayflyAssert {
     }
 
     public static void assertColumn(
+        String expectedTable, String expectedColumn, String expectedValue, 
+        ResultRow row, int index) {
+        assertColumn(expectedTable, expectedColumn, row.expression(index));
+        assertString(expectedValue, row.cell(index));
+    }
+
+    public static void assertColumn(
+        String expectedTable, String expectedColumn, int expectedValue, 
+        ResultRow row, int index) {
+        assertColumn(expectedTable, expectedColumn, row.expression(index));
+        assertLong(expectedValue, row.cell(index));
+    }
+
+    public static void assertColumn(
         String table, String expectedColumn,
         Row row, int index) {
         ResultRow resultRow = new ResultRow(row);
@@ -81,6 +96,11 @@ public class MayflyAssert {
     public static void assertLong(int expected, Cell actual) {
         LongCell cell = (LongCell) actual;
         Assert.assertEquals(expected, cell.asLong());
+    }
+
+    private static void assertString(String expected, Cell actual) {
+        StringCell cell = (StringCell) actual;
+        Assert.assertEquals(expected, cell.asString());
     }
 
 }

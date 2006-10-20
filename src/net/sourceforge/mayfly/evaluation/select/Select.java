@@ -115,9 +115,9 @@ public class Select extends Command {
 
     ResultRows query(DataStore store, String currentSchema, Selected selected) {
         FromElement element = from.soleElement();
-        Rows joinedRows = element.tableContents(store, currentSchema);
+        ResultRows joinedRows = new ResultRows(element.tableContents(store, currentSchema));
 
-        ResultRows afterWhere = new ResultRows((Rows) joinedRows.select(where));
+        ResultRows afterWhere = joinedRows.select(where);
         
         ResultRows afterGrouping = groupBy.group(afterWhere, selected);
 

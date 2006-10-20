@@ -20,20 +20,20 @@ public class GroupedRowsTest extends TestCase {
         groupedRows.add(
             keysForColumn("player"),
             new ResultRow()
-                .withColumn("player", new StringCell("Ganguly"))
-                .withColumn("score", new LongCell(35))
+                .withColumn("players", "player", new StringCell("Ganguly"))
+                .withColumn("players", "score", new LongCell(35))
         );
         groupedRows.add(
             keysForColumn("player"),
             new ResultRow()
-                .withColumn("player", new StringCell("Ganguly"))
-                .withColumn("score", new LongCell(45))
+                .withColumn("players", "player", new StringCell("Ganguly"))
+                .withColumn("players", "score", new LongCell(45))
         );
         groupedRows.add(
             keysForColumn("player"),
             new ResultRow()
-                .withColumn("player", new StringCell("Tendulkar"))
-                .withColumn("score", new LongCell(80))
+                .withColumn("players", "player", new StringCell("Tendulkar"))
+                .withColumn("players", "score", new LongCell(80))
         );
         
         ResultRows rows = groupedRows.ungroup(
@@ -55,30 +55,30 @@ public class GroupedRowsTest extends TestCase {
         groupedRows.add(
             keysForColumns("player", "year"),
             new ResultRow()
-                .withColumn("player", new StringCell("Ganguly"))
-                .withColumn("year", new LongCell(2004))
-                .withColumn("score", new LongCell(35))
+                .withColumn("players", "player", new StringCell("Ganguly"))
+                .withColumn("players", "year", new LongCell(2004))
+                .withColumn("players", "score", new LongCell(35))
         );
         groupedRows.add(
             keysForColumns("player", "year"),
             new ResultRow()
-                .withColumn("player", new StringCell("Ganguly"))
-                .withColumn("year", new LongCell(2004))
-                .withColumn("score", new LongCell(45))
+                .withColumn("players", "player", new StringCell("Ganguly"))
+                .withColumn("players", "year", new LongCell(2004))
+                .withColumn("players", "score", new LongCell(45))
         );
         groupedRows.add(
             keysForColumns("player", "year"),
             new ResultRow()
-                .withColumn("player", new StringCell("Ganguly"))
-                .withColumn("year", new LongCell(2005))
-                .withColumn("score", new LongCell(0))
+                .withColumn("players", "player", new StringCell("Ganguly"))
+                .withColumn("players", "year", new LongCell(2005))
+                .withColumn("players", "score", new LongCell(0))
         );
         groupedRows.add(
             keysForColumns("player", "year"),
             new ResultRow()
-                .withColumn("player", new StringCell("Tendulkar"))
-                .withColumn("year", new LongCell(2004))
-                .withColumn("score", new LongCell(80))
+                .withColumn("players", "player", new StringCell("Tendulkar"))
+                .withColumn("players", "year", new LongCell(2004))
+                .withColumn("players", "score", new LongCell(80))
         );
         
         Average averageExpression = new Average(new SingleColumn("score"), "avg", false);

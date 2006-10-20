@@ -11,6 +11,7 @@ import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class ResultRowTest extends TestCase {
     
@@ -132,4 +133,36 @@ public class ResultRowTest extends TestCase {
         assertEquals(7L, cell.asLong());
     }
 
+    public void testCombine() throws Exception {
+        ResultRow row1 = new ResultRow()
+            .withColumn("foo", "colA", "1")
+            .withColumn("foo", "colB", "2");
+
+        ResultRow row2 = new ResultRow()
+            .withColumn("bar", "colC", "3");
+
+        ResultRow combinedRow = row1.combine(row2);
+        assertEquals(3, combinedRow.size());
+        MayflyAssert.assertColumn("foo", "colA", "1", combinedRow, 0);
+        MayflyAssert.assertColumn("foo", "colB", "2", combinedRow, 1);
+        MayflyAssert.assertColumn("bar", "colC", "3", combinedRow, 2);
+    }
+    
+    public void testConflictingAliases() throws Exception {
+        ResultRow row1 = new ResultRow()
+            .withColumn("table1", "colA", "1")
+            .withColumn("table2", "colB", "2");
+    
+        ResultRow row2 = new ResultRow()
+            .withColumn("TABLE1", "colC", "3");
+
+        try {
+            row1.combine(row2);
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("duplicate table name or alias TABLE1", e.getMessage());
+        }
+    }
+    
 }

@@ -12,8 +12,8 @@ public class SingleColumnTest extends TestCase {
 
     public void testRowTransform() throws Exception {
         ResultRow row = new ResultRow()
-            .withColumn("colA", "1")
-            .withColumn("colB", "2")
+            .withColumn("t", "colA", "1")
+            .withColumn("t", "colB", "2")
         ;
 
         assertEquals(new StringCell("1"), new SingleColumn("colA").evaluate(row));
