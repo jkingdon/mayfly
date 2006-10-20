@@ -388,4 +388,13 @@ public class DataTypeTest extends SqlTestCase {
         }
     }
 
+    public void testNonBinaryInBinaryColumn() throws Exception {
+        execute("create table foo(x " + dialect.binaryTypeName() + ")");
+        expectExecuteFailure("insert into foo(x) values(1)",
+            "attempt to store number 1 as binary data");
+        execute("insert into foo(x) values(null)");
+        assertResultSet(new String[] { " null " }, 
+            query("select x from foo"));
+    }
+
 }

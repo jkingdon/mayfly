@@ -13,6 +13,7 @@ import net.sourceforge.mayfly.datastore.constraint.Cascade;
 import net.sourceforge.mayfly.datastore.constraint.NoAction;
 import net.sourceforge.mayfly.datastore.constraint.SetDefault;
 import net.sourceforge.mayfly.datastore.constraint.SetNull;
+import net.sourceforge.mayfly.datastore.types.BinaryDataType;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
@@ -691,6 +692,7 @@ public class Parser {
                 if (consumeIfMatches(TokenType.OPEN_PAREN)) {
                     expectAndConsume(TokenType.NUMBER);
                     expectAndConsume(TokenType.CLOSE_PAREN);
+                    type = new BinaryDataType();
                 }
             }
             else if (currentText.equalsIgnoreCase("date")) {

@@ -13,6 +13,8 @@ public class DateDataTypeTest extends TestCase {
         checkFailure("12345");
         checkFailure("12345-01-01");
         checkFailure("x1234-01-01");
+        checkFailure("1234-01-01x");
+        check(1234, 1, 1, "1234-01-01");
         checkFailure("1066");
         checkFailure("1066x12-25");
         checkFailure("106612-25");
@@ -24,9 +26,9 @@ public class DateDataTypeTest extends TestCase {
         catch (org.joda.time.IllegalFieldValueException expected) {
             // I'm thinking it is probably a mistake for Mayfly
             // to wrap the exception just to hide the fact that
-            // mayfly is implemented using Joda.  Is it the kind
-            // of exception that people would want to catch in
-            // a specific way?
+            // mayfly is implemented using Joda.  Is it important
+            // that it get caught by the "catch SQLException" which
+            // tends to wrap most people's JDBC calls?
         }
     }
 
