@@ -146,6 +146,14 @@ public final class MayflyResultSet extends ResultSetStub {
         return cellFromName(columnName).asBinaryStream();
     }
     
+    public byte[] getBytes(int columnIndex) throws SQLException {
+        return cellFromIndex(columnIndex).asBytes();
+    }
+    
+    public byte[] getBytes(String columnName) throws SQLException {
+        return cellFromName(columnName).asBytes();
+    }
+    
     private static final String SUGGEST_GET_CHARACTER_STREAM = 
         "We suggest getCharacterStream instead";
 

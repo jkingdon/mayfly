@@ -37,5 +37,9 @@ public class BinaryCell extends Cell {
     public InputStream asBinaryStream() throws SQLException {
         return data.asBinaryStream();
     }
+    
+    public byte[] asBytes() throws SQLException {
+        return data.asBytes();
+    }
 
 }

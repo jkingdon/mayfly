@@ -84,6 +84,11 @@ public abstract class Cell extends ValueObject {
             "Attempt to read " + displayName() + " as binary data");
     }
 
+    public byte[] asBytes() throws SQLException {
+        throw new SQLException(
+            "Attempt to read " + displayName() + " as binary data");
+    }
+
     abstract public int compareTo(Cell otherCell);
 
     public boolean sqlEquals(Cell otherCell) {

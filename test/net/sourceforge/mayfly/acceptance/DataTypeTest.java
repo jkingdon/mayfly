@@ -362,7 +362,13 @@ public class DataTypeTest extends SqlTestCase {
         InputStream stream = results.getBinaryStream(1);
         byte[] contents = IOUtils.toByteArray(stream);
         ArrayAssert.assertEquals(data, contents);
-        stream.close(); // Check JDBC documentation: should I close it?
+        // We don't realy need to close it; the JDBC javadoc says that
+        // the next call to a getter method will close the stream
+        // for us.
+        stream.close();
+        
+        byte[] viaBytes = results.getBytes("x");
+        ArrayAssert.assertEquals(data, viaBytes);
 
         assertFalse(results.next());
         results.close();

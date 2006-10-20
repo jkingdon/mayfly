@@ -42,4 +42,10 @@ public class ImmutableByteArray {
         return new ByteArrayInputStream(bytes);
     }
 
+    public byte[] asBytes() {
+        byte[] copy = new byte[bytes.length];
+        System.arraycopy(bytes, 0, copy, 0, bytes.length);
+        return copy;
+    }
+
 }
