@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.What;
@@ -25,7 +24,7 @@ public class ColumnOrderItem extends OrderItem {
         return cell1.compareTo(cell2);
     }
     
-    public void check(Row dummyRow) {
+    public void check(ResultRow dummyRow) {
         column.evaluate(dummyRow);
     }
     

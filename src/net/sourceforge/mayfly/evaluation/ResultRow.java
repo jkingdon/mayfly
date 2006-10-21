@@ -79,7 +79,11 @@ public class ResultRow {
     }
 
     public Expression findColumn(String columnName) {
-        return findColumn(null, columnName, Location.UNKNOWN);
+        return findColumn(null, columnName);
+    }
+
+    public SingleColumn findColumn(String tableOrAlias, String columnName) {
+        return findColumn(tableOrAlias, columnName, Location.UNKNOWN);
     }
 
     public SingleColumn findColumn(String tableOrAlias, String columnName,
@@ -222,6 +226,29 @@ public class ResultRow {
         }
 
         return new ResultRow(new ImmutableList(result));
+    }
+
+    public ImmutableList expressions() {
+        List result = new ArrayList();
+        for (Iterator iter = elements.iterator(); iter.hasNext();) {
+            Element element = (Element) iter.next();
+            result.add(element.expression);
+        }
+        return new ImmutableList(result);
+    }
+
+    public ImmutableList expressionsForTable(String aliasOrTable) {
+        List found = new ArrayList();
+        for (int i = 0; i < elements.size(); ++i) {
+            Element element = (Element) elements.get(i);
+            if (element.expression instanceof SingleColumn) {
+                SingleColumn column = (SingleColumn) element.expression;
+                if (column.matchesAliasOrTable(aliasOrTable)) {
+                    found.add(column);
+                }
+            }
+        }
+        return new ImmutableList(found);
     }
 
 }

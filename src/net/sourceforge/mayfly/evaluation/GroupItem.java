@@ -1,14 +1,13 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public class GroupItem extends ValueObject {
 
     /**
-     * Not yet immutable, because of {@link #resolve(Row)}.
+     * Not yet immutable, because of {@link #resolve(ResultRow)}.
      */
     private Expression expression;
 
@@ -30,8 +29,8 @@ public class GroupItem extends ValueObject {
         return expression;
     }
 
-    public void resolve(Row row) {
-        expression = expression.resolveAndReturn(row);
+    public void resolve(ResultRow row) {
+        expression = expression.resolve(row);
     }
 
 }

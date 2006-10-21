@@ -78,6 +78,27 @@ public class ResultRowTest extends TestCase {
         }
     }
     
+    public void testFindColumnSpecifyingTable() throws Exception {
+        ResultRow row = 
+            new ResultRow()
+                .withColumn("foo", "x", new LongCell(5))
+                .withColumn("foo", "y", new StringCell("hi"))
+                .withColumn("bar", "x", new LongCell(5))
+                .with(new CountAll("count"), new LongCell(15))
+                ;
+        SingleColumn column = row.findColumn("bar", "x");
+        assertEquals("bar", column.tableOrAlias());
+        assertEquals("x", column.columnName());
+        
+        try {
+            row.findColumn("bar", "y");
+            fail();
+        }
+        catch (NoColumn e) {
+            assertEquals("no column bar.y", e.getMessage());
+        }
+    }
+
     public void testFindValue() throws Exception {
         ResultRow row = 
             new ResultRow()

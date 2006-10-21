@@ -61,7 +61,7 @@ public class Column extends ValueObject implements CellHeader {
         return columnName.equalsIgnoreCase(target);
     }
 
-    public boolean matchesAliasOrTable(String tableOrAlias) {
+    private boolean matchesAliasOrTable(String tableOrAlias) {
         return tableOrAlias.equalsIgnoreCase(this.tableOrAlias);
     }
 

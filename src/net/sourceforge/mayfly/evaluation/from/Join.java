@@ -1,7 +1,7 @@
 package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.util.ValueObject;
 
@@ -17,8 +17,8 @@ public abstract class Join extends ValueObject implements FromElement {
         this.condition = condition;
     }
 
-    public Row dummyRow(DataStore store, String currentSchema) {
-        Row dummyRow = 
+    public ResultRow dummyRow(DataStore store, String currentSchema) {
+        ResultRow dummyRow = 
             left.dummyRow(store, currentSchema)
                 .combine(right.dummyRow(store, currentSchema));
         condition.evaluate(dummyRow);

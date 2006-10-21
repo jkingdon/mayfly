@@ -1,16 +1,18 @@
 package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.datastore.TupleElement;
-import net.sourceforge.mayfly.util.L;
+import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.ValueObject;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 public class FromTable extends ValueObject implements FromElement {
 
@@ -29,31 +31,31 @@ public class FromTable extends ValueObject implements FromElement {
         }
     }
 
-    public Rows tableContents(DataStore store, String currentSchema) {
+    public ResultRows tableContents(DataStore store, String currentSchema) {
         return applyAlias(store.table(currentSchema, tableName).rows());
     }
 
-    public Row dummyRow(DataStore store, String currentSchema) {
+    public ResultRow dummyRow(DataStore store, String currentSchema) {
         return applyAlias(store.table(currentSchema, tableName).dummyRows());
     }
 
-    private Rows applyAlias(Rows storedRows) {
-        L rows = new L();
+    private ResultRows applyAlias(Rows storedRows) {
+        List rows = new ArrayList();
         for (Iterator iter = storedRows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             rows.add(applyAlias(row));
         }
-        return new Rows(rows.asImmutable());
+        return new ResultRows(new ImmutableList(rows));
     }
 
-    private Row applyAlias(Row row) {
-        TupleBuilder newTuples = new TupleBuilder();
+    private ResultRow applyAlias(Row row) {
+        ResultRow result = new ResultRow();
         for (Iterator iter = row.iterator(); iter.hasNext(); ) {
             TupleElement entry = (TupleElement) iter.next();
-            Column newColumn = new Column(alias, entry.column().columnName());
-            newTuples.append(new TupleElement(newColumn, entry.cell()));
+            result = result.withColumn(
+                alias, entry.column().columnName(), entry.cell());
         }
-        return new Row(newTuples);
+        return result;
     }
 
 }

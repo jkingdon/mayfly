@@ -2,17 +2,10 @@ package net.sourceforge.mayfly.evaluation.what;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.NullCell;
-import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.datastore.TupleElement;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
-import net.sourceforge.mayfly.evaluation.what.All;
-import net.sourceforge.mayfly.evaluation.what.AllColumnsFromTable;
-import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class WhatTest extends TestCase {
@@ -22,12 +15,12 @@ public class WhatTest extends TestCase {
             .add(new SingleColumn("a"))
             .add(new AllColumnsFromTable("foo"))
             .add(new SingleColumn("bar", "b"));
-        Row dummyRow = new Row(new TupleBuilder()
-            .append(new TupleElement(new Column("bar", "a"), NullCell.INSTANCE))
-            .append(new TupleElement(new Column("bar", "b"), NullCell.INSTANCE))
-            .append(new TupleElement(new Column("foo", "x"), NullCell.INSTANCE))
-            .append(new TupleElement(new Column("foo", "y"), NullCell.INSTANCE))
-        );
+        ResultRow dummyRow = new ResultRow()
+            .withColumn("bar", "a", NullCell.INSTANCE)
+            .withColumn("bar", "b", NullCell.INSTANCE)
+            .withColumn("foo", "x", NullCell.INSTANCE)
+            .withColumn("foo", "y", NullCell.INSTANCE)
+        ;
         Selected selected = original.selected(dummyRow);
         
         assertEquals(4, selected.size());
@@ -40,18 +33,18 @@ public class WhatTest extends TestCase {
     public void testSelectedDegenerateCase() throws Exception {
         What original = new What().add(new IntegerLiteral(7));
         Selected expected = new Selected().add(new IntegerLiteral(7));
-        assertEquals(expected, original.selected(new Row()));
+        assertEquals(expected, original.selected(new ResultRow()));
     }
     
     public void testSelectedAll() throws Exception {
         What original = new What()
             .add(new All());
-        Row dummyRow = new Row(new TupleBuilder()
-            .append(new TupleElement(new Column("bar", "a"), NullCell.INSTANCE))
-            .append(new TupleElement(new Column("bar", "b"), NullCell.INSTANCE))
-            .append(new TupleElement(new Column("foo", "x"), NullCell.INSTANCE))
-            .append(new TupleElement(new Column("foo", "y"), NullCell.INSTANCE))
-        );
+        ResultRow dummyRow = new ResultRow()
+            .withColumn("bar", "a", NullCell.INSTANCE)
+            .withColumn("bar", "b", NullCell.INSTANCE)
+            .withColumn("foo", "x", NullCell.INSTANCE)
+            .withColumn("foo", "y", NullCell.INSTANCE)
+        ;
         
         Selected expected = new Selected()
             .add(new SingleColumn("bar", "a"))

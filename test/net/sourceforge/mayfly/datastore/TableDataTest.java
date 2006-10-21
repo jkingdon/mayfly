@@ -72,7 +72,7 @@ public class TableDataTest extends TestCase {
         assertEquals(1, update.rowsAffected());
         TableData newTable = update.table();
         Row newRow = (Row) newTable.rows().element(0);
-        DateCell cell = (DateCell) newRow.cell(null, "a");
+        DateCell cell = (DateCell) newRow.cell("a");
         assertEquals(2004, cell.year());
         assertEquals(2, cell.month());
         assertEquals(29, cell.day());

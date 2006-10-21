@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.evaluation.select;
 
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.util.ValueObject;
@@ -20,6 +19,6 @@ abstract public class OrderItem extends ValueObject {
 
     abstract protected int compareAscending(What what, ResultRow first, ResultRow second);
 
-    abstract public void check(Row dummyRow);
+    abstract public void check(ResultRow dummyRow);
 
 }

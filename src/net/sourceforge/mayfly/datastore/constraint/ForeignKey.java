@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.datastore.constraint;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
@@ -60,7 +59,7 @@ public class ForeignKey {
         checkWeAreInTheRightPlace(schema, table);
 
         TableData foundTable = store.table(targetTable);
-        Cell value = pickValue(proposedRow);
+        Cell value = proposedRow.cell(referencerColumn);
         if (!(value instanceof NullCell) &&
             !foundTable.hasValue(targetColumn, value)) {
 
@@ -69,7 +68,7 @@ public class ForeignKey {
                process of inserting satisfies the constraint.
              */
             if (targetTable.matches(referencerSchema, referencerTable)) {
-                Cell newPossibleTarget = proposedRow.cell(null, targetColumn);
+                Cell newPossibleTarget = proposedRow.cell(targetColumn);
                 if (newPossibleTarget.sqlEquals(value)) {
                     return;
                 }
@@ -109,21 +108,15 @@ public class ForeignKey {
         return result.toString();
     }
 
-    private Cell pickValue(Row proposedRow) {
-        Column column = proposedRow.columns().columnFromName(referencerColumn);
-        return proposedRow.cell(column);
-    }
-
     public DataStore checkDelete(DataStore store, String schema, String table, 
         Row rowToDelete, Row replacementRow) {
         if (tableIsMyTarget(schema, table)) {
-            Column column = rowToDelete.findColumn(targetColumn);
-            Cell oldValue = rowToDelete.cell(column);
+            Cell oldValue = rowToDelete.cell(targetColumn);
             TableData referencer = 
                 store.table(referencerSchema, referencerTable);
 
             if (replacementRow != null) {
-                Cell newValue = replacementRow.cell(column);
+                Cell newValue = replacementRow.cell(targetColumn);
                 if (oldValue.sqlEquals(newValue)) {
                     return store;
                 }

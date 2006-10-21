@@ -1,10 +1,9 @@
 package net.sourceforge.mayfly.dump;
 
-import net.sourceforge.mayfly.datastore.Column;
-import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -45,14 +44,14 @@ public class Dumper {
         XmlWriter xml = new XmlWriter();
         xml.startTag(tableName);
         xml.newline();
-        Columns columns = row.columns();
+        ImmutableList columns = row.columnNames();
         for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            Column column = (Column) iter.next();
+            String column = (String) iter.next();
 
             xml.indent(2);
-            xml.startTag(column.columnName());
+            xml.startTag(column);
             xml.text(row.cell(column).asObject().toString());
-            xml.endTag(column.columnName());
+            xml.endTag(column);
             xml.newline();
         }
         xml.endTag(tableName);

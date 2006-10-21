@@ -1,20 +1,16 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.util.Aggregate;
-import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.Iterable;
-import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.Selector;
 import net.sourceforge.mayfly.util.Transformer;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 public class Row extends Aggregate {
 
@@ -45,12 +41,8 @@ public class Row extends Aggregate {
     }
 
 
-    public Cell cell(Column column) {
-        return cell(column.tableOrAlias(), column.columnName());
-    }
-
-    public Cell cell(String tableOrAlias, String column) {
-        return cellFor(findColumn(tableOrAlias, column));
+    public Cell cell(String column) {
+        return cellFor(findColumn(column));
     }
     
     public Column findColumn(String columnName) {
@@ -71,7 +63,7 @@ public class Row extends Aggregate {
      * the columns with {@link TableData#findColumn(String)}.
      */
     public Columns columns() {
-        return new Columns(ImmutableList.fromIterable(headers()));
+        throw new MayflyInternalException("Call columnNames instead");
     }
     
     public ImmutableList columnNames() {
@@ -82,18 +74,6 @@ public class Row extends Aggregate {
             found.add(column.columnName());
         }
         return new ImmutableList(found);
-    }
-
-    public Columns columnsForTable(String aliasOrTable) {
-        L found = new L();
-        for (int i = 0; i < elements.size(); ++i) {
-            TupleElement element = (TupleElement) elements.get(i);
-            Column column = element.column();
-            if (column.matchesAliasOrTable(aliasOrTable)) {
-                found.add(column);
-            }
-        }
-        return new Columns(new ImmutableList(found));
     }
 
     public Cell cellFor(CellHeader header) {
@@ -173,36 +153,6 @@ public class Row extends Aggregate {
         else {
             throw new NoColumn(columnName);
         }
-    }
-
-    /**
-     * Return a new row which has all the columns from two input
-     * rows.
-     */
-    public Row combine(Row right) {
-        Set leftTableNames = new HashSet();
-
-        L result = new L();
-        Iterator leftIterator = this.iterator();
-        while (leftIterator.hasNext()) {
-            TupleElement element = (TupleElement) leftIterator.next();
-            leftTableNames.add(new CaseInsensitiveString(
-                element.column().tableOrAlias()));
-            result.append(element);
-        }
-
-        Iterator rightIterator = right.iterator();
-        while (rightIterator.hasNext()) {
-            TupleElement element = (TupleElement) rightIterator.next();
-            String tableOrAlias = element.column().tableOrAlias();
-            if (leftTableNames.contains(new CaseInsensitiveString(tableOrAlias))) {
-                throw new MayflyException(
-                    "duplicate table name or alias " + tableOrAlias);
-            }
-            result.append(element);
-        }
-
-        return new Row(ImmutableList.fromIterable(result));
     }
 
 }

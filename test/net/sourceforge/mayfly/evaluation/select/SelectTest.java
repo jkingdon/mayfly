@@ -4,7 +4,6 @@ import junit.framework.TestCase;
 import junitx.framework.ObjectAssert;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
@@ -255,7 +254,7 @@ public class SelectTest extends TestCase {
     public void testFullDummyRow() throws Exception {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz");
-        Row dummyRow = select.dummyRow(
+        ResultRow dummyRow = select.dummyRow(
             0,
             new DataStore(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
@@ -264,7 +263,7 @@ public class SelectTest extends TestCase {
             ),
             DataStore.ANONYMOUS_SCHEMA_NAME);
         assertEquals(3, dummyRow.size());
-        MayflyAssert.assertColumn("foo", "id", dummyRow, 0);
+        MayflyAssert.assertColumn("foo", "id", dummyRow.expression(0));
     }
     
     public void testMoveLeftSideOfAnd() throws Exception {

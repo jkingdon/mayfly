@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.datastore.constraint;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
@@ -16,11 +16,11 @@ import java.util.List;
 
 public abstract class NotNullOrUnique extends Constraint {
 
-    private final Columns columns;
+    private final ColumnNames names;
 
     protected NotNullOrUnique(Columns columns) {
-        this.columns = columns;
-        if (columns.size() == 0) {
+        this.names = ColumnNames.fromColumns(columns);
+        if (names.size() == 0) {
             throw new MayflyInternalException("must have at least one column for a constraint");
         }
     }
@@ -40,8 +40,8 @@ public abstract class NotNullOrUnique extends Constraint {
 
     private List valuesForRow(Row row) {
         List valuesForRow = new ArrayList();
-        for (Iterator iterator = columns.iterator(); iterator.hasNext();) {
-            Column column = (Column) iterator.next();
+        for (Iterator iterator = names.iterator(); iterator.hasNext();) {
+            String column = (String) iterator.next();
             valuesForRow.add(row.cell(column));
         }
         return valuesForRow;
@@ -63,20 +63,21 @@ public abstract class NotNullOrUnique extends Constraint {
         StringBuilder message = new StringBuilder();
         message.append(description());
         message.append(" ");
-        Iterator iter = columns.iterator();
-        message.append(((Column) iter.next()).columnName());
+        Iterator iter = names.iterator();
+        String firstColumn = (String) iter.next();
+        message.append(firstColumn);
         while (iter.hasNext()) {
-            Column column = (Column) iter.next();
+            String column = (String) iter.next();
             message.append(",");
-            message.append(column.columnName());
+            message.append(column);
         }
         return message.toString();
     }
 
     private List collectProposedValues(Row proposedRow) {
         List proposedValues = new ArrayList();
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            Column column = (Column) iter.next();
+        for (Iterator iter = names.iterator(); iter.hasNext();) {
+            String column = (String) iter.next();
             Cell proposedCell = proposedRow.cell(column);
             checkForNull(column, proposedCell);
             proposedValues.add(proposedCell);
@@ -84,13 +85,13 @@ public abstract class NotNullOrUnique extends Constraint {
         return proposedValues;
     }
 
-    protected abstract void checkForNull(Column column, Cell proposedCell);
+    protected abstract void checkForNull(String column, Cell proposedCell);
 
     protected abstract String description();
     
     public boolean checkDropColumn(String column) {
-        if (columns.hasColumn(column)) {
-            if (columns.size() > 1) {
+        if (names.hasColumn(column)) {
+            if (names.size() > 1) {
                 throw new MayflyException(
                     "attempt to drop column " + column + 
                     " from multi-column " + constraintName());

@@ -1,6 +1,6 @@
 package net.sourceforge.mayfly.evaluation.what;
 
-import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.L;
@@ -38,7 +38,7 @@ public class What extends Aggregate {
         return this;
     }
 
-    public Selected selected(Row dummyRow) {
+    public Selected selected(ResultRow dummyRow) {
         L result = new L();
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             WhatElement element = (WhatElement) iter.next();

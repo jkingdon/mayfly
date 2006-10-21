@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
@@ -63,7 +62,7 @@ public class OrderBy extends Aggregate {
         return new ResultRows(new ImmutableList(rowList));
     }
 
-    public void check(Row dummyRow) {
+    public void check(ResultRow dummyRow) {
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             OrderItem item = (OrderItem) iter.next();
             item.check(dummyRow);

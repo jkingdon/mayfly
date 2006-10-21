@@ -3,8 +3,6 @@ package net.sourceforge.mayfly.evaluation;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.NullCell;
-import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
@@ -15,7 +13,7 @@ public class GroupByKeysTest extends TestCase {
     public void testResolveColumns() throws Exception {
         GroupByKeys keys = new GroupByKeys();
         keys.add(new GroupItem(new Concatenate(new SingleColumn("a"), new QuotedString("'abc'"))));
-        Row row = new Row(new TupleBuilder().appendColumnCell("foo", "a", NullCell.INSTANCE));
+        ResultRow row = new ResultRow().withColumn("foo", "a", NullCell.INSTANCE);
         keys.resolve(row);
         
         assertEquals(1, keys.size());

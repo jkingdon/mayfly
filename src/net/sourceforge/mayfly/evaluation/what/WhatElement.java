@@ -1,12 +1,7 @@
 package net.sourceforge.mayfly.evaluation.what;
 
-import net.sourceforge.mayfly.datastore.Column;
-import net.sourceforge.mayfly.datastore.Columns;
-import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.util.ValueObject;
-
-import java.util.Iterator;
 
 /**
  * @internal
@@ -22,18 +17,8 @@ import java.util.Iterator;
  */
 abstract public class WhatElement extends ValueObject {
 
-    abstract public Selected selected(Row dummyRow);
+    abstract public Selected selected(ResultRow dummyRow);
 
     abstract public String displayName();
-
-    protected Selected selectedFromColumns(Columns columns) {
-        Selected result = new Selected();
-        Iterator iter = columns.iterator();
-        while (iter.hasNext()) {
-            Column column = (Column) iter.next();
-            result.add(new SingleColumn(column.tableOrAlias(), column.columnName()));
-        }
-        return result;
-    }
 
 }

@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
@@ -22,8 +21,8 @@ abstract public class Expression extends WhatElement {
         this(Location.UNKNOWN);
     }
 
-    public Selected selected(Row dummyRow) {
-        return new Selected(Collections.singletonList(resolveAndReturn(dummyRow)));
+    public Selected selected(ResultRow dummyRow) {
+        return new Selected(Collections.singletonList(resolve(dummyRow)));
     }
 
     public String firstColumn() {
@@ -65,10 +64,6 @@ abstract public class Expression extends WhatElement {
             return firstInLeft;
         }
         return right.firstAggregate();
-    }
-
-    public boolean matches(Column column) {
-        return false;
     }
 
     public final boolean matches(Expression expression) {

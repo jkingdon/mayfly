@@ -4,7 +4,6 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
@@ -45,10 +44,6 @@ public class SingleColumn extends Expression {
         return row.findValue(found);
     }
 
-    public Column lookup(Row row) {
-        return row.findColumn(tableOrAlias, columnName);
-    }
-    
     public SingleColumn lookup(ResultRow row) {
         return row.findColumn(tableOrAlias, columnName, location);
     }
@@ -66,10 +61,6 @@ public class SingleColumn extends Expression {
         return Column.displayName(originalTableOrAlias, columnName);
     }
 
-    public boolean matches(Column column) {
-        return column.matches(tableOrAlias, columnName);
-    }
-    
     public boolean matches(String target) {
         return matches(null, target);
     }

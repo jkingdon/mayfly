@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.util.ValueObject;
 
@@ -36,7 +35,7 @@ public class NoGroupBy extends ValueObject implements Aggregator {
         return firstAggregate != null;
     }
 
-    public void check(Row dummyRow, Selected selected) {
+    public void check(ResultRow dummyRow, Selected selected) {
     }
     
 }

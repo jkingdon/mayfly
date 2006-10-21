@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.evaluation;
 
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.ArrayList;
@@ -14,15 +13,6 @@ public class GroupByKeys extends ValueObject {
 
     public void add(GroupItem key) {
         items.add(key);
-    }
-
-    List columns(Row row) {
-        List columns = new ArrayList();
-        for (Iterator iter = items.iterator(); iter.hasNext();) {
-            GroupItem item = (GroupItem) iter.next();
-            columns.add(item.column().lookup(row));
-        }
-        return columns;
     }
 
     List expressions() {
@@ -57,7 +47,7 @@ public class GroupByKeys extends ValueObject {
         return false;
     }
 
-    public void resolve(Row row) {
+    public void resolve(ResultRow row) {
         for (Iterator iter = items.iterator(); iter.hasNext();) {
             GroupItem item = (GroupItem) iter.next();
             item.resolve(row);

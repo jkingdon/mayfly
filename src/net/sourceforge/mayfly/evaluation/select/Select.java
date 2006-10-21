@@ -3,8 +3,6 @@ package net.sourceforge.mayfly.evaluation.select;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyResultSet;
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupByKeys;
@@ -82,19 +80,19 @@ public class Select extends Command {
 
     public ResultSet select(final DataStore store, String currentSchema) {
         optimize(store, currentSchema);
-        Row dummyRow = dummyRow(store, currentSchema);
+        ResultRow dummyRow = dummyRow(store, currentSchema);
         Selected selected = what.selected(dummyRow);
         check(store, selected, dummyRow);
         return new MayflyResultSet(selected, query(store, currentSchema, selected));
     }
 
-    private void check(final DataStore store, Selected selected, Row dummyRow) {
+    private void check(final DataStore store, Selected selected, ResultRow dummyRow) {
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             Expression element = (Expression) iter.next();
             element.evaluate(dummyRow);
         }
         
-        new Rows(dummyRow).select(where);
+        where.evaluate(dummyRow);
         String firstAggregate = where.firstAggregate();
         if (firstAggregate != null) {
             throw new MayflyException("aggregate " + firstAggregate + " not valid in WHERE");
@@ -108,14 +106,14 @@ public class Select extends Command {
         }
     }
 
-    private Row dummyRow(final DataStore store, String currentSchema) {
+    private ResultRow dummyRow(final DataStore store, String currentSchema) {
         FromElement element = from.soleElement();
         return element.dummyRow(store, currentSchema);
     }
 
     ResultRows query(DataStore store, String currentSchema, Selected selected) {
         FromElement element = from.soleElement();
-        ResultRows joinedRows = new ResultRows(element.tableContents(store, currentSchema));
+        ResultRows joinedRows = element.tableContents(store, currentSchema);
 
         ResultRows afterWhere = joinedRows.select(where);
         
@@ -144,7 +142,7 @@ public class Select extends Command {
      */
     public void optimize(DataStore store, String currentSchema) {
         if (store != null) {
-            Row fullDummyRow = dummyRow(0, store, currentSchema);
+            ResultRow fullDummyRow = dummyRow(0, store, currentSchema);
             where.evaluate(fullDummyRow);
         }
 
@@ -163,9 +161,9 @@ public class Select extends Command {
         }
     }
 
-    Row dummyRow(int index, DataStore store, String currentSchema) {
+    ResultRow dummyRow(int index, DataStore store, String currentSchema) {
         FromElement element = (FromElement) from.element(index);
-        Row dummyRow = element.dummyRow(store, currentSchema);
+        ResultRow dummyRow = element.dummyRow(store, currentSchema);
         if (index >= from.size() - 1) {
             return dummyRow;
         }
@@ -231,9 +229,9 @@ public class Select extends Command {
         }
 
         InnerJoin join = new InnerJoin(first, second, Condition.TRUE);
-        Row partialDummyRow = join.dummyRow(store, currentSchema);
+        ResultRow partialDummyRow = join.dummyRow(store, currentSchema);
         try {
-            condition.check(new ResultRow(partialDummyRow));
+            condition.check(partialDummyRow);
             return true;
         }
         catch (NoColumn e) {

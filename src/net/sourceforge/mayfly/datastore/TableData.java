@@ -113,14 +113,7 @@ public class TableData {
             Row row = (Row) iter.next();
             
             if (where.evaluate(row)) {
-                TupleMapper mapper = new TupleMapper(row);
-                for (Iterator iterator = setClauses.iterator(); iterator.hasNext();) {
-                    SetClause setClause = (SetClause) iterator.next();
-                    Column column = setClause.column(columns);
-                    mapper.put(column, setClause.value(row, column));
-                }
-                setOnUpdateColumns(mapper);
-                Row newRow = mapper.asRow();
+                Row newRow = newRow(setClauses, row);
                 constraints.check(newRows, newRow, Location.UNKNOWN);
                 checker.checkInsert(constraints, newRow);
                 checker.checkDelete(row, newRow);
@@ -136,6 +129,18 @@ public class TableData {
         }
         TableData newTable = new TableData(columns, constraints, newRows);
         return new UpdateTable(newTable, rowsAffected);
+    }
+
+    private Row newRow(List setClauses, Row row) {
+        TupleMapper mapper = new TupleMapper(row);
+        for (Iterator iterator = setClauses.iterator(); iterator.hasNext();) {
+            SetClause setClause = (SetClause) iterator.next();
+            Column column = setClause.column(columns);
+            mapper.put(column, setClause.value(row, column));
+        }
+        setOnUpdateColumns(mapper);
+        Row newRow = mapper.asRow();
+        return newRow;
     }
 
     private void setOnUpdateColumns(TupleMapper mapper) {
@@ -246,10 +251,6 @@ public class TableData {
     }
 
     public boolean hasValue(String column, Cell value) {
-        return hasValue(columns.columnFromName(column), value);
-    }
-
-    private boolean hasValue(Column column, Cell value) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             if (row.cell(column).sqlEquals(value)) {
@@ -262,7 +263,7 @@ public class TableData {
     private boolean hasNull(Column column) {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
-            if (row.cell(column) instanceof NullCell) {
+            if (row.cell(column.columnName()) instanceof NullCell) {
                 return true;
             }
         }

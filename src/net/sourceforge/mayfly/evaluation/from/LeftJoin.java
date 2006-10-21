@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.util.L;
 
@@ -14,22 +14,22 @@ public class LeftJoin extends Join implements FromElement {
         super(left, right, condition);
     }
 
-    public Rows tableContents(DataStore store, String currentSchema) {
-        Rows leftRows = left.tableContents(store, currentSchema);
-        Rows rightRows = right.tableContents(store, currentSchema);
+    public ResultRows tableContents(DataStore store, String currentSchema) {
+        ResultRows leftRows = left.tableContents(store, currentSchema);
+        ResultRows rightRows = right.tableContents(store, currentSchema);
 
         final L joinResult = new L();
 
         Iterator leftIter = leftRows.iterator();
         while (leftIter.hasNext()) {
-            Row leftRow = (Row) leftIter.next();
+            ResultRow leftRow = (ResultRow) leftIter.next();
             boolean haveJoinedThisLeftRow = false;
             
             Iterator rightIter = rightRows.iterator();
             while (rightIter.hasNext()) {
-                Row rightRow = (Row) rightIter.next();
+                ResultRow rightRow = (ResultRow) rightIter.next();
 
-                Row combined = (Row) leftRow.plus(rightRow);
+                ResultRow combined = leftRow.combine(rightRow);
                 
                 if (condition.evaluate(combined)) {
                     joinResult.append(combined);
@@ -38,12 +38,12 @@ public class LeftJoin extends Join implements FromElement {
             }
             
             if (!haveJoinedThisLeftRow) {
-                Row nullRightRow = right.dummyRow(store, currentSchema);
-                Row withNulls = (Row) leftRow.plus(nullRightRow);
+                ResultRow nullRightRow = right.dummyRow(store, currentSchema);
+                ResultRow withNulls = leftRow.combine(nullRightRow);
                 joinResult.append(withNulls);
             }
         }
-        return new Rows(joinResult.asImmutable());
+        return new ResultRows(joinResult.asImmutable());
     }
 
 }
