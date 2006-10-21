@@ -8,7 +8,8 @@ import net.sourceforge.mayfly.datastore.TableReference;
 public class NoAction extends Action {
 
     public DataStore handleDelete(Cell oldValue, DataStore store, 
-        String referencerSchema, String referencerTable, String referencerColumn, TableReference targetTable, String targetColumn) {
+        String referencerSchema, String referencerTable, String referencerColumn, 
+        TableReference targetTable, String targetColumn) {
         throw new MayflyException(
             "foreign key violation: table " + 
             referencerTable + " refers to " + 
@@ -17,9 +18,9 @@ public class NoAction extends Action {
     }
 
     public DataStore handleUpdate(Cell oldValue, Cell newValue, 
-        DataStore store, String referencerSchema, 
-        String referencerTable, 
-        String referencerColumn, TableReference targetTable, String targetColumn) {
+        DataStore store, 
+        String referencerSchema, String referencerTable, String referencerColumn, 
+        TableReference targetTable, String targetColumn) {
         return handleDelete(oldValue, store, 
             referencerSchema, referencerTable, referencerColumn, 
             targetTable, targetColumn);

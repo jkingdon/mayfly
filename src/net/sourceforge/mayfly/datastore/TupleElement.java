@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public class TupleElement extends ValueObject {
@@ -11,16 +12,33 @@ public class TupleElement extends ValueObject {
         this.cell = cell;
     }
 
-    public CellHeader header() {
-        return header;
+    public TupleElement(String column, Cell cell) {
+        this(new Column(column), cell);
     }
 
-    public Column column() {
+    private Column column() {
         return (Column)header;
     }
 
     public Cell cell() {
         return cell;
+    }
+
+    public String columnName() {
+        return column().columnName();
+    }
+
+    public String tableOrAlias() {
+        return column().tableOrAlias();
+    }
+
+    boolean matchesName(String target) {
+        if (target.indexOf('.') != -1) {
+            throw new MayflyException(
+                "column name " + target + " should not contain a period");
+        }
+
+        return columnName().equalsIgnoreCase(target);
     }
 
 }

@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
@@ -29,12 +30,16 @@ public abstract class Action {
         UpdateStore update = store.update(referencerSchema, referencerTable,
             ImmutableList.singleton(
                 new SetClause(referencerColumn, valueToAssign)), 
-            new Equal(
-                new SingleColumn(referencerTable, referencerColumn),
-                new CellExpression(oldValue)
-            )
+            where(oldValue, referencerTable, referencerColumn)
         );
         return update.store();
+    }
+
+    protected Condition where(Cell oldValue, String referencerTable, String referencerColumn) {
+        return new Equal(
+            new SingleColumn(referencerTable, referencerColumn),
+            new CellExpression(oldValue)
+        );
     }
 
 }

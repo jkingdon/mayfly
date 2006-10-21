@@ -2,10 +2,7 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
-import net.sourceforge.mayfly.datastore.CellHeader;
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
@@ -51,15 +48,7 @@ public class ResultRow {
     }
 
     private static Expression findExpression(TupleElement columnAndValue) {
-        CellHeader header = columnAndValue.header();
-        if (header instanceof Column) {
-            Column column = (Column) header;
-            String tableOrAlias = column.tableOrAlias();
-            return new SingleColumn(tableOrAlias, column.columnName());
-        }
-        else {
-            throw new UnimplementedException();
-        }
+        return new SingleColumn(columnAndValue.tableOrAlias(), columnAndValue.columnName());
     }
 
     public int size() {

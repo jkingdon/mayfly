@@ -3,6 +3,8 @@ package net.sourceforge.mayfly.datastore;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 public class RowTest extends TestCase {
 
@@ -16,75 +18,29 @@ public class RowTest extends TestCase {
 
         assertEquals(new StringCell("2"), row.cell("colB"));
         assertEquals(new StringCell("2"), row.cell("COLb"));
-    }
-
-    public void testCellByAliasAndColumn() throws Exception {
-        Row row = new Row(
-            new TupleBuilder()
-                .appendColumnCellContents("Foo", "colA", "1")
-                .appendColumnCellContents("Foo", "colB", "2")
-                .appendColumnCellContents("Bar", "colA", "3")
-        );
-
-        assertEquals(new StringCell("2"), row.cell("colB"));
-        assertEquals(new StringCell("2"), row.cell("COLb"));
 
         try {
-            row.cell("colA");
+            row.cell("colD");
             fail();
         } catch (MayflyException e) {
-            assertEquals("ambiguous column colA", e.getMessage());
-        }
-
-        try {
-            row.cell("colC");
-            fail();
-        } catch (MayflyException e) {
-            assertEquals("no column colC", e.getMessage());
+            assertEquals("no column colD", e.getMessage());
         }
     }
 
-   /**
-     * Replaced by {@link net.sourceforge.mayfly.evaluation.ResultRowTest#testFindColumn()}
-     */
-    public void testFindColumn() throws Exception {
-        Row row = new Row(
-            new TupleBuilder()
-                .append(new Column("x"), new LongCell(5))
-                .append(new Column("foo", "z"), new StringCell("Chicago"))
-                .append(new Column("bar", "z"), new StringCell("Chicago"))
-                .append(new Column("y"), new StringCell("Chicago"))
-        );
-        
-        assertEquals(new Column("y"), row.findColumn("y"));
-        assertEquals(new Column("bar", "z"), row.findColumn("bar", "z"));
+    public void testDuplicateColumnNames() throws Exception {
+        TupleElement one = new TupleElement("colA", new LongCell(5));
+        TupleElement two = new TupleElement("ColA", new LongCell(7));
+        ImmutableList list = ImmutableList.fromArray(
+            new TupleElement[] { one, two });
+        try {
+            new Row(list);
+            fail();
+        }
+        catch (MayflyInternalException e) {
+            assertEquals("duplicate column ColA", e.getMessage());
+        }
     }
 
-    public void testHeaderIs() throws Exception {
-        assertTrue(
-            new Row.HeaderIs(new Column("colA"))
-                .evaluate(new TupleElement(new Column("colA"), new StringCell("a")))
-        );
-        assertFalse(
-            new Row.HeaderIs(new Column("colB"))
-                .evaluate(new TupleElement(new Column("colA"), new StringCell("a")))
-        );
-    }
-
-    public void testGetHeader() throws Exception {
-        assertEquals(
-            new Column("colA"),
-            new Row.GetHeader().transform(new TupleElement(new Column("colA"), new StringCell("a")))
-        );
-    }
-
-    public void testGetCell() throws Exception {
-        assertEquals(
-            new StringCell("a"), 
-            new Row.GetCell().transform(new TupleElement(new Column("colA"), new StringCell("a")))
-        );
-    }
-    
     public void testDropColumn() throws Exception {
         Row row = new TupleBuilder()
             .appendColumnCellContents("a", 7)
@@ -93,7 +49,7 @@ public class RowTest extends TestCase {
         
         Row newRow = row.dropColumn("B");
         
-        assertEquals(1, newRow.size());
+        assertEquals(1, newRow.columnCount());
         LongCell cell = (LongCell) newRow.cell("A");
         assertEquals(7, cell.asLong());
     }
@@ -110,6 +66,18 @@ public class RowTest extends TestCase {
         catch (MayflyException e) {
             assertEquals("no column B", e.getMessage());
         }
+    }
+    
+    public void testToString() throws Exception {
+        Row row = new TupleBuilder()
+            .appendColumnCell("a", new StringCell("hi"))
+            .appendColumnCell("b", new LongCell(777))
+            .appendColumnCell("c", NullCell.INSTANCE)
+            .appendColumnCell("d", new BinaryCell((byte)7))
+            .asRow();
+        assertEquals(
+            "Row(a=string 'hi', b=number 777, c=null, d=binary data)",
+            row.toString());
     }
     
 }

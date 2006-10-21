@@ -53,7 +53,7 @@ public class FromTable extends ValueObject implements FromElement {
         for (Iterator iter = row.iterator(); iter.hasNext(); ) {
             TupleElement entry = (TupleElement) iter.next();
             result = result.withColumn(
-                alias, entry.column().columnName(), entry.cell());
+                alias, entry.columnName(), entry.cell());
         }
         return result;
     }

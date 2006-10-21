@@ -69,7 +69,16 @@ public class UpdateTest extends SqlTestCase {
         execute("insert into foo(a, b, c) values (2, 'do-not-set-me', 20)");
         execute("insert into foo(a, b, c) values (3, 'set-me', 30)");
         assertEquals(2, execute("update foo set a = 9 where b = 'set-me'"));
-        assertResultSet(new String[] { "9, 10", "2, 20", "9, 30" }, query("select a, c from foo"));
+        assertResultSet(new String[] { "9, 10", "2, 20", "9, 30" }, 
+            query("select a, c from foo"));
+    }
+    
+    public void testWhereIncludesTableName() throws Exception {
+        execute("create table foo(a integer, c integer)");
+        execute("insert into foo(a, c) values(1, 10)");
+        assertEquals(1, execute("update foo set c = 20 where foo.c = 10"));
+        assertResultSet(new String[] { "1, 20" }, 
+            query("select a, c from foo"));
     }
     
     public void testDefault() throws Exception {

@@ -9,6 +9,7 @@ public class NoColumn extends MayflyException {
     public NoColumn(String name, Location location) {
         super("no column " + name, location);
     }
+
     public NoColumn(String tableOrAlias, String columnName, Location location) {
         this(
             Column.displayName(tableOrAlias, columnName), 

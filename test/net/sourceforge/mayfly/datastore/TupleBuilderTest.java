@@ -2,15 +2,17 @@ package net.sourceforge.mayfly.datastore;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.util.MayflyAssert;
+
 public class TupleBuilderTest extends TestCase {
     
     public void testBasics() throws Exception {
-        assertEquals(
-            new Row(new TupleElement(new Column("a"), new StringCell("val"))),
-            new TupleBuilder()
-                .appendColumnCellContents("a", "val")
-                .asRow()
-        );
+        Row builtRow = new TupleBuilder()
+            .appendColumnCellContents("a", "val")
+            .asRow();
+        assertEquals(1, builtRow.columnCount());
+        assertEquals("a", builtRow.columnName(0));
+        MayflyAssert.assertString("val", builtRow.cell("a"));
     }
 
 }

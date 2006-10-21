@@ -98,7 +98,7 @@ public class MayflyAssert {
         Assert.assertEquals(expected, cell.asLong());
     }
 
-    private static void assertString(String expected, Cell actual) {
+    public static void assertString(String expected, Cell actual) {
         StringCell cell = (StringCell) actual;
         Assert.assertEquals(expected, cell.asString());
     }

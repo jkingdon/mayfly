@@ -30,12 +30,9 @@ public class ResultRowTest extends TestCase {
 
     public void testFindColumnAmbiguous() throws Exception {
         ResultRow row = 
-            new ResultRow(
-                new TupleBuilder()
-                    .appendColumnCell("foo", "x", new LongCell(5))
-                    .appendColumnCell("bar", "x", new LongCell(5))
-                    .asRow()
-            );
+            new ResultRow()
+                .withColumn("foo", "x", new LongCell(5))
+                .withColumn("bar", "x", new LongCell(5));
         try {
             row.findColumn("x");
             fail();
@@ -47,12 +44,9 @@ public class ResultRowTest extends TestCase {
 
     public void testFindColumnWithPeriod() throws Exception {
         ResultRow row = 
-            new ResultRow(
-                new TupleBuilder()
-                    .appendColumnCell("foo", "x", new LongCell(5))
-                    .appendColumnCell("bar", "x", new LongCell(5))
-                    .asRow()
-            );
+            new ResultRow()
+                .withColumn("foo", "x", new LongCell(5))
+                .withColumn("bar", "x", new LongCell(5));
         try {
             row.findColumn("foo.x");
             fail();

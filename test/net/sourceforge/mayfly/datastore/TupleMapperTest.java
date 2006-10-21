@@ -17,7 +17,7 @@ public class TupleMapperTest extends TestCase {
         mapper.put(new Column("a"), new StringCell("hi"));
         mapper.put(new Column("b"), new LongCell(77));
         Row result = mapper.asRow();
-        assertEquals(3, result.size());
+        assertEquals(3, result.columnCount());
     }
 
 }

@@ -54,10 +54,6 @@ abstract public class Expression extends WhatElement {
         return this;
     }
     
-    public final Expression resolveAndReturn(Row row) {
-        return resolve(new ResultRow(row));
-    }
-
     public static String firstAggregate(Expression left, Expression right) {
         String firstInLeft = left.firstAggregate();
         if (firstInLeft != null) {

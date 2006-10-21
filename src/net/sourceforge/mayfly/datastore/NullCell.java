@@ -44,7 +44,7 @@ public class NullCell extends Cell {
     }
 
     public String displayName() {
-        return "null value";
+        return "null";
     }
 
     public Object asObject() {

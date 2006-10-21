@@ -9,7 +9,9 @@ import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
+import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 import java.util.Collections;
 
@@ -34,9 +36,8 @@ public class TableDataTest extends TestCase {
         
         assertEquals(1, newTable.rowCount());
         Row newRow = (Row) newTable.rows().element(0);
-        assertEquals(1, newRow.size());
-        TupleElement element = (TupleElement) newRow.element(0);
-        assertEquals("a", element.column().columnName());
+        assertEquals(1, newRow.columnCount());
+        assertEquals("a", newRow.columnName(0));
     }
     
     public void testModifyColumn() throws Exception {
@@ -76,6 +77,30 @@ public class TableDataTest extends TestCase {
         assertEquals(2004, cell.year());
         assertEquals(2, cell.month());
         assertEquals(29, cell.day());
+    }
+    
+    public void testDelete() throws Exception {
+        Column a = new Column("foo", "a", NullCell.INSTANCE, 
+            null, false, new DefaultDataType(), false);
+        Row one = new TupleBuilder()
+            .append(a, new LongCell(1))
+            .asRow();
+        Row two = new TupleBuilder()
+            .append(a, new LongCell(2))
+            .asRow();
+        TableData table = new TableData(
+            Columns.singleton(a), 
+            new Constraints(), 
+            new Rows(ImmutableList.fromArray(new Row[] { one, two }))
+        );
+        
+        Condition where = new Parser("a = 1").parseCondition().asBoolean();
+        UpdateTable newTable = table.delete(where, new NullChecker());
+
+        assertEquals(1, newTable.rowsAffected());
+        assertEquals(1, newTable.table().rowCount());
+        Row remainingRow = (Row) newTable.table().rows().element(0);
+        MayflyAssert.assertLong(2, remainingRow.cell("a"));
     }
 
 }
