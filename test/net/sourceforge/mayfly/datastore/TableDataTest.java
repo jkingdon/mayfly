@@ -41,16 +41,16 @@ public class TableDataTest extends TestCase {
     }
     
     public void testModifyColumn() throws Exception {
-        Column a = new Column("foo", "a", NullCell.INSTANCE, 
-            null, false, new DefaultDataType(), true);
+        Column a = new Column("a", NullCell.INSTANCE, null, 
+            false, new DefaultDataType(), true);
         Row row = new TupleBuilder()
             .append(a, new LongCell(7))
             .asRow();
         TableData table = new TableData(
             Columns.singleton(a), new Constraints(), new Rows(row));
         
-        Column newA = new Column("foo", "a", NullCell.INSTANCE, 
-            null, false, new DefaultDataType(), false);
+        Column newA = new Column("a", NullCell.INSTANCE, null, 
+            false, new DefaultDataType(), false);
         TableData newTable = table.modifyColumn(newA);
 
         Column foundColumn = newTable.findColumn("a");
@@ -58,8 +58,8 @@ public class TableDataTest extends TestCase {
     }
 
     public void testCoerceOnUpdate() throws Exception {
-        Column a = new Column("foo", "a", NullCell.INSTANCE, 
-            null, false, new DateDataType(), false);
+        Column a = new Column("a", NullCell.INSTANCE, null, 
+            false, new DateDataType(), false);
         Row row = new TupleBuilder()
             .append(a, new LongCell(7))
             .asRow();
@@ -69,7 +69,7 @@ public class TableDataTest extends TestCase {
         UpdateTable update = table.update(new NullChecker(), 
             Collections.singletonList(
                 new SetClause("a", new QuotedString("'2004-02-29'"))), 
-            Condition.TRUE);
+            Condition.TRUE, "table1");
         assertEquals(1, update.rowsAffected());
         TableData newTable = update.table();
         Row newRow = (Row) newTable.rows().element(0);
@@ -80,8 +80,8 @@ public class TableDataTest extends TestCase {
     }
     
     public void testDelete() throws Exception {
-        Column a = new Column("foo", "a", NullCell.INSTANCE, 
-            null, false, new DefaultDataType(), false);
+        Column a = new Column("a", NullCell.INSTANCE, null, 
+            false, new DefaultDataType(), false);
         Row one = new TupleBuilder()
             .append(a, new LongCell(1))
             .asRow();
@@ -95,7 +95,7 @@ public class TableDataTest extends TestCase {
         );
         
         Condition where = new Parser("a = 1").parseCondition().asBoolean();
-        UpdateTable newTable = table.delete(where, new NullChecker());
+        UpdateTable newTable = table.delete(where, new NullChecker(), "table1");
 
         assertEquals(1, newTable.rowsAffected());
         assertEquals(1, newTable.table().rowCount());

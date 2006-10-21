@@ -26,10 +26,18 @@ public class GreaterTest extends TestCase {
                 .appendColumnCellContents("colB", 7)
         );
 
-        assertFalse(new Greater(new IntegerLiteral(5), new SingleColumn("colA")).evaluate(row));
-        assertFalse(new Greater(new IntegerLiteral(6), new SingleColumn("colA")).evaluate(row));
-        assertTrue(new Greater(new IntegerLiteral(7), new SingleColumn("colA")).evaluate(row));
-        assertTrue(new Greater(new SingleColumn("colB"), new SingleColumn("colA")).evaluate(row));
+        assertFalse(
+            new Greater(new IntegerLiteral(5), new SingleColumn("colA"))
+                .evaluate(row, "table1"));
+        assertFalse(
+            new Greater(new IntegerLiteral(6), new SingleColumn("colA"))
+                .evaluate(row, "table1"));
+        assertTrue(
+            new Greater(new IntegerLiteral(7), new SingleColumn("colA"))
+                .evaluate(row, "table1"));
+        assertTrue(
+            new Greater(new SingleColumn("colB"), new SingleColumn("colA"))
+                .evaluate(row, "table1"));
     }
 
 }

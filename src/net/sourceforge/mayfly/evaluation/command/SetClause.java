@@ -24,12 +24,12 @@ public class SetClause {
         return columns.columnFromName(column);
     }
 
-    public Cell value(Row row, Column column) {
+    public Cell value(Row row, String table, Column column) {
         if (value == null) {
             return column.coerce(column.defaultValue(), Location.UNKNOWN);
         }
         else {
-            return column.coerce(value.evaluate(row), value.location);
+            return column.coerce(value.evaluate(row, table), value.location);
         }
     }
 

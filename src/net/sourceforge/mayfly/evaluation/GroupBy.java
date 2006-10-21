@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.evaluation;
 
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.util.ValueObject;
@@ -20,11 +19,7 @@ public class GroupBy extends ValueObject implements Aggregator {
         this.having = having;
     }
     
-    public GroupedRows makeGroupedRows(Rows rows) {
-        return makeGroupedRows(new ResultRows(rows));
-    }
-
-    private GroupedRows makeGroupedRows(ResultRows resultRows) {
+    public GroupedRows makeGroupedRows(ResultRows resultRows) {
         GroupedRows grouped = new GroupedRows();
         for (Iterator iter = resultRows.iterator(); iter.hasNext();) {
             ResultRow row = (ResultRow) iter.next();

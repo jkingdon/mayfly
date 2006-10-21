@@ -27,8 +27,8 @@ public class ConditionTest extends TestCase {
         Row row1 = new Row(new TupleElement(new Column("name"), new StringCell("steve")));
         Row row2 = new Row(new TupleElement(new Column("name"), new StringCell("bob")));
 
-        assertTrue(where.evaluate(row1));
-        assertFalse(where.evaluate(row2));
+        assertTrue(where.evaluate(row1, "table1"));
+        assertFalse(where.evaluate(row2, "table1"));
     }
     
     public void testNull() throws Exception {
@@ -36,8 +36,8 @@ public class ConditionTest extends TestCase {
         Row fiveRow = new Row(new TupleElement(new Column("a"), new LongCell(5)));
         Row nullRow = new Row(new TupleElement(new Column("a"), NullCell.INSTANCE));
         
-        assertTrue(where.evaluate(fiveRow));
-        assertFalse(where.evaluate(nullRow));
+        assertTrue(where.evaluate(fiveRow, "table1"));
+        assertFalse(where.evaluate(nullRow, "table1"));
     }
 
     public void testFirstAggregate() throws Exception {

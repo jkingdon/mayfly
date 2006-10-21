@@ -26,8 +26,8 @@ public class ResultRow {
     
     private final ImmutableList elements;
 
-    public ResultRow(Row row) {
-        this.elements = fromRow(row);
+    public ResultRow(Row row, String table) {
+        this.elements = fromRow(row, table);
     }
 
     public ResultRow() {
@@ -38,17 +38,15 @@ public class ResultRow {
         this.elements = elements;
     }
 
-    private static ImmutableList fromRow(Row row) {
+    private static ImmutableList fromRow(Row row, String table) {
         List result = new ArrayList();
         for (Iterator iter = row.iterator(); iter.hasNext();) {
             TupleElement columnAndValue = (TupleElement) iter.next();
-            result.add(new Element(findExpression(columnAndValue), columnAndValue.cell()));
+            result.add(new Element(
+                new SingleColumn(table, columnAndValue.columnName()), 
+                columnAndValue.cell()));
         }
         return new ImmutableList(result);
-    }
-
-    private static Expression findExpression(TupleElement columnAndValue) {
-        return new SingleColumn(columnAndValue.tableOrAlias(), columnAndValue.columnName());
     }
 
     public int size() {

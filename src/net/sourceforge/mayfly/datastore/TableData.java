@@ -106,14 +106,14 @@ public class TableData {
     }
 
     public UpdateTable update(Checker checker, List setClauses, 
-        Condition where) {
+        Condition where, String tableName) {
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             
-            if (where.evaluate(row)) {
-                Row newRow = newRow(setClauses, row);
+            if (where.evaluate(row, tableName)) {
+                Row newRow = newRow(setClauses, row, tableName);
                 constraints.check(newRows, newRow, Location.UNKNOWN);
                 checker.checkInsert(constraints, newRow);
                 checker.checkDelete(row, newRow);
@@ -131,12 +131,12 @@ public class TableData {
         return new UpdateTable(newTable, rowsAffected);
     }
 
-    private Row newRow(List setClauses, Row row) {
+    private Row newRow(List setClauses, Row row, String table) {
         TupleMapper mapper = new TupleMapper(row);
         for (Iterator iterator = setClauses.iterator(); iterator.hasNext();) {
             SetClause setClause = (SetClause) iterator.next();
             Column column = setClause.column(columns);
-            mapper.put(column, setClause.value(row, column));
+            mapper.put(column, setClause.value(row, table, column));
         }
         setOnUpdateColumns(mapper);
         Row newRow = mapper.asRow();
@@ -152,13 +152,13 @@ public class TableData {
         }
     }
 
-    public UpdateTable delete(Condition where, Checker checker) {
+    public UpdateTable delete(Condition where, Checker checker, String tableName) {
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             
-            if (where.evaluate(row)) {
+            if (where.evaluate(row, tableName)) {
                 ++rowsAffected;
                 checker.checkDelete(row, null);
             }

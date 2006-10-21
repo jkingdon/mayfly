@@ -4,20 +4,16 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public class TupleElement extends ValueObject {
-    private final CellHeader header;
+    private final String column;
     private final Cell cell;
 
-    public TupleElement(CellHeader header, Cell cell) {
-        this.header = header;
-        this.cell = cell;
+    public TupleElement(Column column, Cell cell) {
+        this(column.columnName(), cell);
     }
 
     public TupleElement(String column, Cell cell) {
-        this(new Column(column), cell);
-    }
-
-    private Column column() {
-        return (Column)header;
+        this.column = column;
+        this.cell = cell;
     }
 
     public Cell cell() {
@@ -25,11 +21,7 @@ public class TupleElement extends ValueObject {
     }
 
     public String columnName() {
-        return column().columnName();
-    }
-
-    public String tableOrAlias() {
-        return column().tableOrAlias();
+        return column;
     }
 
     boolean matchesName(String target) {

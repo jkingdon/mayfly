@@ -12,18 +12,10 @@ public class TupleBuilder {
         return this;
     }
 
-    public TupleBuilder append(CellHeader column, Cell cell) {
+    public TupleBuilder append(Column column, Cell cell) {
         return append(new TupleElement(column, cell));
     }
     
-    public TupleBuilder appendColumnCellContents(String tableName, String columnName, String cellValue) {
-        return appendColumnCell(tableName, columnName, new StringCell(cellValue));
-    }
-
-    public TupleBuilder appendColumnCell(String tableName, String columnName, Cell cell) {
-        return append(new Column(tableName, columnName), cell);
-    }
-
     public TupleBuilder appendColumnCellContents(String columnName, String cellValue) {
         return appendColumnCell(columnName, new StringCell(cellValue));
     }
@@ -33,7 +25,7 @@ public class TupleBuilder {
     }
 
     public TupleBuilder appendColumnCell(String columnName, Cell cell) {
-        return append(new Column(columnName), cell);
+        return append(new TupleElement(columnName, cell));
     }
 
     public ImmutableList asElements() {

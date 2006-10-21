@@ -5,7 +5,6 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.StringCell;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
@@ -58,11 +57,9 @@ public class ResultRowTest extends TestCase {
 
     public void testFindColumnNotFound() throws Exception {
         ResultRow row = 
-            new ResultRow(
-                new TupleBuilder()
-                    .appendColumnCell("foo", "x", new LongCell(5))
-                    .asRow()
-            );
+            new ResultRow()
+                .withColumn("foo", "x", new LongCell(5))
+            ;
         try {
             row.findColumn("y");
             fail();

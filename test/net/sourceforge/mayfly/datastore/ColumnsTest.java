@@ -17,8 +17,8 @@ public class ColumnsTest extends TestCase {
         assertEquals(
             new Columns(
                 new L()
-                    .append(new Column("foo", "a"))
-                    .append(new Column("foo", "b"))
+                    .append(new Column("a"))
+                    .append(new Column("b"))
                     .asImmutable()),
             Columns.fromColumnNames(
                 "foo",
@@ -42,14 +42,14 @@ public class ColumnsTest extends TestCase {
     public void testLookup() throws Exception {
         Columns columns = new Columns(new ImmutableList(Arrays.asList(
             new Column[] {
-                new Column("foo", "a"),
-                new Column("bar", "a"),
-                new Column("foo", "b"),
+                new Column("a"),
+                new Column("a"),
+                new Column("b"),
                 new Column("d")
             })));
         
-        assertEquals(new Column("foo", "b"), columns.columnFromName("b"));
-        assertEquals(new Column("foo", "b"), columns.columnFromName("B"));
+        assertEquals(new Column("b"), columns.columnFromName("b"));
+        assertEquals(new Column("b"), columns.columnFromName("B"));
 
         try {
             columns.columnFromName("c");
@@ -71,13 +71,13 @@ public class ColumnsTest extends TestCase {
     public void testReplace() throws Exception {
         Columns columns = new Columns(new ImmutableList(Arrays.asList(
             new Column[] {
-                new Column("foo", "a"),
-                new Column("bar", "a"),
-                new Column("foo", "b"),
+                new Column("a"),
+                new Column("a"),
+                new Column("b"),
             })));
         Columns newColumns = columns.replace(
-            new Column("foo", "b", new LongCell(42), null,
-                true, new DefaultDataType(), false)
+            new Column("b", new LongCell(42), null, true,
+                new DefaultDataType(), false)
         );
         
         assertFalse(columns.columnFromName("b").isAutoIncrement());

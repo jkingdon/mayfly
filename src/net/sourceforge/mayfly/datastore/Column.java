@@ -9,23 +9,22 @@ import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ValueObject;
 
 public class Column extends ValueObject implements CellHeader {
-    private final String tableOrAlias;
     private final String columnName;
     private final Cell defaultValue;
     private final Cell onUpdateValue;
     private final boolean isAutoIncrement;
     private final DataType type;
     
-    /** This will probably want to be a subclass of
+    /** We'll probably want not-null contraints to be implemented
+     * via a subclass of
      * {@link net.sourceforge.mayfly.datastore.constraint.Constraint}
      * once we implement named constraints.  But we can
      * worry about that then.
      */
     public final boolean isNotNull;
 
-    public Column(String table, String name, Cell defaultValue, Cell onUpdateValue,
-        boolean isAutoIncrement, DataType type, boolean isNotNull) {
-        this.tableOrAlias = table;
+    public Column(String name, Cell defaultValue, Cell onUpdateValue, boolean isAutoIncrement,
+        DataType type, boolean isNotNull) {
         this.columnName = name;
         this.defaultValue = defaultValue;
         this.onUpdateValue = onUpdateValue;
@@ -34,43 +33,31 @@ public class Column extends ValueObject implements CellHeader {
         this.isNotNull = isNotNull;
     }
 
-    public Column(String table, String columnName) {
-        this(table, columnName, NullCell.INSTANCE, null, false, new DefaultDataType(), false);
-    }
-
-    public Column(String column) {
-        this((String)null, column);
+    /**
+     * Create a column with most of the fields defaulted.  I think this is
+     * just called from tests; most code will want to look up an existing
+     * column, rather than create one.
+     */
+    public Column(String columnName) {
+        this(columnName, NullCell.INSTANCE, null, 
+            false, new DefaultDataType(), false);
     }
 
     public String columnName() {
         return columnName;
     }
 
-    public boolean matchesName(String otherName) {
-        return matches(null, otherName);
-    }
-
-    public boolean matches(String tableOrAlias, String target) {
+    public boolean matches(String target) {
         if (target.indexOf('.') != -1) {
-            throw new MayflyException("column name " + target + " should not contain a period");
+            throw new MayflyException(
+                "column name " + target + " should not contain a period");
         }
 
-        if (tableOrAlias != null && !matchesAliasOrTable(tableOrAlias)) {
-            return false;
-        }
         return columnName.equalsIgnoreCase(target);
     }
 
-    private boolean matchesAliasOrTable(String tableOrAlias) {
-        return tableOrAlias.equalsIgnoreCase(this.tableOrAlias);
-    }
-
-    public String tableOrAlias() {
-        return tableOrAlias;
-    }
-
     public String toString() {
-        return displayName(tableOrAlias, columnName);
+        return columnName;
     }
 
     public static String displayName(String tableOrAlias, String column) {
@@ -91,8 +78,8 @@ public class Column extends ValueObject implements CellHeader {
 
     public Column afterAutoIncrement() {
         Cell newDefault = new LongCell(defaultValue.asLong() + 1L);
-        return new Column(tableOrAlias, columnName, newDefault, onUpdateValue,
-            isAutoIncrement, type, isNotNull);
+        return new Column(columnName, newDefault, onUpdateValue, isAutoIncrement,
+            type, isNotNull);
     }
 
     /**

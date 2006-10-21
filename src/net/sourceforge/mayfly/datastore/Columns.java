@@ -26,7 +26,7 @@ public class Columns extends Aggregate {
                 .collect(
                     new Transformer() {
                         public Object transform(Object from) {
-                            return new Column(tableName, (String) from);
+                            return new Column((String) from);
                         }
                     }
                 );
@@ -84,14 +84,10 @@ public class Columns extends Aggregate {
     }
 
     public Column columnFromName(String columnName) {
-        return columnFromName(null, columnName);
-    }
-
-    public Column columnFromName(String tableOrAlias, String columnName) {
         Column found = null;
         for (Iterator iter = columns.iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
-            if (column.matches(tableOrAlias, columnName)) {
+            if (column.matches(columnName)) {
                 if (found != null) {
                     throw new MayflyException("ambiguous column " + columnName);
                 } else {
@@ -100,7 +96,7 @@ public class Columns extends Aggregate {
             }
         }
         if (found == null) {
-            throw new NoColumn(tableOrAlias, columnName, Location.UNKNOWN);
+            throw new NoColumn(columnName, Location.UNKNOWN);
         } else {
             return found;
         }
@@ -109,7 +105,7 @@ public class Columns extends Aggregate {
     public boolean hasColumn(String name) {
         for (Iterator iter = columns.iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
-            if (column.matchesName(name)) {
+            if (column.matches(name)) {
                 return true;
             }
         }
@@ -131,7 +127,7 @@ public class Columns extends Aggregate {
         List result = new ArrayList();
         for (Iterator iter = iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
-            if (column.matchesName(replacement.columnName())) {
+            if (column.matches(replacement.columnName())) {
                 result.add(replacement);
                 found = true;
             }
@@ -150,7 +146,7 @@ public class Columns extends Aggregate {
         List result = new ArrayList();
         for (Iterator iter = iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
-            if (column.matchesName(target)) {
+            if (column.matches(target)) {
                 found = true;
             }
             else {

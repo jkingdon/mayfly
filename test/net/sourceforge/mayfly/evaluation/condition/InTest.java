@@ -30,8 +30,8 @@ public class InTest extends TestCase {
             new L()
 	            .append(new IntegerLiteral(1))
 				.append(new IntegerLiteral(3)));
-        assertFalse(in.evaluate(row(2)));
-        assertTrue(in.evaluate(row(3)));
+        assertFalse(in.evaluate(row(2), "table1"));
+        assertTrue(in.evaluate(row(3), "table1"));
 	}
 
     private Row row(long aValue) {

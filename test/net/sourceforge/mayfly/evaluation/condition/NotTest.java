@@ -28,8 +28,8 @@ public class NotTest extends TestCase {
         );
         Equal compareWithFoo = new Equal(new SingleColumn("x"), new QuotedString("'foo'"));
         Equal compareWithXxx = new Equal(new SingleColumn("x"), new QuotedString("'xxx'"));
-        assertTrue(new Not(compareWithXxx).evaluate(row));
-        assertFalse(new Not(compareWithFoo).evaluate(row));
+        assertTrue(new Not(compareWithXxx).evaluate(row, "table1"));
+        assertFalse(new Not(compareWithFoo).evaluate(row, "table1"));
     }
 
 }

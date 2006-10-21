@@ -131,12 +131,12 @@ public class Schema {
 
     public UpdateSchema update(Checker checker, String table, 
         List setClauses, Condition where) {
-        UpdateTable result = table(table).update(checker, setClauses, where);
+        UpdateTable result = table(table).update(checker, setClauses, where, table);
         return replaceTable(table, result);
     }
 
     public UpdateSchema delete(String table, Condition where, Checker checker) {
-        UpdateTable result = table(table).delete(where, checker);
+        UpdateTable result = table(table).delete(where, checker, table);
         ImmutableMap tablesAfterChecking =
             checker.store().schema(checker.schema()).tables;
         

@@ -24,14 +24,14 @@ public class IsNullTest extends TestCase {
                 .appendColumnCell("colA", NullCell.INSTANCE)
         );
 
-        assertTrue(new IsNull(new SingleColumn("colA")).evaluate(nullRow));
+        assertTrue(new IsNull(new SingleColumn("colA")).evaluate(nullRow, "table1"));
 
         Row nonNullRow = new Row(
             new TupleBuilder()
                 .appendColumnCell("colA", new StringCell("foo"))
         );
 
-        assertFalse(new IsNull(new SingleColumn("colA")).evaluate(nonNullRow));
+        assertFalse(new IsNull(new SingleColumn("colA")).evaluate(nonNullRow, "table1"));
     }
 
 }

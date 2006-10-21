@@ -18,8 +18,12 @@ public class EqualTest extends TestCase {
                 .appendColumnCellContents("colA", "1")
         );
 
-        assertTrue(new Equal(new SingleColumn("colA"), new QuotedString("'1'")).evaluate(row));
-        assertFalse(new Equal(new SingleColumn("colA"), new QuotedString("'2'")).evaluate(row));
+        assertTrue(
+            new Equal(new SingleColumn("colA"), new QuotedString("'1'"))
+                .evaluate(row, "table1"));
+        assertFalse(
+            new Equal(new SingleColumn("colA"), new QuotedString("'2'"))
+                .evaluate(row, "table1"));
     }
     
     public void testEvaluate() throws Exception {
@@ -35,13 +39,17 @@ public class EqualTest extends TestCase {
             new Row(new TupleBuilder()
                 .appendColumnCell("a", NullCell.INSTANCE)
                 .appendColumnCell("b", NullCell.INSTANCE)
-        )));
+            ),
+            "table1"
+        ));
 
         assertTrue(equal.evaluate(
             new Row(new TupleBuilder()
                 .appendColumnCell("a", new LongCell(5))
                 .appendColumnCell("b", new LongCell(5))
-        )));
+            ),
+            "table1"
+        ));
     }
 
 }

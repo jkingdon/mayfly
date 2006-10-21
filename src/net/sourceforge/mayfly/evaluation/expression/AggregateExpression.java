@@ -38,7 +38,7 @@ public abstract class AggregateExpression extends Expression {
     /** 
       @internal
       This is just for checking; aggregation happens in 
-      {@link #aggregate(Rows)}. 
+      {@link #aggregate(ResultRows)}. 
 
       It also is called in evaluating a HAVING condition,
       although that part doesn't work yet. */

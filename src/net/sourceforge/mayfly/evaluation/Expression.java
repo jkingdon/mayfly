@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.parser.Location;
@@ -35,18 +34,14 @@ abstract public class Expression extends WhatElement {
 
     abstract public Cell evaluate(ResultRow row);
 
-    public Cell evaluate(Row row) {
-        return evaluate(new ResultRow(row));
+    public Cell evaluate(Row row, String table) {
+        return evaluate(new ResultRow(row, table));
     }
     
     public void check(ResultRow row) {
     }
 
     abstract public Cell aggregate(ResultRows rows);
-
-    public Cell aggregate(Rows rows) {
-        return aggregate(new ResultRows(rows));
-    }
 
     abstract public boolean sameExpression(Expression other);
 

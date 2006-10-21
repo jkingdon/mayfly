@@ -40,10 +40,10 @@ public class OrTest extends TestCase {
         Equal compareWithFoo = new Equal(new SingleColumn("x"), new QuotedString("'foo'"));
         Equal compareWithXxx = new Equal(new SingleColumn("x"), new QuotedString("'xxx'"));
         Not notNull = new Not(new IsNull(new SingleColumn("x")));
-        assertTrue(new Or(compareWithFoo, notNull).evaluate(row));
-        assertTrue(new Or(compareWithFoo, compareWithXxx).evaluate(row));
-        assertTrue(new Or(compareWithXxx, notNull).evaluate(row));
-        assertFalse(new Or(compareWithXxx, compareWithXxx).evaluate(row));
+        assertTrue(new Or(compareWithFoo, notNull).evaluate(row, "table1"));
+        assertTrue(new Or(compareWithFoo, compareWithXxx).evaluate(row, "table1"));
+        assertTrue(new Or(compareWithXxx, notNull).evaluate(row, "table1"));
+        assertFalse(new Or(compareWithXxx, compareWithXxx).evaluate(row, "table1"));
     }
 
 }

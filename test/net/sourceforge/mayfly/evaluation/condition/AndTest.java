@@ -2,13 +2,8 @@ package net.sourceforge.mayfly.evaluation.condition;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
-import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.evaluation.condition.And;
-import net.sourceforge.mayfly.evaluation.condition.Equal;
-import net.sourceforge.mayfly.evaluation.condition.IsNull;
-import net.sourceforge.mayfly.evaluation.condition.Not;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
@@ -49,10 +44,9 @@ public class AndTest extends TestCase {
     }
 
     public void testEvaluate() throws Exception {
-        Row row = new Row(
-            new TupleBuilder()
-                .appendColumnCell("x", new StringCell("foo"))
-        );
+        ResultRow row = new ResultRow()
+            .withColumn("table1", "x", new StringCell("foo"))
+        ;
         Equal compareWithFoo = new Equal(new SingleColumn("x"), new QuotedString("'foo'"));
         Equal compareWithXxx = new Equal(new SingleColumn("x"), new QuotedString("'xxx'"));
         Not notNull = new Not(new IsNull(new SingleColumn("x")));

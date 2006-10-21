@@ -581,8 +581,8 @@ public class Parser {
 
         boolean isNotNull = parseColumnConstraints(table, name);
 
-        return new Column(table.table(), name, defaultValue, onUpdateValue,
-            isAutoIncrement, parsed.type, isNotNull);
+        return new Column(name, defaultValue, onUpdateValue, isAutoIncrement,
+            parsed.type, isNotNull);
     }
 
     private Cell parseDefaultClause(String name) {
