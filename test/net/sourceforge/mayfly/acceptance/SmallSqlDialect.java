@@ -11,7 +11,11 @@ import java.sql.SQLException;
  * See http://www.smallsql.de/ or http://sourceforge.net/projects/smallsql
  * 
  * This Dialect subclass is able to connect and pass some tests, but
- * the various expectations are not yet set up for a clean test run.
+ * many tests are still failing.  Given the large number of failures,
+ * I'm not sure whether we want to add a whole bunch of methods to
+ * Dialect until SmallSQL is a little closer to a complete SQL
+ * implementation (where "complete" means those features tested
+ * in the mayfly acceptance tests....).
  */
 public class SmallSqlDialect extends Dialect {
 

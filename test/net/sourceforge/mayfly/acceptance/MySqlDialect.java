@@ -209,6 +209,14 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean dataTypesAreEnforced() {
+        return false;
+    }
+    
+    public boolean canGetBytesOnNumber() {
+        return true;
+    }
+    
     public boolean addingColumnCountsAsAffectedRow() {
         return true;
     }

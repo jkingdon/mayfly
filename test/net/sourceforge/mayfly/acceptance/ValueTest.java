@@ -165,14 +165,12 @@ public class ValueTest extends SqlTestCase {
     public void testExpressionInInsert() throws Exception {
         execute("create table foo (a varchar(255))");
 
-        String insert;
         if (dialect.verticalBarsMeanConcatenation()) {
-            insert = "insert into foo(a) values ('cat' || 'e' || 'gory')";
+            execute("insert into foo(a) values ('cat' || 'e' || 'gory')");
         }
         else {
-            insert = "insert into foo(a) values (concat('cat', 'e', 'gory'))";
+            execute("insert into foo(a) values (concat('cat', 'e', 'gory'))");
         }
-        execute(insert);
 
         assertResultSet(
             new String[] { " 'category' " },

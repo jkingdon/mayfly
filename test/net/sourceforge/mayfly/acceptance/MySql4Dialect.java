@@ -7,10 +7,14 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * This is for MySQL 4.x.  For 5.x, see {@link net.sourceforge.mayfly.acceptance.MySqlDialect}.
+ * This is for MySQL 4.x.  For 5.x, see 
+ * {@link net.sourceforge.mayfly.acceptance.MySqlDialect}.
  * 
  * To make this work, install MySQL (the server), start it up on localhost,
  * and that might be all you need...
+ * 
+ * Disclaimer: this was passing in August 2006 but it is quite probable
+ * that it hasn't gotten any attention since then.
  */
 public class MySql4Dialect extends Dialect {
 

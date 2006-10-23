@@ -481,11 +481,23 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean onUpdateSetNullAndCascadeMissing() {
+    public boolean datesAreOff() {
         return false;
     }
 
-    public boolean datesAreOff() {
+    /**
+     * Kind of a catch-all.  There are also more specific ones like
+     * {@link #canGetBytesOnNumber}.
+     */
+    public boolean dataTypesAreEnforced() {
+        return true;
+    }
+
+    public boolean canGetBytesOnNumber() {
+        return false;
+    }
+
+    public boolean onUpdateSetNullAndCascadeMissing() {
         return false;
     }
 

@@ -379,19 +379,38 @@ public class DataTypeTest extends SqlTestCase {
         execute("insert into foo(x) values(1)");
         ResultSet results = query("select x from foo");
         assertTrue(results.next());
-        try {
-            results.getBytes(1);
-            fail();
+        if (!dialect.canGetBytesOnNumber()) {
+            try {
+                results.getBytes(1);
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage("attempt to read number 1 as binary data", e);
+            }
         }
-        catch (SQLException e) {
-            assertMessage("attempt to read number 1 as binary data", e);
+        else {
+            byte[] bytes = results.getBytes(1);
+            // 49 is the value of the character '1'.
+            ArrayAssert.assertEquals(new byte[] { 49 }, bytes);
         }
     }
 
     public void testNonBinaryInBinaryColumn() throws Exception {
         execute("create table foo(x " + dialect.binaryTypeName() + ")");
-        expectExecuteFailure("insert into foo(x) values(1)",
-            "attempt to store number 1 as binary data");
+        String insertOne = "insert into foo(x) values(1)";
+        if (dialect.dataTypesAreEnforced()) {
+            expectExecuteFailure(insertOne,
+                "attempt to store number 1 as binary data");
+            assertResultSet(new String[] { }, query("select x from foo"));
+        }
+        else {
+            execute(insertOne);
+            assertResultSet(new String[] { " 1 " }, query("select x from foo"));
+        }
+    }
+    
+    public void testNullInBinaryColumn() throws Exception {
+        execute("create table foo(x " + dialect.binaryTypeName() + ")");
         execute("insert into foo(x) values(null)");
         assertResultSet(new String[] { " null " }, 
             query("select x from foo"));

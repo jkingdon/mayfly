@@ -147,6 +147,10 @@ public class PostgresDialect extends Dialect {
         return "bytea";
     }
     
+    public boolean canGetBytesOnNumber() {
+        return true;
+    }
+    
     public boolean haveDropTableFooIfExists() {
         return false;
     }
