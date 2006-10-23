@@ -141,6 +141,10 @@ public class HypersonicDialect extends Dialect {
         return true;
     }
     
+    public boolean haveDropForeignKey() {
+        return false;
+    }
+    
     public boolean haveModifyColumn() {
         return false;
     }

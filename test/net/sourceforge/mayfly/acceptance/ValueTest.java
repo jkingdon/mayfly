@@ -299,7 +299,8 @@ public class ValueTest extends SqlTestCase {
     
     public void testDuplicateColumnName() throws Exception {
         execute("create table foo (Id integer)");
-        expectExecuteFailure("insert into foo (Id, Id) values (5, 7)", "duplicate column Id");
+        expectExecuteFailure("insert into foo (Id, Id) values (5, 7)", 
+            "duplicate column Id");
     }
     
     public void testNegativeNumber() throws Exception {

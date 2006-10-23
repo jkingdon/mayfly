@@ -420,6 +420,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean haveDropForeignKey() {
+        return true;
+    }
+
     public boolean haveModifyColumn() {
         return true;
     }

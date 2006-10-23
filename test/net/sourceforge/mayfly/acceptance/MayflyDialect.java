@@ -134,5 +134,9 @@ public class MayflyDialect extends Dialect {
     public boolean onUpdateSetNullAndCascadeMissing() {
         return true;
     }
+    
+    public boolean haveDropForeignKey() {
+        return wishThisWereTrue();
+    }
 
 }

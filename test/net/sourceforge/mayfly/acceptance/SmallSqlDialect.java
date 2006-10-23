@@ -23,6 +23,7 @@ public class SmallSqlDialect extends Dialect {
         Class.forName("smallsql.database.SSDriver");
         Connection bootstrapConnection = 
             DriverManager.getConnection("jdbc:smallsql");
+        SqlTestCase.execute("DROP DATABASE mayflytest", bootstrapConnection);
         SqlTestCase.execute("CREATE DATABASE mayflytest", bootstrapConnection);
         bootstrapConnection.close();
 
@@ -66,6 +67,10 @@ public class SmallSqlDialect extends Dialect {
     }
     
     public boolean disallowNullOnRightHandSideOfIn() {
+        return false;
+    }
+    
+    public boolean disallowNullsInExpressions() {
         return false;
     }
     

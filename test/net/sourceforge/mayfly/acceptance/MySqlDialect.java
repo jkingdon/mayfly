@@ -9,15 +9,29 @@ import java.sql.SQLException;
  * 
  * To make this work, install MySQL (the server), start it up on localhost,
  * and that might be all you need...
+ * If you have a root password, see {@link #MYSQL_ROOT_PASSWORD}.
  */
 public class MySqlDialect extends Dialect {
     
+    /* Wouldn't really have to be the root password, I don't
+       think, although I don't know whether there is a way to
+       give selective access to CREATE/DROP DATABASE.  We don't
+       need access to more than mayflytest, but we do need a way
+       to clear that database on each test.
+       
+       Oh, yeah, and we should read it from a file and all that
+       jazz (sigh - see why I like embedded databases like
+       Derby and Hypersonic?).
+     */
+    private static final String MYSQL_ROOT_PASSWORD = "";
+
     // For the moment, we keep the default SQL MODE setting.
     // We probably want SET sql_mode = 'ANSI'
 
     public Connection openConnection() throws Exception {
         Class.forName("com.mysql.jdbc.Driver");
-        Connection bootstrapConnection = DriverManager.getConnection("jdbc:mysql://localhost/", "root", "");
+        Connection bootstrapConnection = DriverManager.getConnection(
+            "jdbc:mysql://localhost/", "root", MYSQL_ROOT_PASSWORD);
         SqlTestCase.execute("CREATE DATABASE mayflytest", bootstrapConnection);
         bootstrapConnection.close();
 
@@ -25,7 +39,8 @@ public class MySqlDialect extends Dialect {
     }
 
     public Connection openAdditionalConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost/mayflytest", "root", "");
+        return DriverManager.getConnection(
+            "jdbc:mysql://localhost/mayflytest", "root", MYSQL_ROOT_PASSWORD);
     }
 
     public void shutdown(Connection connection) throws Exception {
