@@ -346,7 +346,7 @@ public class ParserTest extends TestCase {
         TextToken original = new TextToken(TokenType.PARAMETER, "?", 5, 73, 5, 74);
         List tokens = new ArrayList();
         tokens.add(new BinaryToken(new ImmutableByteArray(((byte)42)), original));
-        tokens.add(new EndOfFileToken(6, 1));
+        tokens.add(new EndOfFileToken(6, 1, null));
         Parser parser = new Parser(tokens);
 
         CellExpression expression = (CellExpression) parser.parseExpressionOrNull();

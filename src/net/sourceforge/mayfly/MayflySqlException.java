@@ -64,6 +64,19 @@ public class MayflySqlException extends SQLException {
     }
 
     /**
+     * Return the SQL command which caused this exception to be thrown.
+     * In some cases, there are easier ways to find the command.  But
+     * if it is being constructed in an SQL mapping layer, it may or
+     * may not be easy to get your hands on the actual SQL.
+     * 
+     * If Mayfly is unable to supply the command (which means a limitation
+     * in Mayfly), returns null.
+     */
+    public String getFailingCommand() {
+        return location.command;
+    }
+
+    /**
      * In many cases it may be useful to throw an SQLException
      * through code which is not declared <tt>throws SQLException</tt>.
      * 

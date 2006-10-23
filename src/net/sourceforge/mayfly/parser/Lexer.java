@@ -12,16 +12,18 @@ import java.util.List;
 public class Lexer {
 
     private static final int END_OF_FILE_CHARACTER = -1;
-    private Reader sql;
+
+    private final Reader sql;
     private int currentLine;
     private int currentColumn;
     private int previousLine = -1;
     private int previousColumn = -1;
     private int tokenLine;
     private int tokenColumn;
+    private final String command;
 
     public Lexer(String sql) {
-        this(new StringReader(sql));
+        this(new StringReader(sql), sql);
     }
     
     /**
@@ -29,7 +31,12 @@ public class Lexer {
      * The caller is responsible for closing the Reader.
      */
     public Lexer(Reader sql) {
+        this(sql, null);
+    }
+
+    public Lexer(Reader sql, String command) {
         this.sql = sql;
+        this.command = command;
         this.currentLine = 1;
         this.currentColumn = 1;
     }
@@ -262,7 +269,8 @@ public class Lexer {
     }
 
     private Location tokenLocation() {
-        return new Location(tokenLine, tokenColumn, previousLine, previousColumn);
+        return new Location(tokenLine, tokenColumn, previousLine, previousColumn,
+            command);
     }
     
     /**
@@ -272,7 +280,7 @@ public class Lexer {
      */
     private void addEndOfFile(List tokens) {
         tokens.add(
-            new EndOfFileToken(previousLine, previousColumn)
+            new EndOfFileToken(previousLine, previousColumn, command)
         );
     }
 

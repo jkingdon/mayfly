@@ -13,7 +13,8 @@ public class TextToken extends Token {
     public TextToken(TokenType type, String text, 
         int startLineNumber, int startColumn, int endLineNumber, int endColumn) {
         this(type, text, 
-            new Location(startLineNumber, startColumn, endLineNumber, endColumn));
+            new Location(startLineNumber, startColumn, endLineNumber, endColumn,
+                null));
     }
     public TextToken(TokenType type, String text, Location location) {
         super(type, location);

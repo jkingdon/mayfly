@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly;
 
 import junitx.framework.ArrayAssert;
+import junitx.framework.StringAssert;
 
 import net.sourceforge.mayfly.acceptance.DataTypeTest;
 import net.sourceforge.mayfly.acceptance.MayflyDialect;
@@ -10,8 +11,10 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -242,6 +245,24 @@ public class EndToEndTests extends SqlTestCase {
             RuntimeException unchecked = mayflyException.asRuntimeException();
             assertEquals("no table foo", unchecked.getMessage());
             assertNull(unchecked.getCause());
+
+            StringWriter trace = new StringWriter();
+            unchecked.printStackTrace(new PrintWriter(trace));
+            String traceString = trace.toString();
+
+            StringAssert.assertContains("testExceptionAsRuntime", traceString);
+            StringAssert.assertContains("query", traceString);
+        }
+    }
+    
+    public void testFailingCommand() throws Exception {
+        try {
+            execute("create table drop(x integer)");
+            fail();
+        }
+        catch (MayflySqlException e) {
+            assertEquals("expected identifier but got DROP", e.getMessage());
+            assertEquals("create table drop(x integer)", e.getFailingCommand());
         }
     }
     
