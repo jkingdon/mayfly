@@ -72,7 +72,7 @@ public class MayflySqlException extends SQLException {
      * If Mayfly is unable to supply the command (which means a limitation
      * in Mayfly), returns null.
      */
-    public String getFailingCommand() {
+    public String failingCommand() {
         return location.command;
     }
 

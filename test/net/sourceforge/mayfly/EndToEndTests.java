@@ -262,7 +262,21 @@ public class EndToEndTests extends SqlTestCase {
         }
         catch (MayflySqlException e) {
             assertEquals("expected identifier but got DROP", e.getMessage());
-            assertEquals("create table drop(x integer)", e.getFailingCommand());
+            assertEquals("create table drop(x integer)", e.failingCommand());
+        }
+    }
+    
+    public void testCommandInPreparedStatement() throws Exception {
+        execute("create table foo(x integer)");
+        try {
+            connection.prepareStatement(
+                "select table from foo where x < ?");
+            fail();
+        }
+        catch (MayflySqlException e) {
+            assertEquals("expected primary but got TABLE", e.getMessage());
+            assertEquals("select table from foo where x < ?", 
+                e.failingCommand());
         }
     }
     

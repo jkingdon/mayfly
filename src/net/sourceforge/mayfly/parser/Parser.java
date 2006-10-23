@@ -1013,6 +1013,11 @@ public class Parser {
             return expression;
         }
         else {
+            /* What's the right wording for this?  The average SQL programmer
+               shouldn't have to know what a "primary" is (it is sort
+               of a made-up word devised for writing a grammar, really).
+               Would "expression" work?
+            */
             throw new ParserException("primary", currentToken());
         }
     }
