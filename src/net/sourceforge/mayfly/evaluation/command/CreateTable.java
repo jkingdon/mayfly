@@ -5,15 +5,14 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
-import net.sourceforge.mayfly.datastore.constraint.Action;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
-import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 import net.sourceforge.mayfly.datastore.constraint.UniqueConstraint;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -84,38 +83,10 @@ public class CreateTable extends Command {
         L result = new L();
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
             UnresolvedForeignKey key = (UnresolvedForeignKey) iter.next();
-            UnresolvedTableReference targetTable = key.targetTable;
-            if (hasForeignKey(key.constraintName, result)) {
-                throw new MayflyException(
-                    "duplicate constraint name " + key.constraintName);
-            }
-            result.add(
-                new ForeignKey(
-                    schema,
-                    table,
-                    key.referencingColumn,
-
-                    targetTable.resolve(store, schema, table),
-                    key.targetColumn,
-                    
-                    key.onDelete,
-                    key.onUpdate,
-                    
-                    key.constraintName
-                )
-            );
+            key.checkDuplicates(Collections.unmodifiableList(result));
+            result.add(key.resolve(store, schema, table));
         }
         return result;
-    }
-
-    private boolean hasForeignKey(String constraintName, L keys) {
-        for (Iterator iter = keys.iterator(); iter.hasNext();) {
-            ForeignKey key = (ForeignKey) iter.next();
-            if (key.nameMatches(constraintName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private Columns resolveColumns(List constraintColumns) {
@@ -143,14 +114,8 @@ public class CreateTable extends Command {
         uniqueConstraints.add(columns);
     }
 
-    public void addForeignKeyConstraint(String referencingColumn, 
-        UnresolvedTableReference targetTable, String targetColumn, 
-        Action onDelete, Action onUpdate, String constraintName) {
-        foreignKeyConstraints.add(
-            new UnresolvedForeignKey(
-                referencingColumn, targetTable, targetColumn, onDelete, onUpdate,
-                constraintName
-            ));
+    public void addForeignKeyConstraint(UnresolvedForeignKey key) {
+        foreignKeyConstraints.add(key);
     }
     
     /**
@@ -162,27 +127,6 @@ public class CreateTable extends Command {
             primaryKeyColumns != null || 
             !uniqueConstraints.isEmpty() || 
             !foreignKeyConstraints.isEmpty();
-    }
-    
-    static class UnresolvedForeignKey {
-        final String referencingColumn;
-        final UnresolvedTableReference targetTable;
-        final String targetColumn;
-        final Action onDelete;
-        final Action onUpdate;
-        final String constraintName;
-
-        public UnresolvedForeignKey(String referencingColumn, 
-            UnresolvedTableReference targetTable, String targetColumn, 
-            Action onDelete, Action onUpdate, String constraintName) {
-            this.referencingColumn = referencingColumn;
-            this.targetTable = targetTable;
-            this.targetColumn = targetColumn;
-            this.onDelete = onDelete;
-            this.onUpdate = onUpdate;
-            this.constraintName = constraintName;
-        }
-        
     }
 
 }

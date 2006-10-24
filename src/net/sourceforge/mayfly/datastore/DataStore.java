@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
@@ -199,9 +200,18 @@ public class DataStore {
 
     public DataStore dropForeignKey(TableReference table, String constraintName) {
         Schema existing = schema(table.schema());
-        Schema updatedSchema = existing.dropForeignKey(
-            table.tableName(), constraintName);
-        return replace(table.schema(), updatedSchema);
+        return replace(
+            table.schema(), 
+            existing.dropForeignKey(table.tableName(), constraintName)
+        );
+    }
+
+    public DataStore addForeignKey(TableReference table, ForeignKey key) {
+        Schema existing = schema(table.schema());
+        return replace(
+            table.schema(), 
+            existing.addForeignKey(table.tableName(), key)
+        );
     }
 
 }

@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
@@ -246,6 +247,10 @@ public class TableData {
         return rows.size();
     }
 
+    public Row row(int index) {
+        return (Row) rows.element(index);
+    }
+
     public Rows rows() {
         return rows;
     }
@@ -332,6 +337,14 @@ public class TableData {
         return new TableData(
             columns,
             constraints.dropForeignKey(constraintName),
+            rows
+        );
+    }
+
+    public TableData addForeignKey(ForeignKey key) {
+        return new TableData(
+            columns,
+            constraints.addForeignKey(key),
             rows
         );
     }

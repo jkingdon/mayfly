@@ -55,11 +55,23 @@ public class ForeignKey {
         }
     }
 
+    public void checkExistingRows(DataStore store) {
+        TableData table = store.schema(referencerSchema).table(referencerTable);
+        for (int i = 0; i < table.rowCount(); ++i) {
+            Row row = table.row(i);
+            checkInsert(store, row, Location.UNKNOWN);
+        }
+    }
+
     public void checkInsert(DataStore store, String schema, String table, 
         Row proposedRow, Location location) {
 
         checkWeAreInTheRightPlace(schema, table);
 
+        checkInsert(store, proposedRow, location);
+    }
+
+    private void checkInsert(DataStore store, Row proposedRow, Location location) {
         TableData foundTable = store.table(targetTable);
         Cell value = proposedRow.cell(referencerColumn);
         if (!(value instanceof NullCell) &&
@@ -76,7 +88,7 @@ public class ForeignKey {
                 }
             }
 
-            throwInsertException(schema, value, location);
+            throwInsertException(referencerSchema, value, location);
         }
     }
 

@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
@@ -182,6 +183,10 @@ public class Schema {
 
     public Schema dropForeignKey(String table, String constraintName) {
         return replaceTable(table, table(table).dropForeignKey(constraintName));
+    }
+
+    public Schema addForeignKey(String table, ForeignKey key) {
+        return replaceTable(table, table(table).addForeignKey(key));
     }
 
 }

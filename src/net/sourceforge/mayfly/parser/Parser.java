@@ -27,6 +27,7 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.AddColumn;
+import net.sourceforge.mayfly.evaluation.command.AddForeignKey;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.CreateSchema;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
@@ -38,6 +39,7 @@ import net.sourceforge.mayfly.evaluation.command.Insert;
 import net.sourceforge.mayfly.evaluation.command.ModifyColumn;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedForeignKey;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
 import net.sourceforge.mayfly.evaluation.command.Update;
 import net.sourceforge.mayfly.evaluation.condition.And;
@@ -418,10 +420,18 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_add)) {
             // optional according to SQL92 but does anyone omit it?
-            expectAndConsume(TokenType.KEYWORD_column);
-    
-            Column newColumn = parseColumnDisallowingMostConstraints(table);
-            return new AddColumn(table, newColumn);
+            if (consumeIfMatches(TokenType.KEYWORD_column)) {
+                Column newColumn = parseColumnDisallowingMostConstraints(table);
+                return new AddColumn(table, newColumn);
+            }
+            else if (currentTokenType() == TokenType.KEYWORD_foreign) {
+                UnresolvedForeignKey key = parseForeignKeyConstraint(null);
+                return new AddForeignKey(table, key);
+            }
+            else {
+                throw new ParserException(
+                    "alter table add action", currentToken());
+            }
         }
         else if (consumeNonReservedWordIfMatches("modify")) {
             expectAndConsume(TokenType.KEYWORD_column);
@@ -486,7 +496,7 @@ public class Parser {
             table.addUniqueConstraint(parseColumnNames());
         }
         else if (currentTokenType() == TokenType.KEYWORD_foreign) {
-            parseForeignKeyConstraint(table, constraintName);
+            table.addForeignKeyConstraint(parseForeignKeyConstraint(constraintName));
         }
         else {
             throw new MayflyInternalException(
@@ -494,7 +504,7 @@ public class Parser {
         }
     }
 
-    private void parseForeignKeyConstraint(CreateTable table, String constraintName) {
+    private UnresolvedForeignKey parseForeignKeyConstraint(String constraintName) {
         expectAndConsume(TokenType.KEYWORD_foreign);
         expectAndConsume(TokenType.KEYWORD_key);
         expectAndConsume(TokenType.OPEN_PAREN);
@@ -508,10 +518,11 @@ public class Parser {
         expectAndConsume(TokenType.CLOSE_PAREN);
         
         Actions actions = parseActions();
-        table.addForeignKeyConstraint(referencingColumn, 
-            targetTable, targetColumn,
+        return new UnresolvedForeignKey(
+            referencingColumn, targetTable, targetColumn, 
             actions.onDelete, actions.onUpdate,
-            constraintName);
+            constraintName
+        );
     }
 
     Actions parseActions() {

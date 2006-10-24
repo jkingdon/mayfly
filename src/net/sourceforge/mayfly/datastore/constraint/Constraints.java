@@ -147,4 +147,11 @@ public class Constraints {
         return new ImmutableList(keys);
     }
 
+    public Constraints addForeignKey(ForeignKey key) {
+        return new Constraints(
+            primaryKey, 
+            constraints, 
+            foreignKeys.with(key));
+    }
+
 }
