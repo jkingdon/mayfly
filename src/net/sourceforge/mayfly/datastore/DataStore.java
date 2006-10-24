@@ -193,8 +193,15 @@ public class DataStore {
 
     public UpdateStore modifyColumn(TableReference table, Column newColumn) {
         Schema existing = schema(table.schema());
-        Schema updatedSchema = existing.modifyColumn(table, newColumn);
+        Schema updatedSchema = existing.modifyColumn(table.tableName(), newColumn);
         return new UpdateStore(replace(table.schema(), updatedSchema), 0);
+    }
+
+    public DataStore dropForeignKey(TableReference table, String constraintName) {
+        Schema existing = schema(table.schema());
+        Schema updatedSchema = existing.dropForeignKey(
+            table.tableName(), constraintName);
+        return replace(table.schema(), updatedSchema);
     }
 
 }

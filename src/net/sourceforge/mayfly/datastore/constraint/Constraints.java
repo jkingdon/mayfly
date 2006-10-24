@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
@@ -119,6 +120,31 @@ public class Constraints {
             ForeignKey key = (ForeignKey) iter.next();
             key.checkDropTargetColumn(table, column);
         }
+    }
+
+    public Constraints dropForeignKey(String constraintName) {
+        return new Constraints(
+            primaryKey, 
+            constraints, 
+            foreignKeysWithout(constraintName));
+    }
+
+    private ImmutableList foreignKeysWithout(String constraintName) {
+        boolean found = false;
+        List keys = new ArrayList();
+        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
+            ForeignKey key = (ForeignKey) iter.next();
+            if (!key.nameMatches(constraintName)) {
+                keys.add(key);
+            }
+            else {
+                found = true;
+            }
+        }
+        if (!found) {
+            throw new MayflyException("no foreign key " + constraintName);
+        }
+        return new ImmutableList(keys);
     }
 
 }

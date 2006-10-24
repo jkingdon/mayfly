@@ -132,11 +132,7 @@ public class MayflyDialect extends Dialect {
     }
     
     public boolean onUpdateSetNullAndCascadeMissing() {
-        return true;
+        return !wishThisWereTrue();
     }
     
-    public boolean haveDropForeignKey() {
-        return wishThisWereTrue();
-    }
-
 }

@@ -59,8 +59,7 @@ public class Schema {
         }
     }
 
-    public Schema modifyColumn(TableReference table, Column newColumn) {
-        String tableName = table.tableName();
+    public Schema modifyColumn(String tableName, Column newColumn) {
         TableData oldTable = table(tableName);
         return new Schema(
             tables.with(tableName, oldTable.modifyColumn(newColumn)));
@@ -153,10 +152,12 @@ public class Schema {
     }
 
     private UpdateSchema replaceTable(String table, UpdateTable result) {
-        Schema schema = new Schema(
-            tables.with(lookUpTable(table), result.table())
-        );
+        Schema schema = replaceTable(table, result.table());
         return new UpdateSchema(schema, result.rowsAffected());
+    }
+
+    private Schema replaceTable(String tableName, TableData table) {
+        return new Schema(tables.with(lookUpTable(tableName), table));
     }
 
     public DataStore checkDelete(
@@ -177,6 +178,10 @@ public class Schema {
             TableData potentialReferencer = (TableData) iter.next();
             potentialReferencer.checkDropTable(store, schema, table);
         }
+    }
+
+    public Schema dropForeignKey(String table, String constraintName) {
+        return replaceTable(table, table(table).dropForeignKey(constraintName));
     }
 
 }

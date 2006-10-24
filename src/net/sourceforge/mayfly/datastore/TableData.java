@@ -328,4 +328,12 @@ public class TableData {
         );
     }
 
+    public TableData dropForeignKey(String constraintName) {
+        return new TableData(
+            columns,
+            constraints.dropForeignKey(constraintName),
+            rows
+        );
+    }
+
 }

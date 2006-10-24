@@ -397,5 +397,24 @@ public class ForeignKeyTest extends SqlTestCase {
     // multiple referencing columns where one is NULL (but others are not)
     // "references foo" (omitting the '(' column... ')')
     // reference to something other than a primary key (an error, right?)
+    // reference to UNIQUE column (I think this is legal.  Is it?)
+    /* "If there are several rows in the parent table..." case 
+       from the MySQL 5.1 manual. */
+    /* self-referential ON UPDATE CASCADE or ON UPDATE SET NULL
+       (see MySQL 5.1 manual) */
+    // deleting a record which refers to itself via foreign key
+    /* A command which affects several rows - should check them
+       as a batch, not row-by-row */
+    
+    public void testDuplicateConstraintName() throws Exception {
+        execute("create table foo(id integer)"
+            + dialect.databaseTypeForForeignKeys());
+        expectExecuteFailure("create table bar (x integer," +
+            "constraint dup foreign key(x) references foo(id)," +
+            "y integer," +
+            "constraint dup foreign key(y) references foo(id)" +
+            ")" + dialect.databaseTypeForForeignKeys(),
+            "duplicate constraint name dup");
+    }
 
 }

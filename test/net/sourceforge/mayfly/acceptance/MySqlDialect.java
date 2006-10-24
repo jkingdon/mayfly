@@ -73,6 +73,12 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean constraintNamesMightBeCaseSensitive() {
+        // I didn't find this one in the MySQL 5.1 documentation under foreign
+        // keys.  Maybe there is a separate section about constraint names.
+        return true;
+    }
+
     public boolean crossJoinCanHaveOn() {
         return true;
     }

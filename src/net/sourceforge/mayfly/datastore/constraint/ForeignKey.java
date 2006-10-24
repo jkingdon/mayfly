@@ -21,17 +21,18 @@ public class ForeignKey {
 
     private final Action onDelete;
     private final Action onUpdate;
+    private final String constraintName;
     
     public ForeignKey(String referencerTable, String referencerColumn,
         TableReference targetTable, String targetColumn) {
         this(DataStore.ANONYMOUS_SCHEMA_NAME, referencerTable, referencerColumn,
-            targetTable, targetColumn, new NoAction(), new NoAction());
+            targetTable, targetColumn, new NoAction(), new NoAction(), null);
     }
 
     public ForeignKey(
         String referencerSchema, String referencerTable, String referencerColumn, 
         TableReference targetTable, String targetColumn, 
-        Action onDelete, Action onUpdate) {
+        Action onDelete, Action onUpdate, String constraintName) {
         
         this.referencerSchema = referencerSchema;
         this.referencerTable = referencerTable;
@@ -41,6 +42,7 @@ public class ForeignKey {
         this.targetColumn = targetColumn;
         this.onDelete = onDelete;
         this.onUpdate = onUpdate;
+        this.constraintName = constraintName;
         
         if (onUpdate instanceof Cascade) {
             throw new MayflyException("ON UPDATE CASCADE not implemented");
@@ -178,6 +180,13 @@ public class ForeignKey {
                 ", column " + referencerColumn
                 );
         }
+    }
+
+    public boolean nameMatches(String target) {
+        if (constraintName == null) {
+            return false;
+        }
+        return this.constraintName.equalsIgnoreCase(target);
     }
 
 }

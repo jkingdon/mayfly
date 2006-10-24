@@ -81,6 +81,10 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean constraintNamesMightBeCaseSensitive() {
+        return false;
+    }
+
     public boolean detectsAmbiguousColumns() {
         return true;
     }

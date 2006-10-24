@@ -167,6 +167,10 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    public boolean haveDropForeignKey() {
+        return false;
+    }
+    
     public boolean defaultValueCanBeExpression() {
         return true;
     }

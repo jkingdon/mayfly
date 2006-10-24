@@ -85,6 +85,10 @@ public class CreateTable extends Command {
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
             UnresolvedForeignKey key = (UnresolvedForeignKey) iter.next();
             UnresolvedTableReference targetTable = key.targetTable;
+            if (hasForeignKey(key.constraintName, result)) {
+                throw new MayflyException(
+                    "duplicate constraint name " + key.constraintName);
+            }
             result.add(
                 new ForeignKey(
                     schema,
@@ -95,11 +99,23 @@ public class CreateTable extends Command {
                     key.targetColumn,
                     
                     key.onDelete,
-                    key.onUpdate
+                    key.onUpdate,
+                    
+                    key.constraintName
                 )
             );
         }
         return result;
+    }
+
+    private boolean hasForeignKey(String constraintName, L keys) {
+        for (Iterator iter = keys.iterator(); iter.hasNext();) {
+            ForeignKey key = (ForeignKey) iter.next();
+            if (key.nameMatches(constraintName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private Columns resolveColumns(List constraintColumns) {
@@ -129,10 +145,11 @@ public class CreateTable extends Command {
 
     public void addForeignKeyConstraint(String referencingColumn, 
         UnresolvedTableReference targetTable, String targetColumn, 
-        Action onDelete, Action onUpdate) {
+        Action onDelete, Action onUpdate, String constraintName) {
         foreignKeyConstraints.add(
             new UnresolvedForeignKey(
-                referencingColumn, targetTable, targetColumn, onDelete, onUpdate
+                referencingColumn, targetTable, targetColumn, onDelete, onUpdate,
+                constraintName
             ));
     }
     
@@ -153,15 +170,17 @@ public class CreateTable extends Command {
         final String targetColumn;
         final Action onDelete;
         final Action onUpdate;
+        final String constraintName;
 
         public UnresolvedForeignKey(String referencingColumn, 
             UnresolvedTableReference targetTable, String targetColumn, 
-            Action onDelete, Action onUpdate) {
+            Action onDelete, Action onUpdate, String constraintName) {
             this.referencingColumn = referencingColumn;
             this.targetTable = targetTable;
             this.targetColumn = targetColumn;
             this.onDelete = onDelete;
             this.onUpdate = onUpdate;
+            this.constraintName = constraintName;
         }
         
     }
