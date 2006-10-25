@@ -349,4 +349,8 @@ public class TableData {
         );
     }
 
+    public boolean hasPrimaryKey(String targetColumn) {
+        return constraints.hasPrimaryKey(targetColumn);
+    }
+
 }

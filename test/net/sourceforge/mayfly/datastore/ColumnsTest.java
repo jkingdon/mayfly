@@ -21,7 +21,6 @@ public class ColumnsTest extends TestCase {
                     .append(new Column("b"))
                     .asImmutable()),
             Columns.fromColumnNames(
-                "foo",
                 new L()
                     .append("a")
                     .append("b")

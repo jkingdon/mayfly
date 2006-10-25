@@ -26,7 +26,7 @@ public class CreateTable extends Command {
 
     public CreateTable(String table, List columnNames) {
         this.table = table;
-        this.columns = Columns.fromColumnNames(table, columnNames);
+        this.columns = Columns.fromColumnNames(columnNames);
     }
 
     public CreateTable(String table) {

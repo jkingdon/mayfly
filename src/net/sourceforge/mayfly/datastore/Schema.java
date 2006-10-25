@@ -29,7 +29,7 @@ public class Schema {
     public Schema createTable(String table, List columnNames) {
         return createTable(
             table, 
-            Columns.fromColumnNames(table, columnNames), 
+            Columns.fromColumnNames(columnNames), 
             new Constraints());
     }
 

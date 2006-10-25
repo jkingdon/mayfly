@@ -34,8 +34,16 @@ public class NullCell extends Cell {
         return 0;
     }
 
+    public double asDouble() throws SQLException {
+        // What are we supposed to return here?
+        throw new SQLException("Attempt to read SQL NULL as an object");
+    }
+    
     public String asString() {
-        // JDBC seems to force this on us (null, "", or what?).
+        return null;
+    }
+    
+    public byte[] asBytes() throws SQLException {
         return null;
     }
     
@@ -50,11 +58,6 @@ public class NullCell extends Cell {
     public Object asObject() {
         // What are we supposed to return here?
         throw new MayflyException("Attempt to read SQL NULL as an object");
-    }
-    
-    public double asDouble() throws SQLException {
-        // What are we supposed to return here?
-        throw new SQLException("Attempt to read SQL NULL as an object");
     }
     
     public int compareTo(Cell otherCell) {

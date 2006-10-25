@@ -16,11 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 public class Columns extends Aggregate {
-    public static Columns fromColumnNames(final String tableName, List columnNameStrings) {
-        if (tableName == null) {
-            throw new NullPointerException("must pass table to fromColumnNames");
-        }
-
+    public static Columns fromColumnNames(List columnNameStrings) {
         L columnList =
             new L(columnNameStrings)
                 .collect(

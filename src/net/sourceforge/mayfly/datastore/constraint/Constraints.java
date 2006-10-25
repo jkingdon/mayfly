@@ -154,4 +154,10 @@ public class Constraints {
             foreignKeys.with(key));
     }
 
+    public boolean hasPrimaryKey(String targetColumn) {
+        return
+            primaryKey != null
+            && primaryKey.matches(targetColumn);
+    }
+
 }

@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
@@ -11,6 +12,7 @@ import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
 import java.util.Collections;
@@ -101,6 +103,34 @@ public class TableDataTest extends TestCase {
         assertEquals(1, newTable.table().rowCount());
         Row remainingRow = (Row) newTable.table().rows().element(0);
         MayflyAssert.assertLong(2, remainingRow.cell("a"));
+    }
+    
+    public void testHasPrimaryKeyIsSelective() throws Exception {
+        TableData table = new TableData(
+            Columns.fromColumnNames(
+                new L()
+                    .append("a")
+                    .append("b")
+            ),
+            new Constraints(
+                new PrimaryKey(Columns.singleton(new Column("a"))),
+                new ImmutableList(),
+                new ImmutableList()
+            ), 
+            new Rows()
+        );
+        
+        assertTrue(table.hasPrimaryKey("a"));
+        assertFalse(table.hasPrimaryKey("b"));
+    }
+    
+    public void testHasPrimaryKeyWithNone() throws Exception {
+        TableData table = new TableData(
+            Columns.fromColumnNames(ImmutableList.singleton("a")),
+            new Constraints(), 
+            new Rows()
+        );
+        assertFalse(table.hasPrimaryKey("a"));
     }
 
 }

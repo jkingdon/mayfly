@@ -102,24 +102,12 @@ public class ForeignKey {
     }
 
     private void throwInsertException(String schema, Cell value, Location location) {
-        String targetTableName = formatTableName(
-            schema, targetTable.schema(), targetTable.tableName());
+        String targetTableName = targetTable.displayName(schema);
         throw new MayflyException("foreign key violation: " + targetTableName + 
             " has no " +
             targetColumn +
             " " + value.asBriefString(),
             location);
-    }
-
-    private String formatTableName(
-        String defaultSchema, String schemaToFormat, String tableToFormat) {
-        StringBuilder result = new StringBuilder();
-        if (!schemaToFormat.equalsIgnoreCase(defaultSchema)) {
-            result.append(schemaToFormat);
-            result.append(".");
-        }
-        result.append(tableToFormat);
-        return result.toString();
     }
 
     public DataStore checkDelete(DataStore store, String schema, String table, 
@@ -156,7 +144,7 @@ public class ForeignKey {
             throw new MayflyException(
                 "cannot drop " + table +
                 " because a foreign key in table " + 
-                formatTableName(schema, referencerSchema, referencerTable) +
+                TableReference.formatTableName(schema, referencerSchema, referencerTable) +
                 " refers to it"
             );
         }

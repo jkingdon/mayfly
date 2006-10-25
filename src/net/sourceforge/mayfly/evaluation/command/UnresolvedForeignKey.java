@@ -1,12 +1,14 @@
 package net.sourceforge.mayfly.evaluation.command;
 
-import java.util.Iterator;
-import java.util.List;
-
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.TableData;
+import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.datastore.constraint.Action;
 import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class UnresolvedForeignKey {
     private final String referencingColumn;
@@ -28,12 +30,29 @@ public class UnresolvedForeignKey {
     }
     
     public ForeignKey resolve(DataStore store, String schema, String table) {
+        TableReference resolvedTargetTable = 
+            targetTable.resolve(store, schema, table);
+        if (resolvedTargetTable.tableName().equalsIgnoreCase(table)) {
+            // self-reference case.  For now, don't worry about primary
+            // keys.
+        }
+        else {
+            TableData targetTableData = store.table(resolvedTargetTable);
+            if (!targetTableData.hasPrimaryKey(targetColumn)) {
+                throw new MayflyException("foreign key refers to " +
+                    resolvedTargetTable.displayName(schema) +
+                    "(" + targetColumn + ")" +
+                    " which is not unique or a primary key"
+                );
+            }
+        }
+
         ForeignKey resolvedKey = new ForeignKey(
             schema,
             table,
             referencingColumn,
 
-            targetTable.resolve(store, schema, table),
+            resolvedTargetTable,
             targetColumn,
             
             onDelete,

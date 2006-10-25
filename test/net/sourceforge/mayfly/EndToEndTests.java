@@ -210,7 +210,8 @@ public class EndToEndTests extends SqlTestCase {
       data structures don't end up in an inconsistent state.
     */
     public void testForeignKey() throws Exception {
-        execute("create table currency(id integer, name varchar(255))");
+        execute("create table currency(" +
+            "id integer primary key, name varchar(255))");
         execute("create table balance(" +
             "amount decimal(10,3), " +
             "currency integer, " +

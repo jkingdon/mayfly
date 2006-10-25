@@ -101,4 +101,8 @@ public abstract class NotNullOrUnique extends Constraint {
         return true;
     }
 
+    public boolean matches(String targetColumn) {
+        return names.size() == 1 && names.hasColumn(targetColumn);
+    }
+
 }

@@ -29,4 +29,23 @@ public class TableReference {
             && table.equalsIgnoreCase(candidateTable);
     }
 
+    public static String formatTableName(
+        String defaultSchema, String schemaToFormat, String tableToFormat) {
+        StringBuilder result = new StringBuilder();
+        if (!schemaToFormat.equalsIgnoreCase(defaultSchema)) {
+            result.append(schemaToFormat);
+            result.append(".");
+        }
+        result.append(tableToFormat);
+        return result.toString();
+    }
+    
+    public String toString() {
+        return formatTableName(null, schema, table);
+    }
+    
+    public String displayName(String defaultSchema) {
+        return formatTableName(defaultSchema, schema, table);
+    }
+
 }

@@ -414,6 +414,14 @@ public class DataTypeTest extends SqlTestCase {
         execute("insert into foo(x) values(null)");
         assertResultSet(new String[] { " null " }, 
             query("select x from foo"));
+        
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+        byte[] bytes = results.getBytes("x");
+        assertNull(bytes);
+        assertTrue(results.wasNull());
+        assertFalse(results.next());
+        results.close();
     }
 
 }
