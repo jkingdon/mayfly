@@ -377,6 +377,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean foreignKeyJustNeedsIndex() {
+        return false;
+    }
+
     public boolean onDeleteSetDefaultMissing(boolean tableCreateTime) {
         return false;
     }

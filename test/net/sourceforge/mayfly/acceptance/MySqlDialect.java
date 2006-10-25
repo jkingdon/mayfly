@@ -186,6 +186,24 @@ public class MySqlDialect extends Dialect {
         return " type=innodb";
     }
     
+    public boolean foreignKeyJustNeedsIndex() {
+        /*
+           The MySQL rule is somewhat complicated, and is harder to figure
+           out because the error message is just "errno 150" with the
+           real error message buried in SHOW ENGINE INNODB STATUS.
+           But the behavior is basically documented.
+           
+           The rule is that a foreign key needs an index on both
+           the referenced column, and the referring column.
+           The index on the the referring column will be automatically
+           created if need be.  The index on the referenced one will
+           not.  Various bits of SQL cause an index to be created
+           (most obviously PRIMARY KEY, but also things like another
+           foreign key, per the rule given above).
+         */
+        return true;
+    }
+    
     public boolean onDeleteSetDefaultMissing(boolean tableCreateTime) {
         return true;
     }

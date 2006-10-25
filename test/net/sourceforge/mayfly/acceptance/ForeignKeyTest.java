@@ -401,6 +401,26 @@ public class ForeignKeyTest extends SqlTestCase {
             + dialect.databaseTypeForForeignKeys(),
             "foreign key refers to foo(id) which is not unique or a primary key");
     }
+    
+    public void testReferencedColumnHasAnotherForeignKey() throws Exception {
+        execute("create table fixer(id integer primary key)" 
+            + dialect.databaseTypeForForeignKeys());
+        execute("create table foo(id integer," +
+            "foreign key(id) references fixer(id)" +
+            ")" 
+            + dialect.databaseTypeForForeignKeys());
+        String barSql = "create table bar(" +
+            "foo_id integer, foreign key (foo_id) references foo(id))" 
+            + dialect.databaseTypeForForeignKeys();
+        if (dialect.foreignKeyJustNeedsIndex()) {
+            execute(barSql);
+        }
+        else {
+            expectExecuteFailure(barSql,
+                "foreign key refers to foo(id) " +
+                "which is not unique or a primary key");
+        }
+    }
 
     // reference to UNIQUE column (I think this is legal.  Is it?)
     // same cases (primary key, unique) but with self-reference
