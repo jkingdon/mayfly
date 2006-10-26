@@ -62,13 +62,6 @@ public class AggregateTest extends TestCase {
         );
     }
 
-    public void testPlus() throws Exception {
-        assertEquals(
-            new Strings("a", "b"),
-            new Strings("a").plus(new Strings("b"))
-        );
-    }
-
     public void testZipper() throws Exception {
         assertEquals(
             new M()
@@ -99,18 +92,6 @@ public class AggregateTest extends TestCase {
         );
     }
 
-    public void testWith() throws Exception {
-        Strings original = new Strings("a");
-        Strings result = (Strings) original.with("b");
-
-        assertEquals(
-            new Strings("a", "b"),
-            result
-        );
-
-        assertFalse(original==result);
-    }
-
     public void testIndex() throws Exception {
         assertEquals("b", new Strings("a", "b", "c").element(1));
     }
@@ -134,30 +115,6 @@ public class AggregateTest extends TestCase {
     public void testHasContents() throws Exception {
         assertTrue(new Strings("a").hasContents());
         assertFalse(new Strings().hasContents());
-    }
-
-    public void testCartesianJoin() throws Exception {
-        L leftSide =
-            new L()
-                .append(new Strings("a"))
-                .append(new Strings("b"));
-
-        L rightSide =
-            new L()
-                .append(new Strings("x", "x"))
-                .append(new Strings("y", "y"))
-                .append(new Strings("z", "z"));
-
-        assertEquals(
-            new L()
-                .append(new Strings("a", "x", "x"))
-                .append(new Strings("a", "y", "y"))
-                .append(new Strings("a", "z", "z"))
-                .append(new Strings("b", "x", "x"))
-                .append(new Strings("b", "y", "y"))
-                .append(new Strings("b", "z", "z")),
-            leftSide.cartesianJoin(rightSide)
-        );
     }
 
     public void testElementsAt() throws Exception {

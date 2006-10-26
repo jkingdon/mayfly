@@ -136,6 +136,10 @@ public class Columns extends Aggregate {
         }
         return new Columns(new ImmutableList(result));
     }
+    
+    public Columns with(Column newColumn) {
+        return new Columns(columns.with(newColumn));
+    }
 
     public Columns without(String target) {
         boolean found = false;

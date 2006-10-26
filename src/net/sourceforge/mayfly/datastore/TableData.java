@@ -74,7 +74,7 @@ public class TableData {
         constraints.check(rows, newRow, values.location);
         checker.checkInsert(constraints, newRow);
 
-        return new TableData(newColumns, constraints, (Rows) rows.with(newRow));
+        return new TableData(newColumns, constraints, rows.with(newRow));
     }
 
     private MayflyException makeException(String message, Columns columnsToInsert, ValueList values) {
@@ -119,12 +119,12 @@ public class TableData {
                 checker.checkInsert(constraints, newRow);
                 checker.checkDelete(row, newRow);
 
-                newRows = (Rows) newRows.with(newRow);
+                newRows = newRows.with(newRow);
                 ++rowsAffected;
             }
             else {
                 constraints.check(newRows, row, Location.UNKNOWN);
-                newRows = (Rows) newRows.with(row);
+                newRows = newRows.with(row);
             }
 
         }
@@ -164,7 +164,7 @@ public class TableData {
                 checker.checkDelete(row, null);
             }
             else {
-                newRows = (Rows) newRows.with(row);
+                newRows = newRows.with(row);
             }
 
         }
@@ -244,11 +244,11 @@ public class TableData {
     }
     
     public int rowCount() {
-        return rows.size();
+        return rows.rowCount();
     }
 
     public Row row(int index) {
-        return (Row) rows.element(index);
+        return rows.row(index);
     }
 
     public Rows rows() {
@@ -292,7 +292,7 @@ public class TableData {
                 "column " + newColumn.columnName() + " already exists");
         }
         return new TableData(
-            (Columns) columns.with(newColumn), 
+            columns.with(newColumn), 
             constraints,
             rows.addColumn(newColumn)
         );

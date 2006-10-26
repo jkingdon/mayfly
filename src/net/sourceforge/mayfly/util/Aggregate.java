@@ -101,15 +101,6 @@ abstract public class Aggregate extends ValueObject implements Iterable {
         return findFirst(selector, true)!=null;
     }
 
-    public Aggregate plus(Aggregate other) {
-        L list =
-            new L()
-                .addAll(this)
-                .addAll(other);
-
-        return createNew(list);
-    }
-
     public L asList() {
         return new L().addAll(this);
     }
@@ -141,11 +132,6 @@ abstract public class Aggregate extends ValueObject implements Iterable {
         return result;
     }
 
-    public Aggregate with(Object newElement) {
-        Aggregate asAnotherAggregate = createNew(new IterableCollection(new L().append(newElement)));
-        return plus(asAnotherAggregate);
-    }
-
     public Object element(int zeroBasedIndex) {
         return asList().get(zeroBasedIndex);
     }
@@ -160,35 +146,6 @@ abstract public class Aggregate extends ValueObject implements Iterable {
 
     public boolean hasContents() {
         return iterator().hasNext();
-    }
-
-    public Aggregate cartesianJoin(final Aggregate rightSide) {
-        final L joinResult = new L();
-
-        each(
-            new Each() {
-                public void each(Object element) {
-                    mustBeAggregateType(element);
-
-                    final Aggregate leftElement = (Aggregate) element;
-
-                    rightSide.each(new Each() {
-                        public void each(Object element) {
-                            mustBeAggregateType(element);
-
-                            Aggregate rightElement = (Aggregate) element;
-
-                            Aggregate combined = leftElement.plus(rightElement);
-
-                            joinResult.append(combined);
-                        }
-                    });
-
-                }
-            }
-        );
-
-        return createNew(joinResult);
     }
 
     static void mustBeAggregateType(Object element) {

@@ -91,7 +91,7 @@ public class CreateTable extends Command {
     }
 
     public void addColumn(Column column) {
-        columns = (Columns) columns.with(column);
+        columns = columns.with(column);
     }
 
     public void setPrimaryKey(UnresolvedPrimaryKey unresolvedPrimaryKey) {

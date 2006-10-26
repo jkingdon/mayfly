@@ -38,7 +38,7 @@ public class TableDataTest extends TestCase {
         assertEquals(1, newTable.columns().size());
         
         assertEquals(1, newTable.rowCount());
-        Row newRow = (Row) newTable.rows().element(0);
+        Row newRow = newTable.row(0);
         assertEquals(1, newRow.columnCount());
         assertEquals("a", newRow.columnName(0));
     }
@@ -75,7 +75,7 @@ public class TableDataTest extends TestCase {
             Condition.TRUE, "table1");
         assertEquals(1, update.rowsAffected());
         TableData newTable = update.table();
-        Row newRow = (Row) newTable.rows().element(0);
+        Row newRow = newTable.row(0);
         DateCell cell = (DateCell) newRow.cell("a");
         assertEquals(2004, cell.year());
         assertEquals(2, cell.month());
@@ -102,7 +102,7 @@ public class TableDataTest extends TestCase {
 
         assertEquals(1, newTable.rowsAffected());
         assertEquals(1, newTable.table().rowCount());
-        Row remainingRow = (Row) newTable.table().rows().element(0);
+        Row remainingRow = newTable.table().row(0);
         MayflyAssert.assertLong(2, remainingRow.cell("a"));
     }
     

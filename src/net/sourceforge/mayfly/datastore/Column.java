@@ -8,7 +8,7 @@ import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ValueObject;
 
-public class Column extends ValueObject implements CellHeader {
+public class Column extends ValueObject {
     private final String columnName;
     private final Cell defaultValue;
     private final Cell onUpdateValue;
