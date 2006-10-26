@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
+import net.sourceforge.mayfly.datastore.constraint.UniqueConstraint;
 import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
@@ -111,17 +112,21 @@ public class TableDataTest extends TestCase {
                 new L()
                     .append("a")
                     .append("b")
+                    .append("c")
             ),
             new Constraints(
                 new PrimaryKey(Columns.singleton(new Column("a"))),
-                new ImmutableList(),
+                ImmutableList.singleton(
+                    new UniqueConstraint(Columns.singleton(new Column("c")))
+                ),
                 new ImmutableList()
             ), 
             new Rows()
         );
         
-        assertTrue(table.hasPrimaryKey("a"));
-        assertFalse(table.hasPrimaryKey("b"));
+        assertTrue(table.hasPrimaryKeyOrUnique("a"));
+        assertFalse(table.hasPrimaryKeyOrUnique("b"));
+        assertTrue(table.hasPrimaryKeyOrUnique("c"));
     }
     
     public void testHasPrimaryKeyWithNone() throws Exception {
@@ -130,7 +135,7 @@ public class TableDataTest extends TestCase {
             new Constraints(), 
             new Rows()
         );
-        assertFalse(table.hasPrimaryKey("a"));
+        assertFalse(table.hasPrimaryKeyOrUnique("a"));
     }
 
 }

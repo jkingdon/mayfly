@@ -422,6 +422,16 @@ public class ForeignKeyTest extends SqlTestCase {
         }
     }
 
+    public void testUnique() throws Exception {
+        execute("create table foo(id integer" +
+            (dialect.uniqueColumnMayBeNullable() ? "" : " not null") +
+            ", unique(id))" 
+            + dialect.databaseTypeForForeignKeys());
+        execute("create table bar(" +
+            "foo_id integer, foreign key (foo_id) references foo(id))" 
+            + dialect.databaseTypeForForeignKeys());
+    }
+    
     // reference to UNIQUE column (I think this is legal.  Is it?)
     // same cases (primary key, unique) but with self-reference
 

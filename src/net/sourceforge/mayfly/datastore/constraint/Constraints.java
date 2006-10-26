@@ -154,10 +154,24 @@ public class Constraints {
             foreignKeys.with(key));
     }
 
+    public boolean hasPrimaryKeyOrUnique(String targetColumn) {
+        return hasPrimaryKey(targetColumn) || hasUnique(targetColumn);
+    }
+
     public boolean hasPrimaryKey(String targetColumn) {
         return
             primaryKey != null
             && primaryKey.matches(targetColumn);
+    }
+
+    public boolean hasUnique(String targetColumn) {
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            UniqueConstraint constraint = (UniqueConstraint) iter.next();
+            if (constraint.matches(targetColumn)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
