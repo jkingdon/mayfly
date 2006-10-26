@@ -107,6 +107,10 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
+    public boolean allowMultipleNullsInUniqueColumn() {
+        return false;
+    }
+    
     public boolean haveUpdateDefault() {
         return false;
     }

@@ -31,11 +31,27 @@ public abstract class NotNullOrUnique extends Constraint {
         for (Iterator iter = existingRows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             List valuesForRow = valuesForRow(row);
-            if (proposedValues.equals(valuesForRow)) {
+            if (sqlEquals(proposedValues, valuesForRow)) {
                 throw new MayflyException(
                     constraintName() + " already has a value " + describeValues(valuesForRow));
             }
         }
+    }
+
+    public static boolean sqlEquals(List left, List right) {
+        if (left.size() != right.size()) {
+            throw new MayflyInternalException(
+                "meant to compare equal size lists but were " + 
+                left.size() + " and " + right.size());
+        }
+        for (int i = 0; i < left.size(); ++i) {
+            Cell leftCell = (Cell) left.get(i);
+            Cell rightCell = (Cell) right.get(i);
+            if (!leftCell.sqlEquals(rightCell)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private List valuesForRow(Row row) {

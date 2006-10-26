@@ -171,10 +171,6 @@ public class MySqlDialect extends Dialect {
         return false;
     }
 
-    public boolean allowMultipleNullsInUniqueColumn() {
-        return true;
-    }
-    
     public boolean haveTransactions() {
         // If we could make sure we were using InnoDB, this
         // perhaps could be true.  At least for now, don't

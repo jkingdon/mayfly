@@ -26,13 +26,28 @@ public class PerformanceTest extends SqlTestCase {
     }
     
     public void xtestLotsOfRows() throws Exception {
-        //  547 ms for 1000 rows
-        //13000 ms for 10000 rows
+        // At the moment, I'm getting 510 ms for MySQL; 2500 ms for Mayfly.
+        // There must be some low-hanging fruit here...
         execute("create table foo(x integer, y integer, z integer, w varchar(50))");
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 1000; ++i) {
+        for (int i = 0; i < 10000; ++i) {
             execute("insert into foo(x, y, w) values (" + 
                 i + ", " + i % 100 + ", " + "'string " + i + "')");
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");
+    }
+    
+    public void xtestLotsOfRowsWithUnique() throws Exception {
+        // Really slow for mayfly (15x slower than without unique).
+        execute(
+            "create table foo(x integer, y integer, z integer, w varchar(50)" +
+            ",unique(x), unique(y)" +
+            ")");
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 10000; ++i) {
+            execute("insert into foo(x, y, w) values (" + 
+                i + ", " + (i + 100) + ", " + "'string " + i + "')");
         }
         long end = System.currentTimeMillis();
         System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");

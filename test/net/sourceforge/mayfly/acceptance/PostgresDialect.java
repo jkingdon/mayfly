@@ -135,10 +135,6 @@ public class PostgresDialect extends Dialect {
         return false;
     }
 
-    public boolean allowMultipleNullsInUniqueColumn() {
-        return true;
-    }
-    
     public boolean haveTinyint() {
         return false;
     }

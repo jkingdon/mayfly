@@ -314,10 +314,19 @@ public abstract class Dialect {
     }
     
     public boolean allowMultipleNullsInUniqueColumn() {
-        // False is analogous to the GROUP BY model in which all rows
-        // with null go in a single group.  It isn't clear whether this
-        // is the best way to treat null or not.
-        return false;
+        /* Most databases which allow nulls in unique columns allow
+           more than one null (which is what this setting means
+           by true).
+           (MySQL, Postgres, Oracle, Firebird, SQLlite)
+           It isn't clear what null would mean if you only get 
+           one row which gets to omit that columns.  
+           
+           On the other hand,
+           false is analogous to the GROUP BY model in which all rows
+           with null go in a single group.  (MS-SQL, Informix, Hypersonic).  
+           
+           Data from http://www.sqlite.org/nulls.html */
+        return true;
     }
 
     public boolean allowUniqueAsPartOfColumnDeclaration() {
