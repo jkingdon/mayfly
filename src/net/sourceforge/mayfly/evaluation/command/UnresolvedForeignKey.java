@@ -10,7 +10,7 @@ import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 import java.util.Iterator;
 import java.util.List;
 
-public class UnresolvedForeignKey {
+public class UnresolvedForeignKey extends UnresolvedConstraint {
     private final String referencingColumn;
     private final UnresolvedTableReference targetTable;
     private final String targetColumn;

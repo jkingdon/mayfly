@@ -51,4 +51,14 @@ public class ColumnNames {
         return false;
     }
 
+    public Columns resolve(Columns tableColumns) {
+        List resolvedColumns = new ArrayList();
+        for (Iterator iter = iterator(); iter.hasNext();) {
+            String columnName = (String) iter.next();
+            Column column = tableColumns.columnFromName(columnName);
+            resolvedColumns.add(column);
+        }
+        return new Columns(new ImmutableList(resolvedColumns));
+    }
+
 }

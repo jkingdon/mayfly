@@ -1,13 +1,13 @@
 package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
-import net.sourceforge.mayfly.datastore.constraint.UniqueConstraint;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 
@@ -20,8 +20,8 @@ public class CreateTable extends Command {
 
     private String table;
     private Columns columns;
-    private List primaryKeyColumns;
-    private List /* <List<String>> */ uniqueConstraints = new ArrayList();
+    private UnresolvedPrimaryKey primaryKey;
+    private List uniqueConstraints = new ArrayList();
     private List foreignKeyConstraints = new ArrayList();
 
     public CreateTable(String table, List columnNames) {
@@ -63,18 +63,19 @@ public class CreateTable extends Command {
     }
 
     private PrimaryKey primaryKey() {
-        if (primaryKeyColumns == null) {
+        if (primaryKey == null) {
             return null;
         }
 
-        return new PrimaryKey(resolveColumns(primaryKeyColumns));
+        return primaryKey.resolve(columns);
     }
     
     private L uniqueConstraints() {
         L result = new L();
         for (Iterator iter = uniqueConstraints.iterator(); iter.hasNext();) {
-            List columns = (List) iter.next();
-            result.add(new UniqueConstraint(resolveColumns(columns)));
+            UnresolvedUniqueConstraint constraint = 
+                (UnresolvedUniqueConstraint) iter.next();
+            result.add(constraint.resolve(this.columns));
         }
         return result;
     }
@@ -89,33 +90,33 @@ public class CreateTable extends Command {
         return result;
     }
 
-    private Columns resolveColumns(List constraintColumns) {
-        List resolvedColumns = new ArrayList();
-        for (Iterator iter = constraintColumns.iterator(); iter.hasNext();) {
-            String columnName = (String) iter.next();
-            Column column = columns.columnFromName(columnName);
-            resolvedColumns.add(column);
-        }
-        return new Columns(new ImmutableList(resolvedColumns));
-    }
-
     public void addColumn(Column column) {
         columns = (Columns) columns.with(column);
     }
 
-    public void setPrimaryKey(List columns) {
-        if (primaryKeyColumns != null) {
+    public void setPrimaryKey(UnresolvedPrimaryKey unresolvedPrimaryKey) {
+        if (primaryKey != null) {
             throw new MayflyException("attempt to define more than one primary key for table " + table);
         }
-        primaryKeyColumns = columns;
+        primaryKey = unresolvedPrimaryKey;
     }
     
-    public void addUniqueConstraint(List columns) {
-        uniqueConstraints.add(columns);
+    public void addUniqueConstraint(UnresolvedUniqueConstraint constraint) {
+        uniqueConstraints.add(constraint);
     }
 
     public void addForeignKeyConstraint(UnresolvedForeignKey key) {
         foreignKeyConstraints.add(key);
+    }
+    
+    public void addConstraint(UnresolvedConstraint constraint) {
+        if (constraint instanceof UnresolvedForeignKey) {
+            addForeignKeyConstraint((UnresolvedForeignKey) constraint);
+        }
+        else {
+            throw new UnimplementedException(
+                "Do not recognize " + constraint.getClass().getName());
+        }
     }
     
     /**
@@ -124,7 +125,7 @@ public class CreateTable extends Command {
      */
     public boolean hasConstraints() {
         return 
-            primaryKeyColumns != null || 
+            primaryKey != null || 
             !uniqueConstraints.isEmpty() || 
             !foreignKeyConstraints.isEmpty();
     }

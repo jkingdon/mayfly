@@ -40,7 +40,9 @@ import net.sourceforge.mayfly.evaluation.command.ModifyColumn;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedForeignKey;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedPrimaryKey;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedUniqueConstraint;
 import net.sourceforge.mayfly.evaluation.command.Update;
 import net.sourceforge.mayfly.evaluation.condition.And;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
@@ -490,13 +492,13 @@ public class Parser {
 
         if (consumeIfMatches(TokenType.KEYWORD_primary)) {
             expectAndConsume(TokenType.KEYWORD_key);
-            table.setPrimaryKey(parseColumnNames());
+            table.setPrimaryKey(new UnresolvedPrimaryKey(parseColumnNames()));
         }
         else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
-            table.addUniqueConstraint(parseColumnNames());
+            table.addUniqueConstraint(new UnresolvedUniqueConstraint(parseColumnNames()));
         }
         else if (currentTokenType() == TokenType.KEYWORD_foreign) {
-            table.addForeignKeyConstraint(parseForeignKeyConstraint(constraintName));
+            table.addConstraint(parseForeignKeyConstraint(constraintName));
         }
         else {
             throw new MayflyInternalException(
@@ -666,10 +668,10 @@ public class Parser {
         while (true) {
             if (consumeIfMatches(TokenType.KEYWORD_primary)) {
                 expectAndConsume(TokenType.KEYWORD_key);
-                table.setPrimaryKey(Collections.singletonList(column));
+                table.setPrimaryKey(new UnresolvedPrimaryKey(Collections.singletonList(column)));
             }
             else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
-                table.addUniqueConstraint(Collections.singletonList(column));
+                table.addUniqueConstraint(new UnresolvedUniqueConstraint(Collections.singletonList(column)));
             }
             else if (consumeIfMatches(TokenType.KEYWORD_not)) {
                 expectAndConsume(TokenType.KEYWORD_null);
