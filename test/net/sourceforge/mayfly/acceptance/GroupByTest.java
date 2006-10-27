@@ -293,14 +293,19 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into foo(x, y, z) values (7, 20, 400)");
         execute("insert into foo(x, y, z) values (9, 20, 400)");
         
+        assertResultList(new String[] { " 2 " }, 
+            query("select avg(x) from foo group by y having avg(foo.x) < 5"));
+
         String sql = "select avg(x) from foo group by y having avg(x) < 5";
         if (dialect.wishThisWereTrue()) {
             assertResultList(new String[] { " 2 " }, query(sql));
         }
         else {
-            // buggy mayfly behavior...
-            assertResultList(new String[] { " 2 ", " 8 " }, query(sql));
+            // this doesn't really make sense, but it is better
+            // than returning bogus results.
+            expectQueryFailure(sql, "no column x");
         }
+        
     }
     
     public void testHavingIsKeyExpression() throws Exception {
@@ -439,12 +444,10 @@ public class GroupByTest extends SqlTestCase {
     
     public void testBadColumnInHaving() throws Exception {
         execute("create table foo(a integer)");
-        if (dialect.wishThisWereTrue()) {
-            expectQueryFailure(
-                "select * from foo group by a having b < 10", 
-                "no column b",
-                1, 37, 1, 38);
-        }
+        expectQueryFailure(
+            "select * from foo group by a having b < 10", 
+            "no column b",
+            1, 37, 1, 38);
         execute("insert into foo(a) values(6)");
         expectQueryFailure(
             "select * from foo group by a having b < 10", 

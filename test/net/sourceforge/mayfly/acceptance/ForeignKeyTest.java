@@ -432,7 +432,6 @@ public class ForeignKeyTest extends SqlTestCase {
             + dialect.databaseTypeForForeignKeys());
     }
     
-    // reference to UNIQUE column (I think this is legal.  Is it?)
     // same cases (primary key, unique) but with self-reference
 
     // multiple referencing columns

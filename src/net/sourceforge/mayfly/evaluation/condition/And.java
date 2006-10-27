@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
-
 public class And extends Condition {
     public final Condition leftSide;
     public final Condition rightSide;

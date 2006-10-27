@@ -148,6 +148,7 @@ public class Constraints {
     }
 
     public Constraints addForeignKey(ForeignKey key) {
+        key.checkDuplicates(foreignKeys);
         return new Constraints(
             primaryKey, 
             constraints, 

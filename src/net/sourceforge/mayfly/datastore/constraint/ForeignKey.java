@@ -1,5 +1,8 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
+import java.util.Iterator;
+import java.util.List;
+
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
@@ -61,6 +64,23 @@ public class ForeignKey {
             Row row = table.row(i);
             checkInsert(store, row, Location.UNKNOWN);
         }
+    }
+
+    public void checkDuplicates(List keysToCheckAgainst) {
+        if (hasForeignKey(constraintName, keysToCheckAgainst)) {
+            throw new MayflyException(
+                "duplicate constraint name " + constraintName);
+        }
+    }
+
+    private boolean hasForeignKey(String constraintName, List keys) {
+        for (Iterator iter = keys.iterator(); iter.hasNext();) {
+            ForeignKey key = (ForeignKey) iter.next();
+            if (key.nameMatches(constraintName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void checkInsert(DataStore store, String schema, String table, 

@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
@@ -84,8 +85,9 @@ public class CreateTable extends Command {
         L result = new L();
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
             UnresolvedForeignKey key = (UnresolvedForeignKey) iter.next();
-            key.checkDuplicates(Collections.unmodifiableList(result));
-            result.add(key.resolve(store, schema, table));
+            ForeignKey resolved = key.resolve(store, schema, table);
+            resolved.checkDuplicates(Collections.unmodifiableList(result));
+            result.add(resolved);
         }
         return result;
     }
@@ -112,6 +114,12 @@ public class CreateTable extends Command {
     public void addConstraint(UnresolvedConstraint constraint) {
         if (constraint instanceof UnresolvedForeignKey) {
             addForeignKeyConstraint((UnresolvedForeignKey) constraint);
+        }
+        else if (constraint instanceof UnresolvedPrimaryKey) {
+            setPrimaryKey((UnresolvedPrimaryKey) constraint);
+        }
+        else if (constraint instanceof UnresolvedUniqueConstraint) {
+            addUniqueConstraint((UnresolvedUniqueConstraint) constraint);
         }
         else {
             throw new UnimplementedException(

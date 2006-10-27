@@ -41,11 +41,10 @@ public abstract class AggregateExpression extends Expression {
       {@link #aggregate(ResultRows)}. 
 
       It also is called in evaluating a HAVING condition,
-      although that part doesn't work yet. */
+      although that part doesn't completely work yet. */
     public Cell evaluate(ResultRow row) {
-        return NullCell.INSTANCE;
-//        Cell cell = row.findValueOrNull(this);
-//        return cell == null ? new LongCell(30) : cell;
+        Cell cell = row.findValueOrNull(this);
+        return cell == null ? NullCell.INSTANCE : cell;
     }
     
     public Cell evaluateColumn(ResultRow row) {

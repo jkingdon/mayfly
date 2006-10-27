@@ -97,4 +97,8 @@ public class ConditionTest extends TestCase {
         condition.check(row);
     }
     
+    public void testResolve() throws Exception {
+        
+    }
+    
 }

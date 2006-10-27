@@ -7,9 +7,6 @@ import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.datastore.constraint.Action;
 import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 
-import java.util.Iterator;
-import java.util.List;
-
 public class UnresolvedForeignKey extends UnresolvedConstraint {
     private final String referencingColumn;
     private final UnresolvedTableReference targetTable;
@@ -47,7 +44,7 @@ public class UnresolvedForeignKey extends UnresolvedConstraint {
             }
         }
 
-        ForeignKey resolvedKey = new ForeignKey(
+        return new ForeignKey(
             schema,
             table,
             referencingColumn,
@@ -60,24 +57,6 @@ public class UnresolvedForeignKey extends UnresolvedConstraint {
             
             constraintName
         );
-        return resolvedKey;
-    }
-
-    public void checkDuplicates(List keysToCheckAgainst) {
-        if (hasForeignKey(constraintName, keysToCheckAgainst)) {
-            throw new MayflyException(
-                "duplicate constraint name " + constraintName);
-        }
-    }
-
-    private boolean hasForeignKey(String constraintName, List keys) {
-        for (Iterator iter = keys.iterator(); iter.hasNext();) {
-            ForeignKey key = (ForeignKey) iter.next();
-            if (key.nameMatches(constraintName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

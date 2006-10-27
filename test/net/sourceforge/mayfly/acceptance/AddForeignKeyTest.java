@@ -27,20 +27,13 @@ public class AddForeignKeyTest extends SqlTestCase {
         execute("create table bar(first_foo integer, second_foo integer)" +
             dialect.databaseTypeForForeignKeys());
 
-        String addWithName = "alter table bar add constraint bar_foo " +
-            "foreign key (first_foo) references foo(id)";
-        if (dialect.wishThisWereTrue()) {
-            execute(addWithName);
-            expectExecuteFailure("alter table bar add constraint bar_foo " +
-                "foreign key (second_foo) references foo(id)",
-                "duplicate constraint name bar_foo");
-            execute("alter table bar add constraint bar_second_foo " +
-                "foreign key (second_foo) references foo(id)");
-        }
-        else {
-            expectExecuteFailure(addWithName, 
-                "expected alter table add action but got CONSTRAINT");
-        }
+        execute("alter table bar add constraint bar_foo " +
+            "foreign key (first_foo) references foo(id)");
+        expectExecuteFailure("alter table bar add constraint bar_foo " +
+            "foreign key (second_foo) references foo(id)",
+            "duplicate constraint name bar_foo");
+        execute("alter table bar add constraint bar_second_foo " +
+            "foreign key (second_foo) references foo(id)");
     }
     
 }

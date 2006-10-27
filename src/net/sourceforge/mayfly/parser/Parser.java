@@ -39,6 +39,7 @@ import net.sourceforge.mayfly.evaluation.command.Insert;
 import net.sourceforge.mayfly.evaluation.command.ModifyColumn;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedConstraint;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedForeignKey;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedPrimaryKey;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
@@ -430,6 +431,11 @@ public class Parser {
                 UnresolvedForeignKey key = parseForeignKeyConstraint(null);
                 return new AddForeignKey(table, key);
             }
+            else if (consumeIfMatches(TokenType.KEYWORD_constraint)) {
+                String name = consumeIdentifier();
+                UnresolvedForeignKey key = parseForeignKeyConstraint(name);
+                return new AddForeignKey(table, key);
+            }
             else {
                 throw new ParserException(
                     "alter table add action", currentToken());
@@ -472,7 +478,7 @@ public class Parser {
             || currentTokenType() == TokenType.KEYWORD_foreign
             || currentTokenType() == TokenType.KEYWORD_constraint
             ) {
-            parseConstraint(table);
+            table.addConstraint(parseConstraint());
         }
         else {
             throw new ParserException(
@@ -481,7 +487,7 @@ public class Parser {
         }
     }
 
-    private void parseConstraint(CreateTable table) {
+    private UnresolvedConstraint parseConstraint() {
         String constraintName;
         if (consumeIfMatches(TokenType.KEYWORD_constraint)) {
             constraintName = consumeIdentifier();
@@ -492,13 +498,13 @@ public class Parser {
 
         if (consumeIfMatches(TokenType.KEYWORD_primary)) {
             expectAndConsume(TokenType.KEYWORD_key);
-            table.setPrimaryKey(new UnresolvedPrimaryKey(parseColumnNames()));
+            return new UnresolvedPrimaryKey(parseColumnNames());
         }
         else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
-            table.addUniqueConstraint(new UnresolvedUniqueConstraint(parseColumnNames()));
+            return new UnresolvedUniqueConstraint(parseColumnNames());
         }
         else if (currentTokenType() == TokenType.KEYWORD_foreign) {
-            table.addConstraint(parseForeignKeyConstraint(constraintName));
+            return parseForeignKeyConstraint(constraintName);
         }
         else {
             throw new MayflyInternalException(

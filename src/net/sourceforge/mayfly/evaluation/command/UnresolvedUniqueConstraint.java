@@ -6,7 +6,7 @@ import net.sourceforge.mayfly.datastore.constraint.UniqueConstraint;
 
 import java.util.List;
 
-public class UnresolvedUniqueConstraint {
+public class UnresolvedUniqueConstraint extends UnresolvedConstraint {
 
     private ColumnNames constraintColumns;
 

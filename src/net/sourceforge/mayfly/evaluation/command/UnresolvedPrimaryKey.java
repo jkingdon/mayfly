@@ -6,7 +6,7 @@ import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 
 import java.util.List;
 
-public class UnresolvedPrimaryKey {
+public class UnresolvedPrimaryKey extends UnresolvedConstraint {
     
     final ColumnNames columns;
 

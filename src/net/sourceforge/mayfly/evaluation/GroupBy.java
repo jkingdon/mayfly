@@ -35,7 +35,7 @@ public class GroupBy extends ValueObject implements Aggregator {
     
     public void check(ResultRow dummyRow, Selected selected) {
         keys.resolve(dummyRow);
-        makeGroupedRows(new ResultRows(dummyRow)).ungroup(selected);
+        group(new ResultRows(dummyRow), selected);
     }
 
 }
