@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.datastore.constraint.Action;
+import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 
 public class UnresolvedForeignKey extends UnresolvedConstraint {
@@ -26,7 +27,7 @@ public class UnresolvedForeignKey extends UnresolvedConstraint {
         this.constraintName = constraintName;
     }
     
-    public ForeignKey resolve(DataStore store, String schema, String table) {
+    public Constraint resolve(DataStore store, String schema, String table) {
         TableReference resolvedTargetTable = 
             targetTable.resolve(store, schema, table);
         if (resolvedTargetTable.tableName().equalsIgnoreCase(table)) {

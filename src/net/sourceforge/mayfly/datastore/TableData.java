@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
-import net.sourceforge.mayfly.datastore.constraint.ForeignKey;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
@@ -341,10 +341,10 @@ public class TableData {
         );
     }
 
-    public TableData addForeignKey(ForeignKey key) {
+    public TableData addConstraint(Constraint key) {
         return new TableData(
             columns,
-            constraints.addForeignKey(key),
+            constraints.addConstraint(key),
             rows
         );
     }

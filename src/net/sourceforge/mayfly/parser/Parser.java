@@ -27,7 +27,7 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.AddColumn;
-import net.sourceforge.mayfly.evaluation.command.AddForeignKey;
+import net.sourceforge.mayfly.evaluation.command.AddConstraint;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.CreateSchema;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
@@ -427,14 +427,9 @@ public class Parser {
                 Column newColumn = parseColumnDisallowingMostConstraints(table);
                 return new AddColumn(table, newColumn);
             }
-            else if (currentTokenType() == TokenType.KEYWORD_foreign) {
-                UnresolvedForeignKey key = parseForeignKeyConstraint(null);
-                return new AddForeignKey(table, key);
-            }
-            else if (consumeIfMatches(TokenType.KEYWORD_constraint)) {
-                String name = consumeIdentifier();
-                UnresolvedForeignKey key = parseForeignKeyConstraint(name);
-                return new AddForeignKey(table, key);
+            else if (lookingAtConstraint()) {
+                UnresolvedConstraint key = parseConstraint();
+                return new AddConstraint(table, key);
             }
             else {
                 throw new ParserException(
@@ -473,11 +468,7 @@ public class Parser {
         if (currentTokenType() == TokenType.IDENTIFIER) {
             table.addColumn(parseColumnDefinition(table));
         }
-        else if (currentTokenType() == TokenType.KEYWORD_primary
-            || currentTokenType() == TokenType.KEYWORD_unique
-            || currentTokenType() == TokenType.KEYWORD_foreign
-            || currentTokenType() == TokenType.KEYWORD_constraint
-            ) {
+        else if (lookingAtConstraint()) {
             table.addConstraint(parseConstraint());
         }
         else {
@@ -485,6 +476,13 @@ public class Parser {
                 "column or table constraint",
                 currentToken());
         }
+    }
+
+    private boolean lookingAtConstraint() {
+        return currentTokenType() == TokenType.KEYWORD_primary
+            || currentTokenType() == TokenType.KEYWORD_unique
+            || currentTokenType() == TokenType.KEYWORD_foreign
+            || currentTokenType() == TokenType.KEYWORD_constraint;
     }
 
     private UnresolvedConstraint parseConstraint() {

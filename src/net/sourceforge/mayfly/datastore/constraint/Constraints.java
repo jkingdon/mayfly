@@ -149,9 +149,9 @@ public class Constraints {
         }
     }
 
-    public Constraints addForeignKey(Constraint key) {
-        key.checkDuplicates(constraints);
-        return new Constraints(constraints.with(key));
+    public Constraints addConstraint(Constraint constraint) {
+        constraint.checkDuplicates(constraints);
+        return new Constraints(constraints.with(constraint));
     }
 
     public boolean hasPrimaryKeyOrUnique(String targetColumn) {

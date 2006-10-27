@@ -1,0 +1,28 @@
+package net.sourceforge.mayfly.evaluation.command;
+
+import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.TableReference;
+import net.sourceforge.mayfly.datastore.constraint.Constraint;
+
+public class AddConstraint extends Command {
+
+    private final UnresolvedConstraint constraint;
+    private final UnresolvedTableReference table;
+
+    public AddConstraint(
+        UnresolvedTableReference table, UnresolvedConstraint constraint) {
+        this.table = table;
+        this.constraint = constraint;
+    }
+
+    public UpdateStore update(DataStore store, String currentSchema) {
+        TableReference reference = table.resolve(store, currentSchema, null);
+        Constraint resolved = 
+            constraint.resolve(store, reference.schema(), reference.tableName());
+        resolved.checkExistingRows(store, reference);
+        return new UpdateStore(
+            store.addConstraint(reference, resolved), 
+            0);
+    }
+
+}

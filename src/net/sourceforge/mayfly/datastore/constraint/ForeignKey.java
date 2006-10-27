@@ -55,10 +55,11 @@ public class ForeignKey extends Constraint {
         }
     }
 
-    public void checkExistingRows(DataStore store) {
-        TableData table = store.schema(referencerSchema).table(referencerTable);
-        for (int i = 0; i < table.rowCount(); ++i) {
-            Row row = table.row(i);
+    public void checkExistingRows(DataStore store, TableReference table) {
+        checkWeAreInTheRightPlace(table.schema(), table.tableName());
+        TableData tableData = store.schema(referencerSchema).table(referencerTable);
+        for (int i = 0; i < tableData.rowCount(); ++i) {
+            Row row = tableData.row(i);
             checkInsert(store, row, Location.UNKNOWN);
         }
     }

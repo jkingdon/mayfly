@@ -42,6 +42,9 @@ public abstract class Constraint {
         return this.constraintName.equalsIgnoreCase(target);
     }
 
+    abstract public void checkExistingRows(
+        DataStore store, TableReference table);
+
     abstract public void check(
         Rows existingRows, Row proposedRow, Location location);
 

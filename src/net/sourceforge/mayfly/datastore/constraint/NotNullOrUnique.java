@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.Columns;
+import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TableReference;
@@ -24,6 +25,13 @@ public abstract class NotNullOrUnique extends Constraint {
         this.names = ColumnNames.fromColumns(columns);
         if (names.size() == 0) {
             throw new MayflyInternalException("must have at least one column for a constraint");
+        }
+    }
+    
+    public void checkExistingRows(DataStore store, TableReference table) {
+        Rows allRows = store.table(table).rows();
+        for (int i = 0; i < allRows.rowCount(); ++i) {
+            check(allRows.subList(0, i), allRows.row(i), Location.UNKNOWN);
         }
     }
 

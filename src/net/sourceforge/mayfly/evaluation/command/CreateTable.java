@@ -85,7 +85,7 @@ public class CreateTable extends Command {
         L result = new L();
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
             UnresolvedForeignKey key = (UnresolvedForeignKey) iter.next();
-            ForeignKey resolved = key.resolve(store, schema, table);
+            ForeignKey resolved = (ForeignKey) key.resolve(store, schema, table);
             resolved.checkDuplicates(Collections.unmodifiableList(result));
             result.add(resolved);
         }

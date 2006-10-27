@@ -141,8 +141,18 @@ public class ImmutableList implements List {
         return delegate.size();
     }
 
+    /**
+     * @internal
+     * @return an ImmutableList (declared as List to cater to Java 1.4
+     * override rules, but castable to ImmutableList)
+     */
     public List subList(int fromIndex, int toIndex) {
-        return delegate.subList(fromIndex, toIndex);
+        /* Here we rely on the fact that delegate is immutable.
+           Although we don't actually copy the sublist, there is
+           no way for it to change out from under the ImmutableList
+           we are returning.
+         */
+        return new ImmutableList(delegate.subList(fromIndex, toIndex), true);
     }
 
     public Object[] toArray() {

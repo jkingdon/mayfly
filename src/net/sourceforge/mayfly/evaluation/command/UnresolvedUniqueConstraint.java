@@ -2,6 +2,8 @@ package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.Columns;
+import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.UniqueConstraint;
 
 import java.util.Collections;
@@ -25,6 +27,12 @@ public class UnresolvedUniqueConstraint extends UnresolvedConstraint {
         return new UniqueConstraint(
             constraintColumns.resolve(tableColumns),
             constraintName);
+    }
+    
+    public Constraint resolve(DataStore store, String schema, String table) {
+        // Not yet suitable for CREATE TABLE, because we are assuming
+        // the columns are already in the store.
+        return resolve(store.schema(schema).table(table).columns());
     }
     
 }
