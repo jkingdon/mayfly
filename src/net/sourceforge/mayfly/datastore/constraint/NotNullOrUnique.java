@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
+import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.StringBuilder;
 
@@ -18,7 +19,8 @@ public abstract class NotNullOrUnique extends Constraint {
 
     private final ColumnNames names;
 
-    protected NotNullOrUnique(Columns columns) {
+    protected NotNullOrUnique(Columns columns, String constraintName) {
+        super(constraintName);
         this.names = ColumnNames.fromColumns(columns);
         if (names.size() == 0) {
             throw new MayflyInternalException("must have at least one column for a constraint");
@@ -105,7 +107,7 @@ public abstract class NotNullOrUnique extends Constraint {
 
     protected abstract String description();
     
-    public boolean checkDropColumn(String column) {
+    public boolean checkDropColumn(TableReference table, String column) {
         if (names.hasColumn(column)) {
             if (names.size() > 1) {
                 throw new MayflyException(
@@ -117,7 +119,7 @@ public abstract class NotNullOrUnique extends Constraint {
         return true;
     }
 
-    public boolean matches(String targetColumn) {
+    public boolean matchesPrimaryKeyOrUnique(String targetColumn) {
         return names.size() == 1 && names.hasColumn(targetColumn);
     }
 

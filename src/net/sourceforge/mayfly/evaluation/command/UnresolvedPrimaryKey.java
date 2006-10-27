@@ -4,18 +4,26 @@ import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 
+import java.util.Collections;
 import java.util.List;
 
 public class UnresolvedPrimaryKey extends UnresolvedConstraint {
     
     final ColumnNames columns;
 
-    public UnresolvedPrimaryKey(List columns) {
+    final String constraintName;
+
+    public UnresolvedPrimaryKey(List columns, String constraintName) {
         this.columns = new ColumnNames(columns);
+        this.constraintName = constraintName;
     }
     
+    public UnresolvedPrimaryKey(String column) {
+        this(Collections.singletonList(column), null);
+    }
+
     PrimaryKey resolve(Columns tableColumns) {
-        return new PrimaryKey(columns.resolve(tableColumns));
+        return new PrimaryKey(columns.resolve(tableColumns), constraintName);
     }
 
 }

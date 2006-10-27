@@ -15,19 +15,36 @@ import java.util.List;
 
 public class Constraints {
 
-    public final PrimaryKey primaryKey;
     public final ImmutableList constraints;
-    public final ImmutableList foreignKeys;
 
-    public Constraints(PrimaryKey primaryKey, ImmutableList constraints,
+    public Constraints(PrimaryKey primaryKey, ImmutableList uniqueConstraints,
         ImmutableList foreignKeys) {
-        this.primaryKey = primaryKey;
-        this.constraints = constraints;
-        this.foreignKeys = foreignKeys;
+        this(append(primaryKey, uniqueConstraints, foreignKeys));
+    }
+
+    private static ImmutableList append(PrimaryKey primaryKey, 
+        ImmutableList constraints, ImmutableList foreignKeys) {
+        ImmutableList all = constraints.withAll(foreignKeys);
+        if (primaryKey != null) {
+            all = all.with(primaryKey);
+        }
+        return all;
+    }
+
+    public Constraints(ImmutableList all) {
+        this.constraints = all;
+        checkDuplicates(all);
+    }
+
+    private void checkDuplicates(ImmutableList constraints) {
+        for (int i = 0; i < constraints.size(); ++i) {
+            Constraint constraint = (Constraint) constraints.get(i);
+            constraint.checkDuplicates(constraints.subList(0, i));
+        }
     }
 
     public Constraints() {
-        this(null, new ImmutableList(), new ImmutableList());
+        this(new ImmutableList());
     }
 
     /**
@@ -38,10 +55,6 @@ public class Constraints {
      * {@link Column#coerce(net.sourceforge.mayfly.datastore.Cell, Location)}
      */
     public void check(Rows rows, Row newRow, Location location) {
-        if (primaryKey != null) {
-            primaryKey.check(rows, newRow, location);
-        }
-        
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
             constraint.check(rows, newRow, location);
@@ -50,8 +63,8 @@ public class Constraints {
 
     public void checkInsert(
         DataStore store, String schema, String table, Row proposedRow, Location location) {
-        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey constraint = (ForeignKey) iter.next();
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
             constraint.checkInsert(store, schema, table, proposedRow, location);
         }
     }
@@ -59,8 +72,8 @@ public class Constraints {
     public DataStore checkDelete(
         DataStore store, String schema, String table, 
         Row rowToDelete, Row replacementRow) {
-        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey constraint = (ForeignKey) iter.next();
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
             store = constraint.checkDelete(store, schema, table, 
                 rowToDelete, replacementRow);
         }
@@ -68,107 +81,83 @@ public class Constraints {
     }
 
     public void checkDropTable(DataStore store, String schema, String table) {
-        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey constraint = (ForeignKey) iter.next();
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
             constraint.checkDropTable(store, schema, table);
         }
     }
 
     public Constraints dropColumn(TableReference table, String column) {
         return new Constraints(
-            filterPrimaryKeyForDropColumn(column), 
-            filterConstraintsForDropColumn(column), 
-            filterForeignKeysForDropColumn(table, column));
+            filterConstraintsForDropColumn(table, column)
+        );
     }
 
-    private PrimaryKey filterPrimaryKeyForDropColumn(String column) {
-        PrimaryKey key = primaryKey;
-        if (primaryKey != null) {
-            boolean keep = primaryKey.checkDropColumn(column);
-            if (!keep) {
-                key = null;
-            }
-        }
-        return key;
-    }
-
-    private ImmutableList filterConstraintsForDropColumn(String column) {
+    private ImmutableList filterConstraintsForDropColumn(
+        TableReference table, String column) {
         List newConstraints = new ArrayList();
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
-            if (constraint.checkDropColumn(column)) {
+            if (constraint.checkDropColumn(table, column)) {
                 newConstraints.add(constraint);
             }
         }
         return new ImmutableList(newConstraints);
     }
 
-    private ImmutableList filterForeignKeysForDropColumn(
-        TableReference table, String column) {
-        List keys = new ArrayList();
-        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey key = (ForeignKey) iter.next();
-            if (key.checkDropReferencerColumn(table, column)) {
-                keys.add(key);
-            }
-        }
-        return new ImmutableList(keys);
-    }
-
     public void checkDropColumn(TableReference table, String column) {
-        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey key = (ForeignKey) iter.next();
-            key.checkDropTargetColumn(table, column);
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
+            constraint.checkDropTargetColumn(table, column);
         }
     }
 
     public Constraints dropForeignKey(String constraintName) {
         return new Constraints(
-            primaryKey, 
-            constraints, 
-            foreignKeysWithout(constraintName));
+            constraintsWithout(constraintName, ForeignKey.class));
     }
 
-    private ImmutableList foreignKeysWithout(String constraintName) {
-        boolean found = false;
+    private ImmutableList constraintsWithout(String constraintName, Class constraintType) {
+        Constraint found = null;
         List keys = new ArrayList();
-        for (Iterator iter = foreignKeys.iterator(); iter.hasNext();) {
-            ForeignKey key = (ForeignKey) iter.next();
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint key = (Constraint) iter.next();
             if (!key.nameMatches(constraintName)) {
                 keys.add(key);
             }
             else {
-                found = true;
+                found = key;
             }
         }
-        if (!found) {
-            throw new MayflyException("no foreign key " + constraintName);
+        if (found == null) {
+            throw new MayflyException("no constraint " + constraintName);
+        }
+        if (found.getClass() != constraintType) {
+            throw new MayflyException(
+                "constraint " + constraintName + 
+                " is not a " + describe(constraintType));
         }
         return new ImmutableList(keys);
     }
 
-    public Constraints addForeignKey(ForeignKey key) {
-        key.checkDuplicates(foreignKeys);
-        return new Constraints(
-            primaryKey, 
-            constraints, 
-            foreignKeys.with(key));
+    private String describe(Class constraintType) {
+        if (constraintType == ForeignKey.class) {
+            return "foreign key";
+        }
+        else {
+            return constraintType.getName();
+        }
+    }
+
+    public Constraints addForeignKey(Constraint key) {
+        key.checkDuplicates(constraints);
+        return new Constraints(constraints.with(key));
     }
 
     public boolean hasPrimaryKeyOrUnique(String targetColumn) {
-        return hasPrimaryKey(targetColumn) || hasUnique(targetColumn);
-    }
-
-    public boolean hasPrimaryKey(String targetColumn) {
-        return
-            primaryKey != null
-            && primaryKey.matches(targetColumn);
-    }
-
-    public boolean hasUnique(String targetColumn) {
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
-            UniqueConstraint constraint = (UniqueConstraint) iter.next();
-            if (constraint.matches(targetColumn)) {
+            Constraint constraint = (Constraint) iter.next();
+            if (constraint.matchesPrimaryKeyOrUnique(targetColumn)) {
                 return true;
             }
         }

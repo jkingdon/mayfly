@@ -29,6 +29,21 @@ public class DropForeignKeyTest extends SqlTestCase {
         }
     }
     
+    // alter table cities drop constraint city_country restrict
+    // (or CASCADE).
+    
+    public void testConfusionAboutUniqueAndForeign() throws Exception {
+        if (!dialect.haveDropForeignKey()) {
+            return;
+        }
+
+        execute("create table foo(" +
+            "id integer not null, constraint uniq_id unique(id))" +
+            dialect.databaseTypeForForeignKeys());
+        expectExecuteFailure("alter table foo drop foreign key uniq_id",
+            "constraint uniq_id is not a foreign key");
+    }
+    
     public void testErrorCases() throws Exception {
         if (!dialect.haveDropForeignKey()) {
             return;
@@ -44,14 +59,14 @@ public class DropForeignKeyTest extends SqlTestCase {
             dialect.databaseTypeForForeignKeys());
 
         expectExecuteFailure("alter table cities drop foreign key citycountry", 
-            "no foreign key citycountry");
+            "no constraint citycountry");
         expectExecuteFailure(
             "alter table countries drop foreign key city_country",
             /* Maybe the message should say "on table countries"?
                Seems like the kind of thing which would be noise,
                except sometimes, when you would really want it.
              */
-            "no foreign key city_country");
+            "no constraint city_country");
         if (!dialect.constraintNamesMightBeCaseSensitive()) {
             execute("alter table cities drop foreign key CITY_country");
         }

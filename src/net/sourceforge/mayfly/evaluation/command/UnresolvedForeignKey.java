@@ -13,7 +13,7 @@ public class UnresolvedForeignKey extends UnresolvedConstraint {
     private final String targetColumn;
     private final Action onDelete;
     private final Action onUpdate;
-    final String constraintName;
+    private final String constraintName;
 
     public UnresolvedForeignKey(String referencingColumn, 
         UnresolvedTableReference targetTable, String targetColumn, 

@@ -1,19 +1,17 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
-import java.util.Iterator;
-import java.util.List;
-
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.parser.Location;
 
-public class ForeignKey {
+public class ForeignKey extends Constraint {
 
     private final String referencerSchema;
     private final String referencerTable;
@@ -24,7 +22,6 @@ public class ForeignKey {
 
     private final Action onDelete;
     private final Action onUpdate;
-    private final String constraintName;
     
     public ForeignKey(String referencerTable, String referencerColumn,
         TableReference targetTable, String targetColumn) {
@@ -36,6 +33,7 @@ public class ForeignKey {
         String referencerSchema, String referencerTable, String referencerColumn, 
         TableReference targetTable, String targetColumn, 
         Action onDelete, Action onUpdate, String constraintName) {
+        super(constraintName);
         
         this.referencerSchema = referencerSchema;
         this.referencerTable = referencerTable;
@@ -45,7 +43,6 @@ public class ForeignKey {
         this.targetColumn = targetColumn;
         this.onDelete = onDelete;
         this.onUpdate = onUpdate;
-        this.constraintName = constraintName;
         
         if (onUpdate instanceof Cascade) {
             throw new MayflyException("ON UPDATE CASCADE not implemented");
@@ -64,23 +61,6 @@ public class ForeignKey {
             Row row = table.row(i);
             checkInsert(store, row, Location.UNKNOWN);
         }
-    }
-
-    public void checkDuplicates(List keysToCheckAgainst) {
-        if (hasForeignKey(constraintName, keysToCheckAgainst)) {
-            throw new MayflyException(
-                "duplicate constraint name " + constraintName);
-        }
-    }
-
-    private boolean hasForeignKey(String constraintName, List keys) {
-        for (Iterator iter = keys.iterator(); iter.hasNext();) {
-            ForeignKey key = (ForeignKey) iter.next();
-            if (key.nameMatches(constraintName)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public void checkInsert(DataStore store, String schema, String table, 
@@ -175,6 +155,7 @@ public class ForeignKey {
     }
 
     /**
+     * @internal
      * @returns should we keep this key?
      */
     public boolean checkDropReferencerColumn(TableReference table, String column) {
@@ -202,11 +183,23 @@ public class ForeignKey {
         }
     }
 
-    public boolean nameMatches(String target) {
-        if (constraintName == null) {
-            return false;
-        }
-        return this.constraintName.equalsIgnoreCase(target);
+    /**
+     * @internal
+     * Doesn't apply for foreign key; instead we check in
+     * {@link #checkDelete(DataStore, String, String, Row, Row)}
+     * and
+     * {@link #checkInsert(DataStore, String, String, Row, Location)}.
+     */
+    public void check(Rows existingRows, Row proposedRow, Location location) {
+    }
+
+    /**
+     * @internal
+     * For foreign key we currently check in
+     * {@link #checkDropReferencerColumn(TableReference, String)}.
+     */
+    public boolean checkDropColumn(TableReference table, String column) {
+        return checkDropReferencerColumn(table, column);
     }
 
 }

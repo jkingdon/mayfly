@@ -309,6 +309,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean duplicateConstraintNamesOk() {
+        return false;
+    }
+
     public boolean uniqueColumnMayBeNullable() {
         return true;
     }

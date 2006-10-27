@@ -498,10 +498,12 @@ public class Parser {
 
         if (consumeIfMatches(TokenType.KEYWORD_primary)) {
             expectAndConsume(TokenType.KEYWORD_key);
-            return new UnresolvedPrimaryKey(parseColumnNames());
+            return new UnresolvedPrimaryKey(
+                parseColumnNames(), constraintName);
         }
         else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
-            return new UnresolvedUniqueConstraint(parseColumnNames());
+            return new UnresolvedUniqueConstraint(
+                parseColumnNames(), constraintName);
         }
         else if (currentTokenType() == TokenType.KEYWORD_foreign) {
             return parseForeignKeyConstraint(constraintName);
@@ -674,10 +676,10 @@ public class Parser {
         while (true) {
             if (consumeIfMatches(TokenType.KEYWORD_primary)) {
                 expectAndConsume(TokenType.KEYWORD_key);
-                table.setPrimaryKey(new UnresolvedPrimaryKey(Collections.singletonList(column)));
+                table.setPrimaryKey(new UnresolvedPrimaryKey(column));
             }
             else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
-                table.addUniqueConstraint(new UnresolvedUniqueConstraint(Collections.singletonList(column)));
+                table.addUniqueConstraint(new UnresolvedUniqueConstraint(column));
             }
             else if (consumeIfMatches(TokenType.KEYWORD_not)) {
                 expectAndConsume(TokenType.KEYWORD_null);

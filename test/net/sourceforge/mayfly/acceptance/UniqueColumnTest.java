@@ -82,5 +82,20 @@ public class UniqueColumnTest extends SqlTestCase {
         expectExecuteFailure("insert into three(x, y, z) values (3, 13, 100)", 
             "unique column z already has a value 100");
     }
+    
+    public void testDuplicateConstraintName() throws Exception {
+        execute("create table one(x integer primary key)" +
+            dialect.databaseTypeForForeignKeys());
+        String duplicate = "create table foo(x integer not null, y integer, " +
+            "constraint foo_x unique(x)," +
+            "constraint foo_x foreign key(x) references one(x))" +
+            dialect.databaseTypeForForeignKeys();
+        if (dialect.duplicateConstraintNamesOk()) {
+            execute(duplicate);
+        }
+        else {
+            expectExecuteFailure(duplicate, "duplicate constraint name foo_x");
+        }
+    }
 
 }

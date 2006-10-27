@@ -8,7 +8,11 @@ import net.sourceforge.mayfly.datastore.NullCell;
 public class PrimaryKey extends NotNullOrUnique {
 
     public PrimaryKey(Columns columns) {
-        super(columns);
+        this(columns, null);
+    }
+
+    public PrimaryKey(Columns columns, String constraintName) {
+        super(columns, constraintName);
     }
 
     protected void checkForNull(String column, Cell proposedCell) {

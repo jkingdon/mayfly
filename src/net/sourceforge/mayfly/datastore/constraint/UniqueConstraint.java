@@ -6,7 +6,11 @@ import net.sourceforge.mayfly.datastore.Columns;
 public class UniqueConstraint extends NotNullOrUnique {
 
     public UniqueConstraint(Columns columns) {
-        super(columns);
+        this(columns, null);
+    }
+
+    public UniqueConstraint(Columns columns, String constraintName) {
+        super(columns, constraintName);
     }
 
     protected void checkForNull(String column, Cell proposedCell) {

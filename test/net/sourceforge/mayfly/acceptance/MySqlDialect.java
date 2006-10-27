@@ -78,6 +78,11 @@ public class MySqlDialect extends Dialect {
         // keys.  Maybe there is a separate section about constraint names.
         return true;
     }
+    
+    public boolean duplicateConstraintNamesOk() {
+        // Is this for real?  Seems like it....
+        return true;
+    }
 
     public boolean crossJoinCanHaveOn() {
         return true;
