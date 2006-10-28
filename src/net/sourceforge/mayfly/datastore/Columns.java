@@ -80,19 +80,24 @@ public class Columns extends Aggregate {
     }
 
     public Column columnFromName(String columnName) {
+        return columnFromName(columnName, Location.UNKNOWN);
+    }
+
+    public Column columnFromName(String columnName, Location location) {
         Column found = null;
         for (Iterator iter = columns.iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
             if (column.matches(columnName)) {
                 if (found != null) {
-                    throw new MayflyException("ambiguous column " + columnName);
+                    throw new MayflyException(
+                        "ambiguous column " + columnName, location);
                 } else {
                     found = column;
                 }
             }
         }
         if (found == null) {
-            throw new NoColumn(columnName, Location.UNKNOWN);
+            throw new NoColumn(columnName, location);
         } else {
             return found;
         }

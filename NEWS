@@ -1,0 +1,30 @@
+Changes since 0.2:
+
+Most methods in Database now throw runtime exceptions instead
+of checked exceptions.  If you are of the checked exception
+persuasion, or you have some piece of code which expects 
+an SQLException, just call MayflyException#asSqlException. 
+
+Many forms of ALTER TABLE now work.
+
+Some limited query optimization.  It is now possible to,
+for example, implicitly join 3 tables of 1000 rows each, 
+in some cases.  The query optimizer is still dead simple -
+it proceeds from left to right and can decompose a WHERE
+clause made up of AND.  For example, 
+"SELECT * from foo, bar, baz where foo.x = bar.x"
+will get optimized to
+inner join on foo and bar on foo.x = bar.x
+inner join that with baz
+whereas
+"SELECT * from foo, bar, baz where bar.x = baz.x"
+will perform all the joins (requiring temporary storage
+of the number of rows in foo times the number of rows
+in bar times the number of rows in baz), and only
+then apply the WHERE.
+
+Changes from 0.1 to 0.2:
+
+Adds schemas (and SET SCHEMA), GROUP BY, auto-increment columns, 
+and primary and foreign keys.
+

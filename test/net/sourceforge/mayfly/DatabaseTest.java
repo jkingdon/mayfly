@@ -7,7 +7,6 @@ import net.sourceforge.mayfly.datastore.DataStore;
 
 import java.io.Reader;
 import java.io.StringReader;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Set;
@@ -84,7 +83,7 @@ public class DatabaseTest extends TestCase {
         try {
             database.query(fooQuery);
             fail();
-        } catch (SQLException e) {
+        } catch (MayflyException e) {
             assertEquals("no table foo", e.getMessage());
         }
         database.execute("set schema mars");
@@ -122,7 +121,7 @@ public class DatabaseTest extends TestCase {
             database.executeScript(script);
             fail();
         }
-        catch (MayflySqlException e) {
+        catch (MayflyException e) {
             assertEquals("expected data type but got NOT", e.getMessage());
             assertEquals(3, e.startLineNumber());
             assertEquals(7, e.startColumn());

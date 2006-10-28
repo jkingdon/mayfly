@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -81,7 +80,7 @@ public class Database {
      * 
      * @return Number of rows changed.
      */
-    public int execute(String sql) throws SQLException {
+    public int execute(String sql) throws MayflyException {
         return defaultConnection.execute(sql);
     }
 
@@ -89,7 +88,7 @@ public class Database {
      * Execute a series of SQL commands separated by semicolons.
      * This method closes the reader when done.
      */
-    public void executeScript(Reader script) throws MayflySqlException {
+    public void executeScript(Reader script) throws MayflyException {
         try {
             List commands = new Parser(script).parseCommands();
             for (Iterator iter = commands.iterator(); iter.hasNext();) {
@@ -97,16 +96,13 @@ public class Database {
                 defaultConnection.executeUpdate(command);
             }
         }
-        catch (MayflyException e) {
-            throw e.asSqlException();
-        }
         finally {
             try {
                 script.close();
             } catch (IOException e) {
                 // Location should probably be where we stopped
                 // reading, which I guess is always end of file.
-                throw new MayflyException(e).asSqlException();
+                throw new MayflyException(e);
             }
         }
     }
@@ -127,7 +123,7 @@ public class Database {
      * This is similar to the JDBC java.sql.Statement#executeQuery(java.lang.String)
      * but is more convenient if you have a Database instance around.
      */
-    public ResultSet query(String sql) throws SQLException {
+    public ResultSet query(String sql) throws MayflyException {
         return defaultConnection.query(sql);
     }
     
@@ -170,7 +166,7 @@ public class Database {
      * java.sql.DatabaseMetaData, this method may go away or become
      * some kind of convenience method.</p>
      */
-    public List columnNames(String tableName) throws SQLException {
+    public List columnNames(String tableName) {
         return defaultConnection.columnNames(tableName);
     }
 
@@ -182,7 +178,7 @@ public class Database {
      * java.sql.ResultSet (or the SQL COUNT expression).
      * But this method may be convenient in tests.
      */
-    public int rowCount(String tableName) throws SQLException {
+    public int rowCount(String tableName) {
         return defaultConnection.rowCount(tableName);
     }
 
@@ -192,7 +188,7 @@ public class Database {
      * This is similar to the JDBC java.sql.DriverManager#getConnection(java.lang.String)
      * but is based on this Database, rather than the static Database used in the JDBC case.
      */
-    public Connection openConnection() throws SQLException {
+    public Connection openConnection() {
         return new JdbcConnection(this);
     }
 

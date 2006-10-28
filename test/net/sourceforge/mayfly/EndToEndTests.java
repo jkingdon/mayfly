@@ -281,4 +281,12 @@ public class EndToEndTests extends SqlTestCase {
         }
     }
     
+    public void testForeignKeyBadColumn() throws Exception {
+        execute("create table foo(x integer primary key)");
+        expectExecuteFailure(
+            "create table bar(y integer, foreign key(z) references foo(x))",
+            "no column z",
+            1, 29, 1, 61);
+    }
+    
 }

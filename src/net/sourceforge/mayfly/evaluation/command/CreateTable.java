@@ -13,7 +13,6 @@ import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -85,8 +84,8 @@ public class CreateTable extends Command {
         L result = new L();
         for (Iterator iter = foreignKeyConstraints.iterator(); iter.hasNext();) {
             UnresolvedForeignKey key = (UnresolvedForeignKey) iter.next();
-            ForeignKey resolved = (ForeignKey) key.resolve(store, schema, table);
-            resolved.checkDuplicates(Collections.unmodifiableList(result));
+            ForeignKey resolved = (ForeignKey) key.resolve(
+                store, schema, table, columns);
             result.add(resolved);
         }
         return result;

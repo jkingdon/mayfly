@@ -513,6 +513,8 @@ public class Parser {
     }
 
     private UnresolvedForeignKey parseForeignKeyConstraint(String constraintName) {
+        Location start = currentToken().location;
+
         expectAndConsume(TokenType.KEYWORD_foreign);
         expectAndConsume(TokenType.KEYWORD_key);
         expectAndConsume(TokenType.OPEN_PAREN);
@@ -523,13 +525,14 @@ public class Parser {
         UnresolvedTableReference targetTable = parseTableReference();
         expectAndConsume(TokenType.OPEN_PAREN);
         String targetColumn = consumeIdentifier();
-        expectAndConsume(TokenType.CLOSE_PAREN);
+        Token end = expectAndConsume(TokenType.CLOSE_PAREN);
         
         Actions actions = parseActions();
         return new UnresolvedForeignKey(
             referencingColumn, targetTable, targetColumn, 
             actions.onDelete, actions.onUpdate,
-            constraintName
+            constraintName,
+            start.combine(end.location)
         );
     }
 

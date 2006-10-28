@@ -34,27 +34,18 @@ public class MayflyConnection {
         this.database = database;
     }
 
-    public ResultSet query(String sql) throws SQLException {
-        try {
-            Select select = Select.selectFromSql(sql);
-            return query(select);
-        } catch (MayflyException e) {
-            throw e.asSqlException();
-        }
+    public ResultSet query(String sql) throws MayflyException {
+        Select select = Select.selectFromSql(sql);
+        return query(select);
     }
 
     public ResultSet query(Select select) {
         return select.select(database.dataStore(), currentSchema);
     }
 
-    public int execute(String sql) throws SQLException {
-        try {
-            Command command = Command.fromSql(sql);
-            return executeUpdate(command);
-        }
-        catch (MayflyException e) {
-            throw e.asSqlException();
-        }
+    public int execute(String sql) throws MayflyException {
+        Command command = Command.fromSql(sql);
+        return executeUpdate(command);
     }
 
     public int executeUpdate(Command command) {
