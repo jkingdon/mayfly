@@ -677,10 +677,10 @@ public class Parser {
         while (true) {
             if (consumeIfMatches(TokenType.KEYWORD_primary)) {
                 expectAndConsume(TokenType.KEYWORD_key);
-                table.setPrimaryKey(new UnresolvedPrimaryKey(column));
+                table.addConstraint(new UnresolvedPrimaryKey(column));
             }
             else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
-                table.addUniqueConstraint(new UnresolvedUniqueConstraint(column));
+                table.addConstraint(new UnresolvedUniqueConstraint(column));
             }
             else if (consumeIfMatches(TokenType.KEYWORD_not)) {
                 expectAndConsume(TokenType.KEYWORD_null);

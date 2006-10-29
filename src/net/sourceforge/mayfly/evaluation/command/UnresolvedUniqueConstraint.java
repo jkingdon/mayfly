@@ -23,16 +23,21 @@ public class UnresolvedUniqueConstraint extends UnresolvedConstraint {
         this(Collections.singletonList(column), null);
     }
 
-    public UniqueConstraint resolve(Columns tableColumns) {
+    private UniqueConstraint resolve(Columns tableColumns) {
         return new UniqueConstraint(
             constraintColumns.resolve(tableColumns),
             constraintName);
     }
     
     public Constraint resolve(DataStore store, String schema, String table) {
-        // Not yet suitable for CREATE TABLE, because we are assuming
+        // Not suitable for CREATE TABLE, because we are assuming
         // the columns are already in the store.
         return resolve(store.schema(schema).table(table).columns());
     }
     
+    public Constraint resolve(
+        DataStore store, String schema, String table, Columns columns) {
+        return resolve(columns);
+    }
+
 }

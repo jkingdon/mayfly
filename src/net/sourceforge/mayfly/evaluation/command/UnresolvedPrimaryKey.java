@@ -12,9 +12,9 @@ import java.util.List;
 
 public class UnresolvedPrimaryKey extends UnresolvedConstraint {
     
-    final ColumnNames columns;
+    private final ColumnNames columns;
 
-    final String constraintName;
+    private final String constraintName;
 
     public UnresolvedPrimaryKey(List columns, String constraintName) {
         this.columns = new ColumnNames(columns);
@@ -25,12 +25,13 @@ public class UnresolvedPrimaryKey extends UnresolvedConstraint {
         this(Collections.singletonList(column), null);
     }
 
-    PrimaryKey resolve(Columns tableColumns) {
-        return new PrimaryKey(columns.resolve(tableColumns), constraintName);
-    }
-    
     public Constraint resolve(DataStore store, String schema, String table) {
         throw new UnimplementedException();
+    }
+    
+    public Constraint resolve(
+        DataStore store, String schema, String table, Columns tableColumns) {
+        return new PrimaryKey(this.columns.resolve(tableColumns), constraintName);
     }
 
 }

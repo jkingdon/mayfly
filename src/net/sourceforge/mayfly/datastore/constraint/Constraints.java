@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
@@ -17,12 +18,12 @@ public class Constraints {
 
     public final ImmutableList constraints;
 
-    public Constraints(PrimaryKey primaryKey, ImmutableList uniqueConstraints,
+    public Constraints(Constraint primaryKey, ImmutableList uniqueConstraints,
         ImmutableList foreignKeys) {
         this(append(primaryKey, uniqueConstraints, foreignKeys));
     }
 
-    private static ImmutableList append(PrimaryKey primaryKey, 
+    private static ImmutableList append(Constraint primaryKey, 
         ImmutableList constraints, ImmutableList foreignKeys) {
         ImmutableList all = constraints.withAll(foreignKeys);
         if (primaryKey != null) {
@@ -34,12 +35,27 @@ public class Constraints {
     public Constraints(ImmutableList all) {
         this.constraints = all;
         checkDuplicates(all);
+        checkOnlyOnePrimaryKey(all);
     }
 
-    private void checkDuplicates(ImmutableList constraints) {
+    private static void checkDuplicates(ImmutableList constraints) {
         for (int i = 0; i < constraints.size(); ++i) {
             Constraint constraint = (Constraint) constraints.get(i);
             constraint.checkDuplicates(constraints.subList(0, i));
+        }
+    }
+
+    private static void checkOnlyOnePrimaryKey(ImmutableList constraints) {
+        int keys = 0;
+        for (int i = 0; i < constraints.size(); ++i) {
+            Constraint constraint = (Constraint) constraints.get(i);
+            if (constraint instanceof PrimaryKey) {
+                ++keys;
+            }
+        }
+        if (keys > 1) {
+            throw new MayflyInternalException(
+                "attempt to define " + keys + " primary keys");
         }
     }
 
