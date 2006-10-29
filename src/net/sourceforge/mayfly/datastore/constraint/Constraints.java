@@ -18,24 +18,14 @@ public class Constraints {
 
     public final ImmutableList constraints;
 
-    public Constraints(Constraint primaryKey, ImmutableList uniqueConstraints,
-        ImmutableList foreignKeys) {
-        this(append(primaryKey, uniqueConstraints, foreignKeys));
+    public Constraints() {
+        this(new ImmutableList());
     }
 
-    private static ImmutableList append(Constraint primaryKey, 
-        ImmutableList constraints, ImmutableList foreignKeys) {
-        ImmutableList all = constraints.withAll(foreignKeys);
-        if (primaryKey != null) {
-            all = all.with(primaryKey);
-        }
-        return all;
-    }
-
-    public Constraints(ImmutableList all) {
-        this.constraints = all;
-        checkDuplicates(all);
-        checkOnlyOnePrimaryKey(all);
+    public Constraints(ImmutableList constraints) {
+        this.constraints = constraints;
+        checkDuplicates(constraints);
+        checkOnlyOnePrimaryKey(constraints);
     }
 
     private static void checkDuplicates(ImmutableList constraints) {
@@ -57,10 +47,6 @@ public class Constraints {
             throw new MayflyInternalException(
                 "attempt to define " + keys + " primary keys");
         }
-    }
-
-    public Constraints() {
-        this(new ImmutableList());
     }
 
     /**

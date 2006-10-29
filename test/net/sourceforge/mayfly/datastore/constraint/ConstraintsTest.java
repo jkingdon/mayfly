@@ -12,9 +12,10 @@ public class ConstraintsTest extends TestCase {
     
     public void testDropColumn() throws Exception {
         Constraints constraints = new Constraints(
-            new PrimaryKey(makeColumns("id")),
-            ImmutableList.singleton(new UniqueConstraint(makeColumns("id"))),
-            new ImmutableList()
+            ImmutableList.fromArray(new Constraint[] {
+                new PrimaryKey(makeColumns("id")),
+                new UniqueConstraint(makeColumns("id"))
+            })
         );
         assertEquals(2, constraints.constraints.size());
         

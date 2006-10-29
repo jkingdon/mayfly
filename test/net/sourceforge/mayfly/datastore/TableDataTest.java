@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 import net.sourceforge.mayfly.datastore.constraint.UniqueConstraint;
@@ -115,11 +116,10 @@ public class TableDataTest extends TestCase {
                     .append("c")
             ),
             new Constraints(
-                new PrimaryKey(Columns.singleton(new Column("a"))),
-                ImmutableList.singleton(
+                ImmutableList.fromArray(new Constraint[] {
+                    new PrimaryKey(Columns.singleton(new Column("a"))),
                     new UniqueConstraint(Columns.singleton(new Column("c")))
-                ),
-                new ImmutableList()
+                })
             ), 
             new Rows()
         );
