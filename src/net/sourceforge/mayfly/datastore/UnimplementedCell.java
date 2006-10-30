@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.parser.Location;
 
 import java.sql.SQLException;
 
@@ -41,8 +42,9 @@ public class UnimplementedCell extends Cell {
         throw makeException();
     }
 
-    public int compareTo(Cell otherCell) {
-        throw makeException();
+    public int compareTo(Cell otherCell, Location location) {
+        throw new UnimplementedException(expression + " is not implemented",
+            location);
     }
 
     public String displayName() {

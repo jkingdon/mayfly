@@ -21,7 +21,7 @@ public class ColumnOrderItem extends OrderItem {
     public static int compare(ResultRow first, ResultRow second, SingleColumn column) {
         Cell cell1 = column.evaluate(first);
         Cell cell2 = column.evaluate(second);
-        return cell1.compareTo(cell2);
+        return cell1.compareTo(cell2, column.location);
     }
     
     public void check(ResultRow dummyRow) {

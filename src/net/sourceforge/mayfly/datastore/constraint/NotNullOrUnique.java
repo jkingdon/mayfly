@@ -41,14 +41,15 @@ public abstract class NotNullOrUnique extends Constraint {
         for (Iterator iter = existingRows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             List valuesForRow = valuesForRow(row);
-            if (sqlEquals(proposedValues, valuesForRow)) {
+            if (sqlEquals(proposedValues, valuesForRow, location)) {
                 throw new MayflyException(
-                    constraintName() + " already has a value " + describeValues(valuesForRow));
+                    constraintName() + " already has a value " + 
+                    describeValues(valuesForRow));
             }
         }
     }
 
-    public static boolean sqlEquals(List left, List right) {
+    public static boolean sqlEquals(List left, List right, Location location) {
         if (left.size() != right.size()) {
             throw new MayflyInternalException(
                 "meant to compare equal size lists but were " + 
@@ -57,7 +58,7 @@ public abstract class NotNullOrUnique extends Constraint {
         for (int i = 0; i < left.size(); ++i) {
             Cell leftCell = (Cell) left.get(i);
             Cell rightCell = (Cell) right.get(i);
-            if (!leftCell.sqlEquals(rightCell)) {
+            if (!leftCell.sqlEquals(rightCell, location)) {
                 return false;
             }
         }

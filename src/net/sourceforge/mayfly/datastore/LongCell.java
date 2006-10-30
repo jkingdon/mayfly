@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import java.sql.SQLException;
 
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.parser.Location;
 
 
 public class LongCell extends Cell {
@@ -60,7 +61,7 @@ public class LongCell extends Cell {
         return "number " + asString();
     }
 
-    public int compareTo(Cell otherCell) {
+    public int compareTo(Cell otherCell, Location location) {
         if (otherCell instanceof LongCell) {
             return new Long(value).compareTo(new Long(((LongCell) otherCell).value));
         }
@@ -69,7 +70,9 @@ public class LongCell extends Cell {
         }
         else {
             throw new MayflyInternalException(
-                "Attempt to compare a " + this.getClass().getName() + " to a " + otherCell.getClass().getName()
+                "Attempt to compare a " + this.getClass().getName() + 
+                " to a " + otherCell.getClass().getName(),
+                location
             );
         }
     }

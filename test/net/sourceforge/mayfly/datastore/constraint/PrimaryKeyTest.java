@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.StringCell;
+import net.sourceforge.mayfly.parser.Location;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +27,8 @@ public class PrimaryKeyTest extends TestCase {
         try {
             NotNullOrUnique.sqlEquals(
                 Collections.EMPTY_LIST,
-                Collections.singletonList(NullCell.INSTANCE));
+                Collections.singletonList(NullCell.INSTANCE),
+                Location.UNKNOWN);
             fail();
         }
         catch (MayflyInternalException e) {
@@ -36,10 +38,12 @@ public class PrimaryKeyTest extends TestCase {
 
         assertFalse(NotNullOrUnique.sqlEquals(
             Collections.singletonList(NullCell.INSTANCE),
-            Collections.singletonList(NullCell.INSTANCE)));
+            Collections.singletonList(NullCell.INSTANCE), 
+            Location.UNKNOWN));
         assertTrue(NotNullOrUnique.sqlEquals(
             Collections.singletonList(new LongCell(7)),
-            Collections.singletonList(new LongCell(7))));
+            Collections.singletonList(new LongCell(7)), 
+            Location.UNKNOWN));
     }
 
 }

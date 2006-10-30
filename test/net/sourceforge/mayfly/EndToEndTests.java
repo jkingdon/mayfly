@@ -289,4 +289,31 @@ public class EndToEndTests extends SqlTestCase {
             1, 29, 1, 61);
     }
     
+    public void testBinaryAsPrimaryKey() throws Exception {
+        /* At the moment I'm most interested in line numbers
+           on certain UnimplementedException.  I don't know
+           whether those methods will eventually be incapable
+           of throwing exceptions, or whether the exceptions
+           will just morph to "can't compare this data type"
+           or some such.  */
+        execute("create table foo(x " + dialect.binaryTypeName() + 
+            " primary key)");
+        PreparedStatement insert = 
+            connection.prepareStatement("insert into foo(x) values(?)");
+        insert.setBytes(1, new byte[] { 0x1, 0x3, (byte)0xff, (byte)0x90 });
+        assertEquals(1, insert.executeUpdate());
+        insert.setBytes(1, new byte[] { 0x1 });
+        try {
+            assertEquals(1, insert.executeUpdate());
+            fail();
+        }
+        catch (MayflySqlException e) {
+            dialect.assertMessage(
+                "This feature is not yet implemented in Mayfly", 
+                e,
+                1, 20, 1, 29);
+        }
+        insert.close();
+    }
+
 }

@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.parser.Location;
 
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
@@ -19,8 +20,8 @@ public class DateCell extends Cell {
         return new java.sql.Date(localDate.toDateMidnight(zone).getMillis());
     }
 
-    public int compareTo(Cell otherCell) {
-        throw new UnimplementedException();
+    public int compareTo(Cell otherCell, Location location) {
+        throw new UnimplementedException(location);
     }
 
     public String displayName() {

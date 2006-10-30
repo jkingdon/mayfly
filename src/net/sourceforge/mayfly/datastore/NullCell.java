@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.sql.SQLException;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.parser.Location;
 
 public class NullCell extends Cell {
     
@@ -60,11 +61,11 @@ public class NullCell extends Cell {
         throw new MayflyException("Attempt to read SQL NULL as an object");
     }
     
-    public int compareTo(Cell otherCell) {
+    public int compareTo(Cell otherCell, Location location) {
         return otherCell instanceof NullCell ? 0 : -1;
     }
 
-    public boolean sqlEquals(Cell otherCell) {
+    public boolean sqlEquals(Cell otherCell, Location location) {
         return false;
     }
 

@@ -96,7 +96,7 @@ public class ForeignKey extends Constraint {
              */
             if (targetTable.matches(referencerSchema, referencerTable)) {
                 Cell newPossibleTarget = proposedRow.cell(targetColumn);
-                if (newPossibleTarget.sqlEquals(value)) {
+                if (newPossibleTarget.sqlEquals(value, location)) {
                     return;
                 }
             }

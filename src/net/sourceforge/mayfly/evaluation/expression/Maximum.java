@@ -22,7 +22,7 @@ public class Maximum extends AggregateExpression {
     }
     
     boolean isBetter(Cell candidate, Cell bestSoFar) {
-        return candidate.compareTo(bestSoFar) > 0;
+        return candidate.compareTo(bestSoFar, location) > 0;
     }
 
     public Expression resolve(ResultRow row) {

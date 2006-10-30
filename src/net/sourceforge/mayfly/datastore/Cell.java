@@ -4,6 +4,7 @@ import org.joda.time.DateTimeZone;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ValueObject;
 
 import java.io.InputStream;
@@ -89,10 +90,18 @@ public abstract class Cell extends ValueObject {
             "attempt to read " + displayName() + " as binary data");
     }
 
-    abstract public int compareTo(Cell otherCell);
+    final public int compareTo(Cell otherCell) {
+        return compareTo(otherCell, Location.UNKNOWN);
+    }
 
-    public boolean sqlEquals(Cell otherCell) {
-        return compareTo(otherCell) == 0;
+    abstract public int compareTo(Cell otherCell, Location location);
+
+    public final boolean sqlEquals(Cell otherCell) {
+        return sqlEquals(otherCell, Location.UNKNOWN);
+    }
+
+    public boolean sqlEquals(Cell otherCell, Location location) {
+        return compareTo(otherCell, location) == 0;
     }
 
     abstract public String displayName();

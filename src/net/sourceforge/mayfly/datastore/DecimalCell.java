@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.parser.Location;
 
 import java.math.BigDecimal;
 import java.sql.SQLException;
@@ -48,9 +49,9 @@ public class DecimalCell extends Cell {
         return value.doubleValue();
     }
 
-    public int compareTo(Cell otherCell) {
+    public int compareTo(Cell otherCell, Location location) {
         // want test
-        throw new UnimplementedException("Can't yet compare decimals");
+        throw new UnimplementedException("Can't yet compare decimals", location);
     }
 
     public String displayName() {

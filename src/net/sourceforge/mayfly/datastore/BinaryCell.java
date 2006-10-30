@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.sql.SQLException;
 
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableByteArray;
 
 public class BinaryCell extends Cell {
@@ -26,8 +27,8 @@ public class BinaryCell extends Cell {
         return "binary data";
     }
 
-    public int compareTo(Cell otherCell) {
-        throw new UnimplementedException();
+    public int compareTo(Cell otherCell, Location location) {
+        throw new UnimplementedException(location);
     }
 
     public String displayName() {
