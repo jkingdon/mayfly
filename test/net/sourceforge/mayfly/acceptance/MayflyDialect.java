@@ -135,4 +135,23 @@ public class MayflyDialect extends Dialect {
         return !wishThisWereTrue();
     }
     
+    public boolean foreignKeyJustNeedsIndex() {
+        /* Here we adopt the most permissive rule of our
+           tested databases.  That seems expedient in
+           terms of porting applications which were written
+           for MySQL, but not so good in terms of wanting
+           to catch problems in the SQL with Mayfly,
+           rather than just having them show up with
+           the production database (say, Postgres).
+           We might end up reversing this decision,
+           or introducing the concept of options
+           (say, Database#options() and JdbcDriver#options(String url)
+           methods which return an Options object in which
+           one can set options.  Or perhaps we only allow
+           the options to be passed in when the Database is
+           created).
+         */
+        return true;
+    }
+    
 }

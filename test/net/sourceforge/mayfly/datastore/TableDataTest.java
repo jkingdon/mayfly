@@ -124,9 +124,9 @@ public class TableDataTest extends TestCase {
             new Rows()
         );
         
-        assertTrue(table.hasPrimaryKeyOrUnique("a"));
-        assertFalse(table.hasPrimaryKeyOrUnique("b"));
-        assertTrue(table.hasPrimaryKeyOrUnique("c"));
+        assertTrue(table.canBeTargetOfForeignKey("a"));
+        assertFalse(table.canBeTargetOfForeignKey("b"));
+        assertTrue(table.canBeTargetOfForeignKey("c"));
     }
     
     public void testHasPrimaryKeyWithNone() throws Exception {
@@ -135,7 +135,7 @@ public class TableDataTest extends TestCase {
             new Constraints(), 
             new Rows()
         );
-        assertFalse(table.hasPrimaryKeyOrUnique("a"));
+        assertFalse(table.canBeTargetOfForeignKey("a"));
     }
 
 }

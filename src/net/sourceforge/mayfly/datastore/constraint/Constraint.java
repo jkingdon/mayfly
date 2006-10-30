@@ -75,7 +75,7 @@ public abstract class Constraint {
          */        
     }
 
-    public boolean matchesPrimaryKeyOrUnique(String targetColumn) {
+    public boolean canBeTargetOfForeignKey(String targetColumn) {
         return false;
     }
 

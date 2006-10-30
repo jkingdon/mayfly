@@ -349,8 +349,8 @@ public class TableData {
         );
     }
 
-    public boolean hasPrimaryKeyOrUnique(String targetColumn) {
-        return constraints.hasPrimaryKeyOrUnique(targetColumn);
+    public boolean canBeTargetOfForeignKey(String targetColumn) {
+        return constraints.canBeTargetOfForeignKey(targetColumn);
     }
 
 }

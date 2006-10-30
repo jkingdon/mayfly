@@ -423,5 +423,19 @@ public class DataTypeTest extends SqlTestCase {
         assertFalse(results.next());
         results.close();
     }
+    
+    public void xtestBinaryAsPrimaryKey() throws Exception {
+        /* Derby: this is an error because comparisons are not
+           supported (could also check ORDER BY or <) */
+        execute("create table foo(x " + dialect.binaryTypeName() + 
+            " primary key)");
+        PreparedStatement insert = 
+            connection.prepareStatement("insert into foo(x) values(?)");
+        insert.setBytes(1, new byte[] { 0x1, 0x3, (byte)0xff, (byte)0x90 });
+        assertEquals(1, insert.executeUpdate());
+        insert.setBytes(1, new byte[] { 0x1 });
+        assertEquals(1, insert.executeUpdate());
+        insert.close();
+    }
 
 }

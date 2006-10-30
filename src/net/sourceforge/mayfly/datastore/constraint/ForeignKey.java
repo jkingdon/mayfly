@@ -13,6 +13,17 @@ import net.sourceforge.mayfly.parser.Location;
 
 public class ForeignKey extends Constraint {
 
+    /**
+     * @internal
+     * True if a foreign key can point to not just a primary key
+     * or a column with a unique constraint, but also to a column
+     * which itself is a foreign key pointing elsewhere.  True
+     * for compatibility with MySQL; false for compatibility with
+     * most other databases.
+     */
+    private static final boolean 
+        FOREIGN_KEY_CAN_POINT_TO_FOREIGN_KEY = true;
+
     private final String referencerSchema;
     private final String referencerTable;
     private final String referencerColumn;
@@ -24,9 +35,10 @@ public class ForeignKey extends Constraint {
     private final Action onUpdate;
     
     public ForeignKey(String referencerTable, String referencerColumn,
-        TableReference targetTable, String targetColumn) {
+        String targetTable, String targetColumn) {
         this(DataStore.ANONYMOUS_SCHEMA_NAME, referencerTable, referencerColumn,
-            targetTable, targetColumn, new NoAction(), new NoAction(), null);
+            new TableReference(DataStore.ANONYMOUS_SCHEMA_NAME, targetTable), 
+            targetColumn, new NoAction(), new NoAction(), null);
     }
 
     public ForeignKey(
@@ -201,6 +213,13 @@ public class ForeignKey extends Constraint {
      */
     public boolean checkDropColumn(TableReference table, String column) {
         return checkDropReferencerColumn(table, column);
+    }
+    
+    public boolean canBeTargetOfForeignKey(String targetColumn) {
+        if (FOREIGN_KEY_CAN_POINT_TO_FOREIGN_KEY) {
+            return targetColumn.equalsIgnoreCase(referencerColumn);
+        }
+        return super.canBeTargetOfForeignKey(targetColumn);
     }
 
 }

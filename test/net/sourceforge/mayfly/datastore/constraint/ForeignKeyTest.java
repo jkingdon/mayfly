@@ -7,7 +7,6 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Schema;
-import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.parser.Location;
@@ -16,9 +15,7 @@ import net.sourceforge.mayfly.util.ImmutableList;
 public class ForeignKeyTest extends TestCase {
 
     public void testCheckInsert() throws Exception {
-        TableReference barTable = new TableReference(
-            DataStore.ANONYMOUS_SCHEMA_NAME, "bar");
-        ForeignKey key = new ForeignKey("foo", "bar_id", barTable, "id");
+        ForeignKey key = new ForeignKey("foo", "bar_id", "bar", "id");
         DataStore store =
             new DataStore(
                 new Schema()
@@ -50,9 +47,7 @@ public class ForeignKeyTest extends TestCase {
     }
 
     public void testCheckDelete() throws Exception {
-        TableReference barTable = new TableReference(
-            DataStore.ANONYMOUS_SCHEMA_NAME, "bar");
-        ForeignKey key = new ForeignKey("foo", "bar_id", barTable, "id");
+        ForeignKey key = new ForeignKey("foo", "bar_id", "bar", "id");
         DataStore store =
             new DataStore(
                 new Schema()
@@ -72,11 +67,22 @@ public class ForeignKeyTest extends TestCase {
             fail();
         }
         catch (MayflyException e) {
-            assertEquals("foreign key violation: table foo refers to id 5 in bar", e.getMessage());
+            assertEquals(
+                "foreign key violation: table foo refers to id 5 in bar", 
+                e.getMessage());
         }
         
         key.checkDelete(store, "another_schema", "bar", fiveRow, null);
-        key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, "another_table", fiveRow, null);
+        key.checkDelete(store, DataStore.ANONYMOUS_SCHEMA_NAME, 
+            "another_table", fiveRow, null);
+    }
+    
+    public void testCanBeTarget() throws Exception {
+        ForeignKey key = new ForeignKey(
+            "bar", "foo_id", "foo", "id");
+        assertTrue(key.canBeTargetOfForeignKey("foo_id"));
+        assertFalse(key.canBeTargetOfForeignKey("id"));
+        assertFalse(key.canBeTargetOfForeignKey("x"));
     }
 
 }

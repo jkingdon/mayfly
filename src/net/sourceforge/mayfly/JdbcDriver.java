@@ -130,8 +130,8 @@ public class JdbcDriver implements Driver {
         }
     }
     
-    HashMap databases = new HashMap();
-    int nextId;
+    private HashMap databases = new HashMap();
+    private int nextId;
 
     public Connection connect(String url, Properties info) throws SQLException {
         return findDatabase(url).openConnection();

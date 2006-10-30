@@ -156,10 +156,10 @@ public class Constraints {
         return new Constraints(constraints.with(constraint));
     }
 
-    public boolean hasPrimaryKeyOrUnique(String targetColumn) {
+    public boolean canBeTargetOfForeignKey(String targetColumn) {
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
-            if (constraint.matchesPrimaryKeyOrUnique(targetColumn)) {
+            if (constraint.canBeTargetOfForeignKey(targetColumn)) {
                 return true;
             }
         }

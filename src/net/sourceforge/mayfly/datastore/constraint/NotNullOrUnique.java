@@ -127,7 +127,7 @@ public abstract class NotNullOrUnique extends Constraint {
         return true;
     }
 
-    public boolean matchesPrimaryKeyOrUnique(String targetColumn) {
+    public boolean canBeTargetOfForeignKey(String targetColumn) {
         return names.size() == 1 && names.hasColumn(targetColumn);
     }
 

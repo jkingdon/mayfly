@@ -47,7 +47,7 @@ public class UnresolvedForeignKey extends UnresolvedConstraint {
         }
         else {
             TableData targetTableData = store.table(resolvedTargetTable);
-            if (!targetTableData.hasPrimaryKeyOrUnique(targetColumn)) {
+            if (!targetTableData.canBeTargetOfForeignKey(targetColumn)) {
                 throw new MayflyException("foreign key refers to " +
                     resolvedTargetTable.displayName(schema) +
                     "(" + targetColumn + ")" +
