@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.acceptance;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -196,6 +197,31 @@ public class DateTest extends SqlTestCase {
     
     public void testCurentTimestamp() throws Exception {
         execute("create table foo (x timestamp default current_timestamp)");
+    }
+    
+    public void testSetDateOrTimestamp() throws Exception {
+        execute("create table foo(x date, y timestamp)");
+        PreparedStatement statement = connection.prepareStatement(
+            "insert into foo(x, y) values(?, ?)");
+        
+        long november27testMachineTimeZone = 
+            new DateMidnight(2003, 11, 27).getMillis();
+
+        long november29testMachineTimeZone = 
+            new DateTime(2003, 11, 29, 1, 7, 43, 000).getMillis();
+
+        statement.setDate(1, new java.sql.Date(november27testMachineTimeZone));
+        statement.setTimestamp(2, 
+            new java.sql.Timestamp(november29testMachineTimeZone));
+        statement.executeUpdate();
+        
+        ResultSet results = query("select x, y from foo");
+        assertTrue(results.next());
+        assertEquals(november27testMachineTimeZone,
+            results.getDate(1).getTime());
+        assertEquals(november29testMachineTimeZone, 
+            results.getTimestamp(2).getTime());
+        assertFalse(results.next());
     }
 
 }

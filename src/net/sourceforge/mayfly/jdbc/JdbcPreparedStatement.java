@@ -3,12 +3,15 @@ package net.sourceforge.mayfly.jdbc;
 import net.sourceforge.mayfly.MayflyConnection;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.datastore.TimestampCell;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.select.Select;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.parser.Substitutor;
 import net.sourceforge.mayfly.util.ImmutableByteArray;
+
+import org.joda.time.LocalDate;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -159,8 +162,11 @@ public class JdbcPreparedStatement implements PreparedStatement {
         setParameter(parameterIndex, new ImmutableByteArray(value));
     }
 
-    public void setDate(int parameterIndex, java.sql.Date value) throws SQLException {
-        throw new UnimplementedException();
+    public void setDate(int parameterIndex, java.sql.Date value) 
+    throws SQLException {
+        long time = value.getTime();
+        String string = new LocalDate(time).toString();
+        setParameter(parameterIndex, string);
     }
 
     public void setTime(int parameterIndex, Time value) throws SQLException {
@@ -169,7 +175,9 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public void setTimestamp(int parameterIndex, Timestamp value)
             throws SQLException {
-        throw new UnimplementedException();
+        long time = value.getTime();
+        String string = TimestampCell.FORMATTER.print(time);
+        setParameter(parameterIndex, string);
     }
 
     public void setAsciiStream(int parameterIndex, InputStream value, int length)
