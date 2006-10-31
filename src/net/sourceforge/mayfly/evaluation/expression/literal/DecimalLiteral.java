@@ -16,8 +16,12 @@ public class DecimalLiteral extends Literal {
     }
 
     public DecimalLiteral(String value, Location location) {
+        this(new BigDecimal(value), location);
+    }
+
+    public DecimalLiteral(BigDecimal value, Location location) {
         super(location);
-        this.value = new BigDecimal(value);
+        this.value = value;
     }
 
     public Cell valueAsCell() {

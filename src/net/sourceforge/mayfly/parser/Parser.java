@@ -1094,6 +1094,10 @@ public class Parser {
             LongLiteral longLiteral = (LongLiteral) number;
             return new LongLiteral(- longLiteral.value, location);
         }
+        else if (number instanceof DecimalLiteral) {
+            DecimalLiteral decimal = (DecimalLiteral) number;
+            return new DecimalLiteral(decimal.value.negate(), location);
+        }
         else {
             throw new UnimplementedException("don't yet handle big integers");
         }

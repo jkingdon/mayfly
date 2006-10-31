@@ -223,7 +223,8 @@ public class DataTypeTest extends SqlTestCase {
             results.close();
         }
 
-        /* results.getBigDecimal with a scale intentionally not tested as it is deprecated */
+        /* results.getBigDecimal with a scale intentionally not tested 
+           as it is deprecated */
 
         {
             ResultSet results = query("select price, list_price from foo");
@@ -240,6 +241,21 @@ public class DataTypeTest extends SqlTestCase {
             assertFalse(results.next());
             results.close();
         }
+    }
+    
+    public void testSetDecimal() throws Exception {
+        execute("create table foo (price decimal(4, 2), y decimal(11,3))");
+        PreparedStatement statement = connection.prepareStatement(
+            "insert into foo(price, y) values(?, ?)");
+        statement.setBigDecimal(1, new BigDecimal("5.95"));
+        statement.setBigDecimal(2, new BigDecimal("197.952").negate());
+        statement.executeUpdate();
+        
+        ResultSet results = query("select price, y from foo");
+        assertTrue(results.next());
+        assertEquals(5.95, results.getDouble(1), 0.000001);
+        assertEquals(-197.952, results.getDouble(2), 0.000001);
+        assertFalse(results.next());
     }
     
     public void testIntegerToFloat() throws Exception {

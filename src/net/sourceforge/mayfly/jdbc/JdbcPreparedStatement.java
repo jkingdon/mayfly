@@ -151,7 +151,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public void setBigDecimal(int parameterIndex, BigDecimal value)
             throws SQLException {
-        throw new UnimplementedException();
+        setParameter(parameterIndex, value);
     }
 
     public void setString(int parameterIndex, String value) throws SQLException {

@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.util.ImmutableByteArray;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +32,20 @@ public class SubstitutorTest extends TestCase {
                 TokenType.NUMBER, TokenType.EQUAL, TokenType.IDENTIFIER },
             new String[] { "5", null, "x" },
             Substitutor.substitute(tokens, Collections.singletonList(new Long(5)))
+        );
+    }
+
+    public void testSubstituteDecimal() throws Exception {
+        List tokens = Arrays.asList(new Token[] {
+            makeToken(TokenType.PARAMETER)
+        });
+        LexerTest.check(
+            new TokenType[] { 
+                TokenType.MINUS, TokenType.NUMBER, TokenType.PERIOD,
+                TokenType.NUMBER },
+            new String[] { "-", "73", ".", "45" },
+            Substitutor.substitute(tokens, Collections.singletonList(
+                new BigDecimal("-73.45")))
         );
     }
 
