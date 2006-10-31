@@ -173,6 +173,29 @@ public class TransactionTest extends SqlTestCase {
     // what some other transaction does?  Or is it just a way of saying
     // that we check against what is visible in our own transaction, and
     // then check again on commit?
+    
+    public void testForUpdate() throws Exception {
+        execute("create table foo(x integer)");
+        execute("insert into foo(x) values(5)");
+        String selectForUpdate = "select x from foo for update";
+        if (dialect.haveForUpdate()) {
+            assertResultSet(new String[] { "5" }, 
+                query(selectForUpdate));
+    
+            /* I think here we have a second connection
+               try to UPDATE FOO SET X = 6, or delete the row,
+               and the second
+               connection should fail or block or something.
+             */
+    
+            execute("update foo set x = 7");
+            assertResultSet(new String[] { " 7 " }, query("select x from foo"));
+        }
+        else {
+            expectQueryFailure(
+                selectForUpdate, "expected end of file but got FOR");
+        }
+    }
 
     public static void assertResultSet(String[] expectedRows, String sql, Connection connection)
     throws SQLException {

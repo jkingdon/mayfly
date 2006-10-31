@@ -782,6 +782,12 @@ public class Parser {
         OrderBy orderBy = parseOrderBy();
         
         Limit limit = parseLimit();
+        
+        if (consumeIfMatches(TokenType.KEYWORD_for)) {
+            expectAndConsume(TokenType.KEYWORD_update);
+            /* Until we try to do transactions, or at least
+               multiple threads, this can be a noop */
+        }
 
         return new Select(what, from, where, groupBy, orderBy, limit);
     }

@@ -62,6 +62,7 @@ public class TokenType {
     public static final TokenType KEYWORD_distinct = registerKeyword("distinct");
     public static final TokenType KEYWORD_drop = registerKeyword("drop");
     public static final TokenType KEYWORD_exists = registerKeyword("exists");
+    public static final TokenType KEYWORD_for = registerKeyword("for");
     public static final TokenType KEYWORD_foreign = registerKeyword("foreign");
     public static final TokenType KEYWORD_from = registerKeyword("from");
     public static final TokenType KEYWORD_group = registerKeyword("group");

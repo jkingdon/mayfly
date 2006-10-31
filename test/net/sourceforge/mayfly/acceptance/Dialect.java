@@ -382,6 +382,10 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean haveForUpdate() {
+        return true;
+    }
+
     public String databaseTypeForForeignKeys() {
         return "";
     }

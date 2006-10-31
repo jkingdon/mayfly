@@ -119,6 +119,10 @@ public class HypersonicDialect extends Dialect {
         return true;
     }
     
+    public boolean haveForUpdate() {
+        return false;
+    }
+    
     public boolean foreignKeyCanReferToAnotherSchema() {
         return false;
     }
