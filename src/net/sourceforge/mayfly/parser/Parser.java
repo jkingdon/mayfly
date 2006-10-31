@@ -17,7 +17,7 @@ import net.sourceforge.mayfly.datastore.types.BinaryDataType;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
-import net.sourceforge.mayfly.datastore.types.UnimplementedDataType;
+import net.sourceforge.mayfly.datastore.types.TimestampDataType;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupBy;
@@ -740,7 +740,7 @@ public class Parser {
             }
             else if (currentText.equalsIgnoreCase("timestamp")) {
                 // Reserved word in SQL92; maybe we should too...
-                type = new UnimplementedDataType(currentText);
+                type = new TimestampDataType();
             }
             else if (currentText.equalsIgnoreCase("identity")) {
                 isAutoIncrement = true;

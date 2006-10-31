@@ -135,18 +135,6 @@ public class EndToEndTests extends SqlTestCase {
         results.close();
     }
 
-    public void testTimestamp() throws Exception {
-        execute("create table foo (x timestamp)");
-        try {
-            execute("insert into foo(x) values('something')");
-            fail();
-        }
-        catch (MayflySqlException expected) {
-            assertEquals("data type timestamp is not implemented", 
-                expected.getMessage());
-        }
-    }
-
     public void testCurentTimestamp() throws Exception {
         execute("create table foo (" +
             "x timestamp default Current_Timestamp, y integer)");
@@ -156,11 +144,8 @@ public class EndToEndTests extends SqlTestCase {
             fail();
         }
         catch (MayflySqlException expected) {
-            // Either one of these would be OK.
-            assertEquals("data type timestamp is not implemented", 
+            assertEquals("Current_Timestamp is not implemented", 
                 expected.getMessage());
-//            assertEquals("Current_Timestamp is not implemented", 
-//                expected.getMessage());
         }
     }
     

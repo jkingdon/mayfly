@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
 import org.joda.time.DateMidnight;
+import org.joda.time.DateTime;
 
 import java.sql.ResultSet;
 import java.util.Calendar;
@@ -133,6 +134,28 @@ public class DateTest extends SqlTestCase {
 //            results.getTimestamp(1, utc).getTime());
         assertEquals(NOVEMBER_29_UTC, 
             results.getTimestamp("end_time", utc).getTime());
+
+        assertFalse(results.next());
+        results.close();
+    }
+
+    public void testTimestampNoCalendar() throws Exception {
+        execute("create table foo (start_time timestamp, end_time timestamp)");
+        execute("insert into foo(start_time, end_time) " +
+            "values ('2003-11-27 01:07:43', '2003-11-29 00:00:00')");
+
+        ResultSet results = query("select start_time, end_time from foo");
+        assertTrue(results.next());
+
+        long november27testMachineTimeZone = 
+            new DateTime(2003, 11, 27, 1, 7, 43, 000).getMillis();
+        assertEquals(november27testMachineTimeZone,
+            results.getTimestamp(1).getTime());
+
+        long november29testMachineTimeZone = 
+            new DateMidnight(2003, 11, 29).getMillis();
+        assertEquals(november29testMachineTimeZone, 
+            results.getTimestamp("end_time").getTime());
 
         assertFalse(results.next());
         results.close();

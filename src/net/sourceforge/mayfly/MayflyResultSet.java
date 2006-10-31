@@ -12,8 +12,8 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Calendar;
 
 public final class MayflyResultSet extends ResultSetStub {
@@ -178,7 +178,7 @@ public final class MayflyResultSet extends ResultSetStub {
         return cellFromName(columnName).asDate(timeZone(calendar));
     }
     
-    public Date getDate(String columnName) throws SQLException {
+    public java.sql.Date getDate(String columnName) throws SQLException {
         return cellFromName(columnName).asDate(DateTimeZone.getDefault());
     }
 
@@ -187,10 +187,19 @@ public final class MayflyResultSet extends ResultSetStub {
         return cellFromIndex(oneBasedColumn).asDate(timeZone(calendar));
     }
 
-    public Date getDate(int oneBasedColumn) throws SQLException {
+    public java.sql.Date getDate(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asDate(DateTimeZone.getDefault());
     }
+    
+    public Timestamp getTimestamp(String columnName) throws SQLException {
+        return cellFromName(columnName).asTimestamp(DateTimeZone.getDefault());
+    }
 
+    public Timestamp getTimestamp(int oneBasedColumn) throws SQLException {
+        return cellFromIndex(oneBasedColumn)
+            .asTimestamp(DateTimeZone.getDefault());
+    }
+    
     private DateTimeZone timeZone(Calendar calendar) {
         return DateTimeZone.forTimeZone(calendar.getTimeZone());
     }

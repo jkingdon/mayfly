@@ -64,11 +64,17 @@ public abstract class Cell extends ValueObject {
     }
 
     public BigDecimal asBigDecimal() {
-        throw new UnimplementedException("cannot yet get BigDecimal for " + getClass().getName());
+        throw new UnimplementedException(
+            "cannot yet get BigDecimal for " + getClass().getName());
     }
 
     public java.sql.Date asDate(DateTimeZone zone) throws SQLException {
         throw new SQLException("attempt to read " + displayName() + " as a date");
+    }
+
+    public java.sql.Timestamp asTimestamp(DateTimeZone zone) throws SQLException {
+        throw new SQLException(
+            "attempt to read " + displayName() + " as a timestamp");
     }
 
     /**

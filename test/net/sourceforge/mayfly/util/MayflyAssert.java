@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.util;
 
 import junit.framework.Assert;
-import junitx.framework.ObjectAssert;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
@@ -14,17 +13,6 @@ import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Location;
 
 public class MayflyAssert {
-
-    /** 
-     * How does this compare to
-     * {@link ObjectAssert#assertInstanceOf(Class, Object)}
-     */
-    public static void assertInstanceOf(Class expectedClass, Object actualObject) {
-        Assert.assertTrue(
-            "Expected " + expectedClass.getName() + " but got " + actualObject.getClass().getName(),
-            expectedClass.isAssignableFrom(actualObject.getClass())
-        );
-    }
 
     public static void assertInteger(int expected, Expression actual) {
         IntegerLiteral ten = (IntegerLiteral) actual;
@@ -93,6 +81,20 @@ public class MayflyAssert {
     public static void assertString(String expected, Cell actual) {
         StringCell cell = (StringCell) actual;
         Assert.assertEquals(expected, cell.asString());
+    }
+
+    public static void assertLessThan(Cell cell1, Cell cell2) {
+        Assert.assertFalse(cell1.sqlEquals(cell2));
+        Assert.assertFalse(cell2.sqlEquals(cell1));
+        Assert.assertTrue(cell1.compareTo(cell2) < 0);
+        Assert.assertTrue(cell2.compareTo(cell1) > 0);
+    }
+
+    public static void assertIsEquals(Cell cell1, Cell cell2) {
+        Assert.assertTrue(cell1.sqlEquals(cell2));
+        Assert.assertTrue(cell2.sqlEquals(cell1));
+        Assert.assertEquals(0, cell1.compareTo(cell2));
+        Assert.assertEquals(0, cell2.compareTo(cell1));
     }
 
 }

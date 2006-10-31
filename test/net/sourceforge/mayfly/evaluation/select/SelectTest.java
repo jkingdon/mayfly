@@ -21,7 +21,6 @@ import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.MayflyAssert;
@@ -123,7 +122,7 @@ public class SelectTest extends TestCase {
     private ValueList makeValues(String firstStringValue, String secondStringValue) {
         return ValueList
             .singleton(new StringCell(firstStringValue))
-            .with(new Value(new StringCell(secondStringValue), Location.UNKNOWN));
+            .with(new Value(new StringCell(secondStringValue)));
     }
     
     public void testMakeJoinsExplicit() throws Exception {

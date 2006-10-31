@@ -16,6 +16,10 @@ import net.sourceforge.mayfly.parser.Location;
 public class Value {
     public final Cell value;
     public final Location location;
+    
+    public Value(Cell value) {
+        this(value, Location.UNKNOWN);
+    }
 
     public Value(Cell value, Location location) {
         this.value = value;

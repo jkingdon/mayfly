@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.parser;
 
 import junit.framework.TestCase;
+import junitx.framework.ObjectAssert;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
@@ -361,7 +362,7 @@ public class ParserTest extends TestCase {
 
         Parser parser = new Parser(input);
         Expression expression = parser.parseExpressionOrNull();
-        MayflyAssert.assertInstanceOf(expectedClass, expression);
+        ObjectAssert.assertInstanceOf(expectedClass, expression);
 
         MayflyAssert.assertLocation(
             expectedStartColumn, expectedEndColumn, expression.location);
@@ -615,8 +616,8 @@ public class ParserTest extends TestCase {
         Parser.Actions actions = parser.parseActions();
         assertEquals("", parser.remainingTokens());
 
-        MayflyAssert.assertInstanceOf(expectedOnDelete, actions.onDelete);
-        MayflyAssert.assertInstanceOf(expectedOnUpdate, actions.onUpdate);
+        ObjectAssert.assertInstanceOf(expectedOnDelete, actions.onDelete);
+        ObjectAssert.assertInstanceOf(expectedOnUpdate, actions.onUpdate);
     }
     
     public void testMultipleCommands() throws Exception {
