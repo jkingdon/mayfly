@@ -4,6 +4,7 @@ import org.joda.time.DateTimeZone;
 
 import java.sql.Date;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.parser.Location;
@@ -49,6 +50,10 @@ public class NullCell extends Cell {
     }
     
     public Date asDate(DateTimeZone zone) throws SQLException {
+        return null;
+    }
+    
+    public Timestamp asTimestamp(DateTimeZone zone) throws SQLException {
         return null;
     }
 

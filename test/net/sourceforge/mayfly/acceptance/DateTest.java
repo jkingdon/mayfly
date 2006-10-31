@@ -88,6 +88,22 @@ public class DateTest extends SqlTestCase {
         assertFalse(results.next());
     }
     
+    public void testNullTimestamp() throws Exception {
+        execute("create table foo (x timestamp, y timestamp)");
+        execute("insert into foo (x) values (null)");
+        
+        // In this case we are reading as ints (or strings, I forget)
+        assertResultSet(new String[] { " null, null " }, 
+            query("select x, y from foo"));
+        
+        // More interesting is to read as timestamps
+        ResultSet results = query("select x, y from foo");
+        assertTrue(results.next());
+        assertNull(results.getTimestamp("x"));
+        assertNull(results.getTimestamp(2));
+        assertFalse(results.next());
+    }
+    
     public void testGetDateNoCalendar() throws Exception {
         execute("create table foo (start_date date, end_date date)");
         execute("insert into foo (start_date, end_date) " +
