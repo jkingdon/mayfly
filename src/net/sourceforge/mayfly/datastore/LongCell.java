@@ -1,9 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
-import java.sql.SQLException;
-
-import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.parser.Location;
+
+import java.sql.SQLException;
 
 
 public class LongCell extends Cell {
@@ -69,11 +68,7 @@ public class LongCell extends Cell {
             return 1;
         }
         else {
-            throw new MayflyInternalException(
-                "Attempt to compare a " + this.getClass().getName() + 
-                " to a " + otherCell.getClass().getName(),
-                location
-            );
+            throw cannotCompare(otherCell, location);
         }
     }
 

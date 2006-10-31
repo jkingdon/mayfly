@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.parser.Location;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -56,11 +55,7 @@ public class StringCell extends Cell {
             return 1;
         }
         else {
-            throw new MayflyInternalException(
-                "Attempt to compare a " + this.getClass().getName() + 
-                " to a " + otherCell.getClass().getName(),
-                location
-            );
+            throw cannotCompare(otherCell, location);
         }
     }
 

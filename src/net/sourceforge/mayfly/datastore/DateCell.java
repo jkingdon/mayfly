@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.parser.Location;
 
 import org.joda.time.DateTimeZone;
@@ -21,7 +20,16 @@ public class DateCell extends Cell {
     }
 
     public int compareTo(Cell otherCell, Location location) {
-        throw new UnimplementedException(location);
+        if (otherCell instanceof DateCell) {
+            DateCell dateCell = (DateCell) otherCell;
+            return localDate.compareTo(dateCell.localDate);
+        }
+        else if (otherCell instanceof NullCell) {
+            return 1;
+        }
+        else {
+            throw cannotCompare(otherCell, location);
+        }
     }
 
     public String displayName() {
