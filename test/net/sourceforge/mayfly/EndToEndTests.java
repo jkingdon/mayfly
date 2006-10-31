@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * Tests that could be acceptance tests, but the behavior seems
@@ -299,6 +300,26 @@ public class EndToEndTests extends SqlTestCase {
                 1, 20, 1, 29);
         }
         insert.close();
+    }
+    
+    public void testGetMaxRows() throws Exception {
+        int noLimit = 0;
+
+        Statement statement = connection.createStatement();
+        assertEquals(noLimit, statement.getMaxRows());
+        PreparedStatement prepared = 
+            connection.prepareStatement("create table foo(x integer)");
+        assertEquals(noLimit, prepared.getMaxRows());
+    }
+    
+    public void testQueryTimeout() throws Exception {
+        int noLimit = 0;
+
+        Statement statement = connection.createStatement();
+        assertEquals(noLimit, statement.getQueryTimeout());
+        PreparedStatement prepared = 
+            connection.prepareStatement("create table foo(x integer)");
+        assertEquals(noLimit, prepared.getQueryTimeout());
     }
 
 }

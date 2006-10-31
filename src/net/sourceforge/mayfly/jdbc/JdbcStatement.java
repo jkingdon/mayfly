@@ -48,7 +48,7 @@ public class JdbcStatement implements Statement {
     }
 
     public int getMaxRows() throws SQLException {
-        throw new UnimplementedException();
+        return 0;
     }
 
     public void setMaxRows(int max) throws SQLException {
@@ -60,7 +60,7 @@ public class JdbcStatement implements Statement {
     }
 
     public int getQueryTimeout() throws SQLException {
-        throw new UnimplementedException();
+        return 0;
     }
 
     public void setQueryTimeout(int seconds) throws SQLException {

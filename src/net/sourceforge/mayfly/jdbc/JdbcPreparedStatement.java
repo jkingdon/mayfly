@@ -312,7 +312,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public int getMaxRows() throws SQLException {
-        throw new UnimplementedException();
+        return 0;
     }
 
     public void setMaxRows(int max) throws SQLException {
@@ -324,7 +324,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public int getQueryTimeout() throws SQLException {
-        throw new UnimplementedException();
+        return 0;
     }
 
     public void setQueryTimeout(int seconds) throws SQLException {
