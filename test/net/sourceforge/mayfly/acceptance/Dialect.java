@@ -480,6 +480,10 @@ public abstract class Dialect {
     public boolean notNullImpliesDefaults() {
         return false;
     }
+    
+    public boolean timestampDoesNotRespectNull() {
+        return false;
+    }
 
     public boolean haveAutoUnderbarIncrement() {
         return false;

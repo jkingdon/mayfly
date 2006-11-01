@@ -229,6 +229,13 @@ public class MySqlDialect extends Dialect {
         // value (0, '', etc).
         return true;
     }
+    
+    public boolean timestampDoesNotRespectNull() {
+        /* Is the behavior documented?  Is there any way to get
+           a null into a TIMESTAMP column?  What else is
+           going on here?  */
+        return true;
+    }
 
     public boolean haveOnUpdateValue() {
         // As far as I can tell from the MySQL documentation,

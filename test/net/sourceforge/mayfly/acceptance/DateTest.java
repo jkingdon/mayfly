@@ -92,17 +92,50 @@ public class DateTest extends SqlTestCase {
     public void testNullTimestamp() throws Exception {
         execute("create table foo (x timestamp, y timestamp)");
         execute("insert into foo (x) values (null)");
+
+        {
+            // Read as strings
+            ResultSet results = query("select x, y from foo");
+            assertTrue(results.next());
+
+            if (dialect.timestampDoesNotRespectNull()) {
+                // insert null seems to be a synonym for 
+                // insert CURRENT_TIMESTAMP
+                assertTrue(results.getString("x").startsWith("20"));
+                assertFalse(results.wasNull());
+
+                /* y is the MySQL zero date.  Trying to read it
+                   with getString throws an exception... */
+                assertEquals(0, results.getInt(2));
+                assertFalse(results.wasNull());
+            }
+            else {
+                assertEquals(null, results.getString("x"));
+                assertTrue(results.wasNull());
+
+                assertEquals(null, results.getString(2));
+                assertTrue(results.wasNull());
+            }
+    
+            assertFalse(results.next());
+        }
         
-        // In this case we are reading as ints (or strings, I forget)
-        assertResultSet(new String[] { " null, null " }, 
-            query("select x, y from foo"));
-        
-        // More interesting is to read as timestamps
-        ResultSet results = query("select x, y from foo");
-        assertTrue(results.next());
-        assertNull(results.getTimestamp("x"));
-        assertNull(results.getTimestamp(2));
-        assertFalse(results.next());
+        if (dialect.timestampDoesNotRespectNull()) {
+            return;
+        }
+
+        {
+            // More interesting is to read as timestamps
+            ResultSet results = query("select x, y from foo");
+            assertTrue(results.next());
+    
+            assertEquals(null, results.getTimestamp("x"));
+            assertTrue(results.wasNull());
+            assertEquals(null, results.getTimestamp(2));
+            assertTrue(results.wasNull());
+    
+            assertFalse(results.next());
+        }
     }
     
     public void testGetDateNoCalendar() throws Exception {
