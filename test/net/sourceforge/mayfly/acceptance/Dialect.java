@@ -485,6 +485,14 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean allowDateInTimestampColumn() {
+        return false;
+    }
+
+    public boolean allowTimestampInDateColumn() {
+        return false;
+    }
+
     public boolean haveAutoUnderbarIncrement() {
         return false;
     }

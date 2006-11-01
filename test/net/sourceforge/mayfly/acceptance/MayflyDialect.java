@@ -154,4 +154,25 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    /**
+       Although I have my doubts about whether it is really
+       desirable to be loose with types like this, at least
+       for now, compatibility with other databases is
+       winning out.
+     */
+    public boolean allowDateInTimestampColumn() {
+        return true;
+    }
+    
+    /**
+       Although I have my doubts about whether it is really
+       desirable to have someone give us a date&time, and throw
+       out the time part of it, at least
+       for now, compatibility with other databases is
+       winning out.
+     */
+    public boolean allowTimestampInDateColumn() {
+        return true;
+    }
+ 
 }

@@ -36,7 +36,7 @@ public class TimestampDataTypeTest extends TestCase {
         checkFailure("1066");
         checkFailure("1066x12-25");
         checkFailure("106612-25");
-        checkFailure("1066-12-25");
+        check(1066, 12, 25, 0, 0, 0, "1066-12-25");
         checkFailure("1066-12-25T00:00:00"); // Should allow this?
         checkFailure("1066-12-25 0:00:00");
         checkFailure("1066-12-25 00:00:0");

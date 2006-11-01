@@ -91,6 +91,14 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
+    public boolean allowDateInTimestampColumn() {
+        return true;
+    }
+    
+    public boolean allowTimestampInDateColumn() {
+        return true;
+    }
+
     public boolean quotedIdentifiersAreCaseSensitive() {
         return true;
     }

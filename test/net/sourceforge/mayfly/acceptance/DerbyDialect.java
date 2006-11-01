@@ -129,6 +129,16 @@ public class DerbyDialect extends Dialect {
         return false;
     }
 
+    /**
+       @internal
+       Seems strange to me that one would allow this one but not
+       {@link Dialect#allowDateInTimestampColumn()}, as the latter
+       isn't losing any precision.  But that seems to be what Derby does.
+     */
+    public boolean allowTimestampInDateColumn() {
+        return true;
+    }
+
     public boolean haveDropTableFooIfExists() {
         return false;
     }

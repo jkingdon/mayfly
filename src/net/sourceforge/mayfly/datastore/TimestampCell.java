@@ -18,10 +18,13 @@ public class TimestampCell extends Cell {
 
     public TimestampCell(int year, int month, int day, 
         int hour, int minute, int second) {
-        this.stamp = new LocalDateTime(year, month, day, 
-            hour, minute, second, 000);
+        this(new LocalDateTime(year, month, day, hour, minute, second, 000));
     }
     
+    public TimestampCell(LocalDateTime time) {
+        this.stamp = time;
+    }
+
     public java.sql.Timestamp asTimestamp(DateTimeZone zone)
     throws SQLException {
         return new java.sql.Timestamp(stamp.toDateTime(zone).getMillis());

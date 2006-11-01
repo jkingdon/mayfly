@@ -259,6 +259,14 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean allowDateInTimestampColumn() {
+        return true;
+    }
+    
+    public boolean allowTimestampInDateColumn() {
+        return true;
+    }
+
     public boolean dataTypesAreEnforced() {
         return false;
     }

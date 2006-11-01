@@ -12,7 +12,11 @@ public class DateCell extends Cell {
     private final LocalDate localDate;
 
     public DateCell(int year, int month, int day) {
-        localDate = new LocalDate(year, month, day);
+        this(new LocalDate(year, month, day));
+    }
+
+    public DateCell(LocalDate localDate) {
+        this.localDate = localDate;
     }
 
     public java.sql.Date asDate(DateTimeZone zone) throws SQLException {

@@ -160,7 +160,7 @@ public class DateTest extends SqlTestCase {
         results.close();
     }
 
-    public void xtestTimestamp() throws Exception {
+    public void xtestTimestampWithCalendar() throws Exception {
         // Need to figure out what hypersonic is doing
         // with timezones (I think it is just wrong; Derby
         // agrees with what I would expect).
@@ -255,6 +255,42 @@ public class DateTest extends SqlTestCase {
         assertEquals(november29testMachineTimeZone, 
             results.getTimestamp(2).getTime());
         assertFalse(results.next());
+    }
+    
+    public void testDateInTimestampColumn() throws Exception {
+        execute("create table foo(x timestamp)");
+        String insert = "insert into foo(x) values('2004-03-27')";
+        if (dialect.allowDateInTimestampColumn()) {
+            execute(insert);
+            ResultSet results = query("select x from foo");
+            assertTrue(results.next());
+            assertEquals(
+                new DateMidnight(2004, 3, 27).getMillis(), 
+                results.getTimestamp("x").getTime());
+            assertFalse(results.next());
+        }
+        else {
+            expectExecuteFailure(insert, 
+                "'2004-03-27' is not in format yyyy-mm-dd hh:mm:ss");
+        }
+    }
+
+    public void testTimestampInDateColumn() throws Exception {
+        execute("create table foo(x date)");
+        String insert = "insert into foo(x) values('2004-03-27 12:31:00')";
+        if (dialect.allowTimestampInDateColumn()) {
+            execute(insert);
+            ResultSet results = query("select x from foo");
+            assertTrue(results.next());
+            assertEquals(
+                new DateMidnight(2004, 3, 27).getMillis(), 
+                results.getDate("x").getTime());
+            assertFalse(results.next());
+        }
+        else {
+            expectExecuteFailure(insert, 
+                "'2004-03-27 12:31:00' is not in format yyyy-mm-dd");
+        }
     }
 
 }

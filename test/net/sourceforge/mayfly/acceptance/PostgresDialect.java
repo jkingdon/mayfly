@@ -171,6 +171,14 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    public boolean allowDateInTimestampColumn() {
+        return true;
+    }
+    
+    public boolean allowTimestampInDateColumn() {
+        return true;
+    }
+
     public boolean haveSerial() {
         return true;
     }
