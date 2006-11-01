@@ -36,6 +36,7 @@ import net.sourceforge.mayfly.evaluation.command.DropColumn;
 import net.sourceforge.mayfly.evaluation.command.DropForeignKey;
 import net.sourceforge.mayfly.evaluation.command.DropTable;
 import net.sourceforge.mayfly.evaluation.command.Insert;
+import net.sourceforge.mayfly.evaluation.command.LastIdentity;
 import net.sourceforge.mayfly.evaluation.command.ModifyColumn;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
@@ -158,15 +159,12 @@ public class Parser {
         return command;
     }
 
-    public Select parseQuery() {
-        Select command = parseSelect();
-        expectAndConsume(TokenType.END_OF_FILE);
-        return command;
-    }
-
     private Command parseCommand() {
         if (currentTokenType() == TokenType.KEYWORD_select) {
             return parseSelect();
+        }
+        else if (consumeNonReservedWordIfMatches("call")) {
+            return parseCall();
         }
         else if (currentTokenType() == TokenType.KEYWORD_drop) {
             return parseDrop();
@@ -202,6 +200,13 @@ public class Parser {
         else {
             throw new ParserException("command", currentToken());
         }
+    }
+
+    private Command parseCall() {
+        expectNonReservedWord("identity");
+        expectAndConsume(TokenType.OPEN_PAREN);
+        expectAndConsume(TokenType.CLOSE_PAREN);
+        return new LastIdentity();
     }
 
     private Command parseSetSchema() {
@@ -1468,8 +1473,7 @@ public class Parser {
 
     private void expectNonReservedWord(String word) {
         if (!consumeNonReservedWordIfMatches(word)) {
-            throw new ParserException(word,
-                currentToken());
+            throw new ParserException(word, currentToken());
         }
     }
 

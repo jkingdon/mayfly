@@ -5,7 +5,6 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.TimestampCell;
 import net.sourceforge.mayfly.evaluation.command.Command;
-import net.sourceforge.mayfly.evaluation.select.Select;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.parser.Substitutor;
@@ -67,7 +66,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public ResultSet executeQuery() throws SQLException {
         try {
-            Select select = Select.selectFromTokens(substitutedTokens());
+            Command select = Command.fromTokens(substitutedTokens());
             return mayflyConnection.query(select);
         } catch (MayflyException e) {
             throw e.asSqlException();

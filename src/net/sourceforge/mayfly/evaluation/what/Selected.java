@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -21,8 +22,11 @@ public class Selected extends ValueObject implements Iterable {
         this(new ArrayList());
     }
 
+    public Selected(Expression singleExpression) {
+        this(Collections.singletonList(singleExpression));
+    }
+
     public Selected(List expressions) {
-        super();
         this.expressions = expressions;
     }
 

@@ -12,7 +12,8 @@ public class SetSchema extends Command {
     }
 
     public UpdateStore update(DataStore store, String schema) {
-        throw new MayflyInternalException("set schema doesn't operate on a data store");
+        throw new MayflyInternalException(
+            "set schema doesn't operate on a data store");
     }
 
     public String name() {

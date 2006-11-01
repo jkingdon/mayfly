@@ -6,8 +6,6 @@ import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.parser.Location;
 
-import java.util.Collections;
-
 abstract public class Expression extends WhatElement {
     
     public final Location location;
@@ -21,7 +19,7 @@ abstract public class Expression extends WhatElement {
     }
 
     public Selected selected(ResultRow dummyRow) {
-        return new Selected(Collections.singletonList(resolve(dummyRow)));
+        return new Selected(resolve(dummyRow));
     }
 
     public String firstColumn() {

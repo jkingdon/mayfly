@@ -254,6 +254,14 @@ public class MySqlDialect extends Dialect {
     public boolean autoIncrementIsRelativeToLastValue() {
         return true;
     }
+    
+    public String identityType() {
+        return "integer auto_increment primary key";
+    }
+    
+    public String lastIdentityValueQuery(String table, String column) {
+        return "select last_insert_id()";
+    }
 
     public boolean datesAreOff() {
         return true;

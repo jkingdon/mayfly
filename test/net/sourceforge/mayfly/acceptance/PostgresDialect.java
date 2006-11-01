@@ -182,5 +182,18 @@ public class PostgresDialect extends Dialect {
     public boolean haveSerial() {
         return true;
     }
+    
+    public String identityType() {
+        return "serial not null";
+    }
+    
+    public String lastIdentityValueQuery(String table, String column) {
+        return new StringBuffer().append("select currval('")
+            .append(table)
+            .append('_')
+            .append(column)
+            .append("_seq')")
+            .toString();
+    }
 
 }

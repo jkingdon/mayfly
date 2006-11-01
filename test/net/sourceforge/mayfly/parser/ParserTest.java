@@ -107,10 +107,10 @@ public class ParserTest extends TestCase {
         }
     }
     
-    public void testExtraneousTokensAtEndInQuery() throws Exception {
+    public void testExtraneousTokensExampleTwo() throws Exception {
         Parser parser = new Parser("select * from foo 5");
         try {
-            parser.parseQuery();
+            parser.parse();
             fail();
         } catch (MayflyException e) {
             assertEquals("expected end of file but got 5", e.getMessage());

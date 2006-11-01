@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
+import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.condition.And;
 import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.evaluation.condition.Greater;
@@ -80,7 +81,7 @@ public class SelectTest extends TestCase {
     }
 
     private ResultRows query(DataStore store, String sql) {
-        Select select = Select.selectFromSql(sql);
+        Select select = (Select) Command.fromSql(sql);
         select.optimize();
         return select.query(store, DataStore.ANONYMOUS_SCHEMA_NAME, new Selected());
     }

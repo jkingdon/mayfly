@@ -21,24 +21,14 @@ import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
-import net.sourceforge.mayfly.parser.Parser;
 
 import java.sql.ResultSet;
 import java.util.Iterator;
-import java.util.List;
 
 public class Select extends Command {
 
     private static final String UPDATE_MESSAGE = 
         "SELECT is only available with query, not update";
-
-    public static Select selectFromSql(String sql) {
-        return new Parser(sql).parseQuery();
-    }
-
-    public static Select selectFromTokens(List tokens) {
-        return new Parser(tokens).parseQuery();
-    }
 
     /**
      * Not immutable, because of {@link What#add(WhatElement)}

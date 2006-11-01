@@ -508,6 +508,19 @@ public abstract class Dialect {
     public boolean haveSql200xAutoIncrement() {
         return false;
     }
+    
+    /**
+     * @internal
+     * Return the preferred (or one that will work) way to specify
+     * an auto-increment column, including the type.
+     */
+    public String identityType() {
+        return "identity";
+    }
+    
+    public String lastIdentityValueQuery(String table, String column) {
+        return "call identity()"; //hypersonic
+    }
 
     public boolean autoIncrementIsRelativeToLastValue() {
         // Not sure what the arguments on either side of

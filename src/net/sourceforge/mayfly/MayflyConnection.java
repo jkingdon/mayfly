@@ -4,7 +4,6 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
-import net.sourceforge.mayfly.evaluation.select.Select;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -35,11 +34,11 @@ public class MayflyConnection {
     }
 
     public ResultSet query(String sql) throws MayflyException {
-        Select select = Select.selectFromSql(sql);
+        Command select = Command.fromSql(sql);
         return query(select);
     }
 
-    public ResultSet query(Select select) {
+    public ResultSet query(Command select) {
         return select.select(database.dataStore(), currentSchema);
     }
 

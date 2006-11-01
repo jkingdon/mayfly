@@ -54,8 +54,9 @@ public class EndToEndTests extends SqlTestCase {
         execute("create table foo (x integer)");
         expectExecuteFailure("select x from foo", 
             "SELECT is only available with query, not update");
+        // I guess this should be saying "insert" instead of "this command".
         expectQueryFailure("insert into foo(x) values(5)", 
-            "expected SELECT but got INSERT");
+            "This command is only available with update, not query");
     }
     
     public void testTableEngine() throws Exception {

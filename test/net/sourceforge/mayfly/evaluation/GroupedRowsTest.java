@@ -9,7 +9,6 @@ import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
-import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.Arrays;
 
@@ -37,7 +36,7 @@ public class GroupedRowsTest extends TestCase {
         );
         
         ResultRows rows = groupedRows.ungroup(
-            new Selected(ImmutableList.singleton(new SingleColumn("player")))
+            new Selected(new SingleColumn("player"))
         );
         assertEquals(2, rows.size());
 

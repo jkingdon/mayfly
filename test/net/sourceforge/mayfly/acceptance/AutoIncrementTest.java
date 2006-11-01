@@ -94,6 +94,18 @@ public class AutoIncrementTest extends SqlTestCase {
             query("select x, y from foo")
         );
     }
+    
+    public void xtestGetLastIdentityValue() throws Exception {
+        execute("create table foo(x " +
+            dialect.identityType() +
+            ", y integer)");
+        execute("insert into foo(x, y) values(1, 4)");
+        execute("insert into foo(y) values(5)");
+        assertResultSet(new String[] { " 2 " }, 
+            query(dialect.lastIdentityValueQuery("foo", "x")));
+    }
+    
+    // "insert into foo values ( )"
 
     // Not valid in MySQL because this isn't a key:
     // execute("create table foo (x integer not null auto_increment, y varchar(255))");
