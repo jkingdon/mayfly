@@ -1,9 +1,10 @@
 package net.sourceforge.mayfly.evaluation.command;
 
-import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.PrimaryKey;
 
@@ -26,7 +27,14 @@ public class UnresolvedPrimaryKey extends UnresolvedConstraint {
     }
 
     public Constraint resolve(DataStore store, String schema, String table) {
-        throw new UnimplementedException();
+        // Not suitable for CREATE TABLE, because we are assuming
+        // the columns are already in the store.
+        TableData existingTable = store.schema(schema).table(table);
+        if (existingTable.hasPrimaryKey()) {
+            throw new MayflyException(
+                "attempt to define more than one primary key for table " + table);
+        }
+        return resolve(store, schema, table, existingTable.columns());
     }
     
     public Constraint resolve(

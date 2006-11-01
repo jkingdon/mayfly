@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
 /**
+ * @internal
  * Not yet immutable, because of {@link GroupByKeys}
  */
 public interface Aggregator {

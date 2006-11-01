@@ -353,4 +353,8 @@ public class TableData {
         return constraints.canBeTargetOfForeignKey(targetColumn);
     }
 
+    public boolean hasPrimaryKey() {
+        return constraints.hasPrimaryKey();
+    }
+
 }

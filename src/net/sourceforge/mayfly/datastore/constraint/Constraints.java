@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Constraints {
 
-    public final ImmutableList constraints;
+    private final ImmutableList constraints;
 
     public Constraints() {
         this(new ImmutableList());
@@ -35,7 +35,8 @@ public class Constraints {
         }
     }
 
-    private static void checkOnlyOnePrimaryKey(ImmutableList constraints) {
+    private static void checkOnlyOnePrimaryKey(
+        ImmutableList constraints) {
         int keys = 0;
         for (int i = 0; i < constraints.size(); ++i) {
             Constraint constraint = (Constraint) constraints.get(i);
@@ -44,6 +45,9 @@ public class Constraints {
             }
         }
         if (keys > 1) {
+            /* We don't have table name and location, to provide
+               a suitable message for the real case.  So this check
+               is just as a backup.  */
             throw new MayflyInternalException(
                 "attempt to define " + keys + " primary keys");
         }
@@ -160,6 +164,20 @@ public class Constraints {
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
             if (constraint.canBeTargetOfForeignKey(targetColumn)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int constraintCount() {
+        return constraints.size();
+    }
+
+    public boolean hasPrimaryKey() {
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
+            if (constraint instanceof PrimaryKey) {
                 return true;
             }
         }

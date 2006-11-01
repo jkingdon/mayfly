@@ -20,6 +20,9 @@ public abstract class Constraint {
 
     public void checkDuplicates(List constraintsToCheckAgainst) {
         if (hasConstraint(constraintName, constraintsToCheckAgainst)) {
+            /* Are names supposed to be unique per-table?  per-schema?
+               Where should we check this (someplace that has location
+               available)?  */
             throw new MayflyException(
                 "duplicate constraint name " + constraintName);
         }

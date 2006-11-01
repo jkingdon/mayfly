@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * @internal
  * Not yet immutable, because of {@link #add(WhatElement)}
  */
 public class What extends Aggregate {

@@ -44,12 +44,12 @@ public class CreateTable extends Command {
 
     private Constraints makeTableConstraints(
         DataStore store, String schema) {
-        checkMultiplePrimaryKeys(this.constraints);
         return new Constraints(resolveAll(store, schema, this.constraints));
     }
 
     private ImmutableList resolveAll(
         DataStore store, String schema, List unresolved) {
+        checkMultiplePrimaryKeys(unresolved);
         L result = new L();
         for (Iterator iter = unresolved.iterator(); iter.hasNext();) {
             UnresolvedConstraint constraint = 
@@ -67,7 +67,7 @@ public class CreateTable extends Command {
     private void checkMultiplePrimaryKeys(List unresolved) {
         boolean havePrimaryKey = false;
         for (Iterator iter = unresolved.iterator(); iter.hasNext();) {
-            UnresolvedConstraint constraint = 
+            UnresolvedConstraint constraint =
                 (UnresolvedConstraint) iter.next();
             if (constraint instanceof UnresolvedPrimaryKey) {
                 if (havePrimaryKey) {
@@ -83,7 +83,7 @@ public class CreateTable extends Command {
             }
         }
     }
-    
+
     public void addColumn(Column column) {
         columns = columns.with(column);
     }

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * @internal
  * Not yet immutable, because of {@link #add(FromElement)}
  */
 public class From extends Aggregate {

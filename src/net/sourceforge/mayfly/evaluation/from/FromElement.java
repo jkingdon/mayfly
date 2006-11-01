@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 
 /**
+ * @internal
  * Table reference or join.  All implementors should be immutable objects.
  */
 public interface FromElement {

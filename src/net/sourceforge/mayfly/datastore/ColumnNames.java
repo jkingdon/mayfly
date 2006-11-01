@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
+ * @internal
  * Does this class need to decide whether it is just a raw set of names,
  * or ones that have somehow been checked for existence and other such
  * things (analogous to 

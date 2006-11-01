@@ -17,10 +17,10 @@ public class ConstraintsTest extends TestCase {
                 new UniqueConstraint(makeColumns("id"))
             })
         );
-        assertEquals(2, constraints.constraints.size());
+        assertEquals(2, constraints.constraintCount());
         
         Constraints newConstraints = constraints.dropColumn(null, "id");
-        assertEquals(0, newConstraints.constraints.size());
+        assertEquals(0, newConstraints.constraintCount());
     }
 
     private Columns makeColumns(String name) {

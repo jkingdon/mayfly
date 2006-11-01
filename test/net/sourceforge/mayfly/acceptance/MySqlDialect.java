@@ -80,7 +80,10 @@ public class MySqlDialect extends Dialect {
     }
     
     public boolean duplicateConstraintNamesOk() {
-        // Is this for real?  Seems like it....
+        /* It would appear that UNIQUE are in one namespace, PRIMARY KEY
+           in another, and FOREIGN KEY in a third.  But what happens
+           on "alter table foo drop constraint foo_unique"?  Which
+           one gets dropped? */
         return true;
     }
 
