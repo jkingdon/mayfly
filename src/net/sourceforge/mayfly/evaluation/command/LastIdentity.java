@@ -2,8 +2,8 @@ package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyResultSet;
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
@@ -21,7 +21,8 @@ public class LastIdentity extends Command {
         throw new MayflyException(UPDATE_MESSAGE);
     }
     
-    public ResultSet select(DataStore store, String currentSchema) {
+    public ResultSet select(
+        DataStore store, String currentSchema, Cell lastIdentity) {
         Expression expression = new LastIdentityExpression();
         return new MayflyResultSet(
             new Selected(expression), 
@@ -29,7 +30,7 @@ public class LastIdentity extends Command {
                 new ResultRow()
                     .with(
                         expression,
-                        store.lastIdentity())));
+                        lastIdentity)));
     }
 
 }

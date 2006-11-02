@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.ValueObject;
@@ -20,7 +21,7 @@ public abstract class Command extends ValueObject {
 
     abstract public UpdateStore update(DataStore store, String currentSchema);
 
-    public ResultSet select(DataStore store, String currentSchema) {
+    public ResultSet select(DataStore store, String currentSchema, Cell lastIdentity) {
         throw new MayflyException(
             "This command is only available with update, not query");
     }

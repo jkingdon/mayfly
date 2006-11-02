@@ -31,23 +31,21 @@ import java.util.TreeSet;
 public class DataStore {
 
     public static final String ANONYMOUS_SCHEMA_NAME = "";
-    public static final CaseInsensitiveString ANONYMOUS_SCHEMA = new CaseInsensitiveString(ANONYMOUS_SCHEMA_NAME);
+    public static final CaseInsensitiveString ANONYMOUS_SCHEMA = 
+        new CaseInsensitiveString(ANONYMOUS_SCHEMA_NAME);
 
     private final ImmutableMap schemas;
-    private final Cell lastIdentity;
     
     public DataStore() {
         this(new Schema());
     }
 
     public DataStore(Schema anonymousSchema) {
-        this(new ImmutableMap().with(ANONYMOUS_SCHEMA, anonymousSchema),
-            NullCell.INSTANCE);
+        this(new ImmutableMap().with(ANONYMOUS_SCHEMA, anonymousSchema));
     }
 
-    private DataStore(ImmutableMap namedSchemas, Cell lastIdentity) {
+    private DataStore(ImmutableMap namedSchemas) {
         this.schemas = namedSchemas;
-        this.lastIdentity = lastIdentity;
     }
 
     public DataStore addSchema(String newSchemaName, Schema newSchema) {
@@ -55,7 +53,7 @@ public class DataStore {
             throw new MayflyException("schema " + newSchemaName + " already exists");
         }
         ImmutableMap newSchemas = schemas.with(new CaseInsensitiveString(newSchemaName), newSchema);
-        return new DataStore(newSchemas, lastIdentity);
+        return new DataStore(newSchemas);
     }
 
     public DataStore replace(String newSchemaName, Schema newSchema) {
@@ -67,8 +65,9 @@ public class DataStore {
         if (schemaExists(newSchemaName)) {
             ImmutableMap newSchemas = existingSchemas.with(
                 new CaseInsensitiveString(newSchemaName), newSchema);
-            return new DataStore(newSchemas, lastIdentity);
-        } else {
+            return new DataStore(newSchemas);
+        } 
+        else {
             throw new MayflyInternalException("no schema " + newSchemaName);
         }
     }
@@ -111,18 +110,8 @@ public class DataStore {
 
     public DataStore addRow(String schema, String table, 
         List columnNames, ValueList values, Checker checker) {
-        Schema newSchema = schema(schema).addRow(checker, table, columnNames, values);
-
-        if (schemaExists(schema)) {
-            ImmutableMap newSchemas = schemas.with(
-                new CaseInsensitiveString(schema), newSchema);
-            return new DataStore(
-                newSchemas, 
-                checker.lastIdentity(this.lastIdentity));
-        }
-        else {
-            throw new MayflyInternalException("no schema " + schema);
-        }
+        return replace(schema,
+            schema(schema).addRow(checker, table, columnNames, values));
     }
 
     public DataStore addRow(String schema, String table, ValueList values, Checker checker) {
@@ -225,10 +214,6 @@ public class DataStore {
             table.schema(), 
             existing.addConstraint(table.tableName(), key)
         );
-    }
-
-    public Cell lastIdentity() {
-        return lastIdentity;
     }
 
 }

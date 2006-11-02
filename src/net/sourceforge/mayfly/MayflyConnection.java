@@ -1,9 +1,12 @@
 package net.sourceforge.mayfly;
 
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
+import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +31,7 @@ public class MayflyConnection {
     private boolean autoCommit = true;
     //private DataStore rollbackPoint;
     private String currentSchema = DataStore.ANONYMOUS_SCHEMA_NAME;
+    private Cell lastIdentity = NullCell.INSTANCE;
 
     public MayflyConnection(Database database) {
         this.database = database;
@@ -39,7 +43,7 @@ public class MayflyConnection {
     }
 
     public ResultSet query(Command select) {
-        return select.select(database.dataStore(), currentSchema);
+        return select.select(database.dataStore(), currentSchema, lastIdentity);
     }
 
     public int execute(String sql) throws MayflyException {
@@ -55,7 +59,12 @@ public class MayflyConnection {
             currentSchema = proposed;
             return 0;
         }
-        return database.executeUpdate(command, currentSchema);
+        UpdateStore updateResult = 
+            database.executeUpdate(command, currentSchema);
+        if (updateResult.newIdentityValue != null) {
+            lastIdentity = updateResult.newIdentityValue;
+        }
+        return updateResult.rowsAffected();
     }
 
     public Set tables() {

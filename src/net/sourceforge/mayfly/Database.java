@@ -111,10 +111,10 @@ public class Database {
      * @internal
      * Only intended for use within Mayfly.
      */
-    public int executeUpdate(Command command, String currentSchema) {
+    public UpdateStore executeUpdate(Command command, String currentSchema) {
         UpdateStore result = command.update(dataStore, currentSchema);
         dataStore = result.store();
-        return result.rowsAffected();
+        return result;
     }
 
     /**

@@ -27,13 +27,17 @@ public class Insert extends Command {
     }
 
     public UpdateStore update(DataStore store, String currentSchema) {
-        return new UpdateStore(insertOneRow(store, currentSchema), 1);
-    }
-
-    private DataStore insertOneRow(DataStore store, String currentSchema) {
         String schema = schemaToUse(currentSchema);
         Checker checker = new Checker(store, schema, table(), location);
 
+        return new UpdateStore(
+            insertOneRow(store, schema, checker),
+            1,
+            checker.newIdentityValue()
+        );
+    }
+
+    private DataStore insertOneRow(DataStore store, String schema, Checker checker) {
         if (columnNames == null) {
             return store.addRow(schema, table(), values, checker);
         }

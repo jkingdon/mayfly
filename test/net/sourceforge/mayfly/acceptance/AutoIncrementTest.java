@@ -1,6 +1,9 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class AutoIncrementTest extends SqlTestCase {
     
@@ -113,10 +116,29 @@ public class AutoIncrementTest extends SqlTestCase {
             query("select x, y from foo"));
     }
     
-    /* So, is identity() per-connection?  That would seem to make much
-     * more sense than global.  Write a test for that....
-     */
-
+    public void testLastIdentityIsPerConnection() throws Exception {
+        execute("create table foo(x " +
+            dialect.identityType() +
+            ", y integer)");
+        execute("insert into foo(y) values(11)");
+        
+        Connection connection2 = dialect.openAdditionalConnection();
+        try {
+            execute("insert into foo(y) values(22)", connection2);
+    
+            String askForLast = dialect.lastIdentityValueQuery("foo", "x");
+    
+            assertResultSet(new String[] { "1" }, query(askForLast));
+    
+            Statement statement = connection2.createStatement();
+            ResultSet results2 = statement.executeQuery(askForLast);
+            assertResultSet(new String[] { "2" }, results2);
+        }
+        finally {
+            connection2.close();
+        }
+    }
+    
     public void testInsertWithoutColumns() throws Exception {
         execute("create table foo(x " + dialect.identityType() + ")");
 

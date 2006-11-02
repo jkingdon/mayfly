@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyResultSet;
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
@@ -68,7 +69,7 @@ public class Select extends Command {
         return from;
     }
 
-    public ResultSet select(final DataStore store, String currentSchema) {
+    public ResultSet select(final DataStore store, String currentSchema, Cell lastIdentity) {
         optimize(store, currentSchema);
         ResultRow dummyRow = dummyRow(store, currentSchema);
         Selected selected = what.selected(dummyRow);

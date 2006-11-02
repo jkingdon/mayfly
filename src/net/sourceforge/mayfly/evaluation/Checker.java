@@ -74,8 +74,8 @@ public class Checker {
         this.newIdentityValue = cell;
     }
 
-    public Cell lastIdentity(Cell previous) {
-        return newIdentityValue != null ? newIdentityValue : previous;
+    public Cell newIdentityValue() {
+        return newIdentityValue;
     }
     
 }
