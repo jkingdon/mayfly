@@ -95,14 +95,53 @@ public class AutoIncrementTest extends SqlTestCase {
         );
     }
     
-    public void xtestGetLastIdentityValue() throws Exception {
+    public void testGetLastIdentityValue() throws Exception {
         execute("create table foo(x " +
             dialect.identityType() +
             ", y integer)");
-        execute("insert into foo(x, y) values(1, 4)");
         execute("insert into foo(y) values(5)");
-        assertResultSet(new String[] { " 2 " }, 
+        assertResultSet(new String[] { "1" }, 
             query(dialect.lastIdentityValueQuery("foo", "x")));
+
+        execute("insert into foo(y) values(6)");
+        assertResultSet(
+            new String[] { "2" }, 
+            query(dialect.lastIdentityValueQuery("foo", "x")));
+        
+        assertResultSet(
+            new String[] { "1, 5", "2, 6"}, 
+            query("select x, y from foo"));
+    }
+    
+    /* So, is identity() per-connection?  That would seem to make much
+     * more sense than global.  Write a test for that....
+     */
+
+    public void testInsertWithoutColumns() throws Exception {
+        execute("create table foo(x " + dialect.identityType() + ")");
+
+        String insertNoValues = "insert into foo() values()";
+        if (dialect.canInsertNoValues()) {
+            execute(insertNoValues);
+            if (dialect.numberOfValuesMustMatchNumberOfColumns()) {
+                /* MySQL doesn't complain about this */
+//                expectExecuteFailure("insert into foo() values(5)", "");
+                expectExecuteFailure("insert into foo(x) values()", 
+                    "Too few values.\n" +
+                    "Columns and values were:\n" +
+                    "x (none)\n");
+                /* This one is allowed by MySQL, but Mayfly treats
+                   foo as being the same as foo(x), and thus
+                   an error */
+//                expectExecuteFailure("insert into foo values()", "");
+            }
+            assertResultList(
+                new String[] { "1" },
+                query("select x from foo"));
+        }
+        else {
+            expectExecuteFailure(insertNoValues, "expected value but got ')'");
+        }
     }
     
     // "insert into foo values ( )"

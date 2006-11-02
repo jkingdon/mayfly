@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
+import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ValueObject;
@@ -76,8 +77,10 @@ public class Column extends ValueObject {
         return isAutoIncrement;
     }
 
-    public Column afterAutoIncrement() {
-        Cell newDefault = new LongCell(defaultValue.asLong() + 1L);
+    public Column afterAutoIncrement(Checker checker) {
+        Cell valueJustInserted = defaultValue;
+        Cell newDefault = new LongCell(valueJustInserted.asLong() + 1L);
+        checker.setIdentityValue(valueJustInserted);
         return new Column(columnName, newDefault, onUpdateValue, isAutoIncrement,
             type, isNotNull);
     }

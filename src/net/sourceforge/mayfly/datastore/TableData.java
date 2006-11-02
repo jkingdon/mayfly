@@ -68,7 +68,7 @@ public class TableData {
             Column column = (Column) iter.next();
             newColumns = setColumn(
                 specifiedColumnToValue, newColumns, tuple, column, 
-                values.location);
+                values.location, checker);
         }
         Row newRow = new Row(tuple);
         constraints.check(rows, newRow, values.location);
@@ -84,7 +84,7 @@ public class TableData {
     }
 
     private Columns setColumn(M specifiedColumnToValue, Columns newColumns, 
-        TupleBuilder tuple, Column column, Location location) {
+        TupleBuilder tuple, Column column, Location location, Checker checker) {
         boolean isDefault;
         Cell cell;
         if (specifiedColumnToValue.containsKey(column)) {
@@ -101,7 +101,7 @@ public class TableData {
         tuple.append(new TupleElement(column, cell));
 
         if (isDefault && column.isAutoIncrement()) {
-            newColumns = newColumns.replace(column.afterAutoIncrement());
+            newColumns = newColumns.replace(column.afterAutoIncrement(checker));
         }
         return newColumns;
     }

@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation;
 
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
@@ -16,6 +17,10 @@ import net.sourceforge.mayfly.parser.Location;
  * 
  * We also keep track of changes made because of
  * ON DELETE CASCADE and similar.
+ * 
+ * We also keep the lastIdentity, which is something
+ * which is computed down on a column level, but needs
+ * to get passed up to the store somehow.
  */
 public class Checker {
 
@@ -23,6 +28,7 @@ public class Checker {
     private final String table;
     private DataStore store;
     private final Location location;
+    private Cell newIdentityValue = null;
 
     /**
      * @internal
@@ -62,6 +68,14 @@ public class Checker {
 
     public String schema() {
         return schema;
+    }
+
+    public void setIdentityValue(Cell cell) {
+        this.newIdentityValue = cell;
+    }
+
+    public Cell lastIdentity(Cell previous) {
+        return newIdentityValue != null ? newIdentityValue : previous;
     }
     
 }

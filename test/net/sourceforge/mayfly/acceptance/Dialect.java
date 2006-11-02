@@ -282,6 +282,20 @@ public abstract class Dialect {
         return false;
     }
 
+    /**
+     * @internal
+     * Does the syntax "insert into foo() values()" work?
+     * This is an extension from standard SQL, but not having it
+     * leads to craziness like null not meaning null in some
+     * databases.
+     * 
+     * Should check Hibernate Dialect class - I think other databases
+     * have this with a different syntax.
+     */
+    public boolean canInsertNoValues() {
+        return true;
+    }
+
     public boolean canConcatenateStringAndInteger() {
         // Most databases seem to allow this.  I'm sure there
         // are larger issues/tradeoffs here (like "do what I
@@ -540,6 +554,7 @@ public abstract class Dialect {
     }
 
     /**
+     * @internal
      * Kind of a catch-all.  There are also more specific ones like
      * {@link #canGetBytesOnNumber}.
      */
@@ -556,6 +571,7 @@ public abstract class Dialect {
     }
 
     /**
+     * @internal
      * Slightly misnamed; it applies to the column alias cases
      * which Mayfly can't handle.  Things like {@link ResultTest#testAs()}
      * just use select a AS b unconditionally.

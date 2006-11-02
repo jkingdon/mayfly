@@ -126,6 +126,10 @@ public class PostgresDialect extends Dialect {
     public boolean numberOfValuesMustMatchNumberOfColumns() {
         return false;
     }
+    
+    public boolean canInsertNoValues() {
+        return false;
+    }
 
     public boolean disallowNullsInExpressions() {
         return false;

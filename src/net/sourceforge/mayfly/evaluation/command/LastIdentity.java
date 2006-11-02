@@ -29,7 +29,7 @@ public class LastIdentity extends Command {
                 new ResultRow()
                     .with(
                         expression,
-                        new LongCell(12345))));
+                        store.lastIdentity())));
     }
 
 }

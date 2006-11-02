@@ -222,7 +222,7 @@ public class Parser {
         expectAndConsume(TokenType.KEYWORD_into);
         UnresolvedTableReference table = parseTableReference();
 
-        ImmutableList columnNames = parseOptionalColumnNames();
+        ImmutableList columnNames = parseColumnNamesForInsert();
         
         ValueList values = parseValueConstructor();
 
@@ -261,9 +261,19 @@ public class Parser {
         return new SetClause(column, value);
     }
 
-    private ImmutableList parseOptionalColumnNames() {
+    private ImmutableList parseColumnNamesForInsert() {
         if (currentTokenType() == TokenType.OPEN_PAREN) {
-            return parseColumnNames();
+            expectAndConsume(TokenType.OPEN_PAREN);
+            
+            List columnNames = new ArrayList();
+            if (currentTokenType() != TokenType.CLOSE_PAREN) {
+                do {
+                    columnNames.add(consumeIdentifier());
+                } while (consumeIfMatches(TokenType.COMMA));
+            }
+            
+            expectAndConsume(TokenType.CLOSE_PAREN);
+            return new ImmutableList(columnNames);
         }
         else {
             return null;
@@ -288,9 +298,11 @@ public class Parser {
         ValueList values = new ValueList(start);
         expectAndConsume(TokenType.OPEN_PAREN);
 
-        do {
-            values = values.with(parseAndEvaluate());
-        } while (consumeIfMatches(TokenType.COMMA));
+        if (currentTokenType() != TokenType.CLOSE_PAREN) {
+            do {
+                values = values.with(parseAndEvaluate());
+            } while (consumeIfMatches(TokenType.COMMA));
+        }
         Location end = expectAndConsume(TokenType.CLOSE_PAREN).location;
         return values.with(end);
     }
