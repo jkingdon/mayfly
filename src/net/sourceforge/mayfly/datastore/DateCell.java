@@ -20,7 +20,15 @@ public class DateCell extends Cell {
     }
 
     public java.sql.Date asDate(DateTimeZone zone) throws SQLException {
-        return new java.sql.Date(localDate.toDateMidnight(zone).getMillis());
+        return new java.sql.Date(asMillis(zone));
+    }
+    
+    public java.sql.Timestamp asTimestamp(DateTimeZone zone) throws SQLException {
+        return new java.sql.Timestamp(asMillis(zone));
+    }
+
+    private long asMillis(DateTimeZone zone) {
+        return localDate.toDateMidnight(zone).getMillis();
     }
 
     public int compareTo(Cell otherCell, Location location) {

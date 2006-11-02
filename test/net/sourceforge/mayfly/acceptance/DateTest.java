@@ -150,11 +150,15 @@ public class DateTest extends SqlTestCase {
             new DateMidnight(2003, 11, 27).getMillis();
         assertEquals(november27testMachineTimeZone,
             results.getDate(1).getTime());
+        assertEquals(november27testMachineTimeZone,
+            results.getTimestamp(1).getTime());
 
         long november29testMachineTimeZone = 
             new DateMidnight(2003, 11, 29).getMillis();
         assertEquals(november29testMachineTimeZone, 
             results.getDate("end_date").getTime());
+        assertEquals(november29testMachineTimeZone, 
+            results.getTimestamp("end_date").getTime());
 
         assertFalse(results.next());
         results.close();
