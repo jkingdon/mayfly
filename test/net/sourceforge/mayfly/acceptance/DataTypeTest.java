@@ -258,6 +258,25 @@ public class DataTypeTest extends SqlTestCase {
         assertFalse(results.next());
     }
     
+    public void testSetDouble() throws Exception {
+        execute("create table foo (factor decimal(4, 2))");
+        PreparedStatement statement = connection.prepareStatement(
+            "insert into foo(factor) values(?)");
+        statement.setDouble(1, 3.14);
+        statement.executeUpdate();
+        statement.setDouble(1, -0.03);
+        statement.executeUpdate();
+        
+        ResultSet results = query("select factor from foo");
+        assertTrue(results.next());
+        assertEquals(314, 
+            results.getBigDecimal(1).movePointRight(2).intValue());
+        assertTrue(results.next());
+        assertEquals(-3, 
+            results.getBigDecimal(1).movePointRight(2).intValue());
+        assertFalse(results.next());
+    }
+    
     public void testIntegerToFloat() throws Exception {
         execute("create table foo (x bigint, y smallint)");
         // 4503599627370495 is, I believe, the largest integer value which can be

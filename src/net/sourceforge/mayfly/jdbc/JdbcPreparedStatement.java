@@ -145,7 +145,9 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public void setDouble(int parameterIndex, double value) throws SQLException {
-        throw new UnimplementedException();
+        /* What's the difference between the BigDecimal constructor that
+           takes a double and the one that takes a string? */
+        setParameter(parameterIndex, new BigDecimal(String.valueOf(value)));
     }
 
     public void setBigDecimal(int parameterIndex, BigDecimal value)
