@@ -140,6 +140,7 @@ public class ForeignKeyTest extends SqlTestCase {
         expectExecuteFailure("drop table countries",
             "cannot drop countries because " +
             "a foreign key in table urboj.cities refers to it");
+
         execute("set schema urboj");
         String sql = "drop table landoj.countries";
         if (dialect.wishThisWereTrue()) {

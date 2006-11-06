@@ -184,7 +184,8 @@ public class ResultTest extends SqlTestCase {
         execute("CREATE TABLE bar (A INTEGER)");
         execute("INSERT INTO foo (A) values (5)");
         execute("INSERT INTO bar (A) values (7)");
-        ResultSet results = query("select foo.a, bar.a from foo inner join bar on bar.a > foo.a");
+        ResultSet results = query(
+            "select foo.a, bar.a from foo inner join bar on bar.a > foo.a");
         assertTrue(results.next());
         if (dialect.expectMayflyBehavior()) {
             try {

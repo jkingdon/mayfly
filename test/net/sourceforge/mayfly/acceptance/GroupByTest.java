@@ -329,13 +329,13 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testHavingIsDisallowedOnUnaggregated() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
-
         execute("create table foo (x integer, y integer)");
+        /* Mayfly is giving an error for much the right reason, but
+           "no column x" isn't really a clear enough message. */
         expectQueryFailure("select avg(x) from foo group by y having x < 5", 
-            "x is not aggregate or mentioned in GROUP BY");
+            dialect.wishThisWereTrue() ?
+                "x is not aggregate or mentioned in GROUP BY" :
+                "no column x");
     }
     
     public void testHavingWithoutGroupBy() throws Exception {
@@ -374,7 +374,8 @@ public class GroupByTest extends SqlTestCase {
                 " 'Bowman', 'Practical SQL' ", 
                 " 'Gang Of Four', 'Design Patterns' "
             },
-            query("select books.* from books group by author, title order by author, title")
+            query("select books.* from books " +
+                "group by author, title order by author, title")
         );
 
         assertResultList(
@@ -383,18 +384,25 @@ public class GroupByTest extends SqlTestCase {
                 " 'Bowman', 'Practical SQL' ", 
                 " 'Gang Of Four', 'Design Patterns' "
             },
-            query("select * from books group by author, title order by author, title")
+            query("select * from books group by author, title " +
+                "order by author, title")
         );
         
         String selectAll = "select * from books group by author";
         String selectAllFromTable = "select books.* from books group by author";
         if (dialect.errorIfNotAggregateOrGrouped()) {
-            expectQueryFailure(selectAll, "books.title is not aggregate or mentioned in GROUP BY");
-            expectQueryFailure(selectAllFromTable, "books.title is not aggregate or mentioned in GROUP BY");
+            expectQueryFailure(selectAll, 
+                "books.title is not aggregate or mentioned in GROUP BY");
+            expectQueryFailure(selectAllFromTable, 
+                "books.title is not aggregate or mentioned in GROUP BY");
         }
         else {
-            assertResultSet(new String[] { " 'Bowman' ", " 'Gang Of Four' " }, query(selectAll));
-            assertResultSet(new String[] { " 'Bowman' ", " 'Gang Of Four' " }, query(selectAllFromTable));
+            assertResultSet(
+                new String[] { " 'Bowman' ", " 'Gang Of Four' " }, 
+                query(selectAll));
+            assertResultSet(
+                new String[] { " 'Bowman' ", " 'Gang Of Four' " }, 
+                query(selectAllFromTable));
         }
     }
     
