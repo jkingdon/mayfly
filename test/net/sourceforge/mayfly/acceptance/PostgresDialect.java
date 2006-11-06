@@ -199,5 +199,9 @@ public class PostgresDialect extends Dialect {
             .append("_seq')")
             .toString();
     }
+    
+    public boolean autoCommitMustBeOffToCallRollback() {
+        return false;
+    }
 
 }

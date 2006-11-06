@@ -32,6 +32,8 @@ public class MySqlDialect extends Dialect {
         Class.forName("com.mysql.jdbc.Driver");
         Connection bootstrapConnection = DriverManager.getConnection(
             "jdbc:mysql://localhost/", "root", MYSQL_ROOT_PASSWORD);
+        SqlTestCase.execute("DROP DATABASE IF EXISTS mayflytest", 
+            bootstrapConnection);
         SqlTestCase.execute("CREATE DATABASE mayflytest", bootstrapConnection);
         bootstrapConnection.close();
 
@@ -179,14 +181,18 @@ public class MySqlDialect extends Dialect {
         return false;
     }
 
-    public boolean haveTransactions() {
-        // If we could make sure we were using InnoDB, this
-        // perhaps could be true.  At least for now, don't
-        // worry about trying to make sure we have & use InnoDB.
-        return false;
+    public void endTransaction(Connection connection) throws SQLException {
+        // Neither setAutoCommit(true) nor commit() seems to suffice.
+        // Is that really true about commit()?  That it only works if
+        // you have made a change?
+        connection.rollback();
     }
 
-    public String databaseTypeForForeignKeys() {
+    public String tableTypeForTransactions() {
+        return " type=innodb";
+    }
+    
+    public String tableTypeForForeignKeys() {
         return " type=innodb";
     }
     

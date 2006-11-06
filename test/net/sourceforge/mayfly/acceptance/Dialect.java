@@ -392,6 +392,10 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean canProvideRepeatableRead() {
+        return true;
+    }
+
     public boolean willWaitForWriterToCommit() {
         return false;
     }
@@ -400,7 +404,29 @@ public abstract class Dialect {
         return true;
     }
 
-    public String databaseTypeForForeignKeys() {
+    public String tableTypeForTransactions() {
+        return "";
+    }
+    
+    public boolean autoCommitMustBeOffToCallRollback() {
+        return true;
+    }
+    
+    /**
+       @internal
+       
+       Do whatever is needed before calling close() on the connection.
+                 
+       The whole thing, of what you need to do to the transaction
+       before calling close(), might be worth considering, 
+       writing tests for, and reading documentation for various
+       databases.
+    */
+    public void endTransaction(Connection connection) throws SQLException {
+        // By default, nothing is needed.
+    }
+
+    public String tableTypeForForeignKeys() {
         return "";
     }
     

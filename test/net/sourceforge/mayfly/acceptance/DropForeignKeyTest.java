@@ -6,12 +6,12 @@ public class DropForeignKeyTest extends SqlTestCase {
     public void testBasics() throws Exception {
         execute("create table countries (id integer primary key, " +
             "name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "constraint city_country " +
             "foreign key (country) references countries(id)" +
             ")" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
 
         String countrylessCity = "insert into cities values ('Monaco', 99)";
         expectExecuteFailure(countrylessCity,
@@ -39,7 +39,7 @@ public class DropForeignKeyTest extends SqlTestCase {
 
         execute("create table foo(" +
             "id integer not null, constraint uniq_id unique(id))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         expectExecuteFailure("alter table foo drop foreign key uniq_id",
             "constraint uniq_id is not a foreign key");
     }
@@ -51,12 +51,12 @@ public class DropForeignKeyTest extends SqlTestCase {
 
         execute("create table countries (id integer primary key, " +
             "name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "constraint city_country " +
             "foreign key (country) references countries(id)" +
             ")" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
 
         expectExecuteFailure("alter table cities drop foreign key citycountry", 
             "no constraint citycountry");
@@ -79,14 +79,14 @@ public class DropForeignKeyTest extends SqlTestCase {
 
         execute("create table countries (id integer primary key, " +
             "name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)," +
             "colonial_power integer," +
             "constraint colonial_constraint " +
             "foreign key (colonial_power) references countries(id)" +
             ")" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("insert into countries values(1, 'Portugal')");
         execute("insert into countries values(2, 'India')");
         execute("insert into cities values('Goa', 2, 1)");

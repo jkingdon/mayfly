@@ -4,9 +4,9 @@ public class AddForeignKeyTest extends SqlTestCase {
     
     public void testBasics() throws Exception {
         execute("create table foo(id integer primary key)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table bar(foo_id integer)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("insert into bar values(5)");
         execute("insert into bar values(6)");
         execute("insert into foo values(5)");
@@ -23,9 +23,9 @@ public class AddForeignKeyTest extends SqlTestCase {
     
     public void testConstraintNames() throws Exception {
         execute("create table foo(id integer primary key)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table bar(first_foo integer, second_foo integer)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
 
         execute("alter table bar add constraint bar_foo " +
             "foreign key (first_foo) references foo(id)");

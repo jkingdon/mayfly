@@ -85,11 +85,11 @@ public class UniqueColumnTest extends SqlTestCase {
     
     public void testDuplicateConstraintName() throws Exception {
         execute("create table one(x integer primary key)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         String duplicate = "create table foo(x integer not null, y integer, " +
             "constraint foo_x unique(x)," +
             "constraint foo_x foreign key(x) references one(x))" +
-            dialect.databaseTypeForForeignKeys();
+            dialect.tableTypeForForeignKeys();
         if (dialect.duplicateConstraintNamesOk()) {
             execute(duplicate);
         }

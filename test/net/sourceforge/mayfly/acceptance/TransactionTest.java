@@ -17,7 +17,7 @@ public class TransactionTest extends SqlTestCase {
         connection.commit();
         assertResultSet(new String[] { " 5 " }, query("select x from foo"));
         
-        cleanUpForDerby();
+        dialect.endTransaction(connection);
     }
 
     public void testAutoCommitIsPerConnection() throws Exception {
@@ -38,7 +38,8 @@ public class TransactionTest extends SqlTestCase {
         }
         connection.setTransactionIsolation(Connection.TRANSACTION_READ_UNCOMMITTED);
 
-        execute("create table foo (x integer)");
+        execute("create table foo (x integer)" +
+            dialect.tableTypeForTransactions());
         connection.setAutoCommit(false);
         execute("insert into foo(x) values(5)");
         execute("insert into foo(x) values(7)");
@@ -48,7 +49,7 @@ public class TransactionTest extends SqlTestCase {
 //        assertResultSet(new String[] { " 5 ", " 7 " }, query("select x from foo"));
         assertResultSet(new String[] { }, query("select x from foo"));
         
-        cleanUpForDerby();
+        dialect.endTransaction(connection);
     }
     
     public void testRollbackAndAutoCommit() throws Exception {
@@ -60,11 +61,22 @@ public class TransactionTest extends SqlTestCase {
         execute("insert into foo(x) values(5)");
         execute("insert into foo(x) values(7)");
         assertResultSet(new String[] { " 5 ", " 7 " }, query("select x from foo"));
-        // MySQL insists on auto-commit false in order to call rollback.
-        // That might be worth insisting on, if apps can deal.
-//        connection.setAutoCommit(false);
+        
+        if (dialect.autoCommitMustBeOffToCallRollback()) {
+            try {
+                connection.rollback();
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage("auto-commit must be off to call rollback", e);
+            }
+        }
+
+        connection.setAutoCommit(false);
         connection.rollback();
         assertResultSet(new String[] { " 5 ", " 7 " }, query("select x from foo"));
+        
+        dialect.endTransaction(connection);
     }
     
     // Need to deal with whether SET SCHEMA is transactional (see Derby docs)
@@ -80,7 +92,8 @@ public class TransactionTest extends SqlTestCase {
         }
         connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         
-        execute("create table foo (x integer)");
+        execute("create table foo (x integer)"
+            + dialect.tableTypeForTransactions());
         Connection writingConnection = dialect.openAdditionalConnection();
         writingConnection.setAutoCommit(false);
         execute("insert into foo (x) values (5)", writingConnection);
@@ -104,7 +117,8 @@ public class TransactionTest extends SqlTestCase {
         }
         connection.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
         
-        execute("create table foo (x integer)");
+        execute("create table foo (x integer)" +
+            dialect.tableTypeForTransactions());
         execute("insert into foo (x) values (5)");
 
         Connection writingConnection = dialect.openAdditionalConnection();
@@ -124,7 +138,7 @@ public class TransactionTest extends SqlTestCase {
         writingConnection.close();
     }
     
-    public void testTwoWriters() throws Exception {
+    public void testTwoInsertsGetMerged() throws Exception {
         execute("create table foo (x integer)");
         
         Connection connection2 = dialect.openAdditionalConnection();
@@ -138,20 +152,73 @@ public class TransactionTest extends SqlTestCase {
         connection2.commit();
         
         assertResultSet(new String[] { "5", "7" }, query ("select x from foo"));
-        cleanUpForDerby();
+        dialect.endTransaction(connection);
         connection2.close();
+    }
+    
+    public void testReadIsNotRepeatable() throws Exception {
+        checkRepeatableRead(false, Connection.TRANSACTION_READ_COMMITTED);
+    }
+    
+    public void testReadIsRepeatable() throws Exception {
+        checkRepeatableRead(dialect.canProvideRepeatableRead(), 
+            Connection.TRANSACTION_REPEATABLE_READ);
+    }
+
+    /** transaction 1 reads (or just starts a transaction? what triggers start?)
+     * transaction 2 updates a row that 1 has already read
+     * transaction 1 re-reads
+     * So is the update seen/not-seen? ("repeatable read" property)
+     */
+    private void checkRepeatableRead(
+        boolean expectRepeatableRead, int isolationLevel) 
+    throws Exception {
+        if (!dialect.haveTransactions() || dialect.willWaitForWriterToCommit()) {
+            /* I think the willWaitForWriteToCommit issue is that connection2
+               will be waiting for connection to complete.  So it isn't
+               "wait for writer" but "wait for reader which has a lock" */
+            return;
+        }
+        execute("create table foo (x integer)" + 
+            dialect.tableTypeForTransactions());
+        execute("insert into foo(x) values(5)");
+        
+        connection.setTransactionIsolation(isolationLevel);
+        /* Note that the concept of a commit in this case applies even to
+           a transaction which is only reading. */
+        connection.setAutoCommit(false);
+        Connection connection2 = dialect.openAdditionalConnection();
+
+        // Doesn't seem to matter what connection2's transaction isolation is.
+//        connection2.setTransactionIsolation(
+//            Connection.TRANSACTION_REPEATABLE_READ);
+
+        try {
+            // transaction 1 reads (or just starts a transaction? what triggers start?)
+            assertResultSet(new String[] { "5" }, query("select x from foo"));
+            
+            // transaction 2 updates a row that 1 has already read
+            execute("update foo set x = 8", connection2);
+    
+            // transaction 1 re-reads
+            // So is the update seen/not-seen? ("repeatable read" property)
+            assertResultSet(
+                new String[] { 
+                    expectRepeatableRead ? "5" : "8"
+                }, query("select x from foo"));
+            
+            connection.commit();
+            assertResultSet(new String[] { "8" }, query("select x from foo"));
+        }
+        finally {
+            dialect.endTransaction(connection);
+            connection2.close();
+        }
     }
 
     // two connections - uncommitted update seen/not-seen by other
     // uncommitted create table seen/not-seen by other
     // uncommitted create schema seen/not-seen by other
-
-    /* transaction 1 reads (or just starts a transaction? what triggers start?)
-     * transaction 2 updates a row that 1 has already read
-     * transaction 1 re-reads
-     * So is the update seen/not-seen
-     * ("repeatable read" property)
-     */
 
     /* transaction 1 reads
      * transaction 2 inserts a row
@@ -202,17 +269,6 @@ public class TransactionTest extends SqlTestCase {
         Statement myStatement = connection.createStatement();
         assertResultSet(expectedRows, myStatement.executeQuery(sql));
         myStatement.close();
-    }
-
-    private void cleanUpForDerby() throws SQLException {
-        // Derby needs this before the close.
-        //
-        // I suspect the real Derby requirement is that after doing a
-        // read with auto-commit false, one needs to commit or rollback
-        // the transaction before closing.  That seems like something
-        // worth considering, writing tests for, and reading the Derby
-        // documentation.
-        connection.setAutoCommit(true);
     }
     
 }

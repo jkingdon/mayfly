@@ -5,11 +5,11 @@ public class ForeignKeyTest extends SqlTestCase {
     public void testInsertAndDelete() throws Exception {
         execute("create table countries (id integer primary key, " +
             "name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)" +
             ")" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("insert into countries values (1, 'Australia')");
         execute("insert into cities values ('Perth', 1)");
 
@@ -28,11 +28,11 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)" +
             "on delete cascade)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("insert into cities values ('Bombay', null)");
         assertResultSet(new String[] { " 'Bombay', null " }, 
             query("select * from cities"));
@@ -73,11 +73,11 @@ public class ForeignKeyTest extends SqlTestCase {
 
     public void testUpdate() throws Exception {
         execute("create table countries (id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)" +
             ")" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("insert into countries values (1, 'East Germany')");
         execute("insert into countries values (2, 'West Germany')");
         execute("insert into cities values ('Berlin', 1)");
@@ -106,11 +106,11 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)" +
             ")" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         
         expectExecuteFailure("drop table countries",
             "cannot drop countries because " +
@@ -129,12 +129,12 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         createEmptySchema("urboj");
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references landoj.countries(id)" +
             ")" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         
         execute("set schema landoj");
         expectExecuteFailure("drop table countries",
@@ -159,12 +159,12 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         expectExecuteFailure(
             "create table cities (name varchar(255), country integer, " +
             "foreign key (country) references bad_table(id)" +
             ")" +
-            dialect.databaseTypeForForeignKeys(),
+            dialect.tableTypeForForeignKeys(),
             "no table bad_table");
     }
 
@@ -172,11 +172,11 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)" +
             "on delete no action on update no action)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("insert into countries values (1, 'India')");
         execute("insert into cities values ('Bombay', 1)");
         expectExecuteFailure("delete from countries", 
@@ -196,11 +196,11 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)" +
             "on delete cascade)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("insert into countries values (1, 'India')");
         execute("insert into cities values ('Bombay', 1)");
         execute("delete from countries");
@@ -211,12 +211,12 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), " +
             "country integer default 1, " +
             "foreign key (country) references countries(id)" +
             "on delete set null)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("insert into countries values (1, 'The World')");
         execute("insert into countries values (2, 'India')");
         execute("insert into cities values ('Bombay', 2)");
@@ -235,13 +235,13 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
 
         String createCities = "create table cities (name varchar(255), " +
             "country integer default 1, " +
             "foreign key (country) references countries(id)" +
             "on delete set default)" +
-            dialect.databaseTypeForForeignKeys();
+            dialect.tableTypeForForeignKeys();
         if (dialect.onDeleteSetDefaultMissing(true)) {
             expectExecuteFailure(createCities, "errno 150");
             return;
@@ -266,11 +266,11 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("create table cities (name varchar(255), country integer, " +
             "foreign key (country) references countries(id)" +
             "on update no action on delete cascade)" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         execute("insert into countries values (1, 'USSR')");
         execute("insert into countries values (2, 'Russia')");
         execute("insert into cities values ('Moscow', 1)");
@@ -288,11 +288,11 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         String createCities = "create table cities (name varchar(255), country integer, " +
                     "foreign key (country) references countries(id)" +
                     "on update cascade)" +
-                    dialect.databaseTypeForForeignKeys();
+                    dialect.tableTypeForForeignKeys();
         if (dialect.onUpdateSetNullAndCascadeMissing()) {
             expectExecuteFailure(createCities, 
                 "ON UPDATE CASCADE not implemented");
@@ -322,11 +322,11 @@ public class ForeignKeyTest extends SqlTestCase {
         execute(
             "create table countries " +
             "(id integer primary key, name varchar(255))" +
-            dialect.databaseTypeForForeignKeys());
+            dialect.tableTypeForForeignKeys());
         String createCities = "create table cities (name varchar(255), country integer, " +
                     "foreign key (country) references countries(id)" +
                     "on update set null)" +
-                    dialect.databaseTypeForForeignKeys();
+                    dialect.tableTypeForForeignKeys();
         if (dialect.onUpdateSetNullAndCascadeMissing()) {
             expectExecuteFailure(createCities, "ON UPDATE SET NULL not implemented");
         }
@@ -354,7 +354,7 @@ public class ForeignKeyTest extends SqlTestCase {
             "mother integer," +
             "foreign key(mother) references person(id)" +
             ")"
-            + dialect.databaseTypeForForeignKeys()
+            + dialect.tableTypeForForeignKeys()
         );
         execute("insert into person (id) values(1)");
         execute("insert into person (id, mother) values(2, 1)");
@@ -395,23 +395,23 @@ public class ForeignKeyTest extends SqlTestCase {
     
     public void testNoPrimaryKeyOrUnique() throws Exception {
         execute("create table foo(id integer)" 
-            + dialect.databaseTypeForForeignKeys());
+            + dialect.tableTypeForForeignKeys());
         expectExecuteFailure("create table bar(" +
             "foo_id integer, foreign key (foo_id) references foo(id))" 
-            + dialect.databaseTypeForForeignKeys(),
+            + dialect.tableTypeForForeignKeys(),
             "foreign key refers to foo(id) which is not unique or a primary key");
     }
     
     public void testReferencedColumnHasAnotherForeignKey() throws Exception {
         execute("create table fixer(id integer primary key)" 
-            + dialect.databaseTypeForForeignKeys());
+            + dialect.tableTypeForForeignKeys());
         execute("create table foo(id integer," +
             "foreign key(id) references fixer(id)" +
             ")" 
-            + dialect.databaseTypeForForeignKeys());
+            + dialect.tableTypeForForeignKeys());
         String barSql = "create table bar(" +
             "foo_id integer, foreign key (foo_id) references foo(id))" 
-            + dialect.databaseTypeForForeignKeys();
+            + dialect.tableTypeForForeignKeys();
         if (dialect.foreignKeyJustNeedsIndex()) {
             execute(barSql);
         }
@@ -426,10 +426,10 @@ public class ForeignKeyTest extends SqlTestCase {
         execute("create table foo(id integer" +
             (dialect.uniqueColumnMayBeNullable() ? "" : " not null") +
             ", unique(id))" 
-            + dialect.databaseTypeForForeignKeys());
+            + dialect.tableTypeForForeignKeys());
         execute("create table bar(" +
             "foo_id integer, foreign key (foo_id) references foo(id))" 
-            + dialect.databaseTypeForForeignKeys());
+            + dialect.tableTypeForForeignKeys());
     }
     
     // same cases (primary key, unique) but with self-reference
@@ -447,12 +447,12 @@ public class ForeignKeyTest extends SqlTestCase {
     
     public void testDuplicateConstraintName() throws Exception {
         execute("create table foo(id integer primary key)"
-            + dialect.databaseTypeForForeignKeys());
+            + dialect.tableTypeForForeignKeys());
         expectExecuteFailure("create table bar (x integer," +
             "constraint dup foreign key(x) references foo(id)," +
             "y integer," +
             "constraint dup foreign key(y) references foo(id)" +
-            ")" + dialect.databaseTypeForForeignKeys(),
+            ")" + dialect.tableTypeForForeignKeys(),
             "duplicate constraint name dup");
     }
 

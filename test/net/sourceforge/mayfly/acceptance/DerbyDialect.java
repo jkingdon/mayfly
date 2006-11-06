@@ -121,6 +121,17 @@ public class DerbyDialect extends Dialect {
         return true;
     }
     
+    public boolean autoCommitMustBeOffToCallRollback() {
+        return false;
+    }
+    
+    public void endTransaction(Connection connection) throws SQLException {
+        /* setAutoCommit(true) would also suffice.
+           How about commit() (don't think I've tried that one)?
+         */
+        connection.rollback();
+    }
+    
     public boolean haveTinyint() {
         return false;
     }

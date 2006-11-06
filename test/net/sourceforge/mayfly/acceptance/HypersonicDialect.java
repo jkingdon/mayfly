@@ -131,6 +131,14 @@ public class HypersonicDialect extends Dialect {
         return true;
     }
     
+    public boolean canProvideRepeatableRead() {
+        return false;
+    }
+    
+    public boolean autoCommitMustBeOffToCallRollback() {
+        return false;
+    }
+    
     public boolean haveForUpdate() {
         return false;
     }
