@@ -2,14 +2,26 @@ package net.sourceforge.mayfly.evaluation.command;
 
 import junit.framework.TestCase;
 
-import java.util.Collections;
+import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.Columns;
 
 public class CommandTest extends TestCase {
 
     public void testParse() throws Exception {
-        assertEquals(new DropTable("FOO", false), Command.fromSql("drop table FOO"));
-        assertEquals(new CreateTable("Foo", Collections.singletonList("a")),
-            Command.fromSql("Create Table Foo (a integer)"));
+        DropTable command = (DropTable) Command.fromSql("drop table FOO");
+        assertEquals("FOO", command.table());
+        assertFalse(command.ifExists);
+    }
+    
+    public void testParseSecondExample() throws Exception {
+        CreateTable command = (CreateTable) 
+            Command.fromSql("Create Table Foo (a integer)");
+
+        assertEquals("Foo", command.table());
+        Columns columns = command.columns();
+        assertEquals(1, columns.size());
+        Column column = (Column) columns.element(0);
+        assertEquals("a", column.columnName());
     }
     
 }

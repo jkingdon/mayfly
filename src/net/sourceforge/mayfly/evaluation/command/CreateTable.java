@@ -99,5 +99,9 @@ public class CreateTable extends Command {
     public boolean hasConstraints() {
         return !constraints.isEmpty();
     }
+    
+    public Columns columns() {
+        return columns;
+    }
 
 }

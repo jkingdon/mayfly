@@ -303,6 +303,15 @@ public class EndToEndTests extends SqlTestCase {
         insert.close();
     }
     
+    /**
+       Test we can have a big binary data type, where big > 4Gibyte.
+       While we're at it, same for varchar (and who else? CLOB?)
+     */
+    public void testBigSizes() throws Exception {
+        execute("create table foo(a blob(8111222333))");
+        execute("create table bar(a varchar(8111222333))");
+    }
+    
     public void testGetMaxRows() throws Exception {
         int noLimit = 0;
 

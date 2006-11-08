@@ -66,5 +66,9 @@ public class TimestampDataType extends DataType {
             return null;
         }
     }
+    
+    public String dumpName() {
+        return "TIMESTAMP";
+    }
 
 }

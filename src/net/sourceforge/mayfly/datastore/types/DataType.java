@@ -22,4 +22,6 @@ public abstract class DataType extends ValueObject {
         }
     }
 
+    abstract public String dumpName();
+
 }

@@ -58,5 +58,9 @@ public class DateDataType extends DataType {
             return null;
         }
     }
+    
+    public String dumpName() {
+        return "DATE";
+    }
 
 }

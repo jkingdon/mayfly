@@ -129,4 +129,8 @@ public class Row {
         return ((TupleElement)elements.get(index)).columnName();
     }
 
+    public Cell cell(int index) {
+        return ((TupleElement)elements.get(index)).cell();
+    }
+
 }

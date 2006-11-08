@@ -5,7 +5,7 @@ import net.sourceforge.mayfly.datastore.DataStore;
 public class DropTable extends Command {
 
     private final String table;
-    private final boolean ifExists;
+    final boolean ifExists;
 
     public DropTable(String table, boolean ifExists) {
         this.table = table;

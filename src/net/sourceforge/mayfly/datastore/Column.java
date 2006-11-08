@@ -14,7 +14,7 @@ public class Column extends ValueObject {
     private final Cell defaultValue;
     private final Cell onUpdateValue;
     private final boolean isAutoIncrement;
-    private final DataType type;
+    public final DataType type;
     
     /** We'll probably want not-null contraints to be implemented
      * via a subclass of

@@ -712,24 +712,37 @@ public class Parser {
 
     ParsedDataType parseDataType() {
         boolean isAutoIncrement = false;
-        DataType type = new DefaultDataType();
-        if (consumeIfMatches(TokenType.KEYWORD_integer)) {
-        }
-        else if (consumeIfMatches(TokenType.KEYWORD_int)) {
+        DataType type;
+        if (consumeIfMatches(TokenType.KEYWORD_integer)
+            || consumeIfMatches(TokenType.KEYWORD_int)) {
+            type = new DefaultDataType(TokenType.KEYWORD_integer.description());
         }
         else if (consumeIfMatches(TokenType.KEYWORD_smallint)) {
+            type = new DefaultDataType(TokenType.KEYWORD_smallint.description());
         }
         else if (consumeIfMatches(TokenType.KEYWORD_varchar)) {
             expectAndConsume(TokenType.OPEN_PAREN);
-            expectAndConsume(TokenType.NUMBER);
+            long size = consumeLong();
             expectAndConsume(TokenType.CLOSE_PAREN);
+            type = new DefaultDataType(
+                TokenType.KEYWORD_varchar.description() +
+                "(" +
+                size +
+                ")");
         }
         else if (consumeIfMatches(TokenType.KEYWORD_decimal)) {
             expectAndConsume(TokenType.OPEN_PAREN);
-            expectAndConsume(TokenType.NUMBER);
+            int digits1 = consumeInteger();
             expectAndConsume(TokenType.COMMA);
-            expectAndConsume(TokenType.NUMBER);
+            int digits2 = consumeInteger();
             expectAndConsume(TokenType.CLOSE_PAREN);
+            type = new DefaultDataType(
+                TokenType.KEYWORD_decimal.description() +
+                "(" +
+                digits1 +
+                "," +
+                digits2 +
+                ")");
         }
         else if (currentTokenType() == TokenType.IDENTIFIER) {
             // These shouldn't be reserved if they are not in the
@@ -737,15 +750,22 @@ public class Parser {
             Token token = expectAndConsume(TokenType.IDENTIFIER);
             String currentText = token.getText();
             if (currentText.equalsIgnoreCase("tinyint")) {
+                type = new DefaultDataType("TINYINT");
             }
             else if (currentText.equalsIgnoreCase("bigint")) {
+                type = new DefaultDataType("BIGINT");
             }
             else if (currentText.equalsIgnoreCase("text")) {
+                type = new DefaultDataType("TEXT");
             }
             else if (currentText.equalsIgnoreCase("blob")) {
                 if (consumeIfMatches(TokenType.OPEN_PAREN)) {
-                    expectAndConsume(TokenType.NUMBER);
+                    long size = consumeLong();
+                    //expectAndConsume(TokenType.NUMBER);
                     expectAndConsume(TokenType.CLOSE_PAREN);
+                    type = new BinaryDataType(size);
+                }
+                else {
                     type = new BinaryDataType();
                 }
             }
@@ -759,11 +779,10 @@ public class Parser {
                 // Reserved word in SQL92; maybe we should too...
                 type = new TimestampDataType();
             }
-            else if (currentText.equalsIgnoreCase("identity")) {
+            else if (currentText.equalsIgnoreCase("identity")
+                || currentText.equalsIgnoreCase("serial")) {
                 isAutoIncrement = true;
-            }
-            else if (currentText.equalsIgnoreCase("serial")) {
-                isAutoIncrement = true;
+                type = new DefaultDataType("IDENTITY");
             }
             else {
                 throw new ParserException("data type", token);
@@ -1437,6 +1456,18 @@ public class Parser {
         String text = number.getText();
         try {
             return Integer.parseInt(text);
+        }
+        catch (NumberFormatException e) {
+            // Out of range.  Most (all?) other cases are prevented in the lexer.
+            throw new ParserException(text + " is out of range");
+        }
+    }
+
+    long consumeLong() {
+        Token number = expectAndConsume(TokenType.NUMBER);
+        String text = number.getText();
+        try {
+            return Long.parseLong(text);
         }
         catch (NumberFormatException e) {
             // Out of range.  Most (all?) other cases are prevented in the lexer.
