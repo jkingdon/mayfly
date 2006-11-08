@@ -10,8 +10,12 @@ public abstract class DataType extends ValueObject {
 
     abstract public Cell coerce(Value value);
 
-    protected Cell genericCoerce(Value value, String typeDescription) {
+    protected Cell genericCoerce(Value value, String typeDescription, 
+        Class nativeCellType) {
         if (value.value instanceof NullCell) {
+            return value.value;
+        }
+        else if (value.value.getClass() == nativeCellType) {
             return value.value;
         }
         else {

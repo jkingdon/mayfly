@@ -59,6 +59,7 @@ import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Count;
 import net.sourceforge.mayfly.evaluation.expression.CountAll;
+import net.sourceforge.mayfly.evaluation.expression.CurrentTimestampExpression;
 import net.sourceforge.mayfly.evaluation.expression.Divide;
 import net.sourceforge.mayfly.evaluation.expression.Maximum;
 import net.sourceforge.mayfly.evaluation.expression.Minimum;
@@ -68,7 +69,6 @@ import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.Sum;
-import net.sourceforge.mayfly.evaluation.expression.UnimplementedExpression;
 import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
 import net.sourceforge.mayfly.evaluation.expression.literal.DecimalLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
@@ -678,9 +678,8 @@ public class Parser {
         else if (consumeIfMatches(TokenType.KEYWORD_null)) {
             return new NullExpression(start);
         }
-        else if (currentTokenType() == TokenType.KEYWORD_current_timestamp) {
-            Token token = expectAndConsume(TokenType.KEYWORD_current_timestamp);
-            return new UnimplementedExpression(token.getText());
+        else if (consumeIfMatches(TokenType.KEYWORD_current_timestamp)) {
+            return new CurrentTimestampExpression();
         }
         else {
             throw new ParserException(

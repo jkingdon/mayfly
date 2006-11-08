@@ -21,7 +21,7 @@ public class TimestampDataType extends DataType {
             return stringToDate(value.value.asString(), value.location);
         }
         else {
-            return genericCoerce(value, "a timestamp");
+            return genericCoerce(value, "a timestamp", TimestampCell.class);
         }
     }
 

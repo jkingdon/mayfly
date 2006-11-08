@@ -137,20 +137,6 @@ public class EndToEndTests extends SqlTestCase {
         results.close();
     }
 
-    public void testCurentTimestamp() throws Exception {
-        execute("create table foo (" +
-            "x timestamp default Current_Timestamp, y integer)");
-        try {
-            execute("insert into foo(y) values(5)");
-            assertResultSet(new String[] { "0" }, query("select x from foo"));
-            fail();
-        }
-        catch (MayflySqlException expected) {
-            assertEquals("Current_Timestamp is not implemented", 
-                expected.getMessage());
-        }
-    }
-    
     public void testLineNumbersOnForeignKeyViolations() throws Exception {
         /* Line numbers are (at least sometimes) provided by 
          * Oracle in an all_errors table, by SQL Server in the

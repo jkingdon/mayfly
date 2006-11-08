@@ -189,17 +189,27 @@ public class SqlDumperTest extends TestCase {
 //                filename + ":" + e.startLineNumber(), e);
 //        }
         
-        checkRoundTrip(database);
+        checkRoundTrip(database.dataStore());
     }
 
-    private static void checkRoundTrip(Database inputDatabase) {
-        String dump = new SqlDumper().dump(inputDatabase.dataStore());
+    /**
+     * From a datastore, dump it, then load from that dump,
+     * dump again, and compare the two dumps.
+     * 
+     * This is a somewhat weak test in that if the dump does something wrong,
+     * it quite possibly will do the same thing wrong in both dumps.  But if the
+     * dump produces SQL we can't parse or something of that order, we'll
+     * catch it.
+     */
+    private static void checkRoundTrip(DataStore inputStore) {
+        String dump = new SqlDumper().dump(inputStore);
         Database database2 = new Database();
         try {
             database2.executeScript(new StringReader(dump));
         }
         catch (MayflyException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                "failure in command: " + e.failingCommand(), e);
         }
         
         String dump2 = new SqlDumper().dump(database2.dataStore());

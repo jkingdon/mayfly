@@ -18,12 +18,7 @@ public class BinaryDataType extends DataType {
     }
 
     public Cell coerce(Value value) {
-        if (value.value instanceof BinaryCell) {
-            return value.value;
-        }
-        else {
-            return genericCoerce(value, "binary data");
-        }
+        return genericCoerce(value, "binary data", BinaryCell.class);
     }
     
     public String dumpName() {

@@ -21,7 +21,7 @@ public class DateDataType extends DataType {
             return stringToDate(value.value.asString(), value.location);
         }
         else {
-            return genericCoerce(value, "a date");
+            return genericCoerce(value, "a date", DateCell.class);
         }
     }
 

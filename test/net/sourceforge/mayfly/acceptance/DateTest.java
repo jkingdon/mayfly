@@ -18,6 +18,21 @@ public class DateTest extends SqlTestCase {
     private static final long ONE_HOUR = ONE_MINUTE * 60L;
     private static final long ONE_DAY = ONE_HOUR * 24L;
 
+    /** How long the test might execute between saving an approximate
+       expected "current" time and actually reading the current time.
+       Normally, a second or a few would tend to suffice, but given the
+       possibility of stopping/resuming a test run with SIGSTOP, laptop suspend,
+       or similar mechanisms, one could argue
+       for values up to days.  An hour seems like a reasonable compromise. */
+    private static final long HOW_LONG_A_TEST_MIGHT_TAKE = ONE_HOUR;
+    /** If the database server is on another machine, any difference between
+       the clocks of the machines would need to be included here.  If the
+       database reads the clock with, say, one second granularity and
+       the test gets millisecond granularity, then up to a second might need
+       to be included (depending on rounding). */
+    private static final long HOW_MUCH_CURRENT_TIMESTAMP_MIGHT_BE_IN_THE_PAST =
+        ONE_MINUTE;
+
     private static final long NOVEMBER_27_UTC = 1069891200000L;
     private static final long NOVEMBER_29_UTC = NOVEMBER_27_UTC + 2 * ONE_DAY;
 
@@ -221,19 +236,38 @@ public class DateTest extends SqlTestCase {
         // look, but seems to have something to do with the
         // local time zone.
         if (dialect.datesAreOff()) {
-            long oneDayEarlier = expected - ONE_DAY;
-            long oneDayLater = expected + ONE_DAY;
-            assertTrue("Expected between " + oneDayEarlier + " and " + oneDayLater + " but was " + actual,
-                actual >= oneDayEarlier && actual < oneDayLater
-            );
+            assertDateBetween(expected - ONE_DAY, expected + ONE_DAY, actual);
         }
         else {
             assertEquals(expected, actual);
         }
     }
+
+    private void assertDateBetween(
+        long startExpected, long endExpected, long actual) {
+        assertTrue("Expected between " + startExpected + 
+            " and " + endExpected + 
+            " but was " + actual,
+            actual >= startExpected && actual < endExpected
+        );
+    }
     
-    public void testCurentTimestamp() throws Exception {
-        execute("create table foo (x timestamp default current_timestamp)");
+    public void testCurrentTimestamp() throws Exception {
+        execute("create table foo (" +
+            "x timestamp default current_timestamp," +
+            "y integer" +
+            ")");
+        execute("insert into foo(y) values(5)");
+
+        long aboutNow = System.currentTimeMillis();
+        ResultSet results = query("select x, y from foo");
+        assertTrue(results.next());
+        assertDateBetween(
+            aboutNow - HOW_MUCH_CURRENT_TIMESTAMP_MIGHT_BE_IN_THE_PAST, 
+            aboutNow + HOW_LONG_A_TEST_MIGHT_TAKE,
+            results.getTimestamp("x").getTime());
+        assertEquals(5, results.getInt("y"));
+        assertFalse(results.next());
     }
     
     public void testSetDateOrTimestamp() throws Exception {

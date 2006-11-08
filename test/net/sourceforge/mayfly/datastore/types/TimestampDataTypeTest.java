@@ -24,6 +24,13 @@ public class TimestampDataTypeTest extends TestCase {
             new TimestampDataType().coerce(new Value(NullCell.INSTANCE));
         ObjectAssert.assertInstanceOf(NullCell.class, coerced);
     }
+    
+    public void testCoerceFromTimestamp() throws Exception {
+        TimestampCell in = new TimestampCell(2003, 1, 7, 13, 45, 00);
+        TimestampCell coerced = (TimestampCell) 
+            new TimestampDataType().coerce(new Value(in));
+        assertEquals(13, coerced.hour());
+    }
 
     public void testStringToDate() throws Exception {
         checkFailure("");
