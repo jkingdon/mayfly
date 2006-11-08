@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -400,7 +401,7 @@ public class LexerTest extends TestCase {
         
         {
             Token endOfFile = (Token) tokens.get(2);
-            assertEquals(TokenType.END_OF_FILE, endOfFile.getType());
+            assertEquals(TokenType.END_OF_FILE, endOfFile.type);
             assertEquals(2, endOfFile.startLineNumber());
             assertEquals(4, endOfFile.startColumn());
             assertEquals(2, endOfFile.endLineNumber());
@@ -414,13 +415,13 @@ public class LexerTest extends TestCase {
         
         {
             Token period = (Token) tokens.get(0);
-            assertEquals(TokenType.PERIOD, period.getType());
+            assertEquals(TokenType.PERIOD, period.type);
             MayflyAssert.assertLocation(2, 1, 2, 2, period.location);
         }
         
         {
             Token endOfFile = (Token) tokens.get(1);
-            assertEquals(TokenType.END_OF_FILE, endOfFile.getType());
+            assertEquals(TokenType.END_OF_FILE, endOfFile.type);
             MayflyAssert.assertLocation(2, 27, 2, 27, endOfFile.location);
         }
     }
@@ -431,13 +432,13 @@ public class LexerTest extends TestCase {
         
         {
             Token slash = (Token) tokens.get(0);
-            assertEquals(TokenType.DIVIDE, slash.getType());
+            assertEquals(TokenType.DIVIDE, slash.type);
             MayflyAssert.assertLocation(2, 5, 2, 6, slash.location);
         }
         
         {
             Token endOfFile = (Token) tokens.get(1);
-            assertEquals(TokenType.END_OF_FILE, endOfFile.getType());
+            assertEquals(TokenType.END_OF_FILE, endOfFile.type);
             MayflyAssert.assertLocation(2, 27, 2, 27, endOfFile.location);
         }
     }
@@ -447,7 +448,7 @@ public class LexerTest extends TestCase {
         assertEquals(3, tokens.size());
         
         Token string = (Token) tokens.get(0);
-        assertEquals(TokenType.QUOTED_STRING, string.getType());
+        assertEquals(TokenType.QUOTED_STRING, string.type);
         MayflyAssert.assertLocation(1, 1, 1, 9, string.location);
     }
     
@@ -465,6 +466,54 @@ public class LexerTest extends TestCase {
         MayflyAssert.assertLocation(1, 2, 1, 3, ((Token)tokens.get(1)).location);
     }
     
+    public void testCommandFinder() throws Exception {
+        Lexer lexer = new Lexer(new StringReader(
+            "insert into foo; drop table bar\n\n;   "));
+        lexer.tokens();
+        assertEquals(3, lexer.commandCount());
+        assertEquals("insert into foo", lexer.command(0));
+        assertEquals(" drop table bar\n\n", lexer.command(1));
+        assertEquals("   ", lexer.command(2));
+    }
+    
+    public void testCommandFinderAndEmptyStrings() throws Exception {
+        Lexer lexer = new Lexer(new StringReader(
+            ";;\n;drop table bar;"));
+        lexer.tokens();
+        assertEquals(5, lexer.commandCount());
+        
+        /* I don't think these empty commands will give rise to any 
+           exceptions.  So I'm not sure it matters much whether they
+           are "", or null, or what. */
+        assertEquals("", lexer.command(0));
+        assertEquals("", lexer.command(1));
+        assertEquals("\n", lexer.command(2));
+        assertEquals("drop table bar", lexer.command(3));
+        assertEquals("", lexer.command(4));
+    }
+    
+    public void testLocationToCommand() throws Exception {
+        Lexer lexer = new Lexer(new StringReader(
+            "insert into foo; drop table bar\n\n;   "));
+        lexer.tokens();
+        assertEquals("insert into foo", lexer.locationToCommand(1, 1));
+        assertNull(lexer.locationToCommand(1, 16));
+        assertEquals(" drop table bar\n\n", lexer.locationToCommand(1, 17));
+        assertEquals(" drop table bar\n\n", lexer.locationToCommand(2, 1));
+    }
+    
+    public void testTokensKnowCommands() throws Exception {
+        Lexer lexer = new Lexer(new StringReader(
+            "insert ; drop \n\n;   "));
+        List tokens = lexer.tokens();
+        assertEquals(5, tokens.size());
+        assertEquals("insert ", ((Token)tokens.get(0)).location.command);
+        assertNull(((Token)tokens.get(1)).location.command);
+        assertEquals(" drop \n\n", ((Token)tokens.get(2)).location.command);
+        assertNull(((Token)tokens.get(3)).location.command);
+        assertNull(((Token)tokens.get(4)).location.command);
+    }
+    
     private void check(TokenType[] expectedTypes, String[] expectedTexts, 
         String input) {
         check(expectedTypes, expectedTexts, lex(input));
@@ -478,8 +527,8 @@ public class LexerTest extends TestCase {
         List actualTypes = new ArrayList(actual.size());
         for (int i = 0; i < actual.size(); ++i) {
             Token token = (Token) actual.get(i);
-            actualTypes.add(token.getType());
-            if (token.getType() == TokenType.END_OF_FILE) {
+            actualTypes.add(token.type);
+            if (token.type == TokenType.END_OF_FILE) {
                 actualTexts.add(null);
             }
             else {

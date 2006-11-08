@@ -41,6 +41,10 @@ public class DecimalCell extends Cell {
         return value;
     }
     
+    public String asSql() {
+        return value.toString();
+    }
+    
     public BigDecimal asBigDecimal() {
         return value;
     }

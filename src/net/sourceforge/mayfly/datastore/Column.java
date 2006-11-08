@@ -120,4 +120,16 @@ public class Column extends ValueObject {
         }
     }
 
+    public boolean hasDefault() {
+        if (defaultValue() instanceof NullCell) {
+            return false;
+        }
+        if (isAutoIncrement) {
+            /* Although we implement the next value to be assigned as
+               a default value, we don't output it that way in a dump. */
+            return false;
+        }
+        return true;
+    }
+
 }

@@ -853,8 +853,8 @@ public class Parser {
 
     public WhatElement parseWhatElement() {
         if (currentTokenType() == TokenType.IDENTIFIER
-            && ((Token) tokens.get(1)).getType() == TokenType.PERIOD
-            && ((Token) tokens.get(2)).getType() == TokenType.ASTERISK) {
+            && ((Token) tokens.get(1)).type == TokenType.PERIOD
+            && ((Token) tokens.get(2)).type == TokenType.ASTERISK) {
 
             String firstIdentifier = consumeIdentifier();
             expectAndConsume(TokenType.PERIOD);
@@ -876,10 +876,10 @@ public class Parser {
             || currentTokenType() == TokenType.PLUS
             ) {
             Token token = consume();
-            if (token.getType() == TokenType.MINUS) {
+            if (token.type == TokenType.MINUS) {
                 left = new NonBooleanParserExpression(new Minus(left.asNonBoolean(), parseFactor().asNonBoolean()));
             }
-            else if (token.getType() == TokenType.PLUS) {
+            else if (token.type == TokenType.PLUS) {
                 left = new NonBooleanParserExpression(new Plus(left.asNonBoolean(), parseFactor().asNonBoolean()));
             }
             else {
@@ -896,17 +896,17 @@ public class Parser {
             || currentTokenType() == TokenType.ASTERISK
             ) {
             Token token = consume();
-            if (token.getType() == TokenType.CONCATENATE) {
+            if (token.type == TokenType.CONCATENATE) {
                 left = new NonBooleanParserExpression(
                     new Concatenate(left.asNonBoolean(), parsePrimary().asNonBoolean())
                 );
             }
-            else if (token.getType() == TokenType.DIVIDE) {
+            else if (token.type == TokenType.DIVIDE) {
                 left = new NonBooleanParserExpression(
                     new Divide(left.asNonBoolean(), parsePrimary().asNonBoolean())
                 );
             }
-            else if (token.getType() == TokenType.ASTERISK) {
+            else if (token.type == TokenType.ASTERISK) {
                 left = new NonBooleanParserExpression(
                     new Multiply(left.asNonBoolean(), parsePrimary().asNonBoolean())
                 );
@@ -1420,7 +1420,7 @@ public class Parser {
     }
 
     TokenType currentTokenType() {
-        return currentToken().getType();
+        return currentToken().type;
     }
 
     private Token currentToken() {
@@ -1433,7 +1433,7 @@ public class Parser {
         Iterator iter = tokens.iterator();
         while (iter.hasNext()) {
             Token token = (Token) iter.next();
-            if (token.getType() == TokenType.END_OF_FILE) {
+            if (token.type == TokenType.END_OF_FILE) {
                 break;
             }
             if (first) {
@@ -1522,7 +1522,7 @@ public class Parser {
 
     Token expectAndConsume(TokenType expectedType) {
         Token token = currentToken();
-        if (token.getType() != expectedType) {
+        if (token.type != expectedType) {
             throw new ParserException(
                 describeExpectation(expectedType),
                 token

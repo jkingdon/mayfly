@@ -5,7 +5,7 @@ import net.sourceforge.mayfly.util.ImmutableByteArray;
 
 abstract public class Token {
 
-    private final TokenType type;
+    public final TokenType type;
     public final Location location;
 
     protected Token(TokenType type, Token oldToken) {
@@ -15,10 +15,6 @@ abstract public class Token {
     protected Token(TokenType type, Location location) {
         this.type = type;
         this.location = location;
-    }
-
-    public TokenType getType() {
-        return type;
     }
 
     public ImmutableByteArray getBytes() {
@@ -49,7 +45,6 @@ abstract public class Token {
     }
     
     String describe() {
-        TokenType type = getType();
         if (type == TokenType.NUMBER) {
             return getText();
         }
@@ -60,5 +55,7 @@ abstract public class Token {
             return type.description();
         }
     }
+
+    abstract public Token withCommand(String command);
 
 }

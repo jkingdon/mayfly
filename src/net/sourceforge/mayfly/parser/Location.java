@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.parser;
 
+
 public class Location {
 
     public static final Location UNKNOWN = new Location(-1, -1, -1, -1, null);
@@ -39,6 +40,28 @@ public class Location {
 
     public boolean knowEnd() {
         return endLineNumber != -1 && endColumn != -1;
+    }
+
+    public boolean contains(int line, int column) {
+        if (line < startLineNumber) {
+            return false;
+        }
+        else if (line == startLineNumber && column < startColumn) {
+            return false;
+        }
+        else if (line == endLineNumber && column >= endColumn) {
+            return false;
+        }
+        else if (line > endLineNumber) {
+            return false;
+        }
+        return true;
+    }
+
+    public Location withCommand(String newCommand) {
+        return new Location(
+            startLineNumber, startColumn, endLineNumber, endColumn, 
+            newCommand);
     }
 
 }

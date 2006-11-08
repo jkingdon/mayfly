@@ -23,12 +23,20 @@ public class SqlDumper {
     }
 
     public void dump(DataStore store, Writer out) throws IOException {
+        definition(store, out);
+
+        data(store, out);
+    }
+
+    private void definition(DataStore store, Writer out) throws IOException {
         for (Iterator iter = store.anonymousSchema().tables().iterator(); 
             iter.hasNext();) {
             String tableName = (String) iter.next();
             createTable(tableName, store.table(tableName), out);
         }
+    }
 
+    public void data(DataStore store, Writer out) throws IOException {
         for (Iterator iter = store.anonymousSchema().tables().iterator(); 
             iter.hasNext();) {
             String tableName = (String) iter.next();
@@ -48,14 +56,22 @@ public class SqlDumper {
     private void columns(TableData data, Writer out) throws IOException {
         for (Iterator iter = data.columns().iterator(); iter.hasNext();) {
             Column column = (Column) iter.next();
-            out.write("  ");
-            out.write(column.columnName());
-            out.write(" ");
-            out.write(column.type.dumpName());
+            column(column, out);
             if (iter.hasNext()) {
                 out.write(",");
             }
             out.write("\n");
+        }
+    }
+
+    private void column(Column column, Writer out) throws IOException {
+        out.write("  ");
+        out.write(column.columnName());
+        out.write(" ");
+        out.write(column.type.dumpName());
+        if (column.hasDefault()) {
+            out.write(" DEFAULT ");
+            out.write(column.defaultValue().asSql());
         }
     }
 
@@ -83,7 +99,7 @@ public class SqlDumper {
         }
         out.write(") VALUES(");
         for (int i = 0; i < row.columnCount(); ++i) {
-            out.write(row.cell(i).asBriefString());
+            out.write(row.cell(i).asSql());
             if (i < row.columnCount() - 1) {
                 out.write(", ");
             }

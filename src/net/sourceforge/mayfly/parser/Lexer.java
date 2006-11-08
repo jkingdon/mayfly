@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.parser;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.io.IOException;
@@ -22,6 +23,12 @@ public class Lexer {
     private int tokenColumn;
     private final String command;
 
+    private StringBuilder currentCommand;
+    private List commands;
+    private List commandLocations;
+    private int commandLine;
+    private int commandColumn;
+
     public Lexer(String sql) {
         this(new StringReader(sql), sql);
     }
@@ -32,6 +39,8 @@ public class Lexer {
      */
     public Lexer(Reader sql) {
         this(sql, null);
+        this.commands = new ArrayList();
+        this.commandLocations = new ArrayList();
     }
 
     public Lexer(Reader sql, String command) {
@@ -46,6 +55,29 @@ public class Lexer {
     }
 
     public List tokens() {
+        startCommand();
+        List tokens = lex();
+        if (commands == null) {
+            return tokens;
+        }
+        else {
+            return attachCommandsToEachToken(tokens);
+        }
+    }
+
+    private List attachCommandsToEachToken(List tokens) {
+        List result = new ArrayList();
+        for (int i = 0; i < tokens.size(); ++i) {
+            Token token = (Token) tokens.get(i);
+            result.add(
+                token.withCommand(
+                    locationToCommand(
+                        token.startLineNumber(), token.startColumn())));
+        }
+        return result;
+    }
+
+    private List lex() {
         List tokens = new ArrayList();
         int current = nextCharacter();
         markTokenStart();
@@ -55,6 +87,7 @@ public class Lexer {
                 addToken(tokens, TokenType.PERIOD, ".");
             }
             else if (current == ';') {
+                endOfCommand();
                 current = nextCharacter();
                 addToken(tokens, TokenType.SEMICOLON, ";");
             }
@@ -214,6 +247,7 @@ public class Lexer {
             }
             else if (current == -1) {
                 addEndOfFile(tokens);
+                endOfCommand();
                 break;
             }
             else if (current == '\'') {
@@ -306,6 +340,11 @@ public class Lexer {
             previousColumn = currentColumn;
 
             int character = sql.read();
+            if (character != -1) {
+                if (commands != null) {
+                    currentCommand.append((char)character);
+                }
+            }
 
             if (character == '\n') {
                 currentColumn = 1;
@@ -329,6 +368,53 @@ public class Lexer {
         return isIdentifierStart(current) || 
             (current >= '0' && current <= '9') ||
             current == '_';
+    }
+
+    public int commandCount() {
+        if (commands.size() != commandLocations.size()) {
+            throw new MayflyInternalException("confused about command tracking");
+        }
+        return commands.size();
+    }
+
+    public String command(int index) {
+        return (String) commands.get(index);
+    }
+
+    public String locationToCommand(int line, int column) {
+        for (int i = 0; i < commandCount(); ++i) {
+            Location location = (Location) commandLocations.get(i);
+            if (location.contains(line, column)) {
+                return command(i);
+            }
+        }
+        return null;
+    }
+
+    private void endOfCommand() {
+        if (commands != null) {
+            if (currentCommand.length() == 0) {
+                commands.add(currentCommand.toString());
+            }
+            else {
+                int lastCharacter = currentCommand.length() - 1;
+                if (currentCommand.charAt(lastCharacter) == ';') {
+                    currentCommand.delete(lastCharacter, lastCharacter + 1);
+                }
+    
+                commands.add(currentCommand.toString());
+            }
+            
+            commandLocations.add(new Location(
+                commandLine, commandColumn, previousLine, previousColumn));
+            startCommand();
+        }
+    }
+
+    private void startCommand() {
+        currentCommand = new StringBuilder();
+        commandLine = currentLine;
+        commandColumn = currentColumn;
     }
 
 }

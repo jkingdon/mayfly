@@ -112,11 +112,12 @@ public class DatabaseTest extends TestCase {
     }
     
     public void testScriptError() throws Exception {
-        Reader script = new StringReader(
-            "create table foo\n" +
+        String command = "create table foo\n" +
             "   (x integer,\n" +
-            "    y not);"
-        );
+            "    y not)";
+        Reader script = new StringReader(
+            command + ";" +
+            "create table otherTable(a integer);");
         try {
             database.executeScript(script);
             fail();
@@ -127,6 +128,7 @@ public class DatabaseTest extends TestCase {
             assertEquals(7, e.startColumn());
             assertEquals(3, e.endLineNumber());
             assertEquals(10, e.endColumn());
+            assertEquals(command, e.failingCommand());
         }
     }
     

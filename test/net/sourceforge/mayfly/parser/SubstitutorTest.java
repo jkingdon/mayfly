@@ -69,7 +69,7 @@ public class SubstitutorTest extends TestCase {
             Collections.singletonList(new ImmutableByteArray( (byte)3 )));
         assertEquals(1, output.size());
         Token token = (Token) output.get(0);
-        assertEquals(TokenType.BINARY, token.getType());
+        assertEquals(TokenType.BINARY, token.type);
     }
     
     public void testCount() throws Exception {

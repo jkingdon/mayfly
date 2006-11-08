@@ -19,7 +19,7 @@ public class Substitutor {
         Iterator parameterIterator = parameters.iterator();
         for (Iterator tokenIterator = tokens.iterator(); tokenIterator.hasNext();) {
             Token token = (Token) tokenIterator.next();
-            if (token.getType() == TokenType.PARAMETER) {
+            if (token.type == TokenType.PARAMETER) {
                 Object value = parameterIterator.next();
                 result.addAll(tokensFromValue(value, token));
             }
@@ -34,7 +34,7 @@ public class Substitutor {
         int count = 0;
         for (Iterator iter = tokens.iterator(); iter.hasNext();) {
             Token token = (Token) iter.next();
-            if (token.getType() == TokenType.PARAMETER) {
+            if (token.type == TokenType.PARAMETER) {
                 ++count;
             }
         }
@@ -54,7 +54,7 @@ public class Substitutor {
         }
         else if (value instanceof ImmutableByteArray) {
             ImmutableByteArray binaryValue = (ImmutableByteArray) value;
-            return new BinaryToken(binaryValue, oldToken);
+            return new BinaryToken(binaryValue, oldToken.location);
         }
         else if (value == null) {
             return new TextToken(TokenType.KEYWORD_null, "null", oldToken);

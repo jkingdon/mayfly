@@ -51,6 +51,10 @@ public class DateCell extends Cell {
     public String asBriefString() {
         return localDate.toString();
     }
+    
+    public String asSql() {
+        return "'" + localDate.toString() + "'";
+    }
 
     public int year() {
         return localDate.getYear();

@@ -16,6 +16,7 @@ public class TextToken extends Token {
             new Location(startLineNumber, startColumn, endLineNumber, endColumn,
                 null));
     }
+
     public TextToken(TokenType type, String text, Location location) {
         super(type, location);
         if (type == TokenType.BINARY || type == TokenType.END_OF_FILE) {
@@ -27,6 +28,10 @@ public class TextToken extends Token {
 
     public String getText() {
         return text;
+    }
+
+    public Token withCommand(String command) {
+        return new TextToken(type, text, location.withCommand(command));
     }
     
 }

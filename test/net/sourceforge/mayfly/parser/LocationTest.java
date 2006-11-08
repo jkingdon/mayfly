@@ -30,5 +30,26 @@ public class LocationTest extends TestCase {
         assertFalse(otherMixed.knowStart());
         assertTrue(otherMixed.knowEnd());
     }
+    
+    public void testContains() throws Exception {
+        Location one = new Location(5, 40, 7, 30);
+        assertFalse(one.contains(4, 73));
+        assertFalse(one.contains(5, 39));
+        assertTrue(one.contains(5, 40));
+        assertTrue(one.contains(6, 77));
+        assertTrue(one.contains(7, 29));
+        assertFalse(one.contains(7, 30));
+        assertFalse(one.contains(8, 1));
+    }
+
+    public void testSingleLineContains() throws Exception {
+        Location one = new Location(5, 20, 5, 30);
+        assertFalse(one.contains(4, 73));
+        assertFalse(one.contains(5, 19));
+        assertTrue(one.contains(5, 20));
+        assertTrue(one.contains(5, 29));
+        assertFalse(one.contains(5, 30));
+        assertFalse(one.contains(6, 1));
+    }
 
 }

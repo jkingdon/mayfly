@@ -60,6 +60,10 @@ public class NullCell extends Cell {
     public String displayName() {
         return "null";
     }
+    
+    public String asSql() {
+        return "null";
+    }
 
     public Object asObject() {
         // What are we supposed to return here?

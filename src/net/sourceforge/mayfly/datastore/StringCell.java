@@ -40,7 +40,15 @@ public class StringCell extends Cell {
     }
     
     public String displayName() {
-        return "string '" + StringEscapeUtils.escapeSql(content) + "'";
+        return "string " + asQuotedString();
+    }
+    
+    public String asSql() {
+        return asQuotedString();
+    }
+
+    private String asQuotedString() {
+        return "'" + StringEscapeUtils.escapeSql(content) + "'";
     }
 
     public Object asObject() {

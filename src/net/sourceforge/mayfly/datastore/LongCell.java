@@ -59,6 +59,10 @@ public class LongCell extends Cell {
     public String displayName() {
         return "number " + asString();
     }
+    
+    public String asSql() {
+        return asString();
+    }
 
     public int compareTo(Cell otherCell, Location location) {
         if (otherCell instanceof LongCell) {

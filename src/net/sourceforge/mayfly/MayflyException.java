@@ -118,4 +118,12 @@ public class MayflyException extends RuntimeException {
         return location.endColumn;
     }
 
+    /**
+     * The SQL command in which there was a problem, or null
+     * if not known.
+     */
+    public String failingCommand() {
+        return location.command;
+    }
+
 }

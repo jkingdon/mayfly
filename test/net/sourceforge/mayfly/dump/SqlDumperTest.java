@@ -2,10 +2,13 @@ package net.sourceforge.mayfly.dump;
 
 import junit.framework.TestCase;
 
-import java.io.StringWriter;
-
 import net.sourceforge.mayfly.Database;
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.DataStore;
+
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 
 public class SqlDumperTest extends TestCase {
     
@@ -150,11 +153,72 @@ public class SqlDumperTest extends TestCase {
             dump());
     }
     
-    // null and default values
+    public void testDataOfVariousTypes() throws Exception {
+        database.execute("create table foo(a bigint, b decimal(23,1)," +
+            "c varchar(255), d date, e timestamp)");
+        database.execute("insert into foo values(" +
+            "888111222333, 999888111222333.5, 'c''est', '2004-11-04'," +
+            " '2000-02-29 13:45:01' )");
+        assertEquals("INSERT INTO foo(a, b, c, d, e) VALUES(" +
+            "888111222333, 999888111222333.5, 'c''est', '2004-11-04', " +
+            "'2000-02-29 13:45:01');\n\n", 
+            dumpData());
+    }
+    
+    public void testNullAndDefault() throws Exception {
+        database.execute("create table foo(a integer default 5, b integer)");
+        database.execute("insert into foo() values()");
+        assertEquals(
+            "CREATE TABLE foo(\n  a INTEGER DEFAULT 5,\n  b INTEGER\n);\n\n" +
+            "INSERT INTO foo(a, b) VALUES(5, null);\n\n",
+            dump());
+    }
+    
+    public void testRoundTrip() throws Exception {
+        database.execute("create table foo(a integer)");
+        database.execute("insert into foo(a) values(5)");
+
+//        String filename = "mifosdbcreationscript.sql";
+//        try {
+//            database.executeScript(new FileReader(
+//                "../mifos/mifos/sql/" +
+//                filename));
+//        }
+//        catch (MayflyException e) {
+//            throw new RuntimeException(
+//                filename + ":" + e.startLineNumber(), e);
+//        }
+        
+        checkRoundTrip(database);
+    }
+
+    private static void checkRoundTrip(Database inputDatabase) {
+        String dump = new SqlDumper().dump(inputDatabase.dataStore());
+        Database database2 = new Database();
+        try {
+            database2.executeScript(new StringReader(dump));
+        }
+        catch (MayflyException e) {
+            throw new RuntimeException(e);
+        }
+        
+        String dump2 = new SqlDumper().dump(database2.dataStore());
+        assertEquals(dump, dump2);
+    }
+
+    private String dumpData() throws IOException {
+        StringWriter out = new StringWriter();
+        new SqlDumper().data(database.dataStore(), out);
+        return out.toString();
+    }
+    
+    // output of type binary (see what mysqldump does)
     
     // constraints
     
     // round-trip test
+    
+    // auto-increment: can dump out and get the same next value on restore
 
     private String dump() {
         return new SqlDumper().dump(database.dataStore());

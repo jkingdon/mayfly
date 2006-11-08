@@ -48,6 +48,10 @@ public class TimestampCell extends Cell {
     public String asBriefString() {
         return FORMATTER.print(stamp);
     }
+    
+    public String asSql() {
+        return "'" + asBriefString() + "'";
+    }
 
     public int year() {
         return stamp.getYear();
