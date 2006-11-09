@@ -178,16 +178,7 @@ public class SqlDumperTest extends TestCase {
         database.execute("create table foo(a integer)");
         database.execute("insert into foo(a) values(5)");
 
-//        String filename = "mifosdbcreationscript.sql";
-//        try {
-//            database.executeScript(new FileReader(
-//                "../mifos/mifos/sql/" +
-//                filename));
-//        }
-//        catch (MayflyException e) {
-//            throw new RuntimeException(
-//                filename + ":" + e.startLineNumber(), e);
-//        }
+        // Optionally load the large SQL file of your choice here
         
         checkRoundTrip(database.dataStore());
     }
@@ -225,8 +216,6 @@ public class SqlDumperTest extends TestCase {
     // output of type binary (see what mysqldump does)
     
     // constraints
-    
-    // round-trip test
     
     // auto-increment: can dump out and get the same next value on restore
 
