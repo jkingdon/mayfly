@@ -89,6 +89,7 @@ public class DerbyDialect extends Dialect {
     }
     
     public boolean canGroupByExpression() {
+        // Seems to be allowed as of Derby 10.2.1.6
         return false;
     }
     
@@ -171,6 +172,10 @@ public class DerbyDialect extends Dialect {
     }
     
     public boolean haveModifyColumn() {
+        /* Derby 10.2.1.6 claims the ability to change the nullability
+        of a column (or certain other changes).  For the nullability
+        case, the syntax seems to be
+        ALTER TABLE foo ALTER [COLUMN] a [NOT] NULL */
         return false;
     }
 

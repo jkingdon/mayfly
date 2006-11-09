@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.sql.PreparedStatement;
 
 public class SqlDumperTest extends TestCase {
     
@@ -165,6 +166,38 @@ public class SqlDumperTest extends TestCase {
             dumpData());
     }
     
+    public void testBinaryData() throws Exception {
+        /* output of type binary
+           mysqldump outputs roughly:
+             INSERT INTO foo VALUES ('b\0\0');
+           which doesn't really solve the problem if \ is not special
+        */
+        /*
+           Postgres has its own charming syntax for bytea:
+           INSERT INTO foo VALUES('b\\000\\000');
+         */
+        /*
+           According to Postgres docs, the SQL standard has a syntax
+           for BLOB (different from postgres bytea).
+         */
+        /*
+           Hypersonic is hex in single quotes, e.g. '620000'
+         */
+        /* Faced with this I think I need to create my own syntax.
+           These are all insane. */
+
+        database.execute("create table foo(a blob)");
+        PreparedStatement statement = 
+            database.openConnection().prepareStatement(
+                "insert into foo(a) values(?)");
+        statement.setBytes(1, new byte[] {
+            0, 1, 2, 127, 77, (byte) 200, (byte) 255, 0});
+        statement.executeUpdate();
+        
+        assertEquals("INSERT INTO foo(a) VALUES(undumpable_data);\n\n", 
+            dumpData());
+    }
+
     public void testNullAndDefault() throws Exception {
         database.execute("create table foo(a integer default 5, b integer)");
         database.execute("insert into foo() values()");
@@ -274,8 +307,6 @@ public class SqlDumperTest extends TestCase {
         new SqlDumper().data(database.dataStore(), out);
         return out.toString();
     }
-    
-    // output of type binary (see what mysqldump does)
     
     // auto-increment: can dump out and get the same next value on restore
 
