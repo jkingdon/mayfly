@@ -4,6 +4,8 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
+import net.sourceforge.mayfly.datastore.constraint.Constraint;
+import net.sourceforge.mayfly.datastore.constraint.Constraints;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -36,20 +38,13 @@ public class SqlDumper {
         }
     }
 
-    public void data(DataStore store, Writer out) throws IOException {
-        for (Iterator iter = store.anonymousSchema().tables().iterator(); 
-            iter.hasNext();) {
-            String tableName = (String) iter.next();
-            rows(tableName, store.table(tableName), out);
-        }
-    }
-
     private void createTable(String tableName, TableData table, Writer out) 
     throws IOException {
         out.write("CREATE TABLE ");
         out.write(tableName);
         out.write("(\n");
         columns(table, out);
+        constraints(table.constraints, out);
         out.write(");\n\n");
     }
 
@@ -57,7 +52,7 @@ public class SqlDumper {
         for (Iterator iter = data.columns().iterator(); iter.hasNext();) {
             Column column = (Column) iter.next();
             column(column, out);
-            if (iter.hasNext()) {
+            if (iter.hasNext() || data.constraints.constraintCount() > 0) {
                 out.write(",");
             }
             out.write("\n");
@@ -72,6 +67,31 @@ public class SqlDumper {
         if (column.hasDefault()) {
             out.write(" DEFAULT ");
             out.write(column.defaultValue().asSql());
+        }
+        
+        if (column.isNotNull) {
+            out.write(" NOT NULL");
+        }
+    }
+
+    private void constraints(Constraints constraints, Writer out) 
+    throws IOException {
+        for (int i = 0; i < constraints.constraintCount(); ++i) {
+            Constraint constraint = constraints.constraint(i);
+            out.write("  ");
+            constraint.dump(out);
+            if (i < constraints.constraintCount() - 1) {
+                out.write(",");
+            }
+            out.write("\n");
+        }
+    }
+
+    public void data(DataStore store, Writer out) throws IOException {
+        for (Iterator iter = store.anonymousSchema().tables().iterator(); 
+            iter.hasNext();) {
+            String tableName = (String) iter.next();
+            rows(tableName, store.table(tableName), out);
         }
     }
 

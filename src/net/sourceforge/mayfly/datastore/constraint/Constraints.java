@@ -173,6 +173,10 @@ public class Constraints {
     public int constraintCount() {
         return constraints.size();
     }
+    
+    public Constraint constraint(int index) {
+        return (Constraint) constraints.get(index);
+    }
 
     public boolean hasPrimaryKey() {
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {

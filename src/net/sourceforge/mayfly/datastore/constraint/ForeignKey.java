@@ -1,7 +1,11 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.NullCell;
@@ -220,6 +224,10 @@ public class ForeignKey extends Constraint {
             return targetColumn.equalsIgnoreCase(referencerColumn);
         }
         return super.canBeTargetOfForeignKey(targetColumn);
+    }
+
+    public void dump(Writer out) throws IOException {
+        throw new UnimplementedException();
     }
 
 }

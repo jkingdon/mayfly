@@ -174,9 +174,42 @@ public class SqlDumperTest extends TestCase {
             dump());
     }
     
+    public void testNotNull() throws Exception {
+        database.execute("create table foo(a integer not null)");
+        assertEquals(
+            "CREATE TABLE foo(\n  a INTEGER NOT NULL\n);\n\n",
+            dump());
+    }
+    
+    public void testPrimaryKey() throws Exception {
+        database.execute("create table foo(a integer primary key)");
+        database.execute("create table bar(" +
+            "a integer, b integer, primary key(a, b))");
+        assertEquals(
+            "CREATE TABLE foo(\n  a INTEGER,\n  PRIMARY KEY(a)\n);\n\n" +
+            "CREATE TABLE bar(\n" +
+            "  a INTEGER,\n  b INTEGER,\n  PRIMARY KEY(a, b)\n);\n\n",
+            dump());
+    }
+    
+    public void testUnique() throws Exception {
+        database.execute("create table foo(a integer, b integer, c integer," +
+            "unique(a), unique(b, c))");
+        assertEquals(
+            "CREATE TABLE foo(\n  a INTEGER,\n  b INTEGER,\n  c INTEGER,\n" +
+                "  UNIQUE(a),\n  UNIQUE(b, c)\n);\n\n",
+            dump());
+    }
+    
     public void testRoundTrip() throws Exception {
-        database.execute("create table foo(a integer)");
-        database.execute("insert into foo(a) values(5)");
+        database.execute("create table foo(a integer default 5," +
+                "b varchar(255) not null," +
+                "c bigint default 88 not null," +
+                "d decimal(7,1)," +
+                "e timestamp default current_timestamp," +
+                "primary key(b, c)," +
+                "unique(d))");
+        database.execute("insert into foo(b) values('hi')");
 
         // Optionally load the large SQL file of your choice here
         
@@ -215,7 +248,7 @@ public class SqlDumperTest extends TestCase {
     
     // output of type binary (see what mysqldump does)
     
-    // constraints
+    // constraints (foreign key, constraint names)
     
     // auto-increment: can dump out and get the same next value on restore
 

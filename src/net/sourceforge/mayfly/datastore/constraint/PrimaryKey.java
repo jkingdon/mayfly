@@ -1,5 +1,8 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Columns;
@@ -23,6 +26,12 @@ public class PrimaryKey extends NotNullOrUnique {
 
     protected String description() {
         return "primary key";
+    }
+    
+    public void dump(Writer out) throws IOException {
+        out.write("PRIMARY KEY(");
+        dumpColumnNames(out);
+        out.write(")");
     }
 
 }

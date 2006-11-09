@@ -22,7 +22,7 @@ public class TableData {
 
     private final Columns columns;
     private final Rows rows;
-    private final Constraints constraints;
+    public final Constraints constraints;
 
     public TableData(Columns columns, Constraints constraints) {
         this(columns, constraints, new Rows());

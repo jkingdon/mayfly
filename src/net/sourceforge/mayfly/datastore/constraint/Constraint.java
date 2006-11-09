@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.Iterator;
 import java.util.List;
 
@@ -81,5 +83,7 @@ public abstract class Constraint {
     public boolean canBeTargetOfForeignKey(String targetColumn) {
         return false;
     }
+
+    abstract public void dump(Writer out) throws IOException;
 
 }
