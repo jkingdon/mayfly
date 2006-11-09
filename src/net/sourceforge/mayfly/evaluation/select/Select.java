@@ -84,10 +84,7 @@ public class Select extends Command {
         }
         
         where.evaluate(dummyRow);
-        String firstAggregate = where.firstAggregate();
-        if (firstAggregate != null) {
-            throw new MayflyException("aggregate " + firstAggregate + " not valid in WHERE");
-        }
+        where.rejectAggregates("WHERE");
         groupBy.check(dummyRow, selected);
 
         orderBy.check(dummyRow);

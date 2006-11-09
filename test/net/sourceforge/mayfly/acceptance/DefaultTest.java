@@ -145,16 +145,25 @@ public class DefaultTest extends SqlTestCase {
         // Postgres gives a nice error that we can't reference columns
         // That seems sane I guess - what about circular references and
         // other pathological cases?
-        expectExecuteFailure("create table foo (x integer, y integer default x + 1)", 
+        expectExecuteFailure(
+            "create table foo (x integer, y integer default x + 1)", 
             "expected default value for column y but got x");
     }
     
     public void testCombineWithConstraint() throws Exception {
         // Mostly a syntax test, but while we're at it, test semantics
-        execute("create table foo (x varchar(80) default 'zippo' not null, y integer)");
+        execute("create table foo (x varchar(80) default 'zippo' not null, " +
+            "y integer)");
         execute("insert into foo(y) values(0)");
-        expectExecuteFailure("insert into foo(x) values(null)", "column x cannot be null");
+        expectExecuteFailure("insert into foo(x) values(null)", 
+            "column x cannot be null");
         assertResultSet(new String[] { " 'zippo' " }, query("select x from foo"));
     }
     
+    public void testAggregate() throws Exception {
+        execute("create table bar ( y integer )");
+        expectExecuteFailure(
+            "create table foo (x integer default avg(bar.y)",
+            "expected default value for column x but got AVG");
+    }
 }

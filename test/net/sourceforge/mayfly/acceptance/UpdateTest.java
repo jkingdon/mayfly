@@ -90,8 +90,38 @@ public class UpdateTest extends SqlTestCase {
             assertResultSet(new String[] { "5" }, query("select a from foo"));
         }
         else {
-            expectExecuteFailure(updateDefault, "default doesn't look like a valid expression to me");
+            expectExecuteFailure(updateDefault, 
+                "default doesn't look like a valid expression to me");
         }
+    }
+    
+    public void testAggregate() throws Exception {
+        /* Some versions of Postgres apparently crash - CVE-2006-5540 */
+        execute("create table foo(a integer)");
+        execute("insert into foo(a) values(10)");
+        execute("insert into foo(a) values(20)");
+        expectExecuteFailure("update foo set a = avg(a)",
+            "aggregate avg(a) not valid in UPDATE");
+        assertResultSet(new String[] { "10", "20" }, 
+            query("select a from foo"));
+    }
+
+    public void testAggregateNoRows() throws Exception {
+        execute("create table foo(a integer)");
+        execute("insert into foo(a) values(10)");
+        execute("insert into foo(a) values(20)");
+        expectExecuteFailure("update foo set a = avg(a) where a > 50",
+            "aggregate avg(a) not valid in UPDATE");
+        assertResultSet(new String[] { "10", "20" }, 
+            query("select a from foo"));
+    }
+
+    public void testAggregateInWhere() throws Exception {
+        execute("create table foo(a integer)");
+        expectExecuteFailure("update foo set a = 5 where max(a) > 10",
+            "aggregate max(a) not valid in UPDATE");
+        assertResultSet(new String[] { }, 
+            query("select a from foo"));
     }
 
 }

@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.parser.Location;
 
 public class SetClause {
@@ -30,6 +31,12 @@ public class SetClause {
         }
         else {
             return column.coerce(value.evaluate(row, table), value.location);
+        }
+    }
+
+    public void rejectAggregates(String context) {
+        if (value != null) {
+            Condition.rejectAggregates(value.firstAggregate(), context);
         }
     }
 

@@ -40,13 +40,20 @@ public class AggregateTest extends SqlTestCase {
     public void testColumnAndAggregate() throws Exception {
         execute("create table foo (x integer)");
         
-        expectQueryFailure("select x, max(x) from foo", "x is a column but max(x) is an aggregate");
-        expectQueryFailure("select X + 1, Max ( x ) from foo", "X is a column but Max(x) is an aggregate");
-        expectQueryFailure("select 5 + x , MAX(X) from foo", "x is a column but MAX(X) is an aggregate");
-        expectQueryFailure("select max(x) + 4, x from foo", "x is a column but max(x) is an aggregate");
-        expectQueryFailure("select 3 + max(x) , x from foo", "x is a column but max(x) is an aggregate");
-        expectQueryFailure("select foo.*, min(x) from foo", "foo.x is a column but min(x) is an aggregate");
-        expectQueryFailure("select x, max(distinct x) from foo", "x is a column but max(distinct x) is an aggregate");
+        expectQueryFailure("select x, max(x) from foo", 
+            "x is a column but max(x) is an aggregate");
+        expectQueryFailure("select X + 1, Max ( x ) from foo", 
+            "X is a column but Max(x) is an aggregate");
+        expectQueryFailure("select 5 + x , MAX(X) from foo", 
+            "x is a column but MAX(X) is an aggregate");
+        expectQueryFailure("select max(x) + 4, x from foo", 
+            "x is a column but max(x) is an aggregate");
+        expectQueryFailure("select 3 + max(x) , x from foo", 
+            "x is a column but max(x) is an aggregate");
+        expectQueryFailure("select foo.*, min(x) from foo", 
+            "foo.x is a column but min(x) is an aggregate");
+        expectQueryFailure("select x, max(distinct x) from foo", 
+            "x is a column but max(distinct x) is an aggregate");
     }
     
     public void testColumnOperatorAggregate() throws Exception {
@@ -63,21 +70,24 @@ public class AggregateTest extends SqlTestCase {
     
     public void testColumnAndCountAll() throws Exception {
         execute("create table foo (x integer)");
-        expectQueryFailure("select x, coUNt ( * ) from foo", "x is a column but coUNt(*) is an aggregate");
+        expectQueryFailure("select x, coUNt ( * ) from foo", 
+            "x is a column but coUNt(*) is an aggregate");
     }
 
     public void testLiteralAndAggregate() throws Exception {
         execute("create table foo (x integer)");
         execute("insert into foo (x) values (5)");
         
-        assertResultSet(new String[] { " 3, 5 " }, query("select 3, max(x) from foo")); 
+        assertResultSet(new String[] { " 3, 5 " }, 
+            query("select 3, max(x) from foo")); 
     }
 
     public void testLiteralAndColumn() throws Exception {
         execute("create table foo (x integer)");
         execute("insert into foo (x) values (5)");
         
-        assertResultSet(new String[] { " 3, 5 " }, query("select 3, x from foo")); 
+        assertResultSet(new String[] { " 3, 5 " }, 
+            query("select 3, x from foo")); 
     }
 
     public void testBadColumnName() throws Exception {
@@ -95,7 +105,8 @@ public class AggregateTest extends SqlTestCase {
         execute("insert into foo (x, y) values (null, 10)");
         execute("insert into foo (x, y) values (9, 9)");
         
-        assertResultSet(new String[] { " 5 " }, query("select max(x) from foo where y = 10"));
+        assertResultSet(new String[] { " 5 " }, 
+            query("select max(x) from foo where y = 10"));
     }
 
     public void testAggregateInWhere() throws Exception {
@@ -104,19 +115,28 @@ public class AggregateTest extends SqlTestCase {
         execute("insert into foo (x, y, z) values (null, 10, null)");
         execute("insert into foo (x, y, z) values (9, 9, null)");
         
-        expectQueryFailure("select max(x) from foo where count(y) > 0", "aggregate count(y) not valid in WHERE");
-        expectQueryFailure("select max(x) from foo where count(z) > 0", "aggregate count(z) not valid in WHERE");
-        expectQueryFailure("select x from foo where count(y) > 0", "aggregate count(y) not valid in WHERE");
+        expectQueryFailure("select max(x) from foo where count(y) > 0", 
+            "aggregate count(y) not valid in WHERE");
+        expectQueryFailure("select max(x) from foo where count(z) > 0", 
+            "aggregate count(z) not valid in WHERE");
+        expectQueryFailure("select x from foo where count(y) > 0", 
+            "aggregate count(y) not valid in WHERE");
     }
 
     public void testNoRows() throws Exception {
         execute("create table foo (x integer)");
-        assertResultSet(new String[] { " null " }, query("select max(x) from foo"));
-        assertResultSet(new String[] { " null " }, query("select min(x) from foo"));
-        assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
-        assertResultSet(new String[] { " 0 " }, query("select count(*) from foo"));
-        assertResultSet(new String[] { " null " }, query("select sum(x) from foo"));
-        assertResultSet(new String[] { " null " }, query("select avg(x) from foo"));
+        assertResultSet(new String[] { " null " }, 
+            query("select max(x) from foo"));
+        assertResultSet(new String[] { " null " }, 
+            query("select min(x) from foo"));
+        assertResultSet(new String[] { " 0 " }, 
+            query("select count(x) from foo"));
+        assertResultSet(new String[] { " 0 " }, 
+            query("select count(*) from foo"));
+        assertResultSet(new String[] { " null " }, 
+            query("select sum(x) from foo"));
+        assertResultSet(new String[] { " null " }, 
+            query("select avg(x) from foo"));
 
         expectQueryFailure("select max(y) from foo", "no column y");
     }
@@ -148,8 +168,10 @@ public class AggregateTest extends SqlTestCase {
         execute("insert into foo (x, y) values (5, 90)");
         execute("insert into foo (x, y) values (7, 90)");
         
-        assertResultSet(new String[] { " 3 " }, query("select count(all x) from foo"));
-        assertResultSet(new String[] { " 2 " }, query("select count(distinct x) from foo"));
+        assertResultSet(new String[] { " 3 " }, 
+            query("select count(all x) from foo"));
+        assertResultSet(new String[] { " 2 " }, 
+            query("select count(distinct x) from foo"));
 
         String distinctStar = "select count(distinct *) from foo";
         if (dialect.allowCountDistinctStar()) {
@@ -166,10 +188,14 @@ public class AggregateTest extends SqlTestCase {
         execute("insert into foo (x, y) values (5, 90)");
         execute("insert into foo (x, y) values (7, 90)");
         
-        assertResultSet(new String[] { " 80 " }, query("select avg(all y) from foo"));
-        assertResultSet(new String[] { " 17 " }, query("select sum(all x) from foo"));
-        assertResultSet(new String[] { " 5 " }, query("select min(all x) from foo"));
-        assertResultSet(new String[] { " 7 " }, query("select max(all x) from foo"));
+        assertResultSet(new String[] { " 80 " }, 
+            query("select avg(all y) from foo"));
+        assertResultSet(new String[] { " 17 " }, 
+            query("select sum(all x) from foo"));
+        assertResultSet(new String[] { " 5 " }, 
+            query("select min(all x) from foo"));
+        assertResultSet(new String[] { " 7 " }, 
+            query("select max(all x) from foo"));
     }
 
     public void testDistinct() throws Exception {
@@ -202,9 +228,12 @@ public class AggregateTest extends SqlTestCase {
         String averageOfStar = "select avg(*) from foo";
         if (dialect.aggregateAsteriskIsForCountOnly()) {
             expectQueryFailure(averageOfStar, "expected primary but got '*'");
-            expectQueryFailure("select sum(*) from foo", "expected primary but got '*'");
-            expectQueryFailure("select min(*) from foo", "expected primary but got '*'");
-            expectQueryFailure("select max(*) from foo", "expected primary but got '*'");
+            expectQueryFailure("select sum(*) from foo", 
+                "expected primary but got '*'");
+            expectQueryFailure("select min(*) from foo", 
+                "expected primary but got '*'");
+            expectQueryFailure("select max(*) from foo", 
+                "expected primary but got '*'");
         }
         else {
             ResultSet results = query(averageOfStar);
@@ -218,24 +247,32 @@ public class AggregateTest extends SqlTestCase {
         execute("insert into foo (x, y) values ('one', 'b')");
         execute("insert into foo (x, y) values ('two', 'a')");
         
-        assertResultSet(new String[] { " 3 " }, query("select count(*) from foo"));
-        assertResultSet(new String[] { " 3 " }, query("select count(x) from foo"));
-        assertResultSet(new String[] { " 2 " }, query("select count(distinct x) from foo"));
+        assertResultSet(new String[] { " 3 " }, 
+            query("select count(*) from foo"));
+        assertResultSet(new String[] { " 3 " }, 
+            query("select count(x) from foo"));
+        assertResultSet(new String[] { " 2 " }, 
+            query("select count(distinct x) from foo"));
 
         // string sort (just like ORDER BY)
-        assertResultSet(new String[] { " 'one' " }, query("select min(x) from foo"));
-        assertResultSet(new String[] { " 'two' " }, query("select max(x) from foo"));
+        assertResultSet(new String[] { " 'one' " }, 
+            query("select min(x) from foo"));
+        assertResultSet(new String[] { " 'two' " }, 
+            query("select max(x) from foo"));
 
         String sum = "select sum(x) from foo";
         String average = "select avg(x) from foo";
         if (dialect.canSumStrings()) {
-            // Is this parsing the string for a number, or just using zero?  Do we care?
+            /* Is this parsing the string for a number, or just using zero?
+               Do we care? */
             assertResultSet(new String[] { " 0 " }, query(sum));
             assertResultSet(new String[] { " 0 " }, query(average));
         }
         else {
-            expectQueryFailure(sum, "attempt to apply sum(x) to string 'one'");
-            expectQueryFailure(average, "attempt to apply avg(x) to string 'one'");
+            expectQueryFailure(sum, 
+                "attempt to apply sum(x) to string 'one'");
+            expectQueryFailure(average, 
+                "attempt to apply avg(x) to string 'one'");
         }
     }
     

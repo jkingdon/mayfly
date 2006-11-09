@@ -17,7 +17,8 @@ public class MySqlDialect extends Dialect {
        think, although I don't know whether there is a way to
        give selective access to CREATE/DROP DATABASE.  We don't
        need access to more than mayflytest, but we do need a way
-       to clear that database on each test.
+       to clear that database on each test (unless we start
+       testing schemas).
        
        Oh, yeah, and we should read it from a file and all that
        jazz (sigh - see why I like embedded databases like

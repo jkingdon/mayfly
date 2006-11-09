@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.condition;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.util.ValueObject;
@@ -25,5 +26,16 @@ public abstract class Condition extends ValueObject {
     }
 
     abstract public void check(ResultRow row);
+
+    public void rejectAggregates(String context) {
+        rejectAggregates(firstAggregate(), context);
+    }
+
+    public static void rejectAggregates(String firstAggregate, String context) {
+        if (firstAggregate != null) {
+            throw new MayflyException(
+                "aggregate " + firstAggregate + " not valid in " + context);
+        }
+    }
 
 }

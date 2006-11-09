@@ -24,7 +24,8 @@ public class Column extends ValueObject {
      */
     public final boolean isNotNull;
 
-    public Column(String name, Cell defaultValue, Cell onUpdateValue, boolean isAutoIncrement,
+    public Column(String name, Cell defaultValue, Cell onUpdateValue, 
+        boolean isAutoIncrement,
         DataType type, boolean isNotNull) {
         this.columnName = name;
         this.defaultValue = defaultValue;

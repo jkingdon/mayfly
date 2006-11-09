@@ -15,12 +15,14 @@ public class ReferenceOrderItem extends OrderItem {
         this.reference = reference;
     }
 
-    protected int compareAscending(final What what, ResultRow first, ResultRow second) {
+    protected int compareAscending(
+        What what, ResultRow first, ResultRow second) {
         int zeroBasedColumn = reference - 1;
 
         int size = what.size();
         if (zeroBasedColumn < 0 || zeroBasedColumn >= size) {
-            throw new MayflyException("ORDER BY " + reference + " must be in range 1 to " + size);
+            throw new MayflyException(
+                "ORDER BY " + reference + " must be in range 1 to " + size);
         }
 
         WhatElement whatElement = (WhatElement) what.element(zeroBasedColumn);
@@ -28,7 +30,9 @@ public class ReferenceOrderItem extends OrderItem {
             return ColumnOrderItem.compare(first, second, (SingleColumn) whatElement);
         }
         else {
-            throw new MayflyException("ORDER BY " + reference + " refers to an expression not a column");
+            throw new MayflyException(
+                "ORDER BY " + reference + 
+                " refers to an expression not a column");
         }
     }
 
