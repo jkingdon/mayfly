@@ -18,50 +18,64 @@ Sun Java from 1.4, although exact versions may change), and
 should run on any OS which provides a Java platform.  It relies on the
 JDBC interfaces from the Java platform (although one has the choice
 of instantiating a Database object directly if one wishes to avoid
-the static nature of DriverManager).  We've been parsing SQL with
-SQLParser ( http://jsqlparser.sourceforge.net/ ) and LDBC, although
-the jury is probably still out on what we'll pick eventually.
+the static nature of DriverManager).
 Our own unit tests are written with JUnit (
 http://www.junit.org/ ) although Mayfly should be useful for unit
 tests written with any unit test framework.  In terms of other
-dependencies, not a huge list, but some of the usual suspects
-from places like Apache Commons -
-http://jakarta.apache.org/commons/ ).  If we do decide to
+dependencies, not a huge list, but some of the usual suspects:
+http://jakarta.apache.org/commons/ and http://joda-time.sourceforge.net/.  
+If we do decide to
 provide persistence (the ability to save the database to disk), the
 leading candidate for that would be Prevayler (
-http://www.prevayler.org/ ), although persistence is not very high on
+http://www.prevayler.org/ ) or a similar mechanism, 
+although persistence is not very high on
 the list of goals for Mayfly.
 
-The big challenge is being able to implement enough of SQL to run real
-applications.  If Mayfly does not implement enough of SQL as found in
-Postgres, Oracle, MySQL, etc, developers are unlikely to find it
-useful.  Other challenges include figuring out whether the simple
-implementations currently envisaged (for example, table scans rather
+Mayfly is starting to implement enough of SQL to run real
+applications (or their tests).  Contributions are still welcome,
+of course (we've listed a few things missing below).
+Other challenges include figuring out whether the simple
+implementations we currently have (for example, table scans rather
 than indexes) suffice for the kinds of data sets which unit tests end
-up using.  And of course, Mayfly needs to be fast.
+up using.  And of course, Mayfly needs to be fast (see the
+PerformanceTest class for some known slownesses - at the moment
+Mayfly is fast for data definition, but slow for inserting rows and
+the like, which reverses the usual situation with SQL databases).
 
 A short list of SQL features which we believe are high priority are:
 
 * subselects
 
-* inner and outer joins (including the machinery, such as SQL aliases,
-  to return data from several tables)
+* More SQL operators such as LIKE and BETWEEN.
 
-* data types of numeric, string, CLOB, BLOB, date (probably with
-  syntax as similar as feasible to Oracle, Postgres, etc)
+We do not envisage providing network protocols, at least not initially.
+It may be possible to write this
+on top of Mayfly via JDBC, or it may become part of
+Mayfly later on.
 
-* SQL operators such as IN, NOT IN, LIKE, BETWEEN, OR, etc.
-
-We do not envisage providing network protocols or database dump
-formats, at least not initially.  It should be possible to write such
-tools on top of Mayfly via JDBC, or such things may become part of
-Mayfly later on (for a database dump format, one likely choice is an
-XML serialization of the Mayfly objects, using something such as
-XStream - http://xstream.codehaus.org/ ).
+Dumping the contents of a database in some kind of textual format
+is useful for debugging, comparing two databases in a test,
+and the like.
+There is a database dumper in the SqlDumper class which dumps
+to SQL.  SQL is a good choice for preserving things like data
+types and interchange with other SQL databases.  An XML format
+might also be interesting for interchange with non-SQL tools
+(see class Dumper for an extremely preliminary start at one).
+We don't regard Java serialization, XStream, or the like as
+particularly interesting, as these are closely tied to
+Mayfly's internal data structures.
 
 Some of what has been implemented so far:
 
+    * The ability to very cheaply snapshot the database in memory
+      (both metadata and data) and restore from that point.
     * Any number of tables, columns, and rows (limited by available memory and to a certain extent by query speed).
-    * Some join capability.
+    * Joins.
     * WHERE clauses with =, !=, <, >, AND, OR, NOT
-    * Integer and string data types.
+    * Integer, decimal, string, date/timestamp, 
+      binary (BLOB), and text (CLOB) data types.
+    * GROUP BY, HAVING
+    * ORDER BY and LIMIT/OFFSET
+    * Auto-increment columns
+    * NOT NULL, primary key, unique, and foreign key constraints
+    
