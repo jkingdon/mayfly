@@ -79,6 +79,11 @@ public class SqlDumper {
         for (int i = 0; i < constraints.constraintCount(); ++i) {
             Constraint constraint = constraints.constraint(i);
             out.write("  ");
+            if (constraint.constraintName != null) {
+                out.write("CONSTRAINT ");
+                out.write(constraint.constraintName);
+                out.write(" ");
+            }
             constraint.dump(out);
             if (i < constraints.constraintCount() - 1) {
                 out.write(",");

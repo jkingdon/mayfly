@@ -14,7 +14,7 @@ import net.sourceforge.mayfly.parser.Location;
 
 public abstract class Constraint {
 
-    private final String constraintName;
+    public final String constraintName;
 
     public Constraint(String constraintName) {
         this.constraintName = constraintName;

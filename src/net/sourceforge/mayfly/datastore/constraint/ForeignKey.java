@@ -1,11 +1,7 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
-import java.io.IOException;
-import java.io.Writer;
-
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.NullCell;
@@ -14,6 +10,9 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.parser.Location;
+
+import java.io.IOException;
+import java.io.Writer;
 
 public class ForeignKey extends Constraint {
 
@@ -227,7 +226,13 @@ public class ForeignKey extends Constraint {
     }
 
     public void dump(Writer out) throws IOException {
-        throw new UnimplementedException();
+        out.write("FOREIGN KEY(");
+        out.write(referencerColumn);
+        out.write(") REFERENCES ");
+        out.write(targetTable.displayName(DataStore.ANONYMOUS_SCHEMA_NAME));
+        out.write("(");
+        out.write(targetColumn);
+        out.write(")");
     }
 
 }

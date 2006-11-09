@@ -201,6 +201,22 @@ public class SqlDumperTest extends TestCase {
             dump());
     }
     
+    public void testConstraintNames() throws Exception {
+        database.execute("create table name(a integer primary key)");
+        database.execute("create table name2(" +
+            "a integer, b integer, c integer," +
+            "constraint a_key foreign key(a) references name(a)," +
+            "constraint b_key primary key(b)," +
+            "constraint c_uniq unique(c))");
+        assertEquals(
+            "CREATE TABLE name(\n  a INTEGER,\n  PRIMARY KEY(a)\n);\n\n" +
+            "CREATE TABLE name2(\n  a INTEGER,\n  b INTEGER,\n  c INTEGER,\n" +
+                "  CONSTRAINT a_key FOREIGN KEY(a) REFERENCES name(a),\n" +
+                "  CONSTRAINT b_key PRIMARY KEY(b),\n" +
+                "  CONSTRAINT c_uniq UNIQUE(c)\n);\n\n",
+            dump());
+    }
+    
     public void testRoundTrip() throws Exception {
         database.execute("create table foo(a integer default 5," +
                 "b varchar(255) not null," +
@@ -210,6 +226,19 @@ public class SqlDumperTest extends TestCase {
                 "primary key(b, c)," +
                 "unique(d))");
         database.execute("insert into foo(b) values('hi')");
+
+        database.execute("create table bar(a bigint, b decimal(23,1)," +
+            "c varchar(255), d date, e timestamp)");
+        database.execute("insert into bar values(" +
+            "888111222333, 999888111222333.5, 'c''est', '2004-11-04'," +
+            " '2000-02-29 13:45:01' )");
+
+        database.execute("create table name(a integer primary key)");
+        database.execute("create table name2(" +
+            "a integer, b integer, c integer," +
+            "constraint a_key foreign key(a) references name(a)," +
+            "constraint b_key primary key(b)," +
+            "constraint c_uniq unique(c))");
 
         // Optionally load the large SQL file of your choice here
         
@@ -247,8 +276,6 @@ public class SqlDumperTest extends TestCase {
     }
     
     // output of type binary (see what mysqldump does)
-    
-    // constraints (foreign key, constraint names)
     
     // auto-increment: can dump out and get the same next value on restore
 
