@@ -63,9 +63,7 @@ public abstract class Cell extends ValueObject {
         return asObject().toString();
     }
 
-    public String asSql() {
-        return "undumpable_data";
-    }
+    abstract public String asSql();
 
     public BigDecimal asBigDecimal() {
         throw new UnimplementedException(

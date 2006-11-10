@@ -167,27 +167,6 @@ public class SqlDumperTest extends TestCase {
     }
     
     public void testBinaryData() throws Exception {
-        /* output of type binary
-           mysqldump outputs roughly:
-             INSERT INTO foo VALUES ('b\0\0');
-           which doesn't really solve the problem if \ is not special
-           Also see mysqldump --hex-blob
-           INSERT INTO `foo` VALUES (0x010203040566778899AABBCC);
-        */
-        /*
-           Postgres has its own charming syntax for bytea:
-           INSERT INTO foo VALUES('b\\000\\000');
-         */
-        /*
-           According to Postgres docs, the SQL standard has a syntax
-           for BLOB (different from postgres bytea).
-         */
-        /*
-           Hypersonic is hex in single quotes, e.g. '620000'
-         */
-        /* Of these, pick the MySQL hex-blob syntax.  That's the only
-           sane one here. x'4D7953514C' is Standard SQL, apparently. */
-
         database.execute("create table foo(a blob)");
         PreparedStatement statement = 
             database.openConnection().prepareStatement(
@@ -196,7 +175,7 @@ public class SqlDumperTest extends TestCase {
             0, 1, 2, 127, 77, (byte) 200, (byte) 255, 0});
         statement.executeUpdate();
         
-        assertEquals("INSERT INTO foo(a) VALUES(undumpable_data);\n\n", 
+        assertEquals("INSERT INTO foo(a) VALUES(x'0001027f4dc8ff00');\n\n", 
             dumpData());
     }
 
@@ -274,6 +253,10 @@ public class SqlDumperTest extends TestCase {
             "constraint a_key foreign key(a) references name(a)," +
             "constraint b_key primary key(b)," +
             "constraint c_uniq unique(c))");
+
+        database.execute("create table binary_table(a blob)");
+        database.execute(
+            "insert into binary_table(a) values(x'0001027f4dc8ff00')");
 
         // Optionally load the large SQL file of your choice here
         

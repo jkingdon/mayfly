@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.util;
 
+import net.sourceforge.mayfly.MayflyInternalException;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,6 +48,31 @@ public class ImmutableByteArray {
         byte[] copy = new byte[bytes.length];
         System.arraycopy(bytes, 0, copy, 0, bytes.length);
         return copy;
+    }
+
+    public String asSql() {
+        StringBuilder result = new StringBuilder();
+        result.append("x'");
+        for (int i = 0; i < bytes.length; ++i) {
+            int hi = (bytes[i] >> 4) & 0xf;
+            int lo = bytes[i] & 0xf;
+
+            result.append(toHex(hi));
+            result.append(toHex(lo));
+        }
+        result.append("'");
+        return result.toString();
+    }
+
+    private String toHex(int number) {
+        String[] digits = {"0", "1", "2", "3", "4", "5", "6", "7", 
+            "8", "9", "a", "b", "c", "d", "e", "f" };
+        if (number >= 0 && number < 16) {
+            return digits[number];
+        }
+        else {
+            throw new MayflyInternalException(number + " is not a hex digit");
+        }
     }
 
 }

@@ -35,6 +35,10 @@ public class BinaryCell extends Cell {
         return "binary data";
     }
     
+    public String asSql() {
+        return data.asSql();
+    }
+    
     public InputStream asBinaryStream() throws SQLException {
         return data.asBinaryStream();
     }
