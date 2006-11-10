@@ -100,10 +100,20 @@ public class UpdateTest extends SqlTestCase {
         execute("create table foo(a integer)");
         execute("insert into foo(a) values(10)");
         execute("insert into foo(a) values(20)");
-        expectExecuteFailure("update foo set a = avg(a)",
-            "aggregate avg(a) not valid in UPDATE");
-        assertResultSet(new String[] { "10", "20" }, 
-            query("select a from foo"));
+        String setToAggregate = "update foo set a = avg(a)";
+        if (dialect.errorIfUpdateToAggregate()) {
+            expectExecuteFailure(setToAggregate,
+                "aggregate avg(a) not valid in UPDATE");
+            assertResultSet(new String[] { "10", "20" }, 
+                query("select a from foo"));
+        }
+        else {
+            /* The CVE-2006-5540 announcement says the meaning here is 
+               "not well defined" so I'm commenting out the assert. */
+            execute(setToAggregate);
+//            assertResultSet(new String[] { "15", "20" }, 
+//                query("select a from foo"));
+        }
     }
 
     public void testAggregateNoRows() throws Exception {

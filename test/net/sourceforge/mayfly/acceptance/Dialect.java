@@ -355,6 +355,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean errorIfUpdateToAggregate() {
+        return true;
+    }
+
     public boolean haveOnUpdateValue() {
         return false;
     }
