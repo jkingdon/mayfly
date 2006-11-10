@@ -290,6 +290,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean allowHexForInteger() {
+        return true;
+    }
+    
     public boolean addingColumnCountsAsAffectedRow() {
         return true;
     }

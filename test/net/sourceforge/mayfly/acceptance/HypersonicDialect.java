@@ -156,6 +156,10 @@ public class HypersonicDialect extends Dialect {
     public String binaryTypeName() {
         return "BINARY";
     }
+    
+    public boolean allowHexForBinary() {
+        return false;
+    }
 
     public boolean decimalScaleIsFromType() {
         return false;

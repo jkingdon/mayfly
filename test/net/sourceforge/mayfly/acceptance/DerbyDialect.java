@@ -137,6 +137,12 @@ public class DerbyDialect extends Dialect {
         return false;
     }
     
+    public boolean allowHexForBinary() {
+        /* Derby has the x'00' syntax, but not for type BLOB.  I haven't
+           checked what types it is allowed for. */
+        return false;
+    }
+    
     public boolean haveTextType() {
         return false;
     }

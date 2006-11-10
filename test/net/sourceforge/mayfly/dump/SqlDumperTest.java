@@ -171,6 +171,8 @@ public class SqlDumperTest extends TestCase {
            mysqldump outputs roughly:
              INSERT INTO foo VALUES ('b\0\0');
            which doesn't really solve the problem if \ is not special
+           Also see mysqldump --hex-blob
+           INSERT INTO `foo` VALUES (0x010203040566778899AABBCC);
         */
         /*
            Postgres has its own charming syntax for bytea:
@@ -183,8 +185,8 @@ public class SqlDumperTest extends TestCase {
         /*
            Hypersonic is hex in single quotes, e.g. '620000'
          */
-        /* Faced with this I think I need to create my own syntax.
-           These are all insane. */
+        /* Of these, pick the MySQL hex-blob syntax.  That's the only
+           sane one here. x'4D7953514C' is Standard SQL, apparently. */
 
         database.execute("create table foo(a blob)");
         PreparedStatement statement = 

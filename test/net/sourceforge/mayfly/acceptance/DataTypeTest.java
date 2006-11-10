@@ -209,6 +209,30 @@ public class DataTypeTest extends SqlTestCase {
             expectExecuteFailure(sql, "expected data type but got " + typeName);
         }
     }
+    
+    public void testHexInteger() throws Exception {
+        execute("create table foo(a integer)");
+        String hexForInteger = "insert into foo(a) values(x'a0')";
+        if (dialect.allowHexForInteger()) {
+            execute(hexForInteger);
+            execute("insert into foo(a) values(x'ff')");
+            execute("insert into foo(a) values(x'3fff0000')");
+
+            expectExecuteFailure("insert into foo(a) values(x'7')", 
+                "hex constant 7 must have an even number of digits");
+            expectExecuteFailure("insert into foo(a) values(x'7ff')",
+                "hex constant 7ff must have an even number of digits");
+            expectExecuteFailure("insert into foo(a) values(x'0g')",
+                "invalid character g in hex constant 0g");
+            
+            assertResultSet(new String[] { "160", "255", "1073676288" },
+                query("select a from foo"));
+        }
+        else {
+            expectExecuteFailure(hexForInteger, 
+                "attempt to store binary data as integer");
+        }
+    }
 
     public void testDecimal() throws Exception {
         execute("create table foo (price decimal(4, 2), list_price decimal(5, 2))");
@@ -441,6 +465,41 @@ public class DataTypeTest extends SqlTestCase {
         else {
             execute(insertOne);
             assertResultSet(new String[] { " 1 " }, query("select x from foo"));
+        }
+    }
+    
+    public void testHexBinary() throws Exception {
+        execute("create table foo(x " + dialect.binaryTypeName() + ")");
+        String hexForBinary = "insert into foo(x) values(x'00010203ff7f00')";
+        if (dialect.allowHexForBinary()) {
+            execute(hexForBinary);
+            execute("insert into foo(x) values (X'00')");
+
+            /* The current thinking is that having this message read
+               "hex constant 7 must"... is undesirable for long
+               constants.  But we probably should include the first
+               16 bytes or so, with "..." if appropriate. */
+            expectExecuteFailure("insert into foo(x) values(x'7')", 
+                "hex constant must have an even number of digits");
+            expectExecuteFailure("insert into foo(x) values(x'7ff')",
+                "hex constant must have an even number of digits");
+            expectExecuteFailure("insert into foo(x) values(x'0g')",
+                "invalid character 'g' in hex constant");
+            
+            ResultSet results = query("select x from foo");
+            assertTrue(results.next());
+            ArrayAssert.assertEquals(
+                new byte[] { 0, 1, 2, 3, (byte)0xff, (byte)0x7f, 0 }, 
+                results.getBytes(1));
+            assertTrue(results.next());
+            ArrayAssert.assertEquals(
+                new byte[] { 0 }, 
+                results.getBytes(1));
+            assertFalse(results.next());
+        }
+        else {
+            expectExecuteFailure(hexForBinary, 
+                "expected expression but got x'00010203ff7f00'");
         }
     }
     

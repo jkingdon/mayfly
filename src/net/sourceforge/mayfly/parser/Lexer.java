@@ -2,8 +2,10 @@ package net.sourceforge.mayfly.parser;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.util.ImmutableByteArray;
 import net.sourceforge.mayfly.util.StringBuilder;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -21,13 +23,25 @@ public class Lexer {
     private int previousColumn = -1;
     private int tokenLine;
     private int tokenColumn;
+    
+    /**
+     * Command, if we are just lexing a single command.
+     */
     private final String command;
 
+    /*
+     * Start machinery used to keep track of commands if we are lexing from
+     * a Reader.
+     */
     private StringBuilder currentCommand;
     private List commands;
     private List commandLocations;
     private int commandLine;
     private int commandColumn;
+    // End command-tracking machinery
+
+    private int current;
+    private List tokens;
 
     public Lexer(String sql) {
         this(new StringReader(sql), sql);
@@ -78,8 +92,8 @@ public class Lexer {
     }
 
     private List lex() {
-        List tokens = new ArrayList();
-        int current = nextCharacter();
+        tokens = new ArrayList();
+        current = nextCharacter();
         markTokenStart();
         while (true) {
             if (current == '.') {
@@ -211,13 +225,7 @@ public class Lexer {
                 }
             }
             else if (isIdentifierStart(current)) {
-                StringBuilder textBuilder = new StringBuilder();
-                while (isIdentifierCharacter(current)) {
-                    textBuilder.append((char)current);
-                    current = nextCharacter();
-                }
-                String text = textBuilder.toString();
-                addToken(tokens, keywordOrIdentifier(text), text);
+                lexIdentifierOrHex();
             }
             else if (current >= '0' && current <= '9') {
                 StringBuilder text = new StringBuilder();
@@ -283,6 +291,76 @@ public class Lexer {
         return tokens;
     }
 
+    private void lexIdentifierOrHex() {
+        StringBuilder textBuilder = new StringBuilder();
+        
+        if (current == 'x' || current == 'X') {
+            textBuilder.append((char)current);
+            current = nextCharacter();
+            if (current == '\'') {
+                // hex constant
+
+                current = nextCharacter();
+                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                while (current != '\'') {
+                    int first = parseHex(current);
+                    current = nextCharacter();
+                    if (current == '\'') {
+                        throw new MayflyException(
+                            "hex constant must have an even number of digits",
+                            currentCharacter());
+                    }
+                    int second = parseHex(current);
+                    bytes.write(combineHexDigits(first, second));
+                    current = nextCharacter();
+                }
+                current = nextCharacter();
+                Token newToken = new BinaryToken(
+                    new ImmutableByteArray(bytes.toByteArray()), 
+                    tokenLocation());
+                addToken(tokens, newToken);
+                return;
+            }
+        }
+
+        while (isIdentifierCharacter(current)) {
+            textBuilder.append((char)current);
+            current = nextCharacter();
+        }
+        String text = textBuilder.toString();
+        addToken(tokens, keywordOrIdentifier(text), text);
+    }
+
+    int combineHexDigits(int first, int second) {
+        return (first << 4) + second;
+    }
+
+    int parseHex(int character) {
+        if (character >= '0' && character <= '9') {
+            return character - '0';
+        }
+        if (character >= 'a' && character <= 'f') {
+            return character - 'a' + 10;
+        }
+        if (character >= 'A' && character <= 'F') {
+            return character - 'A' + 10;
+        }
+        else {
+            /* Not desirable to give the whole string constant, as it
+               might be quite long.
+             */
+            throw new MayflyException(
+                "invalid character " + describeCharacter(character) + 
+                " in hex constant",
+                currentCharacter());
+        }
+    }
+
+    private Location currentCharacter() {
+        return new Location(previousLine, previousColumn, 
+            currentLine, currentColumn, command);
+    }
+
     /**
      * Usage is to call nextCharacter() and then call this
      * method.  In other words, the character most recently
@@ -291,9 +369,12 @@ public class Lexer {
      * last character of the token.
      */
     private void addToken(List tokens, TokenType tokenType, String text) {
-        tokens.add(
-            new TextToken(tokenType, text, tokenLocation())
-        );
+        TextToken newToken = new TextToken(tokenType, text, tokenLocation());
+        addToken(tokens, newToken);
+    }
+
+    private void addToken(List tokens, Token newToken) {
+        tokens.add(newToken);
         markTokenStart();
     }
 
@@ -324,6 +405,9 @@ public class Lexer {
         }
         else if (current >= 0 && current <= 0x1f || current >= 0x7f && current <= 0xa0) {
             return "0x" + Integer.toHexString(current);
+        }
+        else if (current == '\'') {
+            return "single quote";
         }
         // Doesn't work for surrogate pairs.
         return "'" + (char)current + "'";

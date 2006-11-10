@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.parser;
 
 import junit.framework.TestCase;
+import junitx.framework.ArrayAssert;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.util.MayflyAssert;
@@ -67,9 +68,9 @@ public class LexerTest extends TestCase {
         checkComment("a/***/b");
         checkComment("a/****/b");
 
-        checkUnclosed(" /*/ ", 1, 2, 1, 6);
-        checkUnclosed("  /* unclosed comment", 1, 3, 1, 22);
-        checkUnclosed("\n/* unclosed comment *", 2, 1, 2, 22);
+        expectError("unclosed comment", 1, 2, 1, 6, " /*/ ");
+        expectError("unclosed comment", 1, 3, 1, 22, "  /* unclosed comment");
+        expectError("unclosed comment", 2, 1, 2, 22, "\n/* unclosed comment *");
     }
 
     private void checkComment(String string) {
@@ -80,20 +81,6 @@ public class LexerTest extends TestCase {
             );
     }
     
-    private void checkUnclosed(String input, 
-        int startLineNumber, int startColumn, int endLineNumber, int endColumn) {
-        try {
-            lex(input);
-            fail();
-        }
-        catch (MayflyException e) {
-            assertEquals("unclosed comment", e.getMessage());
-            MayflyAssert.assertLocation(
-                startLineNumber, startColumn, endLineNumber, endColumn, 
-                e.location());
-        }
-    }
-
     public void testSql92Comments() throws Exception {
         check(
             new TokenType[] {
@@ -140,23 +127,11 @@ public class LexerTest extends TestCase {
     }
     
     public void testBangWithoutEqualsAtEnd() throws Exception {
-        try {
-            lex("!");
-            fail();
-        } catch (MayflyException e) {
-            assertEquals("expected '=' but got end of file",
-                e.getMessage());
-        }
+        expectError("expected '=' but got end of file", "!");
     }
 
     public void testBangWithoutEqualsInMiddle() throws Exception {
-        try {
-            lex("!!");
-            fail();
-        } catch (MayflyException e) {
-            assertEquals("expected '=' but got '!'",
-                e.getMessage());
-        }
+        expectError("expected '=' but got '!'", "!!");
     }
 
     public void testVerticalBars() throws Exception {
@@ -203,6 +178,7 @@ public class LexerTest extends TestCase {
         assertEquals("0x1", new Lexer().describeCharacter(0x1));
         assertEquals("0x1f", new Lexer().describeCharacter(0x1f));
         assertEquals("' '", new Lexer().describeCharacter(0x20));
+        assertEquals("single quote", new Lexer().describeCharacter('\''));
         assertEquals("'~'", new Lexer().describeCharacter(0x7e));
         assertEquals("0x7f", new Lexer().describeCharacter(0x7f));
         assertEquals("0x80", new Lexer().describeCharacter(0x80));
@@ -252,6 +228,70 @@ public class LexerTest extends TestCase {
             new String[] { "42", ",", null },
             "42,"
         );
+    }
+    
+    public void testHex() throws Exception {
+        List actual = lex("x'01'");
+
+        assertEquals(2, actual.size());
+
+        BinaryToken token = (BinaryToken) actual.get(0);
+        ArrayAssert.assertEquals(new byte[] { 1 }, token.getBytes().asBytes());
+        MayflyAssert.assertLocation(1, 1, 1, 6, token.location);
+        
+        Token two = (Token) actual.get(1);
+        assertEquals(TokenType.END_OF_FILE, two.type);
+    }
+    
+    public void testNotHex() throws Exception {
+        check(
+            new TokenType[] { TokenType.IDENTIFIER, 
+                TokenType.QUOTED_STRING, 
+                TokenType.IDENTIFIER, TokenType.IDENTIFIER, 
+                TokenType.END_OF_FILE },
+            new String[] { "x", "'01'", "xa", "x01", null},
+            "x '01' xa x01");
+    }
+    
+    public void testHexErrors() throws Exception {
+        expectError("invalid character '&' in hex constant", 
+            1, 4, 1, 5, "x'0&'");
+        expectError("invalid character '+' in hex constant", 
+            1, 3, 1, 4, "x'+0'");
+        expectError("hex constant must have an even number of digits", 
+            1, 4, 1, 5, "x'0'");
+    }
+    
+    public void testParseHex() throws Exception {
+        assertEquals(0, new Lexer().parseHex('0'));
+        assertEquals(5, new Lexer().parseHex('5'));
+        assertEquals(10, new Lexer().parseHex('a'));
+        assertEquals(15, new Lexer().parseHex('F'));
+
+        try {
+            new Lexer().parseHex('g');
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("invalid character 'g' in hex constant",
+                e.getMessage());
+        }
+
+        try {
+            new Lexer().parseHex(-1);
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("invalid character end of file in hex constant",
+                e.getMessage());
+        }
+    }
+    
+    public void testCombineHexDigits() throws Exception {
+        assertEquals(0, new Lexer().combineHexDigits(0, 0));
+        assertEquals(1, new Lexer().combineHexDigits(0, 1));
+        assertEquals(16, new Lexer().combineHexDigits(1, 0));
+        assertEquals(255, new Lexer().combineHexDigits(15, 15));
     }
 
     public void testIdentifierCharacters() throws Exception {
@@ -542,6 +582,31 @@ public class LexerTest extends TestCase {
     
     private List lex(String sql) {
         return new Lexer(sql).tokens();
+    }
+
+    private void expectError(String expectedMessage, String input) {
+        try {
+            lex(input);
+            fail();
+        } catch (MayflyException e) {
+            assertEquals(expectedMessage,
+                e.getMessage());
+        }
+    }
+
+    private void expectError(String expectedMessage, 
+        int startLineNumber, int startColumn, int endLineNumber, int endColumn, 
+        String input) {
+        try {
+            lex(input);
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals(expectedMessage, e.getMessage());
+            MayflyAssert.assertLocation(
+                startLineNumber, startColumn, endLineNumber, endColumn, 
+                e.location());
+        }
     }
 
 }

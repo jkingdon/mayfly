@@ -196,6 +196,14 @@ public class PostgresDialect extends Dialect {
         return "serial not null";
     }
     
+    public boolean allowHexForBinary() {
+        /* Postgres does have the x'00' syntax but it just seems to be
+           for BIT VARYING(x) which doesn't seem to behave quite like
+           BYTEA (or BLOB/BINARY in other databases).
+         */
+        return false;
+    }
+    
     public String lastIdentityValueQuery(String table, String column) {
         return new StringBuffer().append("select currval('")
             .append(table)

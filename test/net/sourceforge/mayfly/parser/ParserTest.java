@@ -378,6 +378,20 @@ public class ParserTest extends TestCase {
         MayflyAssert.assertLocation(17, 21, values.location(1));
     }
 
+    public void testSyntaxErrorInValueConstructor() throws Exception {
+        Parser parser = new Parser("  values ( a 'foo' ) ");
+        try {
+            parser.parseValueConstructor();
+            fail();
+        }
+        catch (MayflyException e) {
+            /* Probably would be nicer if this parsed the syntax frist,
+               and then worried about whether there was a column reference. */
+            assertEquals("values clause may not refer to column: a", 
+                e.getMessage());
+        }
+    }
+
     public void testValueConstructorNoSpaces() throws Exception {
         Parser parser = new Parser("values(5,'Value')");
         ValueList values = parser.parseValueConstructor();

@@ -450,6 +450,14 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean allowHexForInteger() {
+        return false;
+    }
+
+    public boolean allowHexForBinary() {
+        return true;
+    }
+
     public boolean haveTextType() {
         return true;
     }

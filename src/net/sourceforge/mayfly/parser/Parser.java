@@ -17,6 +17,7 @@ import net.sourceforge.mayfly.datastore.types.BinaryDataType;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
+import net.sourceforge.mayfly.datastore.types.IntegerDataType;
 import net.sourceforge.mayfly.datastore.types.TimestampDataType;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
@@ -714,10 +715,10 @@ public class Parser {
         DataType type;
         if (consumeIfMatches(TokenType.KEYWORD_integer)
             || consumeIfMatches(TokenType.KEYWORD_int)) {
-            type = new DefaultDataType(TokenType.KEYWORD_integer.description());
+            type = new IntegerDataType(TokenType.KEYWORD_integer.description());
         }
         else if (consumeIfMatches(TokenType.KEYWORD_smallint)) {
-            type = new DefaultDataType(TokenType.KEYWORD_smallint.description());
+            type = new IntegerDataType(TokenType.KEYWORD_smallint.description());
         }
         else if (consumeIfMatches(TokenType.KEYWORD_varchar)) {
             expectAndConsume(TokenType.OPEN_PAREN);
@@ -749,10 +750,10 @@ public class Parser {
             Token token = expectAndConsume(TokenType.IDENTIFIER);
             String currentText = token.getText();
             if (currentText.equalsIgnoreCase("tinyint")) {
-                type = new DefaultDataType("TINYINT");
+                type = new IntegerDataType("TINYINT");
             }
             else if (currentText.equalsIgnoreCase("bigint")) {
-                type = new DefaultDataType("BIGINT");
+                type = new IntegerDataType("BIGINT");
             }
             else if (currentText.equalsIgnoreCase("text")) {
                 type = new DefaultDataType("TEXT");
