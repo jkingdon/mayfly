@@ -97,7 +97,7 @@ public class PostgresDialect extends Dialect {
         return false;
     }
     
-    public boolean errorIfUpdateToAggregate() {
+    public boolean errorIfUpdateToAggregate(boolean rowsPresent) {
         // false for 8.1.4.  Probably true for some future version.
         return false;
     }

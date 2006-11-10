@@ -101,7 +101,7 @@ public class UpdateTest extends SqlTestCase {
         execute("insert into foo(a) values(10)");
         execute("insert into foo(a) values(20)");
         String setToAggregate = "update foo set a = avg(a)";
-        if (dialect.errorIfUpdateToAggregate()) {
+        if (dialect.errorIfUpdateToAggregate(true)) {
             expectExecuteFailure(setToAggregate,
                 "aggregate avg(a) not valid in UPDATE");
             assertResultSet(new String[] { "10", "20" }, 
@@ -120,18 +120,30 @@ public class UpdateTest extends SqlTestCase {
         execute("create table foo(a integer)");
         execute("insert into foo(a) values(10)");
         execute("insert into foo(a) values(20)");
-        expectExecuteFailure("update foo set a = avg(a) where a > 50",
-            "aggregate avg(a) not valid in UPDATE");
-        assertResultSet(new String[] { "10", "20" }, 
-            query("select a from foo"));
+        String setToAggregate = "update foo set a = avg(a) where a > 50";
+        if (dialect.errorIfUpdateToAggregate(false)) {
+            expectExecuteFailure(setToAggregate,
+                "aggregate avg(a) not valid in UPDATE");
+            assertResultSet(new String[] { "10", "20" }, 
+                query("select a from foo"));
+        }
+        else {
+            execute(setToAggregate);
+        }
     }
 
     public void testAggregateInWhere() throws Exception {
         execute("create table foo(a integer)");
-        expectExecuteFailure("update foo set a = 5 where max(a) > 10",
-            "aggregate max(a) not valid in UPDATE");
-        assertResultSet(new String[] { }, 
-            query("select a from foo"));
+        String aggregateInWhere = "update foo set a = 5 where max(a) > 10";
+        if (dialect.errorIfAggregateInWhere()) {
+            expectExecuteFailure(aggregateInWhere,
+                "aggregate max(a) not valid in UPDATE");
+            assertResultSet(new String[] { }, 
+                query("select a from foo"));
+        }
+        else {
+            execute(aggregateInWhere);
+        }
     }
 
 }

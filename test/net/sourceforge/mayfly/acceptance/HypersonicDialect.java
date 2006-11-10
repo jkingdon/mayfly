@@ -74,6 +74,14 @@ public class HypersonicDialect extends Dialect {
     public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression() {
         return false;
     }
+    
+    public boolean errorIfUpdateToAggregate(boolean rowsPresent) {
+        return rowsPresent;
+    }
+    
+    public boolean errorIfAggregateInWhere() {
+        return false;
+    }
 
     public boolean disallowColumnAndAggregateInExpression() {
         return false;

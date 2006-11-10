@@ -14,6 +14,7 @@ public class Delete extends Command {
     }
 
     public UpdateStore update(DataStore store, String currentSchema) {
+        where.rejectAggregates("DELETE");
         return store.delete(
             table.schema(currentSchema), table.tableName(), where);
     }

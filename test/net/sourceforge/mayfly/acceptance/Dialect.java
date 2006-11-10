@@ -355,7 +355,11 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean errorIfUpdateToAggregate() {
+    public boolean errorIfUpdateToAggregate(boolean rowsPresent) {
+        return true;
+    }
+    
+    public boolean errorIfAggregateInWhere() {
         return true;
     }
 

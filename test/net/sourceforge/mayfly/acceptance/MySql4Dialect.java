@@ -7,9 +7,6 @@ package net.sourceforge.mayfly.acceptance;
  * 
  * To make this work, see the instructions in
  * {@link net.sourceforge.mayfly.acceptance.MySqlDialect}.
- * 
- * Disclaimer: this was passing in October 2006 but it is quite probable
- * that it hasn't gotten any attention since then.
  */
 public class MySql4Dialect extends MySqlDialect {
 
