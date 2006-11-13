@@ -100,9 +100,8 @@ public class SqlDumperTest extends TestCase {
             "  c TINYINT,\n" +
             "  d SMALLINT,\n" +
             "  e BIGINT,\n" +
-            // Probably should be f INTEGER AUTO_INCREMENT NOT NULL or some such
-            "  f IDENTITY,\n" +
-            "  g IDENTITY\n" +
+            "  f INTEGER AUTO_INCREMENT,\n" +
+            "  g INTEGER AUTO_INCREMENT\n" +
             ");\n\n", 
             dump()
         );
@@ -231,6 +230,41 @@ public class SqlDumperTest extends TestCase {
             dump());
     }
     
+    public void testAutoIncrementNoData() throws Exception {
+        database.execute("create table incr2(a integer auto_increment)");
+        
+        assertEquals(
+            "CREATE TABLE incr2(\n  a INTEGER AUTO_INCREMENT\n);\n\n",
+            dump());
+    }
+    
+    public void testAutoIncrement() throws Exception {
+        database.execute("create table incr(a integer auto_increment not null," +
+            "b varchar(255))");
+        database.execute("insert into incr(a, b) values(7, 'seven')");
+        database.execute("insert into incr(b) values('before dump')");
+        
+        String dump = dump();
+        assertEquals(
+            "CREATE TABLE incr(\n" +
+            "  a INTEGER DEFAULT 2 AUTO_INCREMENT NOT NULL,\n" +
+            "  b VARCHAR(255)\n" +
+            ");\n\n" +
+            "INSERT INTO incr(a, b) VALUES(7, 'seven');\n" +
+            "INSERT INTO incr(a, b) VALUES(1, 'before dump');\n\n", 
+            dump);
+        
+        Database database2 = new Database();
+        database2.executeScript(new StringReader(dump));
+        
+        database.execute("insert into incr(b) values('after dump')");
+        database2.execute("insert into incr(b) values('after dump')");
+        
+        String dump1 = dump();
+        String dump2 = new SqlDumper().dump(database2.dataStore());
+        assertEquals(dump1, dump2);
+    }
+    
     public void testRoundTrip() throws Exception {
         database.execute("create table foo(a integer default 5," +
                 "b varchar(255) not null," +
@@ -258,7 +292,12 @@ public class SqlDumperTest extends TestCase {
         database.execute(
             "insert into binary_table(a) values(x'0001027f4dc8ff00')");
 
-        // Optionally load the large SQL file of your choice here
+        database.execute("create table incr(a integer auto_increment not null," +
+            "b varchar(255))");
+        database.execute("insert into incr(a, b) values(7, 'seven')");
+        database.execute("insert into incr(b) values('before dump')");
+
+    // Optionally load the large SQL file of your choice here
         
         checkRoundTrip(database.dataStore());
     }

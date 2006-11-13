@@ -630,7 +630,7 @@ public class Parser {
             isAutoIncrement = true;
         }
 
-        if (isAutoIncrement) {
+        if (isAutoIncrement && defaultValue instanceof NullCell) {
             defaultValue = new LongCell(1);
         }
 
@@ -782,7 +782,7 @@ public class Parser {
             else if (currentText.equalsIgnoreCase("identity")
                 || currentText.equalsIgnoreCase("serial")) {
                 isAutoIncrement = true;
-                type = new DefaultDataType("IDENTITY");
+                type = new IntegerDataType("INTEGER");
             }
             else {
                 throw new ParserException("data type", token);

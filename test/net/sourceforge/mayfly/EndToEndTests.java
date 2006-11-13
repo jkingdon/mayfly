@@ -298,6 +298,23 @@ public class EndToEndTests extends SqlTestCase {
         execute("create table bar(a varchar(8111222333))");
     }
     
+    public void testIdentityDoesNotAcceptStrings() throws Exception {
+        execute("create table foo(a identity)");
+        expectExecuteFailure("insert into foo(a) values('bad')",
+            "attempt to store string 'bad' as integer");
+    }
+    
+    public void testAutoIncrementStartsWith() throws Exception {
+        /* 
+           Different databases have different ways of specifying the
+           value that an auto-increment starts with, if it can be
+           done at all.  For now, Mayfly does it with DEFAULT.
+         */
+        execute("create table foo(a integer default 6 auto_increment)");
+        execute("insert into foo() values()");
+        assertResultSet(new String[] { "6" }, query("select a from foo"));
+    }
+    
     public void testGetMaxRows() throws Exception {
         int noLimit = 0;
 

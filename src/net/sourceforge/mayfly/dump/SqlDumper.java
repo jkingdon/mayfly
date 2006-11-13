@@ -69,6 +69,10 @@ public class SqlDumper {
             out.write(column.defaultValue().asSql());
         }
         
+        if (column.isAutoIncrement()) {
+            out.write(" AUTO_INCREMENT");
+        }
+
         if (column.isNotNull) {
             out.write(" NOT NULL");
         }

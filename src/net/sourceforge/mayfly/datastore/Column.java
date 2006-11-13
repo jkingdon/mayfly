@@ -126,9 +126,13 @@ public class Column extends ValueObject {
             return false;
         }
         if (isAutoIncrement) {
-            /* Although we implement the next value to be assigned as
-               a default value, we don't output it that way in a dump. */
-            return false;
+            /* We implement the next value to be assigned as
+               a default value.  At least for now, we dump it
+               that way too.  But don't dump it if leaving it out
+               has the same meaning (that is, next value is 1). */
+            if (defaultValue.sqlEquals(new LongCell(1))) {
+                return false;
+            }
         }
         return true;
     }
