@@ -27,7 +27,7 @@ import java.util.Set;
  * 
  * public void tearDown() throws Exception {
  * &nbsp;&nbsp;&nbsp;&nbsp;// Nulling variables can hurt performance in general, but 
- * &nbsp;&nbsp;&nbsp;&nbsp;// might be helpful here because JUnit keeps test case
+ * &nbsp;&nbsp;&nbsp;&nbsp;// might be helpful here because JUnit3 keeps test case
  * &nbsp;&nbsp;&nbsp;&nbsp;// objects around until the end of a test run.
  * &nbsp;&nbsp;&nbsp;&nbsp;database = null;
  * }

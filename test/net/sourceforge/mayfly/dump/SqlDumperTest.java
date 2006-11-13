@@ -297,7 +297,7 @@ public class SqlDumperTest extends TestCase {
         database.execute("insert into incr(a, b) values(7, 'seven')");
         database.execute("insert into incr(b) values('before dump')");
 
-    // Optionally load the large SQL file of your choice here
+        // Optionally load the large SQL file of your choice here
         
         checkRoundTrip(database.dataStore());
     }
@@ -332,8 +332,6 @@ public class SqlDumperTest extends TestCase {
         return out.toString();
     }
     
-    // auto-increment: can dump out and get the same next value on restore
-
     private String dump() {
         return new SqlDumper().dump(database.dataStore());
     }
