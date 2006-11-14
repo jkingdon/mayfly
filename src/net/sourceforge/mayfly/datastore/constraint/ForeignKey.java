@@ -233,6 +233,10 @@ public class ForeignKey extends Constraint {
         out.write("(");
         out.write(targetColumn);
         out.write(")");
+        if (!(onDelete instanceof NoAction)) {
+            out.write(" ON DELETE ");
+            onDelete.dump(out);
+        }
     }
 
 }

@@ -1,5 +1,8 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
@@ -24,6 +27,10 @@ public class NoAction extends Action {
         return handleDelete(oldValue, store, 
             referencerSchema, referencerTable, referencerColumn, 
             targetTable, targetColumn);
+    }
+    
+    public void dump(Writer out) throws IOException {
+        out.write("NO ACTION");
     }
     
 }

@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.Database;
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.DataStore;
 
 import java.io.IOException;
@@ -230,6 +231,21 @@ public class SqlDumperTest extends TestCase {
             dump());
     }
     
+    public void testForeignKeyActions() throws Exception {
+        database.execute("create table refd(a integer primary key)");
+        database.execute("create table refr(d integer," +
+            "foreign key(d) references refd(a) " +
+            "on delete set null on update no action)");
+        assertEquals(
+            "CREATE TABLE refd(\n  a INTEGER,\n  PRIMARY KEY(a)\n);\n\n" +
+            "CREATE TABLE refr(\n  d INTEGER,\n" +
+            "  FOREIGN KEY(d) REFERENCES refd(a) " +
+            "ON DELETE SET NULL\n" +
+            ");\n\n",
+            dump()
+        );
+    }
+    
     public void testAutoIncrementNoData() throws Exception {
         database.execute("create table incr2(a integer auto_increment)");
         
@@ -265,6 +281,53 @@ public class SqlDumperTest extends TestCase {
         assertEquals(dump1, dump2);
     }
     
+    public void testQuotedIdentifiers() throws Exception {
+        database.execute("create table \"join\" (" +
+            "\"null\" integer, \"=\" integer, \"\u00a1\" integer," +
+            "\"nonquote\" integer)");
+        assertEquals("CREATE TABLE \"join\"(\n" +
+            "  \"null\" INTEGER,\n" +
+            "  \"=\" INTEGER,\n" +
+            "  \"\u00a1\" INTEGER,\n" +
+            "  nonquote INTEGER\n" +
+            ");\n\n",
+            dump());
+    }
+    
+    public void testIdentifier() throws Exception {
+        assertEquals("\"integer\"", identifier("integer"));
+        assertEquals("foo", identifier("foo"));
+        assertEquals("\"<\"", identifier("<"));
+        assertEquals("\"0foo\"", identifier("0foo"));
+        assertEquals("foo7", identifier("foo7"));
+        assertEquals("foo_bar", identifier("foo_bar"));
+        assertEquals("\"foo&bar\"", identifier("foo&bar"));
+
+        try {
+            identifier("");
+            fail();
+        }
+        catch (MayflyInternalException e) {
+            assertEquals("shouldn't have empty string as identifier",
+                e.getMessage());
+        }
+
+        try {
+            identifier("\"");
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("don't know how to dump identifier " +
+                "containing a double quote", e.getMessage());
+        }
+    }
+
+    private String identifier(String in) throws IOException {
+        StringWriter out = new StringWriter();
+        SqlDumper.identifier(in, out);
+        return out.toString();
+    }
+    
     public void testRoundTrip() throws Exception {
         database.execute("create table foo(a integer default 5," +
                 "b varchar(255) not null," +
@@ -291,6 +354,10 @@ public class SqlDumperTest extends TestCase {
         database.execute("create table binary_table(a blob)");
         database.execute(
             "insert into binary_table(a) values(x'0001027f4dc8ff00')");
+
+        database.execute("create table \"join\" (" +
+            "\"null\" integer, \"=\" integer, \"\u00a1\" integer," +
+            "\"nonquote\" integer)");
 
         database.execute("create table incr(a integer auto_increment not null," +
             "b varchar(255))");

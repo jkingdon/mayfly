@@ -1,11 +1,15 @@
 package net.sourceforge.mayfly.dump;
 
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.parser.Lexer;
+import net.sourceforge.mayfly.parser.TokenType;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -41,11 +45,48 @@ public class SqlDumper {
     private void createTable(String tableName, TableData table, Writer out) 
     throws IOException {
         out.write("CREATE TABLE ");
-        out.write(tableName);
+        identifier(tableName, out);
         out.write("(\n");
         columns(table, out);
         constraints(table.constraints, out);
         out.write(");\n\n");
+    }
+
+    public static void identifier(String text, Writer out) throws IOException {
+        if (TokenType.lookupKeyword(text) != null) {
+            out.write("\"");
+            out.write(text);
+            out.write("\"");
+        }
+        else if (looksLikeIdentifier(text)) {
+            out.write(text);
+        }
+        else {
+            out.write("\"");
+            out.write(text);
+            out.write("\"");
+        }
+    }
+
+    private static boolean looksLikeIdentifier(String text) {
+        if (text.indexOf('\"') != -1) {
+            throw new MayflyException(
+                "don't know how to dump identifier containing a double quote"
+            );
+        }
+        if (text.length() == 0) {
+            throw new MayflyInternalException(
+                "shouldn't have empty string as identifier");
+        }
+        if (!Lexer.isIdentifierStart(text.charAt(0))) {
+            return false;
+        }
+        for (int i = 1; i < text.length(); ++i) {
+            if (!Lexer.isIdentifierCharacter(text.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void columns(TableData data, Writer out) throws IOException {
@@ -61,7 +102,7 @@ public class SqlDumper {
 
     private void column(Column column, Writer out) throws IOException {
         out.write("  ");
-        out.write(column.columnName());
+        identifier(column.columnName(), out);
         out.write(" ");
         out.write(column.type.dumpName());
         if (column.hasDefault()) {

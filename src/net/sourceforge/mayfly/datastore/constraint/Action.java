@@ -1,5 +1,8 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
@@ -41,5 +44,7 @@ public abstract class Action {
             new CellExpression(oldValue)
         );
     }
+
+    abstract public void dump(Writer out) throws IOException;
 
 }

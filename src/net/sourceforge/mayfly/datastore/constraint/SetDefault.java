@@ -1,5 +1,8 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
@@ -20,6 +23,10 @@ public class SetDefault extends Action {
         String referencerTable, 
         String referencerColumn, TableReference targetTable, String targetColumn) {
         throw new UnimplementedException();
+    }
+    
+    public void dump(Writer out) throws IOException {
+        out.write("SET DEFAULT");
     }
 
 }

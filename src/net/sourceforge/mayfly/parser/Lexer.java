@@ -443,12 +443,12 @@ public class Lexer {
         }
     }
 
-    private boolean isIdentifierStart(int current) {
+    public static boolean isIdentifierStart(int current) {
         return (current >= 'a' && current <= 'z') || 
             (current >= 'A' && current <= 'Z');
     }
 
-    private boolean isIdentifierCharacter(int current) {
+    public static boolean isIdentifierCharacter(int current) {
         return isIdentifierStart(current) || 
             (current >= '0' && current <= '9') ||
             current == '_';
