@@ -231,7 +231,7 @@ public class SqlDumperTest extends TestCase {
             dump());
     }
     
-    public void testForeignKeyActions() throws Exception {
+    public void testForeignKeyOnDelete() throws Exception {
         database.execute("create table refd(a integer primary key)");
         database.execute("create table refr(d integer," +
             "foreign key(d) references refd(a) " +
@@ -244,6 +244,23 @@ public class SqlDumperTest extends TestCase {
             ");\n\n",
             dump()
         );
+    }
+    
+    public void testForeignKeyOnUpdate() throws Exception {
+        database.execute("create table refd(a integer primary key)");
+        try {
+            database.execute("create table refr(d integer," +
+                "foreign key(d) references refd(a) " +
+                "on update set default)");
+
+            // Here's where we'd dump it and assert it came out right.
+
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("ON UPDATE SET DEFAULT not implemented",
+                e.getMessage());
+        }
     }
     
     public void testAutoIncrementNoData() throws Exception {
