@@ -240,11 +240,13 @@ public class ValueTest extends SqlTestCase {
         if (dialect.valuesClauseCanReferToColumn()) {
             execute(referToValueWeInsert);
             execute(referToUnsetColumn);
-            assertResultSet(new String[] { "5, 8", "null, null" }, query("select a,b from foo"));
+            assertResultSet(new String[] { "5, 8", "null, null" }, 
+                query("select a,b from foo"));
         }
         else {
             expectExecuteFailure(referToValueWeInsert,
-                "values clause may not refer to column: a");
+                "values clause may not refer to column: a",
+                1, 34, 1, 35);
             expectExecuteFailure(referToUnsetColumn, 
                 "values clause may not refer to column: foo.b"); 
         }

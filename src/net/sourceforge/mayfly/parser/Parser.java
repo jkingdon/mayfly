@@ -321,7 +321,8 @@ public class Parser {
                     Location location) {
                     throw new MayflyException(
                         "values clause may not refer to column: " 
-                        + Column.displayName(tableOrAlias, columnName)
+                        + Column.displayName(tableOrAlias, columnName),
+                        location
                     );
                 }
             }
