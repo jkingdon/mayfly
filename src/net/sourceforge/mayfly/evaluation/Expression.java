@@ -32,7 +32,7 @@ abstract public class Expression extends WhatElement {
 
     abstract public Cell evaluate(ResultRow row);
 
-    public Cell evaluate(Row row, String table) {
+    final public Cell evaluate(Row row, String table) {
         return evaluate(new ResultRow(row, table));
     }
     

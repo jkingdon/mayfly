@@ -21,7 +21,8 @@ public class CountAll extends Expression {
     }
 
     public Cell evaluate(ResultRow row) {
-        /** This is just for checking; aggregation happens in {@link #aggregate(Rows)}. */
+        /** This is just for checking; aggregation happens in 
+            {@link #aggregate(Rows)}. */
         return new LongCell(0);
     }
 

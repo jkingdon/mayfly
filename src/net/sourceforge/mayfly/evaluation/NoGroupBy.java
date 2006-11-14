@@ -29,7 +29,8 @@ public class NoGroupBy extends ValueObject implements Aggregator {
             }
             
             if (firstColumn != null && firstAggregate != null) {
-                throw new MayflyException(firstColumn + " is a column but " + firstAggregate + " is an aggregate");
+                throw new MayflyException(firstColumn + " is a column but " + 
+                    firstAggregate + " is an aggregate");
             }
         }
         return firstAggregate != null;

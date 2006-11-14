@@ -276,8 +276,44 @@ public class AggregateTest extends SqlTestCase {
         }
     }
     
+    public void testColumnAlias() throws Exception {
+        execute("create table foo(displayName varchar(255))");
+        execute("insert into foo values('center1')");
+        execute("insert into foo values('another center')");
+        
+        /* First without the column alias, just to show it
+           shouldn't matter */
+        assertResultSet(new String[] { " 0 " },
+            query(
+                "select count(*) from foo center " +
+                "where center.displayName='no such center'"
+            )
+        );
+        assertResultSet(new String[] { " 1 " },
+            query(
+                "select count(*) from foo center " +
+                "where center.displayName='center1'"
+            )
+        );
+
+        /* Now with the column alias */
+        assertResultSet(new String[] { " 0 " },
+            query(
+                "select count(*) as col_0_0_ from foo center " +
+                "where center.displayName='no such center'"
+            )
+        );
+        assertResultSet(new String[] { " 1 " },
+            query(
+                "select count(*) as col_0_0_ from foo center " +
+                "where center.displayName='center1'"
+            )
+        );
+    }
+    
     // TODO: String case with no non-null values:
     // Should still get the errors based on the column type....
-    // select count(*) from foo cross join bar -> gives the count of the result rows, right?
+    // select count(*) from foo cross join bar -> 
+    //   gives the count of the result rows, right?
 
 }
