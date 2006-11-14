@@ -206,5 +206,14 @@ public class HypersonicDialect extends Dialect {
     public boolean autoIncrementIsRelativeToLastValue() {
         return true;
     }
+    
+    public boolean allowOrderByOnDelete() {
+        /* The message is 
+             Integrity constraint violation SYS_FK_46 table: FOO
+           which makes me wonder whether the ORDER BY is simply
+           being ignored.
+           */
+        return false;
+    }
 
 }

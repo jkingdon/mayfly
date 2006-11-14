@@ -174,5 +174,11 @@ public class MayflyDialect extends Dialect {
     public boolean allowTimestampInDateColumn() {
         return true;
     }
+    
+    public boolean allowOrderByOnDelete() {
+        /* I don't know how I'm going to implement ORDER BY on DELETE.
+           Is there another solution to the foreign key problem? */
+        return wishThisWereTrue();
+    }
  
 }

@@ -630,4 +630,8 @@ public abstract class Dialect {
         return haveColumnAlias();
     }
 
+    public boolean allowOrderByOnDelete() {
+        return true;
+    }
+
 }

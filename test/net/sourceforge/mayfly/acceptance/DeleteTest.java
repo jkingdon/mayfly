@@ -26,5 +26,28 @@ public class DeleteTest extends SqlTestCase {
             execute(aggregateInWhere);
         }
     }
+    
+    public void testSelfReference() throws Exception {
+        execute("create table foo(id integer primary key," +
+            "name varchar(255)," +
+            "parent integer," +
+            "foreign key(parent) references foo(id)" +
+            ")");
+        execute("insert into foo values(1, 'Eve', null)");
+        execute("insert into foo values(10, 'Seth', 1)");
+        execute("insert into foo values(101, 'Enos', 10)");
+        
+        String delete = "delete from foo order by id desc";
+        if (dialect.allowOrderByOnDelete()) {
+            expectExecuteFailure("delete from foo order by id asc", 
+                "foreign key violation: table foo refers to id 1 in foo");
+
+            execute(delete);
+            assertResultSet(new String[] { }, query("select * from foo"));
+        }
+        else {
+            expectExecuteFailure(delete, "expected end of file but got ORDER");
+        }
+    }
 
 }

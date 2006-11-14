@@ -214,5 +214,9 @@ public class DerbyDialect extends Dialect {
     public boolean onUpdateSetNullAndCascadeMissing() {
         return true;
     }
+    
+    public boolean allowOrderByOnDelete() {
+        return false;
+    }
 
 }
