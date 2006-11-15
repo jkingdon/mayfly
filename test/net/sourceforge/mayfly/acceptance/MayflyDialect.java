@@ -176,9 +176,10 @@ public class MayflyDialect extends Dialect {
     }
     
     public boolean allowOrderByOnDelete() {
-        /* I don't know how I'm going to implement ORDER BY on DELETE.
-           Is there another solution to the foreign key problem? */
-        return wishThisWereTrue();
+        /* I don't know how I'd implement ORDER BY on DELETE.
+           It also doesn't seem very elegant.
+           Maybe for now just tell people to work around it? */
+        return false;
     }
  
 }
