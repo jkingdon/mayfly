@@ -27,12 +27,13 @@ public class DeleteTest extends SqlTestCase {
         }
     }
     
-    public void testSelfReference() throws Exception {
+    public void testOrderBy() throws Exception {
         execute("create table foo(id integer primary key," +
             "name varchar(255)," +
             "parent integer," +
             "foreign key(parent) references foo(id)" +
-            ")");
+            ")" +
+            dialect.tableTypeForForeignKeys());
         execute("insert into foo values(1, 'Eve', null)");
         execute("insert into foo values(10, 'Seth', 1)");
         execute("insert into foo values(101, 'Enos', 10)");
@@ -41,12 +42,44 @@ public class DeleteTest extends SqlTestCase {
         if (dialect.allowOrderByOnDelete()) {
             expectExecuteFailure("delete from foo order by id asc", 
                 "foreign key violation: table foo refers to id 1 in foo");
+            assertResultSet(new String[] { " 'Eve' ", " 'Seth' ", " 'Enos' " }, 
+                query("select name from foo"));
 
             execute(delete);
-            assertResultSet(new String[] { }, query("select * from foo"));
+            assertResultSet(new String[] { }, query("select name from foo"));
         }
         else {
             expectExecuteFailure(delete, "expected end of file but got ORDER");
+        }
+    }
+
+    public void testSelfReference() throws Exception {
+        execute("create table foo(id integer primary key," +
+            "name varchar(255)," +
+            "parent integer," +
+            "foreign key(parent) references foo(id)" +
+            ")" +
+            dialect.tableTypeForForeignKeys());
+        execute("insert into foo values(1, 'Rock', null)");
+        execute("insert into foo values(10, 'Paper', 1)");
+        execute("insert into foo values(101, 'Scissors', 10)");
+        execute("update foo set parent = 101 where id = 1");
+        
+        expectExecuteFailure("delete from foo where name = 'Rock'", 
+            "foreign key violation: table foo refers to id 1 in foo");
+        expectExecuteFailure("delete from foo where name = 'Paper'", 
+            "foreign key violation: table foo refers to id 10 in foo");
+        expectExecuteFailure("delete from foo where name = 'Scissors'", 
+            "foreign key violation: table foo refers to id 101 in foo");
+
+        String deleteAll = "delete from foo";
+        if (dialect.deleteAllRowsIsSmartAboutForeignKeys()) {
+            execute(deleteAll);
+            assertResultSet(new String[] { }, query("select name from foo"));
+        }
+        else {
+            expectExecuteFailure("delete from foo where name = 'Rock'", 
+                "foreign key violation: table foo refers to id 1 in foo");
         }
     }
 

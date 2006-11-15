@@ -98,8 +98,19 @@ public class PostgresDialect extends Dialect {
     }
     
     public boolean errorIfUpdateToAggregate(boolean rowsPresent) {
-        // false for 8.1.4.  Probably true for some future version.
-        return false;
+        /* Some versions of Postgres apparently can crash - CVE-2006-5540 */
+
+        if (rowsPresent) {
+            // false for 8.1.4.  Probably true for some future version.
+            return false;
+        }
+        else {
+            /* This one is already true, I guess (although the message
+               is "ctid is NULL" which doesn't really make it clear to
+               me that Posgres is winning on purpose rather than by accident.
+             */
+            return true;
+        }
     }
     
     public boolean nullSortsLower() {
@@ -215,6 +226,14 @@ public class PostgresDialect extends Dialect {
     
     public boolean autoCommitMustBeOffToCallRollback() {
         return false;
+    }
+    
+    public boolean allowOrderByOnDelete() {
+        return false;
+    }
+    
+    public boolean deleteAllRowsIsSmartAboutForeignKeys() {
+        return true;
     }
 
 }

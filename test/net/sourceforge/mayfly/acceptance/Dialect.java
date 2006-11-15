@@ -634,4 +634,8 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean deleteAllRowsIsSmartAboutForeignKeys() {
+        return false;
+    }
+
 }

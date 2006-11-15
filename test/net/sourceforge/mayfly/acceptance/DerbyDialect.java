@@ -219,4 +219,8 @@ public class DerbyDialect extends Dialect {
         return false;
     }
 
+    public boolean deleteAllRowsIsSmartAboutForeignKeys() {
+        return true;
+    }
+
 }
