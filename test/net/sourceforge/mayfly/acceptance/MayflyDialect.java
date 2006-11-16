@@ -181,5 +181,17 @@ public class MayflyDialect extends Dialect {
            Maybe for now just tell people to work around it? */
         return false;
     }
- 
+    
+    public boolean canSumStrings(boolean rowsPresent) {
+        if (rowsPresent) {
+            return super.canSumStrings(rowsPresent);
+        }
+        else {
+            /* Interesting.  We don't carry the type forward to where we
+               actually compute the sum.  But maybe it would work fine
+               to have a checking phase ahead of time.  */
+            return true;
+        }
+    }
+    
 }

@@ -37,6 +37,21 @@ public class AggregateTest extends SqlTestCase {
         );
     }
 
+    public void testJoinAndCount() throws Exception {
+        execute("create table foo(a integer)");
+        execute("insert into foo(a) values(7)");
+        execute("insert into foo(a) values(3)");
+
+        execute("create table bar(a integer)");
+        execute("insert into bar(a) values(13)");
+        execute("insert into bar(a) values(15)");
+        execute("insert into bar(a) values(16)");
+        
+        assertResultSet(new String[] { " 6 " },
+            query("select count(*) from foo inner join bar on 1 = 1")
+        );
+    }
+    
     public void testColumnAndAggregate() throws Exception {
         execute("create table foo (x integer)");
         
@@ -154,6 +169,26 @@ public class AggregateTest extends SqlTestCase {
         expectQueryFailure("select max(y) from foo", "no column y");
     }
 
+    public void testNullRowsOnlyWithStrings() throws Exception {
+        execute("create table foo (x varchar(255))");
+        execute("insert into foo (x) values (null)");
+        assertResultSet(new String[] { " null " }, query("select max(x) from foo"));
+        assertResultSet(new String[] { " null " }, query("select min(x) from foo"));
+        assertResultSet(new String[] { " 0 " }, query("select count(x) from foo"));
+        assertResultSet(new String[] { " 1 " }, query("select count(*) from foo"));
+
+        String sum = "select sum(x) from foo";
+        String average = "select avg(x) from foo";
+        if (dialect.canSumStrings(false)) {
+            assertResultSet(new String[] { " null " }, query(sum));
+            assertResultSet(new String[] { " null " }, query(average));
+        }
+        else {
+            expectQueryFailure(sum, "attempt to sum string column x");
+            expectQueryFailure(average, "attempt to average string column x");
+        }
+    }
+
     public void testAggregateExpression() throws Exception {
         execute("create table foo (x integer)");
         execute("insert into foo (x) values (5)");
@@ -262,7 +297,7 @@ public class AggregateTest extends SqlTestCase {
 
         String sum = "select sum(x) from foo";
         String average = "select avg(x) from foo";
-        if (dialect.canSumStrings()) {
+        if (dialect.canSumStrings(true)) {
             /* Is this parsing the string for a number, or just using zero?
                Do we care? */
             assertResultSet(new String[] { " 0 " }, query(sum));
@@ -311,9 +346,4 @@ public class AggregateTest extends SqlTestCase {
         );
     }
     
-    // TODO: String case with no non-null values:
-    // Should still get the errors based on the column type....
-    // select count(*) from foo cross join bar -> 
-    //   gives the count of the result rows, right?
-
 }

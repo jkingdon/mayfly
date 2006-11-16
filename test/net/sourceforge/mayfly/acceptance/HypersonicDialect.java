@@ -71,6 +71,15 @@ public class HypersonicDialect extends Dialect {
         return true;
     }
     
+    public boolean canSumStrings(boolean rowsPresent) {
+        if (rowsPresent) {
+            return super.canSumStrings(rowsPresent);
+        }
+        else {
+            return true;
+        }
+    }
+    
     public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression() {
         return false;
     }

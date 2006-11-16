@@ -219,7 +219,7 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean canSumStrings() {
+    public boolean canSumStrings(boolean rowsPresent) {
         return false;
     }
 

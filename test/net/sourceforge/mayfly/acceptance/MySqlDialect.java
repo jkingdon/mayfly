@@ -146,7 +146,7 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
-    public boolean canSumStrings() {
+    public boolean canSumStrings(boolean rowsPresent) {
         return true;
     }
     
