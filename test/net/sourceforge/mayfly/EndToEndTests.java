@@ -301,7 +301,7 @@ public class EndToEndTests extends SqlTestCase {
     public void testIdentityDoesNotAcceptStrings() throws Exception {
         execute("create table foo(a identity)");
         expectExecuteFailure("insert into foo(a) values('bad')",
-            "attempt to store string 'bad' as integer");
+            "attempt to store string 'bad' into integer column a");
     }
     
     public void testAutoIncrementStartsWith() throws Exception {

@@ -230,7 +230,7 @@ public class DataTypeTest extends SqlTestCase {
         }
         else {
             expectExecuteFailure(hexForInteger, 
-                "attempt to store binary data as integer");
+                "attempt to store binary data into integer column a");
         }
     }
 
@@ -459,7 +459,7 @@ public class DataTypeTest extends SqlTestCase {
         String insertOne = "insert into foo(x) values(1)";
         if (dialect.dataTypesAreEnforced()) {
             expectExecuteFailure(insertOne,
-                "attempt to store number 1 as binary data");
+                "attempt to store number 1 into binary column x");
             assertResultSet(new String[] { }, query("select x from foo"));
         }
         else {

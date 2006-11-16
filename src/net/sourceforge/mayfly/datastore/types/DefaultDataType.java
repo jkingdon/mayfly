@@ -19,7 +19,7 @@ public class DefaultDataType extends DataType {
         this.dumpName = dumpName;
     }
 
-    public Cell coerce(Value value) {
+    public Cell coerce(Value value, String columnName) {
         return value.value;
     }
     

@@ -95,7 +95,7 @@ public class Column extends ValueObject {
                 "column " + columnName() + " cannot be null",
                 location);
         }
-        return type.coerce(new Value(value, location));
+        return type.coerce(new Value(value, location), columnName());
     }
 
     public Cell newColumnValue() {

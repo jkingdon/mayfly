@@ -13,23 +13,26 @@ import net.sourceforge.mayfly.evaluation.Value;
 public class TimestampDataTypeTest extends TestCase {
     
     public void testCoerce() throws Exception {
-        Value input = new Value(new StringCell("2038-12-01 03:43:07"));
-        TimestampCell cell = (TimestampCell) 
-            new TimestampDataType().coerce(input);
+        TimestampCell cell = (TimestampCell) coerce(
+            new TimestampDataType(), new StringCell("2038-12-01 03:43:07"));
         assertEquals(2038, cell.year());
     }
     
     public void testCallsGenericCoerce() throws Exception {
         Cell coerced = 
-            new TimestampDataType().coerce(new Value(NullCell.INSTANCE));
+            coerce(new TimestampDataType(), NullCell.INSTANCE);
         ObjectAssert.assertInstanceOf(NullCell.class, coerced);
     }
     
     public void testCoerceFromTimestamp() throws Exception {
         TimestampCell in = new TimestampCell(2003, 1, 7, 13, 45, 00);
-        TimestampCell coerced = (TimestampCell) 
-            new TimestampDataType().coerce(new Value(in));
+        TimestampCell coerced = (TimestampCell) coerce(
+            new TimestampDataType(), in);
         assertEquals(13, coerced.hour());
+    }
+
+    private Cell coerce(DataType type, Cell cell) {
+        return type.coerce(new Value(cell), "test_column");
     }
 
     public void testStringToDate() throws Exception {

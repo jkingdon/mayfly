@@ -17,8 +17,8 @@ public class BinaryDataType extends DataType {
         this.size = size;
     }
 
-    public Cell coerce(Value value) {
-        return genericCoerce(value, "binary data", BinaryCell.class);
+    public Cell coerce(Value value, String columnName) {
+        return genericCoerce(value, columnName, "binary", BinaryCell.class);
     }
     
     public String dumpName() {

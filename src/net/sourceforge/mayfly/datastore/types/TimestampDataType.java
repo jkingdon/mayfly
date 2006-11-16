@@ -16,12 +16,13 @@ import java.util.regex.Pattern;
 
 public class TimestampDataType extends DataType {
 
-    public Cell coerce(Value value) {
+    public Cell coerce(Value value, String columnName) {
         if (value.value instanceof StringCell) {
             return stringToDate(value.value.asString(), value.location);
         }
         else {
-            return genericCoerce(value, "a timestamp", TimestampCell.class);
+            return genericCoerce(value, columnName, 
+                "timestamp", TimestampCell.class);
         }
     }
 

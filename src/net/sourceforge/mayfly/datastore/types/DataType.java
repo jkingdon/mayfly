@@ -8,10 +8,10 @@ import net.sourceforge.mayfly.util.ValueObject;
 
 public abstract class DataType extends ValueObject {
 
-    abstract public Cell coerce(Value value);
+    abstract public Cell coerce(Value value, String columnName);
 
-    protected Cell genericCoerce(Value value, String typeDescription, 
-        Class nativeCellType) {
+    protected Cell genericCoerce(Value value, String columnName, 
+        String typeDescription, Class nativeCellType) {
         if (value.value instanceof NullCell) {
             return value.value;
         }
@@ -20,8 +20,8 @@ public abstract class DataType extends ValueObject {
         }
         else {
             throw new MayflyException("attempt to store " + 
-                value.value.displayName() + " as " +
-                        typeDescription,
+                value.value.displayName() + " into " +
+                typeDescription + " column " + columnName,
                 value.location);
         }
     }

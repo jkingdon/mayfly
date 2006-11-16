@@ -20,8 +20,8 @@ public class IntegerDataType extends DataType {
         this.dumpName = dumpName;
     }
 
-    public Cell coerce(Value value) {
-        return genericCoerce(value, dumpName.toLowerCase(), LongCell.class);
+    public Cell coerce(Value value, String columnName) {
+        return genericCoerce(value, columnName, dumpName.toLowerCase(), LongCell.class);
     }
     
     public String dumpName() {

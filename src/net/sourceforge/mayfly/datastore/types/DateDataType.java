@@ -16,12 +16,12 @@ import java.util.regex.Pattern;
 
 public class DateDataType extends DataType {
 
-    public Cell coerce(Value value) {
+    public Cell coerce(Value value, String columnName) {
         if (value.value instanceof StringCell) {
             return stringToDate(value.value.asString(), value.location);
         }
         else {
-            return genericCoerce(value, "a date", DateCell.class);
+            return genericCoerce(value, columnName, "date", DateCell.class);
         }
     }
 
