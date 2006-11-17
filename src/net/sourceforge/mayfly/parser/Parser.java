@@ -406,13 +406,15 @@ public class Parser {
     private void parseTableTypeIfPresent() {
         if (consumeNonReservedWordIfMatches("engine")) {
             expectAndConsume(TokenType.EQUAL);
-            String tableType = consumeIdentifier();
+            Token token = expectAndConsume(TokenType.IDENTIFIER);
+            String tableType = token.getText();
             if ("innodb".equalsIgnoreCase(tableType)
                 || "myisam".equalsIgnoreCase(tableType)) {
                 // For now, ignore the type
             }
             else {
-                throw new ParserException("unrecognized table type " + tableType);
+                throw new ParserException("unrecognized table type " + tableType,
+                    token.location);
             }
         }
     }
@@ -611,7 +613,8 @@ public class Parser {
             }
             else {
                 throw new ParserException("expected ON DELETE action " +
-                    " but got SET " + currentToken().describe());
+                    " but got SET " + currentToken().describe(),
+                    currentToken().location);
             }
         }
         else {
@@ -1255,7 +1258,9 @@ public class Parser {
         }
 
         public Condition asBoolean() {
-            throw new ParserException("expected boolean expression but got non-boolean expression");
+            throw new ParserException(
+                "expected boolean expression but got non-boolean expression",
+                expression.location);
         }
 
         public Expression asNonBoolean() {
@@ -1266,18 +1271,19 @@ public class Parser {
 
     public class BooleanParserExpression extends ParserExpression {
 
-        private final Condition expression;
+        private final Condition condition;
 
         public BooleanParserExpression(Condition expression) {
-            this.expression = expression;
+            this.condition = expression;
         }
 
         public Condition asBoolean() {
-            return expression;
+            return condition;
         }
 
         public Expression asNonBoolean() {
-            throw new ParserException("expected non-boolean expression but got boolean expression");
+            throw new ParserException(
+                "expected non-boolean expression but got boolean expression");
         }
 
     }
@@ -1387,8 +1393,10 @@ public class Parser {
             return groupBy;
         }
         else {
-            if (consumeIfMatches(TokenType.KEYWORD_having)) {
-                throw new ParserException("can't specify HAVING without GROUP BY");
+            if (currentTokenType() == TokenType.KEYWORD_having) {
+                throw new ParserException(
+                    "can't specify HAVING without GROUP BY",
+                    currentToken().location);
             }
             return new NoGroupBy();
         }
@@ -1495,7 +1503,8 @@ public class Parser {
         }
         catch (NumberFormatException e) {
             // Out of range.  Most (all?) other cases are prevented in the lexer.
-            throw new ParserException(text + " is out of range");
+            throw new ParserException(text + " is out of range",
+                number.location);
         }
     }
 
@@ -1507,7 +1516,8 @@ public class Parser {
         }
         catch (NumberFormatException e) {
             // Out of range.  Most (all?) other cases are prevented in the lexer.
-            throw new ParserException(text + " is out of range");
+            throw new ParserException(text + " is out of range",
+                number.location);
         }
     }
 
