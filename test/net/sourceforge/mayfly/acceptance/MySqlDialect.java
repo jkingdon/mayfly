@@ -21,7 +21,8 @@ public class MySqlDialect extends Dialect {
        to clear that database on each test (unless we start
        testing schemas).
        
-       Oh, yeah, and we should read it from a file and all that
+       Oh, yeah, and we should read the password from a 
+       file/property/environment-variable and all that
        jazz (sigh - see why I like embedded databases like
        Derby and Hypersonic?).
      */

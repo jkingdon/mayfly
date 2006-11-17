@@ -58,6 +58,7 @@ import net.sourceforge.mayfly.evaluation.condition.Not;
 import net.sourceforge.mayfly.evaluation.condition.NotEqual;
 import net.sourceforge.mayfly.evaluation.condition.Or;
 import net.sourceforge.mayfly.evaluation.expression.Average;
+import net.sourceforge.mayfly.evaluation.expression.SearchedCase;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Count;
 import net.sourceforge.mayfly.evaluation.expression.CountAll;
@@ -1038,6 +1039,9 @@ public class Parser {
         else if (consumeIfMatches(TokenType.MINUS)) {
             return parseNegativeNumber(start);
         }
+        else if (currentTokenType() == TokenType.KEYWORD_case) {
+            return parseCase();
+        }
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
             return parseQuotedString();
         }
@@ -1105,6 +1109,32 @@ public class Parser {
             */
             throw new ParserException("primary", currentToken());
         }
+    }
+
+    private ParserExpression parseCase() {
+        Location start = currentToken().location;
+
+        SearchedCase result = new SearchedCase();
+        expectAndConsume(TokenType.KEYWORD_case);
+        do {
+            expectAndConsume(TokenType.KEYWORD_when);
+            Condition condition = parseWhere();
+            expectAndConsume(TokenType.KEYWORD_then);
+            
+            // This will get more complicated when/if we allow NULL
+            Expression thenValue = parseExpression().asNonBoolean();
+            
+            result = result.withCase(condition, thenValue);
+        }
+        while (currentTokenType() == TokenType.KEYWORD_when);
+        
+        if (consumeIfMatches(TokenType.KEYWORD_else)) {
+            result = result.withElse(parseExpression().asNonBoolean());
+        }
+        Token end = expectAndConsume(TokenType.KEYWORD_end);
+        return new NonBooleanParserExpression(
+            result.withLocation(start.combine(end.location))
+        );
     }
 
     private ParserExpression parseQuotedString() {

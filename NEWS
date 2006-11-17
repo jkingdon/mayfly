@@ -5,6 +5,13 @@ The new SqlDumper class can dump a database as an SQL script.
 Now can insert hex literals into BLOB columns, for example:
 INSERT INTO foo(a) VALUES(x'aa65fe')
 
+Some CASE statements now work.
+
+Added LIKE conditions.
+
+Column aliases (SELECT foo as bar FROM) now work for the simple
+cases.
+
 Most methods in Database now throw runtime exceptions instead
 of checked exceptions.  If you are of the checked exception
 persuasion, or you have some piece of code which expects 

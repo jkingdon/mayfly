@@ -179,6 +179,10 @@ public abstract class Dialect {
     public boolean verticalBarsMeanConcatenation() {
         return true;
     }
+    
+    public boolean caseExpressionPickyAboutTypes() {
+        return false;
+    }
 
     public boolean maySpecifyTableDotColumnToJdbc() {
         return false;

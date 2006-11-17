@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
@@ -19,12 +20,22 @@ abstract public class BinaryOperator extends Expression {
     public Cell evaluate(ResultRow row) {
         Cell leftCell = left.evaluate(row);
         Cell rightCell = right.evaluate(row);
-        return combine(leftCell, rightCell);
+        return combineCellsOrNulls(leftCell, rightCell);
     }
 
     public Cell aggregate(ResultRows rows) {
         Cell leftCell = left.aggregate(rows);
         Cell rightCell = right.aggregate(rows);
+        return combineCellsOrNulls(leftCell, rightCell);
+    }
+
+    private Cell combineCellsOrNulls(Cell leftCell, Cell rightCell) {
+        if (leftCell instanceof NullCell) {
+            return leftCell;
+        }
+        if (rightCell instanceof NullCell) {
+            return rightCell;
+        }
         return combine(leftCell, rightCell);
     }
     

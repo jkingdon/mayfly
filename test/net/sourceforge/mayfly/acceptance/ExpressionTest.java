@@ -69,8 +69,26 @@ public class ExpressionTest extends SqlTestCase {
     public void testPlus() throws Exception {
         execute("create table names (birthyear integer, age integer)");
         execute("insert into names(birthyear, age) values (1706, 50)");
-        ResultSet results = query("select birthyear + age from names");
-        assertResultSet(new String[] { " 1756 " }, results);
+        assertResultSet(new String[] { " 1756 " }, 
+            query("select birthyear + age from names"));
+    }
+
+    public void testNullAndMath() throws Exception {
+        execute("create table names (" +
+            "birthyear integer, age integer, name varchar(255))");
+        execute("insert into names(birthyear, age, name) " +
+            "values (1706, null, 'no-age')");
+        execute("insert into names(birthyear, age, name) " +
+            "values (null, 13, 'no-year')");
+        execute("insert into names(birthyear, age, name) " +
+            "values (1960, 13, 'both')");
+        assertResultSet(
+            new String[] {
+                " null, 'no-age' ", 
+                " null, 'no-year' ", 
+                " 1973, 'both' " 
+            },
+            query("select birthyear + age, name from names"));
     }
 
     public void testMath() throws Exception {
@@ -80,5 +98,50 @@ public class ExpressionTest extends SqlTestCase {
         ResultSet results = query("select 2 * a + c / 3 - 1 from foo");
         assertResultSet(new String[] { " 9 ", " 4 " }, results);
     }
+    
+    public void testSearchedCase() throws Exception {
+        execute("create table foo(a integer, b integer, c integer)");
+        execute("insert into foo(a,b,c) values(5,6,7)");
+        execute("insert into foo(a,b,c) values(5,6,null)");
+        execute("insert into foo(a,b,c) values(null,6,99)");
+        
+        // The when clauses should be evaluated in order
+        execute("insert into foo(a,b,c) values(null,53,null)");
+        
+        assertResultSet(
+            new String[] { " 11 ", " 18 ", " 6 ", " 53 " },
+            query("select case " +
+                "when a is null then b " +
+                "when c is null then a + b " +
+                "else a + b + c " +
+                "end " +
+                "from foo")
+        );
+    }
+    
+    public void testSearchedCaseNoElse() throws Exception {
+        execute("create table foo(a integer)");
+        execute("insert into foo(a) values(5)");
+        execute("insert into foo(a) values(6)");
+        
+        String sql = 
+            "select case " +
+            "when a = 5 then 55 " +
+            "end " +
+            "from foo";
+        if (dialect.caseExpressionPickyAboutTypes()) {
+            expectQueryFailure(sql, 
+                "types INTEGER and CHAR are not compatible");
+        }
+        else {
+            assertResultSet(
+                new String[] { " 55 ", " null " },
+                query(sql)
+            );
+        }
+    }
+    
+    // TODO: simple case
+    // e.g. case a when 7 then 9 when 6 then 5 end
     
 }

@@ -88,6 +88,13 @@ public class DerbyDialect extends Dialect {
         return false;
     }
     
+    public boolean caseExpressionPickyAboutTypes() {
+        /* Not sure exactly what is going on here.  It might have
+           to do with omitting ELSE from the case expression, but
+           I'm not sure of that. */
+        return true;
+    }
+    
     public boolean canGroupByExpression() {
         // Seems to be allowed as of Derby 10.2.1.6
         return false;

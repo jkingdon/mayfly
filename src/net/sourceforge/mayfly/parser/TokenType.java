@@ -44,9 +44,11 @@ public class TokenType {
     public static final TokenType KEYWORD_and = registerKeyword("and");
     public static final TokenType KEYWORD_as = registerKeyword("as");
     public static final TokenType KEYWORD_asc = registerKeyword("asc");
-    public static final TokenType KEYWORD_authorization = registerKeyword("authorization");
+    public static final TokenType KEYWORD_authorization = 
+        registerKeyword("authorization");
     public static final TokenType KEYWORD_avg = registerKeyword("avg");
     public static final TokenType KEYWORD_by = registerKeyword("by");
+    public static final TokenType KEYWORD_case = registerKeyword("case");
     public static final TokenType KEYWORD_character = registerKeyword("character");
     public static final TokenType KEYWORD_column = registerKeyword("column");
     public static final TokenType KEYWORD_constraint = registerKeyword("constraint");
@@ -61,6 +63,8 @@ public class TokenType {
     public static final TokenType KEYWORD_desc = registerKeyword("desc");
     public static final TokenType KEYWORD_distinct = registerKeyword("distinct");
     public static final TokenType KEYWORD_drop = registerKeyword("drop");
+    public static final TokenType KEYWORD_else = registerKeyword("else");
+    public static final TokenType KEYWORD_end = registerKeyword("end");
     public static final TokenType KEYWORD_exists = registerKeyword("exists");
     public static final TokenType KEYWORD_for = registerKeyword("for");
     public static final TokenType KEYWORD_foreign = registerKeyword("foreign");
@@ -96,10 +100,12 @@ public class TokenType {
     public static final TokenType KEYWORD_smallint = registerKeyword("smallint");
     public static final TokenType KEYWORD_sum = registerKeyword("sum");
     public static final TokenType KEYWORD_table = registerKeyword("table");
+    public static final TokenType KEYWORD_then = registerKeyword("then");
     public static final TokenType KEYWORD_unique = registerKeyword("unique");
     public static final TokenType KEYWORD_update = registerKeyword("update");
     public static final TokenType KEYWORD_values = registerKeyword("values");
     public static final TokenType KEYWORD_varchar = registerKeyword("varchar");
+    public static final TokenType KEYWORD_when = registerKeyword("when");
     public static final TokenType KEYWORD_where = registerKeyword("where");
 
     public static TokenType lookupKeyword(String text) {
