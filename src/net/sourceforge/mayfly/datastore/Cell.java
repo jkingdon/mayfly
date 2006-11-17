@@ -1,12 +1,13 @@
 package net.sourceforge.mayfly.datastore;
 
-import org.joda.time.DateTimeZone;
-
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.MayflySqlException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ValueObject;
+
+import org.joda.time.DateTimeZone;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -22,18 +23,18 @@ public abstract class Cell extends ValueObject {
         {@link #asInt()}, and {@link #asLong()}.
       */
     public byte asByte() throws SQLException {
-        throw new SQLException(
-            "attempt to read " + displayName() + " as a byte");
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as a byte").asSqlException();
     }
 
     public short asShort() throws SQLException {
-        throw new SQLException(
-            "attempt to read " + displayName() + " as a short");
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as a short").asSqlException();
     }
 
     public int asInt() throws SQLException {
-        throw new SQLException(
-            "attempt to read " + displayName() + " as an int");
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as an int").asSqlException();
     }
 
     public long asLong() throws MayflyException {
@@ -65,18 +66,22 @@ public abstract class Cell extends ValueObject {
 
     abstract public String asSql();
 
-    public BigDecimal asBigDecimal() {
-        throw new UnimplementedException(
-            "cannot yet get BigDecimal for " + getClass().getName());
+    public BigDecimal asBigDecimal() throws MayflySqlException {
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as a decimal")
+            .asSqlException();
     }
 
     public java.sql.Date asDate(DateTimeZone zone) throws SQLException {
-        throw new SQLException("attempt to read " + displayName() + " as a date");
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as a date")
+            .asSqlException();
     }
 
     public java.sql.Timestamp asTimestamp(DateTimeZone zone) throws SQLException {
-        throw new SQLException(
-            "attempt to read " + displayName() + " as a timestamp");
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as a timestamp")
+            .asSqlException();
     }
 
     /**
@@ -85,18 +90,21 @@ public abstract class Cell extends ValueObject {
         it is OK to truncate/round.
       */
     public double asDouble() throws SQLException {
-        throw new SQLException(
-            "attempt to read " + displayName() + " as a double");
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as a double")
+            .asSqlException();
     }
 
     public InputStream asBinaryStream() throws SQLException {
-        throw new SQLException(
-            "attempt to read " + displayName() + " as binary data");
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as binary data")
+            .asSqlException();
     }
 
     public byte[] asBytes() throws SQLException {
-        throw new SQLException(
-            "attempt to read " + displayName() + " as binary data");
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as binary data")
+            .asSqlException();
     }
 
     final public int compareTo(Cell otherCell) {

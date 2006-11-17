@@ -301,6 +301,83 @@ public class DataTypeTest extends SqlTestCase {
         assertFalse(results.next());
     }
     
+    public void testNullInDecimalColumn() throws Exception {
+        execute("create table foo(x decimal(7, 1))");
+        execute("insert into foo(x) values(null)");
+        assertResultSet(new String[] { " null " }, 
+            query("select x from foo"));
+        
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+        BigDecimal decimal = results.getBigDecimal("x");
+        assertNull(decimal);
+        assertTrue(results.wasNull());
+        assertFalse(results.next());
+        results.close();
+    }
+    
+    public void testStringColumnAsNumber() throws Exception {
+        execute("create table foo(x varchar(50))");
+        execute("insert into foo(x) values('not decimal')");
+        
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+        try {
+            results.getByte("x");
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage(
+                "attempt to read string 'not decimal' as a byte", e);
+        }
+
+        try {
+            results.getShort("x");
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage(
+                "attempt to read string 'not decimal' as a short", e);
+        }
+
+        try {
+            results.getInt("x");
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage(
+                "attempt to read string 'not decimal' as an int", e);
+        }
+
+        try {
+            results.getLong("x");
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage(
+                "attempt to read string 'not decimal' as a long", e);
+        }
+
+        try {
+            results.getDouble("x");
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage(
+                "attempt to read string 'not decimal' as a double", e);
+        }
+
+        try {
+            results.getBigDecimal("x");
+            fail();
+        }
+        catch (SQLException e) {
+            assertMessage(
+                "attempt to read string 'not decimal' as a decimal", e);
+        }
+        assertFalse(results.next());
+    }
+    
     public void testIntegerToFloat() throws Exception {
         execute("create table foo (x bigint, y smallint)");
         // 4503599627370495 is, I believe, the largest integer value which can be

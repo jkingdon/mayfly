@@ -2,11 +2,13 @@ package net.sourceforge.mayfly.datastore;
 
 import org.joda.time.DateTimeZone;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflySqlException;
 import net.sourceforge.mayfly.parser.Location;
 
 public class NullCell extends Cell {
@@ -39,6 +41,10 @@ public class NullCell extends Cell {
     public double asDouble() throws SQLException {
         // What are we supposed to return here?
         throw new SQLException("Attempt to read SQL NULL as an object");
+    }
+    
+    public BigDecimal asBigDecimal() throws MayflySqlException {
+        return null;
     }
     
     public String asString() {

@@ -5,7 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * This is for MySQL 5.x.  For 4.x, see {@link net.sourceforge.mayfly.acceptance.MySql4Dialect}.
+ * This is for MySQL 5.x.  For 4.x, see 
+ * {@link net.sourceforge.mayfly.acceptance.MySql4Dialect}.
  * 
  * To make this work, install MySQL (the server), start it up on localhost,
  * and that might be all you need...
