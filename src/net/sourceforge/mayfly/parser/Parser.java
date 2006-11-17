@@ -53,6 +53,7 @@ import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.evaluation.condition.Greater;
 import net.sourceforge.mayfly.evaluation.condition.In;
 import net.sourceforge.mayfly.evaluation.condition.IsNull;
+import net.sourceforge.mayfly.evaluation.condition.Like;
 import net.sourceforge.mayfly.evaluation.condition.Not;
 import net.sourceforge.mayfly.evaluation.condition.NotEqual;
 import net.sourceforge.mayfly.evaluation.condition.Or;
@@ -961,6 +962,10 @@ public class Parser {
         if (consumeIfMatches(TokenType.EQUAL)) {
             Expression right = parsePrimary().asNonBoolean();
             return new BooleanParserExpression(new Equal(left.asNonBoolean(), right));
+        }
+        if (consumeIfMatches(TokenType.KEYWORD_like)) {
+            Expression right = parsePrimary().asNonBoolean();
+            return new BooleanParserExpression(new Like(left.asNonBoolean(), right));
         }
         else if (consumeIfMatches(TokenType.LESS_GREATER)) {
             Expression right = parsePrimary().asNonBoolean();

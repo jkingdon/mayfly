@@ -273,5 +273,25 @@ public class WhereTest extends SqlTestCase {
             expectQueryFailure(sql, "no column a_and_b");
         }
     }
+    
+    public void testLike() throws Exception {
+        execute("create table foo(a varchar(255))");
+        execute("insert into foo(a) values('cat')");
+        execute("insert into foo(a) values('category')");
+        execute("insert into foo(a) values('tomcat')");
+        execute("insert into foo(a) values('dog')");
+        execute("insert into foo(a) values(null)");
+        
+        assertResultSet(new String[] { " 'cat' " },
+            query("select a from foo where a like 'cat'"));
+        assertResultSet(new String[] { " 'cat' ", " 'category' " },
+            query("select a from foo where a like 'cat%'"));
+        assertResultSet(new String[] { 
+            " 'cat' ", " 'category' ", " 'tomcat' " },
+            query("select a from foo where a like '%cat%'"));
+        assertResultSet(new String[] { 
+            " 'cat' ", " 'tomcat' " },
+            query("select a from foo where a like '%cat'"));
+    }
 
 }

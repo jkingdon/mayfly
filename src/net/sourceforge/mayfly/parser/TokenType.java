@@ -78,6 +78,7 @@ public class TokenType {
     public static final TokenType KEYWORD_join = registerKeyword("join");
     public static final TokenType KEYWORD_key = registerKeyword("key");
     public static final TokenType KEYWORD_left = registerKeyword("left");
+    public static final TokenType KEYWORD_like = registerKeyword("like");
     public static final TokenType KEYWORD_limit = registerKeyword("limit");
     public static final TokenType KEYWORD_max = registerKeyword("max");
     public static final TokenType KEYWORD_min = registerKeyword("min");
