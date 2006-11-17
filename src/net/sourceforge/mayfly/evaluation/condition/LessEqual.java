@@ -10,7 +10,7 @@ public class LessEqual extends RowExpression {
     }
 
     protected boolean compare(Cell leftSide, Cell rightSide) {
-        return leftSide.asLong() <= rightSide.asLong();
+        return leftSide.compareTo(rightSide) <= 0;
     }
 
 }

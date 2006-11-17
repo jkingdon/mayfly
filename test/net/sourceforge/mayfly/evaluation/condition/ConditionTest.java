@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation.condition;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.DateCell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
@@ -99,6 +100,18 @@ public class ConditionTest extends TestCase {
     
     public void testResolve() throws Exception {
         
+    }
+    
+    public void testCompareDates() throws Exception {
+        ResultRow row = new ResultRow()
+            .withColumn("foo", "a", new DateCell(2001, 9, 11))
+            .withColumn("foo", "b", new DateCell(2004, 11, 2));
+        assertTrue(new Greater(
+            new SingleColumn("b"), 
+            new SingleColumn("a")).evaluate(row));
+        assertFalse(new LessEqual(
+            new SingleColumn("b"), 
+            new SingleColumn("a")).evaluate(row));
     }
     
 }
