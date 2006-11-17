@@ -546,6 +546,8 @@ public class DataTypeTest extends SqlTestCase {
     }
     
     public void testHexBinary() throws Exception {
+        /* TODO: Also should accept x'00' '01' '02' syntax which allows
+           a long hex literal to be continued over several lines */
         execute("create table foo(x " + dialect.binaryTypeName() + ")");
         String hexForBinary = "insert into foo(x) values(x'00010203ff7f00')";
         if (dialect.allowHexForBinary()) {

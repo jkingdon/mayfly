@@ -7,7 +7,7 @@ INSERT INTO foo(a) VALUES(x'aa65fe')
 
 Some CASE statements now work.
 
-Added LIKE conditions.
+Added LIKE, <=, and >= conditions.
 
 Column aliases (SELECT foo as bar FROM) now work for the simple
 cases.

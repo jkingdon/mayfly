@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
@@ -15,7 +16,18 @@ abstract public class RowExpression extends Condition {
     }
 
     public boolean evaluate(ResultRow row) {
-        return compare(leftSide.evaluate(row), rightSide.evaluate(row));
+        return compareCellsOrNulls(
+            leftSide.evaluate(row), rightSide.evaluate(row));
+    }
+
+    private boolean compareCellsOrNulls(Cell leftCell, Cell rightCell) {
+        if (leftCell instanceof NullCell) {
+            return false;
+        }
+        if (rightCell instanceof NullCell) {
+            return false;
+        }
+        return compare(leftCell, rightCell);
     }
 
     abstract protected boolean compare(Cell leftSide, Cell rightSide);

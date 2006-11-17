@@ -42,6 +42,8 @@ public class WhereTest extends SqlTestCase {
         execute("insert into foo (a, b, c) values (1, 2, 1)");
         execute("insert into foo (a, b, c) values (1, 2, 2)");
         execute("insert into foo (a, b, c) values (2, 2, 2)");
+        execute("insert into foo (a, b, c) values (1, 2, null)");
+        execute("insert into foo (a, b, c) values (null, 1, 1)");
 
         assertResultSet(
             new String[] {
@@ -59,12 +61,17 @@ public class WhereTest extends SqlTestCase {
         execute("insert into foo (a, b, c) values (1, 2, 1)");
         execute("insert into foo (a, b, c) values (1, 2, 2)");
         execute("insert into foo (a, b, c) values (2, 2, 2)");
+        execute("insert into foo (a, b, c) values (2, null, 1)");
+        execute("insert into foo (a, b, c) values (null, 1, 1)");
+        execute("insert into foo (a, b, c) values (null, null, 1)");
 
         assertResultSet(
             new String[] {
                 "   1,  1,  1 ",
                 "   1,  1,  2 ",
                 "   2,  2,  2 ",
+                "   2,  null,  1 ",
+                "   null,  1,  1 ",
             },
             query("select a, b, c from foo where a=2 or b=1")
         );
@@ -114,6 +121,7 @@ public class WhereTest extends SqlTestCase {
         execute("insert into foo (a) values (4)");
         execute("insert into foo (a) values (5)");
         execute("insert into foo (a) values (6)");
+        execute("insert into foo (a) values (null)");
 
         assertResultSet(
             new String[] {
@@ -132,20 +140,55 @@ public class WhereTest extends SqlTestCase {
         );
 
         assertResultSet(
-                new String[] {
-                    "   4 ",
-                    "   5 ",
-                },
-                query("select a from foo where a < 6 ")
-            );
+            new String[] {
+                "   4 ",
+                "   5 ",
+            },
+            query("select a from foo where a < 6 ")
+        );
+    }
+    
+    public void testLessThanOrEqual() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into foo (a) values (6)");
+        execute("insert into foo (a) values (null)");
+
+        assertResultSet(
+            new String[] {
+                "   4 ",
+                "   5 ",
+            },
+            query("select a from foo where a <= 5")
+        );
     }
 
+    public void testGreaterThanOrEqual() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo (a) values (4)");
+        execute("insert into foo (a) values (5)");
+        execute("insert into foo (a) values (6)");
+        execute("insert into foo (a) values (null)");
+
+        assertResultSet(
+            new String[] {
+                "   5 ",
+                "   6 ",
+            },
+            query("select a from foo where a >= 5")
+        );
+    }
 
     public void testSimpleIn() throws Exception {
         execute("create table foo (a integer, b integer)");
         execute("insert into foo (a, b) values (1, 1)");
         execute("insert into foo (a, b) values (2, 4)");
         execute("insert into foo (a, b) values (3, 9)");
+
+        // OK, this one is where an SQL boolean needs to be true,false,null.
+        // I think.
+//        execute("insert into foo (a, b) values (null, -1)");
 
         assertResultSet(
             new String[] {

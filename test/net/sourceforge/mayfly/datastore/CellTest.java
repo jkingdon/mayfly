@@ -54,6 +54,28 @@ public class CellTest extends TestCase {
         }
     }
     
+    public void testSqlEquals() throws Exception {
+        assertSqlEqual(new LongCell(6), new LongCell(6));
+        assertNotSqlEqual(new LongCell(6), new LongCell(7));
+        
+        assertSqlEqual(new StringCell("foo"), new StringCell("foo"));
+        assertNotSqlEqual(new StringCell("11"), new StringCell("5"));
+
+        assertNotSqlEqual(NullCell.INSTANCE, NullCell.INSTANCE);
+        assertNotSqlEqual(NullCell.INSTANCE, new StringCell(""));
+        assertNotSqlEqual(NullCell.INSTANCE, new LongCell(0));
+    }
+
+    private void assertSqlEqual(Cell first, Cell second) {
+        assertTrue(first.sqlEquals(second));
+        assertTrue(second.sqlEquals(first));
+    }
+
+    private void assertNotSqlEqual(Cell first, Cell second) {
+        assertFalse(first.sqlEquals(second));
+        assertFalse(second.sqlEquals(first));
+    }
+
     public void testDisplayName() throws Exception {
         assertEquals("string 'foo'", new StringCell("foo").displayName());
         assertEquals("string 'don''t'", new StringCell("don't").displayName());
