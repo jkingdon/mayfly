@@ -293,15 +293,6 @@ public class ResultTest extends SqlTestCase {
         // In this example, N == 2 so we end up getting 'a'
         // 'b' as part of the "N", and 'c' because it is a tie.
         
-        if (!dialect.haveLimit()) {
-            return;
-        }
-
-        if (!dialect.wishThisWereTrue()) {
-            // no subselects
-            return;
-        }
-
         execute("create table foo (x integer, y varchar(255))");
         execute("insert into foo (x, y) values (1, 'a')");
         execute("insert into foo (x, y) values (1, 'c')");
@@ -311,9 +302,18 @@ public class ResultTest extends SqlTestCase {
         // There are other ways to write this query (one involves
         // the "RANK() OVER" feature from SQL2003), but this
         // looks like a pretty sane one.
-        assertResultSet(new String[] { " 'a' ", " 'b' ", " 'c' " },
-            query("SELECT y FROM foo WHERE x <= (SELECT x FROM foo ORDER BY x ASC LIMIT 1 OFFSET 1) ")
-        );
+        String topNViaSubselectAndLimit = 
+            "SELECT y FROM foo WHERE x <= " +
+                "(SELECT x FROM foo ORDER BY x ASC LIMIT 1 OFFSET 1) ";
+
+        if (dialect.haveLimit() && dialect.wishThisWereTrue()) {
+            assertResultSet(new String[] { " 'a' ", " 'b' ", " 'c' " },
+                query(topNViaSubselectAndLimit)
+            );
+        }
+        else {
+            expectQueryFailure(topNViaSubselectAndLimit, "no subselects");
+        }
     }
     
     public void testLimitNoOffset() throws Exception {

@@ -56,7 +56,8 @@ public class Select extends Command {
         this(what, from, where, new NoGroupBy(), new OrderBy(), Limit.NONE);
     }
 
-    public Select(What what, From from, Condition where, Aggregator groupBy, OrderBy orderBy, Limit limit) {
+    public Select(What what, From from, Condition where, Aggregator groupBy, 
+        OrderBy orderBy, Limit limit) {
         this.what = what;
         this.from = from;
         this.where = where;
@@ -69,7 +70,8 @@ public class Select extends Command {
         return from;
     }
 
-    public ResultSet select(final DataStore store, String currentSchema, Cell lastIdentity) {
+    public ResultSet select(final DataStore store, String currentSchema, 
+        Cell lastIdentity) {
         optimize(store, currentSchema);
         ResultRow dummyRow = dummyRow(store, currentSchema);
         Selected selected = what.selected(dummyRow);

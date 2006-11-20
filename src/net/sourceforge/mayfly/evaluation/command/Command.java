@@ -21,7 +21,8 @@ public abstract class Command extends ValueObject {
 
     abstract public UpdateStore update(DataStore store, String currentSchema);
 
-    public ResultSet select(DataStore store, String currentSchema, Cell lastIdentity) {
+    public ResultSet select(DataStore store, String currentSchema, 
+        Cell lastIdentity) {
         throw new MayflyException(
             "This command is only available with update, not query");
     }

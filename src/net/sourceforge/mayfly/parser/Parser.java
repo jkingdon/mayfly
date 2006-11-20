@@ -823,9 +823,9 @@ public class Parser {
         Aggregator groupBy = parseGroupBy();
         
         OrderBy orderBy = parseOrderBy();
-        
+
         Limit limit = parseLimit();
-        
+
         if (consumeIfMatches(TokenType.KEYWORD_for)) {
             expectAndConsume(TokenType.KEYWORD_update);
             /* Until we try to do transactions, or at least
@@ -1111,7 +1111,13 @@ public class Parser {
             }
         }
         else if (consumeIfMatches(TokenType.OPEN_PAREN)) {
-            ParserExpression expression = parseCondition();
+            ParserExpression expression;
+            if (currentTokenType() == TokenType.KEYWORD_select) {
+                expression = parseScalarSubselect();
+            }
+            else {
+                expression = parseCondition();
+            }
             expectAndConsume(TokenType.CLOSE_PAREN);
             return expression;
         }
@@ -1123,6 +1129,11 @@ public class Parser {
             */
             throw new ParserException("primary", currentToken());
         }
+    }
+
+    private ParserExpression parseScalarSubselect() {
+        parseSelect();
+        throw new UnimplementedException("no subselects");
     }
 
     private ParserExpression parseCase() {

@@ -266,7 +266,8 @@ public class WhereTest extends SqlTestCase {
             // Mayfly and Postgres are pickier than some databases about boolean vs non-boolean
             // If some writes SQL like that they are either making a mistake, or they are
             // being too clever for our tastes.
-            expectQueryFailure(booleanAsLeftSideOfIn, "expected boolean expression but got non-boolean expression");
+            expectQueryFailure(booleanAsLeftSideOfIn, 
+                "expected boolean expression but got non-boolean expression");
             
             // The message should identify what part of the expression is the problem.
             // For example, "expected boolean expression but got foo.a"
@@ -278,11 +279,6 @@ public class WhereTest extends SqlTestCase {
     }
 
     public void testInWithSubselect() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            // No subselects
-            return;
-        }
-
         execute("create table foo (a integer, b integer)");
         execute("insert into foo (a, b) values (1, 1)");
         execute("insert into foo (a, b) values (2, 4)");
@@ -292,13 +288,21 @@ public class WhereTest extends SqlTestCase {
         execute("insert into bar (c) values (2)");
         execute("insert into bar (c) values (3)");
 
-        assertResultSet(
-            new String[] {
-                "   4 ",
-                "   9 ",
-            },
-            query("select b from foo where foo.a in (select c from bar)")
-        );
+        String inWithSubselect = 
+            "select b from foo where foo.a in (select c from bar)";
+        if (dialect.wishThisWereTrue()) {
+            assertResultSet(
+                new String[] {
+                    "   4 ",
+                    "   9 ",
+                },
+                query(inWithSubselect)
+            );
+        }
+        else {
+            expectQueryFailure(inWithSubselect, 
+                "expected primary but got SELECT");
+        }
     }
     
     public void testReferToColumnAlias() throws Exception {
