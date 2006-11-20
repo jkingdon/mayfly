@@ -167,6 +167,10 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    public boolean canCompareStringColumnToIntegerLiteral() {
+        return true;
+    }
+    
     public boolean haveDropTableFooIfExists() {
         return false;
     }

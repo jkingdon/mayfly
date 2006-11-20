@@ -36,6 +36,11 @@ public class DateCell extends Cell {
             DateCell dateCell = (DateCell) otherCell;
             return localDate.compareTo(dateCell.localDate);
         }
+        else if (otherCell instanceof StringCell) {
+            StringCell otherAsString = (StringCell)otherCell;
+            DateCell otherAsDate = otherAsString.coerceToDate(location);
+            return compareTo(otherAsDate);
+        }
         else if (otherCell instanceof NullCell) {
             return 1;
         }

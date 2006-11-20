@@ -378,6 +378,33 @@ public class DataTypeTest extends SqlTestCase {
         assertFalse(results.next());
     }
     
+    public void testCompareStringWithInteger() throws Exception {
+        execute("create table foo(x integer, y varchar(255))");
+        execute("insert into foo(x, y) values (5, 'hello')");
+
+        String integerColumnStringLiteral = "select y from foo where x < 'zzz'";
+        if (dialect.dataTypesAreEnforced()) {
+            expectQueryFailure(integerColumnStringLiteral,
+                "attempt to compare string 'zzz' to number 5");
+        }
+        else {
+            /* The obvious question here is what kind of comparison is
+               done - string or literal.  But we don't test that. */
+            query(integerColumnStringLiteral);
+        }
+
+        String stringColumnIntegerLiteral = "select y from foo where y < 99";
+        if (dialect.canCompareStringColumnToIntegerLiteral()) {
+            /* The obvious question here is what kind of comparison is
+               done - string or literal.  But we don't test that. */
+            query(stringColumnIntegerLiteral);
+        }
+        else {
+            expectQueryFailure(stringColumnIntegerLiteral,
+            "attempt to compare number 99 to string 'hello'");
+        }
+    }
+    
     public void testIntegerToFloat() throws Exception {
         execute("create table foo (x bigint, y smallint)");
         // 4503599627370495 is, I believe, the largest integer value which can be

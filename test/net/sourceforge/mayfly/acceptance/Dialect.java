@@ -612,6 +612,10 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean canCompareStringColumnToIntegerLiteral() {
+        return false;
+    }
+
     public boolean onUpdateSetNullAndCascadeMissing() {
         return false;
     }

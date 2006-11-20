@@ -330,5 +330,38 @@ public class DateTest extends SqlTestCase {
                 "'2004-03-27 12:31:00' is not in format yyyy-mm-dd");
         }
     }
+    
+    public void testCompareWithString() throws Exception {
+        execute("create table foo(x date)");
+        execute("insert into foo(x) values('2003-03-27')");
+        execute("insert into foo(x) values('2004-06-11')");
+        execute("insert into foo(x) values('2004-01-21')");
+        ResultSet results = 
+            query("select x from foo where x < '2004-02-29' order by x");
+
+        assertTrue(results.next());
+        assertEquals(
+            new DateMidnight(2003, 3, 27).getMillis(), 
+            results.getDate("x").getTime());
+
+        assertTrue(results.next());
+        assertEquals(
+            new DateMidnight(2004, 1, 21).getMillis(), 
+            results.getDate("x").getTime());
+
+        assertFalse(results.next());
+    }
+    
+    public void testEqualsWithString() throws Exception {
+        execute("create table foo(x date, y varchar(255))");
+        execute(
+            "insert into foo(x, y) values('2004-07-04', 'Independence Day')");
+        execute("insert into foo(x, y) values('2004-11-11', 'Armistice Day')");
+        
+        assertResultSet(new String[] { " 'Armistice Day' " }, 
+            query("select y from foo where x = '2004-11-11'"));
+        assertResultSet(new String[] { " 'Independence Day' " }, 
+            query("select y from foo where x <> '2004-11-11'"));
+    }
 
 }

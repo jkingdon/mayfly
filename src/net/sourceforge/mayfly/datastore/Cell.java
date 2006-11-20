@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.MayflySqlException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.parser.Location;
@@ -124,9 +123,9 @@ public abstract class Cell extends ValueObject {
     abstract public String displayName();
 
     protected MayflyException cannotCompare(Cell otherCell, Location location) {
-        return new MayflyInternalException(
-            "Attempt to compare a " + this.getClass().getName() + 
-            " to a " + otherCell.getClass().getName(),
+        return new MayflyException(
+            "attempt to compare " + displayName() + 
+            " to " + otherCell.displayName(),
             location
         );
     }

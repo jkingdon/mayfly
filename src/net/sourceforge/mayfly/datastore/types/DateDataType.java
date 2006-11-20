@@ -29,7 +29,7 @@ public class DateDataType extends DataType {
         return stringToDate(text, Location.UNKNOWN);
     }
 
-    DateCell stringToDate(String text, Location location) {
+    public DateCell stringToDate(String text, Location location) {
         LocalDate date = parseDate(text);
         if (date != null) {
             return new DateCell(date);

@@ -177,6 +177,10 @@ public class HypersonicDialect extends Dialect {
     public boolean allowHexForBinary() {
         return false;
     }
+    
+    public boolean canCompareStringColumnToIntegerLiteral() {
+        return true;
+    }
 
     public boolean decimalScaleIsFromType() {
         return false;

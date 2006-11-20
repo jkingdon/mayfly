@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.LongLiteral;
 
@@ -31,6 +32,25 @@ public class CellTest extends TestCase {
         assertLessThan(NullCell.INSTANCE, new StringCell(""));
         assertLessThan(NullCell.INSTANCE, new LongCell(0));
     }
+    
+    public void testDateVsString() throws Exception {
+        assertLessThan(
+            new DateCell(2008, 2, 29), new StringCell("2008-03-01"));
+        assertLessThan(
+            new StringCell("1999-12-31"), new DateCell(2000, 01, 01));
+        assertComparesSqlEqual(
+            new DateCell(2008, 11, 23), new StringCell("2008-11-23"));
+        
+        try {
+            assertLessThan(
+                new DateCell(2008, 2, 29), new StringCell("someday"));
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("'someday' is not in format yyyy-mm-dd",
+                e.getMessage());
+        }
+    }
 
     private void assertComparesEqual(Cell first, Cell second) {
         assertEquals(0, first.compareTo(second));
@@ -38,8 +58,20 @@ public class CellTest extends TestCase {
         
         // I think the GROUP BY code makes more sense if
         // compareTo is consistent with equals()
+        /* (TODO: Specifically what about the GROUP BY code? It doesn't seem
+           right for a StringCell to .equals a DateCell, yet
+           they might be sqlEquals.  So what is the impact on GROUP BY?
+         */
         assertEquals(first, second);
         assertEquals(second, first);
+    }
+
+    private void assertComparesSqlEqual(Cell first, Cell second) {
+        assertEquals(0, first.compareTo(second));
+        assertEquals(0, second.compareTo(first));
+        
+        assertTrue(first.sqlEquals(second));
+        assertTrue(second.sqlEquals(first));
     }
 
     private void assertLessThan(Cell first, Cell second) {

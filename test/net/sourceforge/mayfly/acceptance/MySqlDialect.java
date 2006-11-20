@@ -292,6 +292,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean canCompareStringColumnToIntegerLiteral() {
+        return true;
+    }
+    
     public boolean allowHexForInteger() {
         return true;
     }

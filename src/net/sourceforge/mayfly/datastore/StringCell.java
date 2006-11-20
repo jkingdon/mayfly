@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.parser.Location;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -36,12 +37,19 @@ public class StringCell extends Cell {
         if (otherCell instanceof StringCell) {
             return content.compareTo(((StringCell) otherCell).content);
         }
+        else if (otherCell instanceof DateCell) {
+            return coerceToDate(location).compareTo(otherCell);
+        }
         else if (otherCell instanceof NullCell) {
             return 1;
         }
         else {
             throw cannotCompare(otherCell, location);
         }
+    }
+
+    public DateCell coerceToDate(Location location) {
+        return new DateDataType().stringToDate(content, location);
     }
 
 }
