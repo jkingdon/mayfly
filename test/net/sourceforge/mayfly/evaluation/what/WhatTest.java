@@ -17,7 +17,9 @@ public class WhatTest extends TestCase {
             .add(new SingleColumn("bar", "b"));
         ResultRow dummyRow = new ResultRow()
             .withColumn("bar", "a", NullCell.INSTANCE)
+            .withColumn("bar", "aa", NullCell.INSTANCE)
             .withColumn("bar", "b", NullCell.INSTANCE)
+            .withColumn("bar", "c", NullCell.INSTANCE)
             .withColumn("foo", "x", NullCell.INSTANCE)
             .withColumn("foo", "y", NullCell.INSTANCE)
         ;
@@ -32,8 +34,11 @@ public class WhatTest extends TestCase {
     
     public void testSelectedDegenerateCase() throws Exception {
         What original = new What().add(new IntegerLiteral(7));
-        Selected expected = new Selected().add(new IntegerLiteral(7));
-        assertEquals(expected, original.selected(new ResultRow()));
+        Selected selected = original.selected(new ResultRow());
+        assertEquals(1, selected.size());
+
+        IntegerLiteral element = (IntegerLiteral) selected.element(0);
+        assertEquals(7, element.value);
     }
     
     public void testSelectedAll() throws Exception {
@@ -46,13 +51,12 @@ public class WhatTest extends TestCase {
             .withColumn("foo", "y", NullCell.INSTANCE)
         ;
         
-        Selected expected = new Selected()
-            .add(new SingleColumn("bar", "a"))
-            .add(new SingleColumn("bar", "b"))
-            .add(new SingleColumn("foo", "x"))
-            .add(new SingleColumn("foo", "y"));
-    
-        assertEquals(expected, original.selected(dummyRow));
+        Selected selected = original.selected(dummyRow);
+        assertEquals(4, selected.size());
+        MayflyAssert.assertColumn("bar", "a", selected.element(0));
+        MayflyAssert.assertColumn("bar", "b", selected.element(1));
+        MayflyAssert.assertColumn("foo", "x", selected.element(2));
+        MayflyAssert.assertColumn("foo", "y", selected.element(3));
     }
 
 }

@@ -3,9 +3,8 @@ package net.sourceforge.mayfly.evaluation.condition;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.ResultRow;
-import net.sourceforge.mayfly.util.ValueObject;
 
-public abstract class Condition extends ValueObject {
+public abstract class Condition {
 
     public static final Condition TRUE = new True();
 

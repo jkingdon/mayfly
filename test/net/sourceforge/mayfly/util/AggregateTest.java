@@ -62,36 +62,6 @@ public class AggregateTest extends TestCase {
         );
     }
 
-    public void testZipper() throws Exception {
-        assertEquals(
-            new M()
-                .entry("a", "x")
-                .entry("b", "y")
-                .entry("c", "z"),
-            new Strings("a", "b", "c").zipper(new Strings("x", "y", "z"))
-        );
-
-        Transformer append1 = new Transformer() {
-            public Object transform(Object from) {
-                return from.toString() + "1";
-            }
-        };
-
-        Transformer append2 = new Transformer() {
-            public Object transform(Object from) {
-                return from.toString() + "2";
-            }
-        };
-
-        assertEquals(
-            new M()
-                .entry("a1", "x2")
-                .entry("b1", "y2")
-                .entry("c1", "z2"),
-            new Strings("a", "b", "c").zipper(append1, new Strings("x", "y", "z"), append2)
-        );
-    }
-
     public void testIndex() throws Exception {
         assertEquals("b", new Strings("a", "b", "c").element(1));
     }

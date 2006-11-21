@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
-import net.sourceforge.mayfly.util.ValueObject;
 
 /** 
  * @internal
@@ -10,7 +9,7 @@ import net.sourceforge.mayfly.util.ValueObject;
  * have not yet applied the default schema nor checked
  * that the table exists, nor canonicalized the table name).
  */
-public class UnresolvedTableReference extends ValueObject {
+public class UnresolvedTableReference {
 
     private final String tableName;
     private final String schema;

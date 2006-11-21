@@ -2,11 +2,10 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.Iterator;
 
-public class GroupBy extends ValueObject implements Aggregator {
+public class GroupBy implements Aggregator {
     
     private GroupByKeys keys = new GroupByKeys();
     private Condition having = Condition.TRUE;

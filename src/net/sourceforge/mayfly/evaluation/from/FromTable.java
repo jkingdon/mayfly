@@ -8,13 +8,12 @@ import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.util.ImmutableList;
-import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class FromTable extends ValueObject implements FromElement {
+public class FromTable implements FromElement {
 
     public final String tableName;
     public final String alias;

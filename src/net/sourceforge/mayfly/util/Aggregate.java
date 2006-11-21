@@ -8,7 +8,6 @@ import org.apache.commons.lang.ArrayUtils;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -105,32 +104,6 @@ abstract public class Aggregate extends ValueObject implements Iterable {
         return new L().addAll(this);
     }
 
-
-    public M zipper(Aggregate mapValues) {
-        return zipper(Transformer.JUST_RETURN, mapValues, Transformer.JUST_RETURN);
-    }
-
-    public M zipper(Transformer keyTransformer, Aggregate mapValues, Transformer valueTransformer) {
-        L keys = collect(keyTransformer);
-        L values = mapValues.collect(valueTransformer);
-
-        if (keys.size()!=values.size()) {
-            throw new RuntimeException("mapify only supports equal-sized key and value lists. \n" +
-                                       "there were (" + keys.size() + " keys and " + values.size() + " values)");
-        }
-
-        if (keys.size()!= new HashSet(keys).size()) {
-            throw new RuntimeException("mapify only supports unique keysets. \n" +
-                                       "keys: " + keys.toString());
-        }
-
-        M result = new M();
-        for (int i = 0; i < keys.size(); i++) {
-            result.put(keys.get(i), values.get(i));
-        }
-
-        return result;
-    }
 
     public Object element(int zeroBasedIndex) {
         return asList().get(zeroBasedIndex);

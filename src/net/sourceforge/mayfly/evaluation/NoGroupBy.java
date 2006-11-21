@@ -2,11 +2,10 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.Iterator;
 
-public class NoGroupBy extends ValueObject implements Aggregator {
+public class NoGroupBy implements Aggregator {
 
     public ResultRows group(ResultRows rows, Selected selected) {
         if (isAggregate(selected)) {

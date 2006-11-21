@@ -14,28 +14,14 @@ import java.util.Arrays;
 public class ColumnsTest extends TestCase {
 
     public void testFromColumnNames() throws Exception {
-        assertEquals(
-            new Columns(
-                new L()
-                    .append(new Column("a"))
-                    .append(new Column("b"))
-                    .asImmutable()),
-            Columns.fromColumnNames(
+        Columns columns = Columns.fromColumnNames(
                 new L()
                     .append("a")
                     .append("b")
-            )
-        );
-    }
-
-    public void testAsNames() throws Exception {
-        assertEquals("a", new Columns.ToName().transform(new Column("a")));
-        assertEquals("Id", new Columns.ToName().transform(new Column("Id")));
-    }
-
-    public void testAsLowercaseNames() throws Exception {
-        assertEquals("a", new Columns.ToLowercaseName().transform(new Column("a")));
-        assertEquals("id", new Columns.ToLowercaseName().transform(new Column("Id")));
+            );
+        assertEquals(2, columns.columnCount());
+        assertEquals("a", columns.column(0).columnName());
+        assertEquals("b", columns.column(1).columnName());
     }
 
     public void testLookup() throws Exception {
@@ -47,8 +33,8 @@ public class ColumnsTest extends TestCase {
                 new Column("d")
             })));
         
-        assertEquals(new Column("b"), columns.columnFromName("b"));
-        assertEquals(new Column("b"), columns.columnFromName("B"));
+        assertEquals("b", columns.columnFromName("b").columnName());
+        assertEquals("b", columns.columnFromName("B").columnName() );
 
         try {
             columns.columnFromName("c");
@@ -64,7 +50,7 @@ public class ColumnsTest extends TestCase {
             assertEquals("ambiguous column a", e.getMessage());
         }
         
-        assertEquals(new Column("d"), columns.columnFromName("d"));
+        assertEquals("d", columns.columnFromName("d").columnName());
     }
     
     public void testReplace() throws Exception {

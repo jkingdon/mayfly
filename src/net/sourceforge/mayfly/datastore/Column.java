@@ -7,9 +7,8 @@ import net.sourceforge.mayfly.datastore.types.DefaultDataType;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.parser.Location;
-import net.sourceforge.mayfly.util.ValueObject;
 
-public class Column extends ValueObject {
+public class Column {
     private final String columnName;
     private final Cell defaultValue;
     private final Cell onUpdateValue;

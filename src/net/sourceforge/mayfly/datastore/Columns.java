@@ -5,8 +5,8 @@ import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.ImmutableList;
-import net.sourceforge.mayfly.util.Iterable;
 import net.sourceforge.mayfly.util.L;
+import net.sourceforge.mayfly.util.M;
 import net.sourceforge.mayfly.util.Transformer;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class Columns extends Aggregate {
+public class Columns {
     public static Columns fromColumnNames(List columnNameStrings) {
         L columnList =
             new L(columnNameStrings)
@@ -42,40 +42,21 @@ public class Columns extends Aggregate {
         this.columns = columns;
     }
 
-    protected Aggregate createNew(Iterable items) {
-        return new Columns(new L().addAll(items).asImmutable());
-    }
-
     public Iterator iterator() {
         return columns.iterator();
     }
 
-    public L asNames() {
-        return collect(new ToName());
-    }
-
-    public List asLowercaseNames() {
-        return collect(new ToLowercaseName());
-    }
-
-
-    static class ToName implements Transformer {
-        public Object transform(Object from) {
-            return ((Column)from).columnName();
+    public ImmutableList asNames() {
+        List names = new ArrayList();
+        for (int i = 0; i < columns.size(); ++i) {
+            Column column = (Column) columns.get(i);
+            names.add(column.columnName());
         }
+        return new ImmutableList(names);
     }
 
-    static class ToLowercaseName implements Transformer {
-        public Object transform(Object from) {
-            return ((Column)from).columnName().toLowerCase();
-        }
-    }
 
-    public ImmutableList asImmutableList() {
-        return columns;
-    }
-
-    public Column get(int index) {
+    public Column column(int index) {
         return (Column) columns.get(index);
     }
 
@@ -167,6 +148,36 @@ public class Columns extends Aggregate {
         else {
             throw new NoColumn(target);
         }
+    }
+
+    public int columnCount() {
+        return columns.size();
+    }
+
+    public M zipper(Aggregate mapValues) {
+        return zipper(Transformer.JUST_RETURN, mapValues, Transformer.JUST_RETURN);
+    }
+
+    public M zipper(Transformer keyTransformer, Aggregate mapValues, Transformer valueTransformer) {
+        List keys = columns;
+        L values = mapValues.collect(valueTransformer);
+
+        if (keys.size()!=values.size()) {
+            throw new RuntimeException("mapify only supports equal-sized key and value lists. \n" +
+                                       "there were (" + keys.size() + " keys and " + values.size() + " values)");
+        }
+
+        if (keys.size()!= new HashSet(keys).size()) {
+            throw new RuntimeException("mapify only supports unique keysets. \n" +
+                                       "keys: " + keys.toString());
+        }
+
+        M result = new M();
+        for (int i = 0; i < keys.size(); i++) {
+            result.put(keys.get(i), values.get(i));
+        }
+
+        return result;
     }
 
 }

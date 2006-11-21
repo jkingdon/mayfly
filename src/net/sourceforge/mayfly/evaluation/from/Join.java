@@ -3,9 +3,8 @@ package net.sourceforge.mayfly.evaluation.from;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
-import net.sourceforge.mayfly.util.ValueObject;
 
-public abstract class Join extends ValueObject implements FromElement {
+public abstract class Join implements FromElement {
 
     public final FromElement right;
     public final Condition condition;

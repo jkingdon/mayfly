@@ -51,8 +51,8 @@ public class TableData {
 
     private TableData addRow(Checker checker,
         Columns columnsToInsert, ValueList values) {
-        if (columnsToInsert.size() != values.size()) {
-            if (values.size() > columnsToInsert.size()) {
+        if (columnsToInsert.columnCount() != values.size()) {
+            if (values.size() > columnsToInsert.columnCount()) {
                 throw makeException("Too many values.\n", columnsToInsert, values);
             } else {
                 throw makeException("Too few values.\n", columnsToInsert, values);
@@ -219,10 +219,10 @@ public class TableData {
     public Row dummyRows() {
 
         TupleBuilder tuple = new TupleBuilder();
-        for (int i = 0; i < columns.size(); ++i) {
+        for (int i = 0; i < columns.columnCount(); ++i) {
             tuple.append(
                 new TupleElement(
-                    columns.get(i),
+                    columns.column(i),
                     NullCell.INSTANCE
                 )
             );

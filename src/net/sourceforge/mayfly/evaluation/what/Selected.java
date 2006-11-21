@@ -7,14 +7,13 @@ import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.util.Iterable;
-import net.sourceforge.mayfly.util.ValueObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class Selected extends ValueObject implements Iterable {
+public class Selected implements Iterable {
 
     private List expressions;
 

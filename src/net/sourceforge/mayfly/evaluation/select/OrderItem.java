@@ -2,9 +2,8 @@ package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.what.What;
-import net.sourceforge.mayfly.util.ValueObject;
 
-abstract public class OrderItem extends ValueObject {
+abstract public class OrderItem {
 
     private final boolean ascending;
 

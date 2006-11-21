@@ -36,7 +36,7 @@ public class TableDataTest extends TestCase {
         
         TableData newTable = table.dropColumn(null, "B");
         
-        assertEquals(1, newTable.columns().size());
+        assertEquals(1, newTable.columns().columnCount());
         
         assertEquals(1, newTable.rowCount());
         Row newRow = newTable.row(0);

@@ -1,13 +1,11 @@
 package net.sourceforge.mayfly.evaluation;
 
-import net.sourceforge.mayfly.util.ValueObject;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-public class GroupByKeys extends ValueObject {
+public class GroupByKeys {
 
     private List items = new ArrayList();
 

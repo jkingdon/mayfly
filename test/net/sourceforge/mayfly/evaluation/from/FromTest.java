@@ -7,13 +7,19 @@ import net.sourceforge.mayfly.parser.Parser;
 public class FromTest extends TestCase {
 
     public void testSimple() throws Exception {
-        assertEquals(
-            new From()
-                .add(new FromTable("foo", "f"))
-                .add(new FromTable("bar", "b"))
-                .add(new FromTable("zzz")),
-            new Parser("foo f, bar b, zzz").parseFromItems()
-        );
+        From from = new Parser("foo f, bar b, zzz").parseFromItems();
+        
+        assertEquals(3, from.size());
+        checkElement("foo", "f", from, 0);
+        checkElement("bar", "b", from, 1);
+        checkElement("zzz", "zzz", from, 2);
+    }
+
+    private void checkElement(String expectedTable, String expectedAlias, 
+        From from, int index) {
+        FromTable table = (FromTable) from.element(index);
+        assertEquals(expectedTable, table.tableName);
+        assertEquals(expectedAlias, table.alias);
     }
     
     public void xtestDuplicate() throws Exception {

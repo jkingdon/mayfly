@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class RowTest extends TestCase {
 
@@ -16,8 +17,8 @@ public class RowTest extends TestCase {
                 .appendColumnCellContents("colC", "3")
         );
 
-        assertEquals(new StringCell("2"), row.cell("colB"));
-        assertEquals(new StringCell("2"), row.cell("COLb"));
+        MayflyAssert.assertString("2", row.cell("colB"));
+        MayflyAssert.assertString("2", row.cell("COLb"));
 
         try {
             row.cell("colD");

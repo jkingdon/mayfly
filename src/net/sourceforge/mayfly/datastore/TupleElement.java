@@ -1,9 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.util.ValueObject;
 
-public class TupleElement extends ValueObject {
+public class TupleElement {
     private final String column;
     private final Cell cell;
 

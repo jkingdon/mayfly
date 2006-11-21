@@ -2,9 +2,8 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
-import net.sourceforge.mayfly.util.ValueObject;
 
-public class GroupItem extends ValueObject {
+public class GroupItem {
 
     /**
      * Not yet immutable, because of {@link #resolve(ResultRow)}.

@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class ImmutableMap extends ValueObject implements Map {
+public class ImmutableMap implements Map {
 
     Map delegate;
 

@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation.what;
 
 import net.sourceforge.mayfly.evaluation.ResultRow;
-import net.sourceforge.mayfly.util.ValueObject;
 
 /**
  * @internal
@@ -15,7 +14,7 @@ import net.sourceforge.mayfly.util.ValueObject;
  * and {@link net.sourceforge.mayfly.evaluation.what.What} would carry down
  * to here.
  */
-abstract public class WhatElement extends ValueObject {
+abstract public class WhatElement {
 
     abstract public Selected selected(ResultRow dummyRow);
 
