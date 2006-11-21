@@ -2,11 +2,11 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class SingleColumnTest extends TestCase {
 
@@ -16,8 +16,8 @@ public class SingleColumnTest extends TestCase {
             .withColumn("t", "colB", "2")
         ;
 
-        assertEquals(new StringCell("1"), new SingleColumn("colA").evaluate(row));
-        assertEquals(new StringCell("2"), new SingleColumn("colB").evaluate(row));
+        MayflyAssert.assertString("1", new SingleColumn("colA").evaluate(row));
+        MayflyAssert.assertString("2", new SingleColumn("colB").evaluate(row));
     }
 
     public void testSameColumn() throws Exception {

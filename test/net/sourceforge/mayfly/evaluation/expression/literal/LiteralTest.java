@@ -2,14 +2,13 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class LiteralTest extends TestCase {
 
     public void testTransform() throws Exception {
-        assertEquals(
-            new StringCell("foo"),
+        MayflyAssert.assertString("foo",
             new QuotedString("'foo'").evaluate(new ResultRow())
         );
     }

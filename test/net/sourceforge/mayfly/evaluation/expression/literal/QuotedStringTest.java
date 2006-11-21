@@ -2,9 +2,9 @@ package net.sourceforge.mayfly.evaluation.expression.literal;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Parser;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class QuotedStringTest extends TestCase {
 
@@ -14,17 +14,11 @@ public class QuotedStringTest extends TestCase {
     }
     
     public void testValue() throws Exception {
-        {
-            StringCell cell = (StringCell) 
-                new QuotedString("'steve'").evaluate((ResultRow)null);
-            assertEquals("steve", cell.asString());
-        }
+        MayflyAssert.assertString("steve",
+            new QuotedString("'steve'").evaluate((ResultRow)null));
 
-        {
-            StringCell cell = (StringCell) 
-                new QuotedString("'a''''b'").evaluate((ResultRow)null);
-            assertEquals("a''b", cell.asString());
-        }
+        MayflyAssert.assertString("a''b",
+            new QuotedString("'a''''b'").evaluate((ResultRow)null));
     }
     
     public void testSameExpression() throws Exception {
