@@ -56,11 +56,17 @@ public class CellTest extends TestCase {
         assertEquals(0, first.compareTo(second));
         assertEquals(0, second.compareTo(first));
         
-        // I think the GROUP BY code makes more sense if
-        // compareTo is consistent with equals()
-        /* (TODO: Specifically what about the GROUP BY code? It doesn't seem
+        /**
+           The GROUP BY code (in particular, the way that an object of type
+           {@link net.sourceforge.mayfly.evaluation.GroupByCells} is the key
+           to a map) relies on equals.  So here we test that compareTo
+           is consistent with equals().
+           
+           On the other hand, it doesn't seem
            right for a StringCell to .equals a DateCell, yet
            they might be sqlEquals.  So what is the impact on GROUP BY?
+           (perhaps none, if we enforce column types, but this might require
+           a bit more looking).
          */
         assertEquals(first, second);
         assertEquals(second, first);
