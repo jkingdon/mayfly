@@ -324,6 +324,7 @@ public class WhereTest extends SqlTestCase {
     public void testLike() throws Exception {
         execute("create table foo(a varchar(255))");
         execute("insert into foo(a) values('cat')");
+        execute("insert into foo(a) values('cut')");
         execute("insert into foo(a) values('category')");
         execute("insert into foo(a) values('tomcat')");
         execute("insert into foo(a) values('dog')");
@@ -339,6 +340,9 @@ public class WhereTest extends SqlTestCase {
         assertResultSet(new String[] { 
             " 'cat' ", " 'tomcat' " },
             query("select a from foo where a like '%cat'"));
+
+        assertResultSet(new String[] { " 'cat' " , " 'cut' " },
+            query("select a from foo where a like 'c_t'"));
     }
 
 }

@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.UnimplementedException;
-import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
@@ -37,7 +36,7 @@ public class OrderBy extends Aggregate {
         return elements.iterator();
     }
 
-    public ResultRows sort(final DataStore store, ResultRows rows, final What what) {
+    public ResultRows sort(ResultRows rows, final What what) {
         if (isEmpty()) {
             return rows;
         }

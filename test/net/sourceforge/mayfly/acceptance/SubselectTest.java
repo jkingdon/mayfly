@@ -38,6 +38,52 @@ public class SubselectTest extends SqlTestCase {
                 "(select country from cities where name = 'Perth')"));
     }
     
+    public void testDelete() throws Exception {
+        execute("create table foo(x integer, name varchar(10))");
+        execute("insert into foo(x, name) values(6, 'six')");
+        execute("insert into foo(x, name) values(5, 'five')");
+        execute("insert into foo(x, name) values(4, 'four')");
+
+        execute("create table bar(y integer)");
+        execute("insert into bar(y) values(5)");
+        execute("insert into bar(y) values(2)");
+        
+        String sql = "delete from foo where x = (select max(y) from bar)";
+        if (dialect.wishThisWereTrue()) {
+            assertEquals(1,
+                execute(sql));
+            assertResultSet(new String[] { "4", "6" }, query("select x from foo"));
+        }
+        else {
+            expectExecuteFailure(sql, 
+                "subselects are not yet implemented in this context");
+        }
+    }
+    
+    public void testReferToRowInEnclosingQuery() throws Exception {
+        execute("create table countries(" +
+            "region varchar(255), name varchar(255), population integer)");
+        execute("insert into countries values('Americas', 'USA', 300)");
+        execute("insert into countries values('Americas', 'Canada', 32)");
+        execute("insert into countries values('Asia', 'India', 1000)");
+
+        // Now select the largest country in each region:
+        String subselectRefersOutside = 
+            "SELECT name FROM countries candidate" +
+            "  WHERE population >= " +
+            "    (SELECT max(population) FROM countries other" +
+            "        WHERE other.region = candidate.region)";
+        if (dialect.wishThisWereTrue()) {
+            assertResultSet(
+                new String[] { " 'USA' ", " 'India' " },
+                query(subselectRefersOutside));
+        }
+        else {
+            expectQueryFailure(subselectRefersOutside, 
+                "no column candidate.region");
+        }
+    }
+    
     /* Similar case but the subselect has a reference to the foo row.
     */
 

@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.evaluation.select;
 import junit.framework.TestCase;
 import junitx.framework.ObjectAssert;
 
-import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
@@ -175,10 +174,10 @@ public class SelectTest extends TestCase {
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("b")), 
             new FromTable("foo"), new FromTable("bar"), 
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
-                .createTable("bar", ImmutableList.singleton("b"))), 
-            DataStore.ANONYMOUS_SCHEMA_NAME));
+                .createTable("bar", ImmutableList.singleton("b")))
+            ));
     }
     
     public void testCannotMoveNoColumn() throws Exception {
@@ -187,10 +186,10 @@ public class SelectTest extends TestCase {
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("c")), 
             new FromTable("foo"), new FromTable("bar"), 
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
-                .createTable("bar", ImmutableList.singleton("b"))), 
-            DataStore.ANONYMOUS_SCHEMA_NAME));
+                .createTable("bar", ImmutableList.singleton("b"))) 
+            ));
     }
     
     public void testCannotMoveNoTable() throws Exception {
@@ -199,10 +198,10 @@ public class SelectTest extends TestCase {
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("baz", "c")), 
             new FromTable("foo"), new FromTable("bar"), 
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
-                .createTable("bar", ImmutableList.singleton("b"))), 
-            DataStore.ANONYMOUS_SCHEMA_NAME));
+                .createTable("bar", ImmutableList.singleton("b"))) 
+            ));
     }
     
     public void testCheckComplexExpressionUnmovable() throws Exception {
@@ -214,10 +213,10 @@ public class SelectTest extends TestCase {
                     new SingleColumn("baz", "c"))
             ), 
             new FromTable("foo"), new FromTable("bar"), 
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
-                .createTable("bar", ImmutableList.singleton("b"))), 
-            DataStore.ANONYMOUS_SCHEMA_NAME));
+                .createTable("bar", ImmutableList.singleton("b"))) 
+            ));
     }
     
     public void testCheckComplexExpressionMovable() throws Exception {
@@ -229,10 +228,10 @@ public class SelectTest extends TestCase {
                     new SingleColumn("bar", "b"))
             ), 
             new FromTable("foo"), new FromTable("bar"), 
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
-                .createTable("bar", ImmutableList.singleton("b"))), 
-            DataStore.ANONYMOUS_SCHEMA_NAME));
+                .createTable("bar", ImmutableList.singleton("b"))) 
+            ));
     }
     
     public void testCannotMoveAggregate() throws Exception {
@@ -244,10 +243,10 @@ public class SelectTest extends TestCase {
                 new Maximum(new SingleColumn("a"), "max", false),
                 new IntegerLiteral(5)), 
             new FromTable("foo"), new FromTable("bar"), 
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
-                .createTable("bar", ImmutableList.singleton("b"))), 
-            DataStore.ANONYMOUS_SCHEMA_NAME));
+                .createTable("bar", ImmutableList.singleton("b"))) 
+            ));
     }
     
     public void testFullDummyRow() throws Exception {

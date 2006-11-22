@@ -35,7 +35,7 @@ abstract public class Expression extends WhatElement {
         return firstAggregate() != null;
     }
 
-    final public Cell evaluate(ResultRow row) {
+    public Cell evaluate(ResultRow row) {
         return evaluate(row, Evaluator.NO_SUBSELECT_NEEDED);
     }
 

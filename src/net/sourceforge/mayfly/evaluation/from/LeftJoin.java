@@ -31,7 +31,7 @@ public class LeftJoin extends Join {
 
                 ResultRow combined = leftRow.combine(rightRow);
                 
-                if (condition.evaluate(combined)) {
+                if (condition.evaluate(combined, evaluator)) {
                     joinResult.append(combined);
                     haveJoinedThisLeftRow = true;
                 }

@@ -46,12 +46,12 @@ public class SearchedCase extends Expression {
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         for (int i = 0; i < conditions.size(); ++i) {
             Condition condition = (Condition) conditions.get(i);
-            if (condition.evaluate(row)) {
+            if (condition.evaluate(row, evaluator)) {
                 Expression expression = (Expression) thenValues.get(i);
-                return expression.evaluate(row);
+                return expression.evaluate(row, evaluator);
             }
         }
-        return elseExpression.evaluate(row);
+        return elseExpression.evaluate(row, evaluator);
     }
 
     public boolean sameExpression(Expression other) {

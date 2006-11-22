@@ -25,6 +25,13 @@ public class LikeTest extends TestCase {
         assertTrue(Like.compare("abc", "%b%"));
     }
 
+    public void testUnderbar() throws Exception {
+        assertTrue(Like.compare("abc", "a__"));
+        assertTrue(Like.compare("abc", "__c"));
+        assertTrue(Like.compare("abc", "_b_"));
+        assertFalse(Like.compare("ab", "_b_"));
+    }
+
     public void testSpecialCharacters() throws Exception {
         assertTrue(Like.compare("a%", "a%"));
         assertTrue(Like.compare(

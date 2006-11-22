@@ -107,7 +107,7 @@ public class Select extends Command {
         
         ResultRows afterGrouping = groupBy.group(afterWhere, selected);
 
-        ResultRows sorted = orderBy.sort(evaluator.store, afterGrouping, what);
+        ResultRows sorted = orderBy.sort(afterGrouping, what);
         return limit.limit(sorted);
     }
 
@@ -180,7 +180,7 @@ public class Select extends Command {
         Evaluator evaluator, 
         final MoveResult moveResult, Condition toAnalyze) {
         if (canMove(toAnalyze, first, second, 
-            evaluator.store, evaluator.currentSchema)) {
+            evaluator)) {
             moveResult.toBeMoved = makeAnd(toAnalyze, moveResult.toBeMoved);
         }
         else if (toAnalyze instanceof And) {
@@ -213,13 +213,13 @@ public class Select extends Command {
 
     static boolean canMove(Condition condition, 
         FromElement first, FromElement second, 
-        DataStore store, String currentSchema) {
+        Evaluator evaluator) {
         if (condition.firstAggregate() != null) {
             return false;
         }
 
         InnerJoin join = new InnerJoin(first, second, Condition.TRUE);
-        ResultRow partialDummyRow = join.dummyRow(store, currentSchema);
+        ResultRow partialDummyRow = join.dummyRow(evaluator);
         try {
             condition.check(partialDummyRow);
             return true;

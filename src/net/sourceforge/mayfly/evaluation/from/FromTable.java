@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleElement;
@@ -33,12 +32,14 @@ public class FromTable extends FromElement {
 
     public ResultRows tableContents(Evaluator evaluator) {
         return applyAlias(
-            evaluator.store.table(evaluator.currentSchema, tableName)
+            evaluator.store().table(evaluator.currentSchema, tableName)
                 .rows());
     }
 
-    public ResultRow dummyRow(DataStore store, String currentSchema) {
-        return applyAlias(store.table(currentSchema, tableName).dummyRows());
+    public ResultRow dummyRow(Evaluator evaluator) {
+        return applyAlias(
+            evaluator.store().table(evaluator.currentSchema, tableName)
+                .dummyRows());
     }
 
     private ResultRows applyAlias(Rows storedRows) {

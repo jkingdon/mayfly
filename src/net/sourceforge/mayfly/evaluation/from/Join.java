@@ -1,8 +1,8 @@
 package net.sourceforge.mayfly.evaluation.from;
 
-import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public abstract class Join extends FromElement {
 
@@ -16,11 +16,11 @@ public abstract class Join extends FromElement {
         this.condition = condition;
     }
 
-    public ResultRow dummyRow(DataStore store, String currentSchema) {
+    public ResultRow dummyRow(Evaluator evaluator) {
         ResultRow dummyRow = 
-            left.dummyRow(store, currentSchema)
-                .combine(right.dummyRow(store, currentSchema));
-        condition.evaluate(dummyRow);
+            left.dummyRow(evaluator)
+                .combine(right.dummyRow(evaluator));
+        condition.evaluate(dummyRow, evaluator);
         return dummyRow;
     }
 

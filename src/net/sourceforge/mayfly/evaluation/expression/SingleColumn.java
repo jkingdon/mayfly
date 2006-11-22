@@ -41,6 +41,10 @@ public class SingleColumn extends Expression {
     }
 
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
+        return evaluate(row);
+    }
+
+    public Cell evaluate(ResultRow row) {
         Expression found = row.findColumn(tableOrAlias, columnName, location);
         return row.findValue(found);
     }

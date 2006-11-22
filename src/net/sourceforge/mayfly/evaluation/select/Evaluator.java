@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.select;
 
+import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
 
@@ -12,7 +13,7 @@ public class Evaluator {
     public static final Evaluator NO_SUBSELECT_NEEDED = 
         new Evaluator(null, null);
 
-    public final DataStore store;
+    private final DataStore store;
     public final String currentSchema;
 
     public Evaluator(DataStore store, String currentSchema) {
@@ -22,6 +23,14 @@ public class Evaluator {
 
     public Evaluator(Schema schema) {
         this(new DataStore(schema), DataStore.ANONYMOUS_SCHEMA_NAME);
+    }
+
+    public DataStore store() {
+        if (store == null) {
+            throw new UnimplementedException(
+                "subselects are not yet implemented in this context");
+        }
+        return store;
     }
 
 }

@@ -22,7 +22,11 @@ public class Like extends RowExpression {
     }
 
     static boolean compare(String candidate, String pattern) {
-        String regex = quote(pattern).replaceAll("%", ".*");
+        String regex = 
+            quote(pattern)
+                .replaceAll("%", ".*")
+                .replaceAll("_", ".")
+                ;
         return Pattern.matches(regex, candidate);
     }
 
