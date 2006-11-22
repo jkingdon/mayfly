@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public abstract class AggregateExpression extends Expression {
 
       It also is called in evaluating a HAVING condition,
       although that part doesn't completely work yet. */
-    public Cell evaluate(ResultRow row) {
+    public Cell evaluate(ResultRow row, Evaluator evaluator) {
         Cell cell = row.findValueOrNull(this);
         return cell == null ? NullCell.INSTANCE : cell;
     }

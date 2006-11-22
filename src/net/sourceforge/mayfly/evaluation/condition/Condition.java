@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation.condition;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public abstract class Condition {
 
@@ -12,7 +13,11 @@ public abstract class Condition {
         return evaluate(new ResultRow(row, table));
     }
     
-    abstract public boolean evaluate(ResultRow row);
+    final public boolean evaluate(ResultRow row) {
+        return evaluate(row, Evaluator.NO_SUBSELECT_NEEDED);
+    }
+
+    abstract public boolean evaluate(ResultRow row, Evaluator evaluator);
 
     abstract public String firstAggregate();
 

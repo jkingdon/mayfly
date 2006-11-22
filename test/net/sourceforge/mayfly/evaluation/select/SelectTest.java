@@ -31,8 +31,8 @@ public class SelectTest extends TestCase {
     public void testExecuteSimpleJoin() throws Exception {
         L fooColumns = new L().append("colA").append("colB");
         L barColumns = new L().append("colX").append("colY");
-        DataStore store =
-            new DataStore(
+        Evaluator evaluator =
+            new Evaluator(
                 new Schema()
                     .createTable("foo", fooColumns)
                     .addRow("foo", fooColumns, makeValues("1a", "1b"))
@@ -44,7 +44,7 @@ public class SelectTest extends TestCase {
                     .addRow("bar", barColumns, makeValues("3a", "3b"))
             );
 
-        ResultRows rows = query(store, "select * from foo, bar");
+        ResultRows rows = query(evaluator, "select * from foo, bar");
         assertEquals(6, rows.size());
         assertRow("foo", "colA", "1a", "foo", "colB", "1b", "bar", "colX", "1a", "bar", "colY", "1b", rows.row(0));
         assertRow("foo", "colA", "1a", "foo", "colB", "1b", "bar", "colX", "2a", "bar", "colY", "2b", rows.row(1));
@@ -80,15 +80,15 @@ public class SelectTest extends TestCase {
         assertEquals(value, element.value.asString());
     }
 
-    private ResultRows query(DataStore store, String sql) {
+    private ResultRows query(Evaluator evaluator, String sql) {
         Select select = (Select) Command.fromSql(sql);
         select.optimize();
-        return select.query(store, DataStore.ANONYMOUS_SCHEMA_NAME, new Selected());
+        return select.query(evaluator, new Selected());
     }
 
     public void testSmallerJoin() throws Exception {
-        DataStore store =
-            new DataStore(
+        Evaluator evaluator =
+            new Evaluator(
                 new Schema()
                     .createTable("foo", new L().append("colA"))
                     .addRow("foo", new L().append("colA"), ValueList.singleton(new StringCell("1a")))
@@ -98,15 +98,15 @@ public class SelectTest extends TestCase {
                 );
 
 
-        ResultRows rows = query(store, "select * from foo, bar");
+        ResultRows rows = query(evaluator, "select * from foo, bar");
         assertEquals(1, rows.size());
         assertRow("foo", "colA", "1a", "bar", "colX", "barXValue", rows.row(0));
     }
 
     public void testSimpleWhere() throws Exception {
         L columnNames = new L().append("colA").append("colB");
-        DataStore store =
-            new DataStore(
+        Evaluator evaluator =
+            new Evaluator(
                 new Schema()
                     .createTable("foo", columnNames)
                     .addRow("foo", columnNames, makeValues("1a", "1b"))
@@ -114,7 +114,7 @@ public class SelectTest extends TestCase {
                     .addRow("foo", columnNames, makeValues("3a", "xx"))
             );
 
-        ResultRows rows = query(store, "select * from foo where colB = 'xx'");
+        ResultRows rows = query(evaluator, "select * from foo where colB = 'xx'");
         assertEquals(2, rows.size());
         assertRow("foo", "colA", "2a", "foo", "colB", "xx", rows.row(0));
         assertRow("foo", "colA", "3a", "foo", "colB", "xx", rows.row(1));
@@ -153,12 +153,11 @@ public class SelectTest extends TestCase {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz where foo.id = bar.id");
         select.optimize(
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
-            ),
-            DataStore.ANONYMOUS_SCHEMA_NAME);
+            ));
 
         InnerJoin join = (InnerJoin) select.from().soleElement();
         InnerJoin firstJoin = (InnerJoin) join.left;
@@ -256,12 +255,11 @@ public class SelectTest extends TestCase {
             "select * from foo, bar, baz");
         ResultRow dummyRow = select.dummyRow(
             0,
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
-            ),
-            DataStore.ANONYMOUS_SCHEMA_NAME);
+            ));
         assertEquals(3, dummyRow.size());
         MayflyAssert.assertColumn("foo", "id", dummyRow.expression(0));
     }
@@ -271,12 +269,11 @@ public class SelectTest extends TestCase {
             "select * from foo, bar, baz " +
             "where foo.id = bar.id and (bar.id = 5 or baz.id = 7)");
         select.optimize(
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
-            ),
-            DataStore.ANONYMOUS_SCHEMA_NAME);
+            ));
 
         InnerJoin join = (InnerJoin) select.from().soleElement();
         InnerJoin firstJoin = (InnerJoin) join.left;
@@ -299,12 +296,11 @@ public class SelectTest extends TestCase {
             "select * from foo, bar, baz " +
             "where foo.id = baz.id and (bar.id = 5 or foo.id = 7)");
         select.optimize(
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
-            ),
-            DataStore.ANONYMOUS_SCHEMA_NAME);
+            ));
 
         InnerJoin join = (InnerJoin) select.from().soleElement();
         InnerJoin firstJoin = (InnerJoin) join.left;
@@ -325,12 +321,11 @@ public class SelectTest extends TestCase {
             "select * from foo, bar, baz " +
             "where foo.id = bar.id and bar.id > 5 and baz.id = 9 and foo.id > 7");
         select.optimize(
-            new DataStore(new Schema()
+            new Evaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
-            ),
-            DataStore.ANONYMOUS_SCHEMA_NAME);
+            ));
 
         InnerJoin join = (InnerJoin) select.from().soleElement();
         InnerJoin firstJoin = (InnerJoin) join.left;

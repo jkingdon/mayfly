@@ -59,6 +59,7 @@ import net.sourceforge.mayfly.evaluation.condition.Not;
 import net.sourceforge.mayfly.evaluation.condition.NotEqual;
 import net.sourceforge.mayfly.evaluation.condition.Or;
 import net.sourceforge.mayfly.evaluation.expression.Average;
+import net.sourceforge.mayfly.evaluation.expression.ScalarSubselect;
 import net.sourceforge.mayfly.evaluation.expression.SearchedCase;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Count;
@@ -1132,8 +1133,8 @@ public class Parser {
     }
 
     private ParserExpression parseScalarSubselect() {
-        parseSelect();
-        throw new UnimplementedException("no subselects");
+        return new NonBooleanParserExpression(
+            new ScalarSubselect(parseSelect()));
     }
 
     private ParserExpression parseCase() {

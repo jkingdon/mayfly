@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.what.Selected;
+import net.sourceforge.mayfly.parser.Location;
 
 import org.joda.time.DateTimeZone;
 
@@ -259,6 +260,31 @@ public final class MayflyResultSet extends ResultSetStub {
     }
 
     public void close() throws SQLException {
+    }
+
+    public Cell scalar() {
+        return scalar(Location.UNKNOWN);
+    }
+
+    /**
+     * @internal
+     * Return the result of a query which returns just a single cell.
+     */
+    public Cell scalar(Location location) {
+        if (selected.size() != 1) {
+            throw new MayflyException(
+                "attempt to specify " + selected.size() + 
+                " expressions in a subselect", 
+                location);
+        }
+        
+        if (rows.size() != 1) {
+            throw new MayflyException(
+                "subselect expects one row but got " + rows.size(),
+                location);
+        }
+        
+        return rows.row(0).cell(0);
     }
 
 }

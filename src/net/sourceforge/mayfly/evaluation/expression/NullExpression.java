@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 public class NullExpression extends Expression {
@@ -13,7 +14,7 @@ public class NullExpression extends Expression {
         super(location);
     }
 
-    public Cell evaluate(ResultRow row) {
+    public Cell evaluate(ResultRow row, Evaluator evaluator) {
         return NullCell.INSTANCE;
     }
 

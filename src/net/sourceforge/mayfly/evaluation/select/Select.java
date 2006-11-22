@@ -23,13 +23,9 @@ import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
 
-import java.sql.ResultSet;
 import java.util.Iterator;
 
 public class Select extends Command {
-
-    private static final String UPDATE_MESSAGE = 
-        "SELECT is only available with query, not update";
 
     /**
      * Not immutable, because of {@link What#add(WhatElement)}
@@ -70,22 +66,23 @@ public class Select extends Command {
         return from;
     }
 
-    public ResultSet select(final DataStore store, String currentSchema, 
-        Cell lastIdentity) {
-        optimize(store, currentSchema);
-        ResultRow dummyRow = dummyRow(store, currentSchema);
+    public MayflyResultSet select(Evaluator evaluator, Cell lastIdentity) {
+        optimize(evaluator);
+        ResultRow dummyRow = dummyRow(evaluator);
         Selected selected = what.selected(dummyRow);
-        check(store, selected, dummyRow);
-        return new MayflyResultSet(selected, query(store, currentSchema, selected));
+        check(evaluator, selected, dummyRow);
+        ResultRows rows = 
+            query(evaluator, selected);
+        return new MayflyResultSet(selected, rows);
     }
 
-    private void check(final DataStore store, Selected selected, ResultRow dummyRow) {
+    private void check(Evaluator evaluator, Selected selected, ResultRow dummyRow) {
         for (Iterator iter = selected.iterator(); iter.hasNext();) {
             Expression element = (Expression) iter.next();
-            element.evaluate(dummyRow);
+            element.evaluate(dummyRow, evaluator);
         }
         
-        where.evaluate(dummyRow);
+        where.evaluate(dummyRow, evaluator);
         where.rejectAggregates("WHERE");
         groupBy.check(dummyRow, selected);
 
@@ -96,29 +93,31 @@ public class Select extends Command {
         }
     }
 
-    private ResultRow dummyRow(final DataStore store, String currentSchema) {
+    private ResultRow dummyRow(Evaluator evaluator) {
         FromElement element = from.soleElement();
-        return element.dummyRow(store, currentSchema);
+        return element.dummyRow(evaluator);
     }
 
-    ResultRows query(DataStore store, String currentSchema, Selected selected) {
+    ResultRows query(Evaluator evaluator, Selected selected) {
         FromElement element = from.soleElement();
-        ResultRows joinedRows = element.tableContents(store, currentSchema);
+        ResultRows joinedRows = element.tableContents(
+            evaluator);
 
-        ResultRows afterWhere = joinedRows.select(where);
+        ResultRows afterWhere = joinedRows.select(where, evaluator);
         
         ResultRows afterGrouping = groupBy.group(afterWhere, selected);
 
-        ResultRows sorted = orderBy.sort(store, afterGrouping, what);
+        ResultRows sorted = orderBy.sort(evaluator.store, afterGrouping, what);
         return limit.limit(sorted);
     }
 
     public UpdateStore update(DataStore store, String schema) {
-        throw new MayflyException(UPDATE_MESSAGE);
+        throw new MayflyException(
+            "SELECT is only available with query, not update");
     }
 
     public void optimize() {
-        optimize(null, null);
+        optimize(null);
     }
 
     /**
@@ -130,10 +129,10 @@ public class Select extends Command {
      * method could make use of the joins which were built up
      * in the first step.
      */
-    public void optimize(DataStore store, String currentSchema) {
-        if (store != null) {
-            ResultRow fullDummyRow = dummyRow(0, store, currentSchema);
-            where.evaluate(fullDummyRow);
+    public void optimize(Evaluator evaluator) {
+        if (evaluator != null) {
+            ResultRow fullDummyRow = dummyRow(0, evaluator);
+            where.evaluate(fullDummyRow, evaluator);
         }
 
         while (from.size() > 1) {
@@ -142,7 +141,7 @@ public class Select extends Command {
             FromElement second = (FromElement) from.element(1);
             
             Condition on = 
-                moveWhereToOn(first, second, store, currentSchema);
+                moveWhereToOn(first, second, evaluator);
             InnerJoin explicitJoin = new InnerJoin(first, second, on);
 
             from.remove(0);
@@ -151,42 +150,43 @@ public class Select extends Command {
         }
     }
 
-    ResultRow dummyRow(int index, DataStore store, String currentSchema) {
+    ResultRow dummyRow(int index, Evaluator evaluator) {
         FromElement element = (FromElement) from.element(index);
-        ResultRow dummyRow = element.dummyRow(store, currentSchema);
+        ResultRow dummyRow = element.dummyRow(evaluator);
         if (index >= from.size() - 1) {
             return dummyRow;
         }
         else {
             return dummyRow.combine(
-                dummyRow(index + 1, store, currentSchema));
+                dummyRow(index + 1, evaluator));
         }
     }
 
     private Condition moveWhereToOn(
         FromElement first, FromElement second,
-        DataStore store, String currentSchema) {
-        if (store == null) {
+        Evaluator evaluator) {
+        if (evaluator == null) {
             // For convenience in tests.
             return Condition.TRUE;
         }
 
         MoveResult result = new MoveResult();
-        moveToResult(first, second, store, currentSchema, result, where);
+        moveToResult(first, second, evaluator, result, where);
         where = result.nonMovable;
         return result.toBeMoved;
     }
 
     private void moveToResult(FromElement first, FromElement second, 
-        DataStore store, String currentSchema, 
+        Evaluator evaluator, 
         final MoveResult moveResult, Condition toAnalyze) {
-        if (canMove(toAnalyze, first, second, store, currentSchema)) {
+        if (canMove(toAnalyze, first, second, 
+            evaluator.store, evaluator.currentSchema)) {
             moveResult.toBeMoved = makeAnd(toAnalyze, moveResult.toBeMoved);
         }
         else if (toAnalyze instanceof And) {
             And and = (And) toAnalyze;
-            moveToResult(first, second, store, currentSchema, moveResult, and.leftSide);
-            moveToResult(first, second, store, currentSchema, moveResult, and.rightSide);
+            moveToResult(first, second, evaluator, moveResult, and.leftSide);
+            moveToResult(first, second, evaluator, moveResult, and.rightSide);
         }
         else {
             moveResult.nonMovable = toAnalyze;

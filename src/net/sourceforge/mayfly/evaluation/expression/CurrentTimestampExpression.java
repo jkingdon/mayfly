@@ -7,10 +7,11 @@ import net.sourceforge.mayfly.datastore.TimestampCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public class CurrentTimestampExpression extends Expression {
 
-    public Cell evaluate(ResultRow row) {
+    public Cell evaluate(ResultRow row, Evaluator evaluator) {
         return valueAsCell();
     }
 

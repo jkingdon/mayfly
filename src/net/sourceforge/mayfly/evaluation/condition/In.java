@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation.condition;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.Iterator;
@@ -18,12 +19,12 @@ public class In extends Condition {
         this.expressions = new ImmutableList(expressions);
     }
 
-    public boolean evaluate(ResultRow row) {
-        Cell leftSideValue = leftSide.evaluate(row);
+    public boolean evaluate(ResultRow row, Evaluator evaluator) {
+        Cell leftSideValue = leftSide.evaluate(row, evaluator);
 
         for (Iterator iter = expressions.iterator(); iter.hasNext();) {
             Expression element = (Expression) iter.next();
-            Cell aRightSideValue = element.evaluate(row);
+            Cell aRightSideValue = element.evaluate(row, evaluator);
             if (leftSideValue.sqlEquals(aRightSideValue)) {
                 return true;
             }

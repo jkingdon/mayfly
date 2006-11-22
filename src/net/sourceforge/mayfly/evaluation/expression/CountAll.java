@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 public class CountAll extends Expression {
@@ -20,7 +21,7 @@ public class CountAll extends Expression {
         this(functionName, Location.UNKNOWN);
     }
 
-    public Cell evaluate(ResultRow row) {
+    public Cell evaluate(ResultRow row, Evaluator evaluator) {
         /** This is just for checking; aggregation happens in 
             {@link #aggregate(Rows)}. */
         return new LongCell(0);

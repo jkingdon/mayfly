@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,7 +44,9 @@ public class MayflyConnection {
     }
 
     public ResultSet query(Command select) {
-        return select.select(database.dataStore(), currentSchema, lastIdentity);
+        return select.select(
+            new Evaluator(database.dataStore(), currentSchema), 
+            lastIdentity);
     }
 
     public int execute(String sql) throws MayflyException {

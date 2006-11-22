@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public class IsNull extends Condition {
 
@@ -13,8 +14,8 @@ public class IsNull extends Condition {
         this.expression = expression;
     }
 
-    public boolean evaluate(ResultRow row) {
-        Cell cell = expression.evaluate(row);
+    public boolean evaluate(ResultRow row, Evaluator evaluator) {
+        Cell cell = expression.evaluate(row, evaluator);
         return cell instanceof NullCell;
     }
 

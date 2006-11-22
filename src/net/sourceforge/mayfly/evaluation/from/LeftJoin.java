@@ -1,22 +1,22 @@
 package net.sourceforge.mayfly.evaluation.from;
 
-import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.util.L;
 
 import java.util.Iterator;
 
-public class LeftJoin extends Join implements FromElement {
+public class LeftJoin extends Join {
 
     public LeftJoin(FromElement left, FromElement right, Condition condition) {
         super(left, right, condition);
     }
 
-    public ResultRows tableContents(DataStore store, String currentSchema) {
-        ResultRows leftRows = left.tableContents(store, currentSchema);
-        ResultRows rightRows = right.tableContents(store, currentSchema);
+    public ResultRows tableContents(Evaluator evaluator) {
+        ResultRows leftRows = left.tableContents(evaluator);
+        ResultRows rightRows = right.tableContents(evaluator);
 
         final L joinResult = new L();
 
@@ -38,7 +38,7 @@ public class LeftJoin extends Join implements FromElement {
             }
             
             if (!haveJoinedThisLeftRow) {
-                ResultRow nullRightRow = right.dummyRow(store, currentSchema);
+                ResultRow nullRightRow = right.dummyRow(evaluator);
                 ResultRow withNulls = leftRow.combine(nullRightRow);
                 joinResult.append(withNulls);
             }

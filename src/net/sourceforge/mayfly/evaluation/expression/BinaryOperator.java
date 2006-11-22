@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 abstract public class BinaryOperator extends Expression {
 
@@ -17,9 +18,9 @@ abstract public class BinaryOperator extends Expression {
         this.right = right;
     }
 
-    public Cell evaluate(ResultRow row) {
-        Cell leftCell = left.evaluate(row);
-        Cell rightCell = right.evaluate(row);
+    public Cell evaluate(ResultRow row, Evaluator evaluator) {
+        Cell leftCell = left.evaluate(row, evaluator);
+        Cell rightCell = right.evaluate(row, evaluator);
         return combineCellsOrNulls(leftCell, rightCell);
     }
 

@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.LastIdentity;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public class LastIdentityExpression extends Expression {
 
@@ -25,7 +26,7 @@ public class LastIdentityExpression extends Expression {
      * "call identity() + 7" or some such, but I don't even know
      * whether that makes any sense to worry about.
      */
-    public Cell evaluate(ResultRow row) {
+    public Cell evaluate(ResultRow row, Evaluator evaluator) {
         throw new MayflyInternalException(
             "no need to evaluate with identity()");
     }

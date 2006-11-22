@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 public class SingleColumn extends Expression {
@@ -39,7 +40,7 @@ public class SingleColumn extends Expression {
         this.columnName = columnName;
     }
 
-    public Cell evaluate(ResultRow row) {
+    public Cell evaluate(ResultRow row, Evaluator evaluator) {
         Expression found = row.findColumn(tableOrAlias, columnName, location);
         return row.findValue(found);
     }

@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 public abstract class Literal extends Expression {
@@ -12,7 +13,7 @@ public abstract class Literal extends Expression {
         super(location);
     }
 
-    public final Cell evaluate(ResultRow row) {
+    public final Cell evaluate(ResultRow row, Evaluator evaluator) {
         return valueAsCell();
     }
 

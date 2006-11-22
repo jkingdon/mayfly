@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.ArrayList;
@@ -51,10 +52,14 @@ public class ResultRows {
     }
 
     public ResultRows select(Condition condition) {
+        return select(condition, Evaluator.NO_SUBSELECT_NEEDED);
+    }
+
+    public ResultRows select(Condition condition, Evaluator evaluator) {
         ResultRows selected = new ResultRows();
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ResultRow row = (ResultRow) iter.next();
-            if (condition.evaluate(row)) {
+            if (condition.evaluate(row, evaluator)) {
                 selected = selected.with(row);
             }
         }

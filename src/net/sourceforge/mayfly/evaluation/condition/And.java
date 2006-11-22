@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public class And extends Condition {
     public final Condition leftSide;
@@ -11,7 +12,7 @@ public class And extends Condition {
         this.rightSide = rightSide;
     }
 
-    public boolean evaluate(ResultRow row) {
+    public boolean evaluate(ResultRow row, Evaluator evaluator) {
         /*
          * We currently implement this as a short-circuited evaluation.
          * 
@@ -24,7 +25,8 @@ public class And extends Condition {
          * the data, rather than a row-independent error like 
          * syntax error, ambiguous column, etc.
          */
-        return leftSide.evaluate(row) && rightSide.evaluate(row);
+        return leftSide.evaluate(row, evaluator) && 
+            rightSide.evaluate(row, evaluator);
     }
 
     public String firstAggregate() {

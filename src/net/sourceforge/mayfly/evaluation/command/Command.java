@@ -1,11 +1,12 @@
 package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyResultSet;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Parser;
 
-import java.sql.ResultSet;
 import java.util.List;
 
 public abstract class Command {
@@ -20,8 +21,7 @@ public abstract class Command {
 
     abstract public UpdateStore update(DataStore store, String currentSchema);
 
-    public ResultSet select(DataStore store, String currentSchema, 
-        Cell lastIdentity) {
+    public MayflyResultSet select(Evaluator evaluator, Cell lastIdentity) {
         throw new MayflyException(
             "This command is only available with update, not query");
     }

@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public class Or extends Condition {
 
@@ -12,8 +13,9 @@ public class Or extends Condition {
         this.rightSide = rightSide;
     }
 
-    public boolean evaluate(ResultRow row) {
-        return leftSide.evaluate(row) || rightSide.evaluate(row);
+    public boolean evaluate(ResultRow row, Evaluator evaluator) {
+        return leftSide.evaluate(row, evaluator) || 
+            rightSide.evaluate(row, evaluator);
     }
 
     public String firstAggregate() {

@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.condition;
 
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 
 public class Not extends Condition {
@@ -11,8 +12,8 @@ public class Not extends Condition {
         this.operand = operand;
     }
 
-    public boolean evaluate(ResultRow row) {
-        return !operand.evaluate(row);
+    public boolean evaluate(ResultRow row, Evaluator evaluator) {
+        return !operand.evaluate(row, evaluator);
     }
 
     public String firstAggregate() {

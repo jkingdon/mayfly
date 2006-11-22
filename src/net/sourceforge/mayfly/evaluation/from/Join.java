@@ -4,7 +4,7 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 
-public abstract class Join implements FromElement {
+public abstract class Join extends FromElement {
 
     public final FromElement right;
     public final Condition condition;

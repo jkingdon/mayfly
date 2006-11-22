@@ -17,7 +17,8 @@ public class ResultRowsTest extends TestCase {
             ;
         assertEquals(2, rows.size());
         
-        ResultRows someRows = rows.select(new Equal(new IntegerLiteral(9), new SingleColumn("x")));
+        ResultRows someRows = rows.select(
+            new Equal(new IntegerLiteral(9), new SingleColumn("x")));
         assertEquals(1, someRows.size());
     }
 

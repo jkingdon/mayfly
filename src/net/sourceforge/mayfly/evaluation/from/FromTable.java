@@ -7,13 +7,14 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class FromTable implements FromElement {
+public class FromTable extends FromElement {
 
     public final String tableName;
     public final String alias;
@@ -30,8 +31,10 @@ public class FromTable implements FromElement {
         }
     }
 
-    public ResultRows tableContents(DataStore store, String currentSchema) {
-        return applyAlias(store.table(currentSchema, tableName).rows());
+    public ResultRows tableContents(Evaluator evaluator) {
+        return applyAlias(
+            evaluator.store.table(evaluator.currentSchema, tableName)
+                .rows());
     }
 
     public ResultRow dummyRow(DataStore store, String currentSchema) {

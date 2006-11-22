@@ -8,9 +8,9 @@ import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.expression.LastIdentityExpression;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
-import java.sql.ResultSet;
 
 public class LastIdentity extends Command {
 
@@ -21,8 +21,8 @@ public class LastIdentity extends Command {
         throw new MayflyException(UPDATE_MESSAGE);
     }
     
-    public ResultSet select(
-        DataStore store, String currentSchema, Cell lastIdentity) {
+    public MayflyResultSet select(
+        Evaluator evaluator, Cell lastIdentity) {
         Expression expression = new LastIdentityExpression();
         return new MayflyResultSet(
             new Selected(expression), 

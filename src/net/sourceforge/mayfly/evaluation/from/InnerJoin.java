@@ -1,20 +1,20 @@
 package net.sourceforge.mayfly.evaluation.from;
 
-import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
-public class InnerJoin extends Join implements FromElement {
+public class InnerJoin extends Join {
 
     public InnerJoin(FromElement left, FromElement right, Condition condition) {
         super(left, right, condition);
     }
 
-    public ResultRows tableContents(DataStore store, String currentSchema) {
+    public ResultRows tableContents(Evaluator evaluator) {
         ResultRows unfiltered = 
-            left.tableContents(store, currentSchema)
-                .join(right.tableContents(store, currentSchema));
-        return unfiltered.select(condition);
+            left.tableContents(evaluator)
+                .join(right.tableContents(evaluator));
+        return unfiltered.select(condition, evaluator);
     }
 
 }

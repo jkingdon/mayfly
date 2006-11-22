@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 /**
  * @internal
@@ -41,8 +42,8 @@ public class AliasedExpression extends Expression {
         return expression.aggregate(rows);
     }
 
-    public Cell evaluate(ResultRow row) {
-        return expression.evaluate(row);
+    public Cell evaluate(ResultRow row, Evaluator evaluator) {
+        return expression.evaluate(row, evaluator);
     }
 
     public boolean sameExpression(Expression other) {

@@ -306,13 +306,13 @@ public class ResultTest extends SqlTestCase {
             "SELECT y FROM foo WHERE x <= " +
                 "(SELECT x FROM foo ORDER BY x ASC LIMIT 1 OFFSET 1) ";
 
-        if (dialect.haveLimit() && dialect.wishThisWereTrue()) {
+        if (dialect.haveLimit()) {
             assertResultSet(new String[] { " 'a' ", " 'b' ", " 'c' " },
                 query(topNViaSubselectAndLimit)
             );
         }
         else {
-            expectQueryFailure(topNViaSubselectAndLimit, "no subselects");
+            expectQueryFailure(topNViaSubselectAndLimit, "no LIMIT");
         }
     }
     

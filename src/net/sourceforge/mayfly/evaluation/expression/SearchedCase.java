@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
@@ -42,7 +43,7 @@ public class SearchedCase extends Expression {
         throw new UnimplementedException();
     }
 
-    public Cell evaluate(ResultRow row) {
+    public Cell evaluate(ResultRow row, Evaluator evaluator) {
         for (int i = 0; i < conditions.size(); ++i) {
             Condition condition = (Condition) conditions.get(i);
             if (condition.evaluate(row)) {
