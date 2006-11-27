@@ -31,7 +31,7 @@ public class SelectTest extends TestCase {
         L fooColumns = new L().append("colA").append("colB");
         L barColumns = new L().append("colX").append("colY");
         Evaluator evaluator =
-            new Evaluator(
+            new StoreEvaluator(
                 new Schema()
                     .createTable("foo", fooColumns)
                     .addRow("foo", fooColumns, makeValues("1a", "1b"))
@@ -87,7 +87,7 @@ public class SelectTest extends TestCase {
 
     public void testSmallerJoin() throws Exception {
         Evaluator evaluator =
-            new Evaluator(
+            new StoreEvaluator(
                 new Schema()
                     .createTable("foo", new L().append("colA"))
                     .addRow("foo", new L().append("colA"), ValueList.singleton(new StringCell("1a")))
@@ -105,7 +105,7 @@ public class SelectTest extends TestCase {
     public void testSimpleWhere() throws Exception {
         L columnNames = new L().append("colA").append("colB");
         Evaluator evaluator =
-            new Evaluator(
+            new StoreEvaluator(
                 new Schema()
                     .createTable("foo", columnNames)
                     .addRow("foo", columnNames, makeValues("1a", "1b"))
@@ -152,7 +152,7 @@ public class SelectTest extends TestCase {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz where foo.id = bar.id");
         select.optimize(
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
@@ -174,7 +174,7 @@ public class SelectTest extends TestCase {
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("b")), 
             new FromTable("foo"), new FromTable("bar"), 
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
                 .createTable("bar", ImmutableList.singleton("b")))
             ));
@@ -186,7 +186,7 @@ public class SelectTest extends TestCase {
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("c")), 
             new FromTable("foo"), new FromTable("bar"), 
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
                 .createTable("bar", ImmutableList.singleton("b"))) 
             ));
@@ -198,7 +198,7 @@ public class SelectTest extends TestCase {
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("baz", "c")), 
             new FromTable("foo"), new FromTable("bar"), 
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
                 .createTable("bar", ImmutableList.singleton("b"))) 
             ));
@@ -213,7 +213,7 @@ public class SelectTest extends TestCase {
                     new SingleColumn("baz", "c"))
             ), 
             new FromTable("foo"), new FromTable("bar"), 
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
                 .createTable("bar", ImmutableList.singleton("b"))) 
             ));
@@ -228,7 +228,7 @@ public class SelectTest extends TestCase {
                     new SingleColumn("bar", "b"))
             ), 
             new FromTable("foo"), new FromTable("bar"), 
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
                 .createTable("bar", ImmutableList.singleton("b"))) 
             ));
@@ -243,7 +243,7 @@ public class SelectTest extends TestCase {
                 new Maximum(new SingleColumn("a"), "max", false),
                 new IntegerLiteral(5)), 
             new FromTable("foo"), new FromTable("bar"), 
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("a"))
                 .createTable("bar", ImmutableList.singleton("b"))) 
             ));
@@ -254,7 +254,7 @@ public class SelectTest extends TestCase {
             "select * from foo, bar, baz");
         ResultRow dummyRow = select.dummyRow(
             0,
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
@@ -268,7 +268,7 @@ public class SelectTest extends TestCase {
             "select * from foo, bar, baz " +
             "where foo.id = bar.id and (bar.id = 5 or baz.id = 7)");
         select.optimize(
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
@@ -295,7 +295,7 @@ public class SelectTest extends TestCase {
             "select * from foo, bar, baz " +
             "where foo.id = baz.id and (bar.id = 5 or foo.id = 7)");
         select.optimize(
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
@@ -320,7 +320,7 @@ public class SelectTest extends TestCase {
             "select * from foo, bar, baz " +
             "where foo.id = bar.id and bar.id > 5 and baz.id = 9 and foo.id > 7");
         select.optimize(
-            new Evaluator(new Schema()
+            new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))

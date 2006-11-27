@@ -32,13 +32,13 @@ public class FromTable extends FromElement {
 
     public ResultRows tableContents(Evaluator evaluator) {
         return applyAlias(
-            evaluator.store().table(evaluator.currentSchema, tableName)
+            evaluator.store().table(evaluator.currentSchema(), tableName)
                 .rows());
     }
 
     public ResultRow dummyRow(Evaluator evaluator) {
         return applyAlias(
-            evaluator.store().table(evaluator.currentSchema, tableName)
+            evaluator.store().table(evaluator.currentSchema(), tableName)
                 .dummyRows());
     }
 
