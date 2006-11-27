@@ -82,9 +82,37 @@ public class SubselectTest extends SqlTestCase {
             expectQueryFailure(subselectRefersOutside, 
                 "no column candidate.region");
         }
+
+        String shadowedNamesBindToInnermost = 
+            "SELECT name FROM countries candidate" +
+            "  WHERE population >= " +
+            "    (SELECT max(population) FROM countries other" +
+            "        WHERE region = 'Americas')";
+        /* "region" in the subselect means "other.region" */
+        assertResultSet(
+            new String[] { " 'USA' ", " 'India' " },
+            query(shadowedNamesBindToInnermost)
+        );
+
+        String forComparison = 
+            "SELECT name FROM countries candidate" +
+            "  WHERE population >= " +
+            "    (SELECT max(population) FROM countries other" +
+            "        WHERE candidate.region = 'Americas')";
+        if (dialect.wishThisWereTrue()) {
+            /* The subselect sometimes returns null.  */
+            assertResultSet(
+                new String[] { },
+                query(forComparison)
+            );
+        }
+        else {
+            expectQueryFailure(subselectRefersOutside, 
+                "no column candidate.region");
+        }
     }
     
-    /* Similar case but the subselect has a reference to the foo row.
-    */
-
+    // TODO: case where the subselect refers to the enclosing row without
+    // qualifying it with an alias.
+    
 }
