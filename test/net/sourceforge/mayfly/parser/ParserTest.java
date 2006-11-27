@@ -339,8 +339,37 @@ public class ParserTest extends TestCase {
         checkExpression(SingleColumn.class, 1, 2, "x ");
         checkExpression(SingleColumn.class, 2, 9, " foo . x ");
 
-        // TODO: null (exception should include location)
-        // TODO: case where we catch null
+        checkExpression(NullExpression.class, 2, 6, " null ");
+    }
+    
+    public void testNullExceptionHasLocation() throws Exception {
+        Parser parser = new Parser(" null ");
+        try {
+            parser.parseExpression();
+            fail();
+        }
+        catch (FoundNullLiteral e) {
+            MayflyAssert.assertLocation(2, 6, e.location());
+        }
+    }
+    
+    public void testRethrownNullExceptionHasLocation() throws Exception {
+        Parser parser = new Parser(" 5 + null + 7 ");
+        try {
+            parser.parseExpressionOrNull();
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals(
+                "Specify a null literal rather than an expression containing one",
+                e.getMessage());
+            
+            /* This is currently from the start of the expression until the
+               first null.  Would be a bit more friendly to parse the whole
+               expression and provide the location of the whole expression,
+               I guess, but maybe this location is close enough.  */
+            MayflyAssert.assertLocation(2, 10, e.location());
+        }
     }
     
     public void testBinaryLocation() throws Exception {

@@ -14,6 +14,8 @@ import java.util.List;
 
 public class Lexer {
 
+    private static final int SIZE_OF_HEX_CONSTANT_TO_DISPLAY_IN_MESSAGES = 18;
+
     private static final int END_OF_FILE_CHARACTER = -1;
 
     private final Reader sql;
@@ -298,27 +300,7 @@ public class Lexer {
             textBuilder.append((char)current);
             current = nextCharacter();
             if (current == '\'') {
-                // hex constant
-
-                current = nextCharacter();
-                ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                while (current != '\'') {
-                    int first = parseHex(current);
-                    current = nextCharacter();
-                    if (current == '\'') {
-                        throw new MayflyException(
-                            "hex constant must have an even number of digits",
-                            currentCharacter());
-                    }
-                    int second = parseHex(current);
-                    bytes.write(combineHexDigits(first, second));
-                    current = nextCharacter();
-                }
-                current = nextCharacter();
-                Token newToken = new BinaryToken(
-                    new ImmutableByteArray(bytes.toByteArray()), 
-                    tokenLocation());
-                addToken(tokens, newToken);
+                lexHexConstant(textBuilder);
                 return;
             }
         }
@@ -329,6 +311,48 @@ public class Lexer {
         }
         String text = textBuilder.toString();
         addToken(tokens, keywordOrIdentifier(text), text);
+    }
+
+    private void lexHexConstant(StringBuilder textBuilder) {
+        textBuilder.append((char)current);
+        current = nextCharacter();
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        while (current != '\'') {
+            int first = nextHexDigit(textBuilder);
+            if (current == '\'') {
+                throw new MayflyException(
+                    "hex constant " +
+                    displayForHexConstant(textBuilder) +
+                    " must have an even number of digits",
+                    currentCharacter());
+            }
+            int second = nextHexDigit(textBuilder);
+            bytes.write(combineHexDigits(first, second));
+        }
+        current = nextCharacter();
+        Token newToken = new BinaryToken(
+            new ImmutableByteArray(bytes.toByteArray()), 
+            tokenLocation());
+        addToken(tokens, newToken);
+    }
+
+    private String displayForHexConstant(StringBuilder textBuilder) {
+        if (textBuilder.length() == SIZE_OF_HEX_CONSTANT_TO_DISPLAY_IN_MESSAGES) {
+            textBuilder.append("'...");
+        }
+        else {
+            textBuilder.append("'");
+        }
+        return textBuilder.toString();
+    }
+
+    private int nextHexDigit(StringBuilder textBuilder) {
+        int first = parseHex(current);
+        if (textBuilder.length() < SIZE_OF_HEX_CONSTANT_TO_DISPLAY_IN_MESSAGES) {
+            textBuilder.append((char)current);
+        }
+        current = nextCharacter();
+        return first;
     }
 
     int combineHexDigits(int first, int second) {

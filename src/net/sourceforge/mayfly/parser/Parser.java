@@ -348,7 +348,9 @@ public class Parser {
             try {
                 return parseExpression().asNonBoolean();
             } catch (FoundNullLiteral e) {
-                throw new MayflyException("Specify a null literal rather than an expression containing one");
+                throw new MayflyException(
+                    "Specify a null literal rather than an expression containing one",
+                    start.combine(e.location()));
             }
         }
     }
@@ -1070,7 +1072,7 @@ public class Parser {
             }
         }
         else if (consumeIfMatches(TokenType.KEYWORD_null)) {
-            throw new FoundNullLiteral();
+            throw new FoundNullLiteral(start);
         }
         else if (currentTokenType() == TokenType.BINARY) {
             Token token = expectAndConsume(TokenType.BINARY);

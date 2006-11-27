@@ -258,8 +258,16 @@ public class LexerTest extends TestCase {
             1, 4, 1, 5, "x'0&'");
         expectError("invalid character '+' in hex constant", 
             1, 3, 1, 4, "x'+0'");
-        expectError("hex constant must have an even number of digits", 
+        expectError("hex constant x'0' must have an even number of digits", 
             1, 4, 1, 5, "x'0'");
+        expectError("hex constant X'fFf' must have an even number of digits", 
+            1, 6, 1, 7, "X'fFf'");
+        expectError("hex constant x'0123456789abcde' must have an even number of digits", 
+            1, 18, 1, 19, "x'0123456789abcde'");
+        expectError(
+            "hex constant x'0123456789abcdef'... " +
+                "must have an even number of digits", 
+            1, 20, 1, 21, "x'0123456789abcdef0'");
     }
     
     public void testParseHex() throws Exception {

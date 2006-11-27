@@ -581,14 +581,10 @@ public class DataTypeTest extends SqlTestCase {
             execute(hexForBinary);
             execute("insert into foo(x) values (X'00')");
 
-            /* The current thinking is that having this message read
-               "hex constant 7 must"... is undesirable for long
-               constants.  But we probably should include the first
-               16 bytes or so, with "..." if appropriate. */
-            expectExecuteFailure("insert into foo(x) values(x'7')", 
-                "hex constant must have an even number of digits");
+            /** See {@link net.sourceforge.mayfly.parser.LexerTest#testHexErrors()}
+               for more tests of these error messages. */
             expectExecuteFailure("insert into foo(x) values(x'7ff')",
-                "hex constant must have an even number of digits");
+                "hex constant x'7ff' must have an even number of digits");
             expectExecuteFailure("insert into foo(x) values(x'0g')",
                 "invalid character 'g' in hex constant");
             
