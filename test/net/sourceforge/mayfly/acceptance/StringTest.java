@@ -94,6 +94,25 @@ public class StringTest extends SqlTestCase {
             query("select a from foo where a < 'hi'"));
     }
     
+    public void testInternalAndLeadingSpaces() throws Exception {
+        execute("create table foo(a varchar(255))");
+        execute("insert into foo(a) values(' a')");
+        execute("insert into foo(a) values('a b')");
+        
+        assertResultSet(new String[] { "' a'", "'a b'" }, 
+            query("select a from foo"));
+        assertResultSet(new String[] { "' a'" }, 
+            query("select a from foo where a = ' a'"));
+        assertResultSet(new String[] { }, 
+            query("select a from foo where a = 'a'"));
+        assertResultSet(new String[] { }, 
+            query("select a from foo where a = '  a'"));
+        assertResultSet(new String[] { }, 
+            query("select a from foo where a = 'a  b'"));
+        assertResultSet(new String[] { "'a b'" },
+            query("select a from foo where a = 'a b'"));
+    }
+    
     /**
      * @internal
      * Also see {@link EndToEndTests#testCharacterStream()}

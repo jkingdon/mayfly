@@ -35,7 +35,7 @@ public class StringCell extends Cell {
 
     public int compareTo(Cell otherCell, Location location) {
         if (otherCell instanceof StringCell) {
-            return content.compareTo(((StringCell) otherCell).content);
+            return sqlStringCompare(content, ((StringCell) otherCell).content);
         }
         else if (otherCell instanceof DateCell) {
             return coerceToDate(location).compareTo(otherCell);
@@ -46,6 +46,10 @@ public class StringCell extends Cell {
         else {
             throw cannotCompare(otherCell, location);
         }
+    }
+
+    public static int sqlStringCompare(String mine, String theirs) {
+        return mine.compareTo(theirs);
     }
 
     public DateCell coerceToDate(Location location) {
