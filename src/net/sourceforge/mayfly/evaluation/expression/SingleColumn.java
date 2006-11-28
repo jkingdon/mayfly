@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
@@ -41,7 +42,12 @@ public class SingleColumn extends Expression {
     }
 
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
-        return evaluate(row);
+        try {
+            return evaluate(row);
+        }
+        catch (NoColumn e) {
+            return evaluator.lookup(tableOrAlias, columnName, location);
+        }
     }
 
     public Cell evaluate(ResultRow row) {

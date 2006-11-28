@@ -816,6 +816,8 @@ public class Parser {
     }
 
     Select parseSelect() {
+        Location start = currentToken().location;
+        
         expectAndConsume(TokenType.KEYWORD_select);
         What what = parseWhat();
         expectAndConsume(TokenType.KEYWORD_from);
@@ -835,7 +837,8 @@ public class Parser {
                multiple threads, this can be a noop */
         }
 
-        return new Select(what, from, where, groupBy, orderBy, limit);
+        return new Select(what, from, where, groupBy, orderBy, limit,
+            start);
     }
 
     private Condition parseOptionalWhere() {

@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
+import net.sourceforge.mayfly.evaluation.select.RowEvaluator;
 import net.sourceforge.mayfly.evaluation.select.Select;
 
 public class ScalarSubselect extends Expression {
@@ -21,7 +22,8 @@ public class ScalarSubselect extends Expression {
     }
 
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
-        return select.select(evaluator, null).scalar();
+        Evaluator innerEvaluator = new RowEvaluator(row, evaluator);
+        return select.select(innerEvaluator, null).scalar(select.location);
     }
 
     public boolean sameExpression(Expression other) {

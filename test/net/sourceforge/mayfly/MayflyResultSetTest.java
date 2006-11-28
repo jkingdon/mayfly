@@ -1,8 +1,11 @@
 package net.sourceforge.mayfly;
 
 import junit.framework.TestCase;
+import junitx.framework.ObjectAssert;
 
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
@@ -27,17 +30,16 @@ public class MayflyResultSetTest extends TestCase {
     }
 
     public void testNoRows() throws Exception {
-        notAScalar(
-            "subselect expects one row but got 0", 
-            new MayflyResultSet(
-                new Selected(ImmutableList.fromArray(new Expression[] { 
-                    new Maximum(new SingleColumn("a"), "max", false)
-                })),
-                new ResultRows()
-            ));
+        Cell scalar = new MayflyResultSet(
+            new Selected(ImmutableList.fromArray(new Expression[] { 
+                new Maximum(new SingleColumn("a"), "max", false)
+            })),
+            new ResultRows()
+        ).scalar();
+        ObjectAssert.assertInstanceOf(NullCell.class, scalar);
     }
 
-    public void testGroupBy() throws Exception {
+    public void testGroupByOrOtherMultipleRowCase() throws Exception {
         Maximum maximum = new Maximum(new SingleColumn("a"), "max", false);
         notAScalar(
             "subselect expects one row but got 2", 

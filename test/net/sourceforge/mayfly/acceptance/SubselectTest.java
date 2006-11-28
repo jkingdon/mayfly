@@ -68,51 +68,89 @@ public class SubselectTest extends SqlTestCase {
         execute("insert into countries values('Asia', 'India', 1000)");
 
         // Now select the largest country in each region:
-        String subselectRefersOutside = 
-            "SELECT name FROM countries candidate" +
-            "  WHERE population >= " +
-            "    (SELECT max(population) FROM countries other" +
-            "        WHERE other.region = candidate.region)";
-        if (dialect.wishThisWereTrue()) {
-            assertResultSet(
-                new String[] { " 'USA' ", " 'India' " },
-                query(subselectRefersOutside));
-        }
-        else {
-            expectQueryFailure(subselectRefersOutside, 
-                "no column candidate.region");
-        }
-
-        String shadowedNamesBindToInnermost = 
-            "SELECT name FROM countries candidate" +
-            "  WHERE population >= " +
-            "    (SELECT max(population) FROM countries other" +
-            "        WHERE region = 'Americas')";
-        /* "region" in the subselect means "other.region" */
         assertResultSet(
             new String[] { " 'USA' ", " 'India' " },
-            query(shadowedNamesBindToInnermost)
-        );
-
-        String forComparison = 
-            "SELECT name FROM countries candidate" +
+            query("SELECT name FROM countries candidate" +
             "  WHERE population >= " +
             "    (SELECT max(population) FROM countries other" +
-            "        WHERE candidate.region = 'Americas')";
-        if (dialect.wishThisWereTrue()) {
-            /* The subselect sometimes returns null.  */
-            assertResultSet(
-                new String[] { },
-                query(forComparison)
-            );
-        }
-        else {
-            expectQueryFailure(subselectRefersOutside, 
-                "no column candidate.region");
-        }
+            "        WHERE other.region = candidate.region)"));
+
+        /* "region" in the subselect means "other.region" -
+           the innermost possible binding, that is. */
+        assertResultSet(
+            new String[] { " 'USA' ", " 'India' " },
+            query("SELECT name FROM countries candidate" +
+            "  WHERE population >= " +
+            "    (SELECT max(population) FROM countries other" +
+            "        WHERE region = 'Americas')")
+        );
+
+        /* Here's what would have happened if region in the previous
+           example had been candidate.region.
+          
+           The subselect sometimes returns null.  */
+        assertResultSet(
+            new String[] { },
+            query("SELECT name FROM countries candidate" +
+            "  WHERE population >= " +
+            "    (SELECT max(population) FROM countries other" +
+            "        WHERE candidate.region = 'Americas')")
+        );
     }
     
-    // TODO: case where the subselect refers to the enclosing row without
-    // qualifying it with an alias.
+    public void testReferToEnclosingNoAlias() throws Exception {
+        execute("create table foo(x integer, x2 integer, name varchar(10))");
+        execute("insert into foo(x, x2, name) values(6, 60, 'six')");
+        execute("insert into foo(x, x2, name) values(5, 52, 'five')");
+        execute("insert into foo(x, x2, name) values(4, 35, 'four')");
+
+        execute("create table bar(y integer, z integer)");
+        execute("insert into bar(y, z) values(60, 6)");
+        execute("insert into bar(y, z) values(50, 5)");
+        execute("insert into bar(y, z) values(40, 4)");
+
+        /* In this case, x in the subselect refers to the foo row
+           without calling it "foo.x" */
+        assertResultSet(new String[] { " 'six' ", " 'five' " },
+            query("select name from foo where x2 >= " +
+                "(select y from bar where z = x)"));
+    }
+    
+    public void testNoRowsMatch() throws Exception {
+        execute("create table foo(x integer)");
+        execute("insert into foo(x) values(5)");
+        
+        execute("create table bar(y integer)");
+        
+        /* Isn't this better written with EXISTS?
+           Is it desirable to throw an error except in the EXISTS case?
+         */
+        assertResultSet(new String[] { " 5 " }, 
+            query("select x from foo where " +
+                "(select y from bar where y = x) is null"));
+
+//        expectQueryFailure(
+//            "select x from foo where x = \n" +
+//                "(select y from bar where y = 77)", 
+//            "subselect expects one row but got 0",
+//            2, 2, 2, 
+//            
+//            /* 34 might make more sense (that is, flag the whole select).
+//               But maybe the start of the select in question is OK.  */
+//            8);
+    }
+    
+    public void testNestedSubselects() throws Exception {
+        /*
+         select a from apples where . . .
+           (select b from bananas where . . .
+             (select c from carrots where
+               apples.a . . .
+         */
+        // the reference to apples.a will fail because mayfly currently
+        // can only look in the next subselect out, not follow the
+        // whole chain.  Need to move the catch of NoColumn into
+        // a method in Evaluator, I think.
+    }
     
 }

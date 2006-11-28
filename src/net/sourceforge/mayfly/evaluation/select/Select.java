@@ -8,7 +8,6 @@ import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.GroupByKeys;
 import net.sourceforge.mayfly.evaluation.NoColumn;
-import net.sourceforge.mayfly.evaluation.NoGroupBy;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.Command;
@@ -22,6 +21,7 @@ import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
+import net.sourceforge.mayfly.parser.Location;
 
 import java.util.Iterator;
 
@@ -48,18 +48,17 @@ public class Select extends Command {
 
     private final Limit limit;
 
-    public Select(What what, From from, Condition where) {
-        this(what, from, where, new NoGroupBy(), new OrderBy(), Limit.NONE);
-    }
+    public final Location location;
 
     public Select(What what, From from, Condition where, Aggregator groupBy, 
-        OrderBy orderBy, Limit limit) {
+        OrderBy orderBy, Limit limit, Location location) {
         this.what = what;
         this.from = from;
         this.where = where;
         this.groupBy = groupBy;
         this.orderBy = orderBy;
         this.limit = limit;
+        this.location = location;
     }
 
     public From from() {

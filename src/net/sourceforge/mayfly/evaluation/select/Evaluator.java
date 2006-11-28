@@ -1,6 +1,9 @@
 package net.sourceforge.mayfly.evaluation.select;
 
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.evaluation.NoColumn;
+import net.sourceforge.mayfly.parser.Location;
 
 /**
  * @internal
@@ -14,5 +17,9 @@ public abstract class Evaluator {
     abstract public DataStore store();
 
     abstract public String currentSchema();
+
+    public Cell lookup(String tableOrAlias, String columnName, Location location) {
+        throw new NoColumn(tableOrAlias, columnName, location);
+    }
 
 }

@@ -278,7 +278,10 @@ public final class MayflyResultSet extends ResultSetStub {
                 location);
         }
         
-        if (rows.size() != 1) {
+        if (rows.size() == 0) {
+            return NullCell.INSTANCE;
+        }
+        else if (rows.size() != 1) {
             throw new MayflyException(
                 "subselect expects one row but got " + rows.size(),
                 location);
