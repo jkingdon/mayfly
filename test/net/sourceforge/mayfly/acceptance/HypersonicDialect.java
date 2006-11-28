@@ -52,6 +52,10 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
+    public boolean trailingSpacesConsultedInComparisons() {
+        return true;
+    }
+
     public boolean orderByCountsAsWhat() {
         return true;
     }

@@ -154,6 +154,14 @@ public abstract class Dialect {
         return false;
     }
 
+    /**
+     * @internal
+     * The SQL Standard is said to specify false.
+     */
+    public boolean trailingSpacesConsultedInComparisons() {
+        return false;
+    }
+
     public boolean notBindsMoreTightlyThanIn() {
         return false;
     }
