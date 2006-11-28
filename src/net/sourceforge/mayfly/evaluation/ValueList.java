@@ -48,11 +48,15 @@ public class ValueList {
     }
 
     public Cell cell(int index) {
-        return ((Value)values.get(index)).value;
+        return value(index).value;
     }
 
     public Location location(int index) {
-        return ((Value)values.get(index)).location;
+        return value(index).location;
     }
 
+    public Value value(int index) {
+        return (Value)values.get(index);
+    }
+    
 }

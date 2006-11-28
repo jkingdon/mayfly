@@ -51,12 +51,4 @@ public class ImmutableListTest extends TestCase {
         assertEquals(expected, actual);
     }
     
-    public void testFromAggregate() throws Exception {
-        Strings source = new Strings("a", "b");
-        ImmutableList list = ImmutableList.fromIterable(source);
-        assertEquals(2, list.size());
-        assertEquals("a", list.get(0));
-        assertEquals("b", list.get(1));
-    }
-
 }

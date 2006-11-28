@@ -13,7 +13,6 @@ import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.M;
 import net.sourceforge.mayfly.util.StringBuilder;
-import net.sourceforge.mayfly.util.Transformer;
 
 import java.util.Iterator;
 import java.util.List;
@@ -59,7 +58,7 @@ public class TableData {
             }
         }
         
-        M specifiedColumnToValue = columnsToInsert.zipper(new L(values.values));
+        M specifiedColumnToValue = columnsToInsert.zipper(values);
         Columns newColumns = columns;
         
         TupleBuilder tuple = new TupleBuilder();
@@ -202,15 +201,11 @@ public class TableData {
     }
 
     public Columns findColumns(List columnNames) {
-        L columnList =
-            new L(columnNames)
-                .collect(
-                    new Transformer() {
-                        public Object transform(Object from) {
-                            return findColumn((String) from);
-                        }
-                    }
-                );
+        L columnList = new L();
+        for (Iterator iter = columnNames.iterator(); iter.hasNext();) {
+            String name = (String) iter.next();
+            columnList.add(findColumn(name));
+        }
 
         Columns specified = new Columns(columnList.asImmutable());
         return specified;

@@ -1,9 +1,6 @@
 package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.util.Aggregate;
-import net.sourceforge.mayfly.util.Iterable;
-import net.sourceforge.mayfly.util.L;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -13,7 +10,7 @@ import java.util.List;
  * @internal
  * Not yet immutable, because of {@link #add(FromElement)}
  */
-public class From extends Aggregate {
+public class From {
 
     private final List fromElements;
 
@@ -21,11 +18,6 @@ public class From extends Aggregate {
 
     public From(List fromElements) {
         this.fromElements = fromElements;
-    }
-
-
-    protected Aggregate createNew(Iterable items) {
-        return new From(new L().addAll(items));
     }
 
     public Iterator iterator() {
@@ -51,7 +43,15 @@ public class From extends Aggregate {
                 "optimizer left us " + size() + " elements");
         }
     
-        return (FromElement) element(0);
+        return element(0);
+    }
+
+    public int size() {
+        return fromElements.size();
+    }
+    
+    public FromElement element(int index) {
+        return (FromElement) fromElements.get(index);
     }
 
 }

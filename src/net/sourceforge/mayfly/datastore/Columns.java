@@ -2,12 +2,11 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.evaluation.NoColumn;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.parser.Location;
-import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.M;
-import net.sourceforge.mayfly.util.Transformer;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,15 +16,11 @@ import java.util.Set;
 
 public class Columns {
     public static Columns fromColumnNames(List columnNameStrings) {
-        L columnList =
-            new L(columnNameStrings)
-                .collect(
-                    new Transformer() {
-                        public Object transform(Object from) {
-                            return new Column((String) from);
-                        }
-                    }
-                );
+        L columnList = new L();
+        for (Iterator iter = columnNameStrings.iterator(); iter.hasNext();) {
+            String name = (String) iter.next();
+            columnList.add(new Column(name));
+        }
 
         return new Columns(columnList.asImmutable());
     }
@@ -154,14 +149,8 @@ public class Columns {
         return columns.size();
     }
 
-    public M zipper(Aggregate mapValues) {
-        return zipper(Transformer.JUST_RETURN, mapValues, Transformer.JUST_RETURN);
-    }
-
-    public M zipper(Transformer keyTransformer, Aggregate mapValues, Transformer valueTransformer) {
+    public M zipper(ValueList values) {
         List keys = columns;
-        L values = mapValues.collect(valueTransformer);
-
         if (keys.size()!=values.size()) {
             throw new RuntimeException("mapify only supports equal-sized key and value lists. \n" +
                                        "there were (" + keys.size() + " keys and " + values.size() + " values)");
@@ -174,7 +163,7 @@ public class Columns {
 
         M result = new M();
         for (int i = 0; i < keys.size(); i++) {
-            result.put(keys.get(i), values.get(i));
+            result.put(keys.get(i), values.value(i));
         }
 
         return result;

@@ -23,30 +23,6 @@ public class LTest extends TestCase {
         assertEquals(expected, list);
     }
 
-    public void testSelectObjectsOfClass() throws Exception {
-        L list = new L();
-
-        list
-            .append(new Integer(1))
-            .append(new Integer(2))
-            .append("a")
-            .append("b");
-
-        assertEquals(
-            new L()
-                .append("a")
-                .append("b"),
-            list.selectObjectsThatAre(String.class)
-        );
-
-        assertEquals(
-            new L()
-                .append(new Integer(1))
-                .append(new Integer(2)),
-            list.selectObjectsThatAre(Integer.class)
-        );
-    }
-    
     public void testToString() throws Exception {
         List arrayList = new ArrayList();
         arrayList.add(new Integer(7));

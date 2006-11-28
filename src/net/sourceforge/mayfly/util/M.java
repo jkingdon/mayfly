@@ -6,9 +6,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 
-public class M extends Aggregate implements Map {
+public class M implements Map {
 
     public static M fromEntries(Iterable entries) {
         M newMap = new M();
@@ -41,11 +40,6 @@ public class M extends Aggregate implements Map {
     public ImmutableMap asImmutable() {
         return new ImmutableMap(this);
     }
-
-    protected Aggregate createNew(Iterable items) {
-        return fromEntries(items);
-    }
-
 
 
     public Iterator iterator() {
@@ -113,37 +107,4 @@ public class M extends Aggregate implements Map {
         return delegate.toString();
     }
 
-    public M subMap(L keysWanted) {
-        final M result = new M(new TreeMap());
-
-        keysWanted.each(new Each() {
-            public void each(Object element) {
-                result.put(element, get(element));
-            }
-        });
-
-        return result;
-    }
-
-    public boolean containsKeyCaseInsensitive(String key) {
-        return exists(new CaseInsensitiveKeyIs(key));
-    }
-
-    public Object getCaseInsensitive(String key) {
-        return ((Map.Entry)findFirst(new CaseInsensitiveKeyIs(key))).getValue();
-    }
-
-
-    public static class CaseInsensitiveKeyIs implements Selector {
-        private String keyIsLike;
-
-        public CaseInsensitiveKeyIs(String keyIsLike) {
-            this.keyIsLike = keyIsLike;
-        }
-
-        public boolean evaluate(Object candidate) {
-            Map.Entry entry = (Map.Entry) candidate;
-            return keyIsLike.equalsIgnoreCase((String) entry.getKey());
-        }
-    }
 }

@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly.util;
 
-import net.sourceforge.mayfly.MayflyInternalException;
-
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.lang.ArrayUtils;
 
@@ -13,7 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class L extends Aggregate implements List {
+public class L implements List {
     private List delegate;
 
     public L() {
@@ -28,38 +26,9 @@ public class L extends Aggregate implements List {
         delegate = IteratorUtils.toList(items.iterator());
     }
 
-    protected Aggregate createNew(Iterable items) {
-        return new L(items);
-    }
-
     public L append(Object o) {
         add(o);
         return this;
-    }
-
-    public Object selectObjectThatIs(final Class type) {
-        return selectObjectsThatAre(type).get(0);
-    }
-
-    public L selectObjectsThatAre(final Class type) {
-        return (L)
-            select(new Selector() {
-                public boolean evaluate(Object candidate) {
-                    return type.isAssignableFrom(candidate.getClass());
-                }
-            });
-    }
-
-    public Object selectSingle(Class aClass, Object defaultValue) {
-        int matchCount = selectObjectsThatAre(aClass).size();
-        if (matchCount == 0) {
-            return defaultValue;
-        } else if (matchCount == 1) {
-            return selectObjectThatIs(aClass);
-        } else {
-            throw new MayflyInternalException("Expected none or one of type " + aClass.getName() + 
-                ", got " + matchCount);
-        }
     }
 
     public boolean contains(int candidate) {

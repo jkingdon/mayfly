@@ -25,7 +25,7 @@ public class ReferenceOrderItem extends OrderItem {
                 "ORDER BY " + reference + " must be in range 1 to " + size);
         }
 
-        WhatElement whatElement = (WhatElement) what.element(zeroBasedColumn);
+        WhatElement whatElement = what.element(zeroBasedColumn);
         if (whatElement instanceof SingleColumn) {
             return ColumnOrderItem.compare(first, second, (SingleColumn) whatElement);
         }

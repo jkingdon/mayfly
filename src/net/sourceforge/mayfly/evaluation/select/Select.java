@@ -136,8 +136,8 @@ public class Select extends Command {
 
         while (from.size() > 1) {
             // x y z -> join(x, y) z
-            FromElement first = (FromElement) from.element(0);
-            FromElement second = (FromElement) from.element(1);
+            FromElement first = from.element(0);
+            FromElement second = from.element(1);
             
             Condition on = 
                 moveWhereToOn(first, second, evaluator);
@@ -150,8 +150,7 @@ public class Select extends Command {
     }
 
     ResultRow dummyRow(int index, Evaluator evaluator) {
-        FromElement element = (FromElement) from.element(index);
-        ResultRow dummyRow = element.dummyRow(evaluator);
+        ResultRow dummyRow = from.element(index).dummyRow(evaluator);
         if (index >= from.size() - 1) {
             return dummyRow;
         }

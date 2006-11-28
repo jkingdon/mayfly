@@ -18,10 +18,6 @@ public class ImmutableList implements List {
         return new ImmutableList(Arrays.asList(elements));
     }
     
-    public static ImmutableList fromIterable(Iterable contents) {
-        return new ImmutableList(new L(contents));
-    }
-
     List delegate;
 
     public ImmutableList() {

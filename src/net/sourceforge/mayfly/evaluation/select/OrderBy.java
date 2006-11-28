@@ -1,13 +1,10 @@
 package net.sourceforge.mayfly.evaluation.select;
 
-import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.What;
-import net.sourceforge.mayfly.util.Aggregate;
 import net.sourceforge.mayfly.util.ImmutableList;
-import net.sourceforge.mayfly.util.Iterable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,7 +12,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
-public class OrderBy extends Aggregate {
+public class OrderBy {
 
     List elements = new ArrayList();
 
@@ -26,10 +23,6 @@ public class OrderBy extends Aggregate {
     public OrderBy add(OrderItem item) {
         elements.add(item);
         return this;
-    }
-
-    protected Aggregate createNew(Iterable items) {
-        throw new UnimplementedException();
     }
 
     public Iterator iterator() {
