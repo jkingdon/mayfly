@@ -19,5 +19,15 @@ public class NoColumn extends MayflyException {
     public NoColumn(String columnName) {
         this(columnName, Location.UNKNOWN);
     }
+    
+    private NoColumn(String message, Location location, boolean isDummy) {
+        super(message, location);
+    }
+
+    public static NoColumn dummyExceptionForSubselect(Location location) {
+        return new NoColumn(
+            "The query optimizer shouldn't try to move subselects", 
+            location, true);
+    }
 
 }

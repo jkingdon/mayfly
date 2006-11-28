@@ -159,10 +159,8 @@ public class SchemaTest extends SqlTestCase {
         execute("create table foo (x integer)");
         execute("insert into mars.foo (x) values (7)");
         
-        if (dialect.wishThisWereTrue()) {
-            assertResultSet(new String[] { " 7 " }, query("select x from mars.foo"));
-            assertResultSet(new String[] { " 7 " }, query("select foo.x from mars.foo"));
-        }
+        assertResultSet(new String[] { " 7 " }, query("select x from mars.foo"));
+        assertResultSet(new String[] { " 7 " }, query("select foo.x from mars.foo"));
     }
     
     public void testCurrentSchemaIsPerConnection() throws Exception {

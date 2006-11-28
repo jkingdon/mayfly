@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
+import net.sourceforge.mayfly.MayflyResultSet;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
@@ -22,8 +23,14 @@ public class ScalarSubselect extends Expression {
     }
 
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
+        MayflyResultSet rows = subselect(row, evaluator, select);
+        return rows.scalar(select.location);
+    }
+
+    public static MayflyResultSet subselect(
+        ResultRow row, Evaluator evaluator, Select subselect) {
         Evaluator innerEvaluator = new RowEvaluator(row, evaluator);
-        return select.select(innerEvaluator, null).scalar(select.location);
+        return subselect.select(innerEvaluator, null);
     }
 
     public boolean sameExpression(Expression other) {

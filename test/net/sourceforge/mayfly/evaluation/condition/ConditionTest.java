@@ -11,9 +11,12 @@ import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.expression.CountAll;
+import net.sourceforge.mayfly.evaluation.expression.ScalarSubselect;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.select.Select;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.parser.Parser;
 
@@ -60,6 +63,19 @@ public class ConditionTest extends TestCase {
         assertEquals("count(*)", new Or(new IsNull(new CountAll("count")), Condition.TRUE).firstAggregate());
         assertEquals("count(*)", new And(Condition.TRUE, new IsNull(new CountAll("count"))).firstAggregate());
     }
+    
+    public void testSubselectsAndFirstAggregate() throws Exception {
+        Select select = (Select) Command.fromSql("select max(x) from foo");
+        assertEquals(null, 
+            new Equal(new ScalarSubselect(select), new IntegerLiteral(5))
+            .firstAggregate());
+        assertEquals(null, 
+            new SubselectedIn(new SingleColumn("x"), select)
+            .firstAggregate());
+        assertEquals("count(*)", 
+            new SubselectedIn(new CountAll("count"), select)
+            .firstAggregate());
+    }
 
     public void testCheck() throws Exception {
         ResultRow row = new ResultRow()
@@ -79,6 +95,36 @@ public class ConditionTest extends TestCase {
         assertNoBaz("baz.a is null", row);
         
         Condition.TRUE.check(row);
+    }
+    
+    public void testSubselectAndCheck() throws Exception {
+        ResultRow row = new ResultRow()
+            .withColumn("foo", "a", NullCell.INSTANCE)
+            .withColumn("bar", "a", NullCell.INSTANCE);
+
+        assertNoBaz("baz.a in (select a from bar)", row);
+        try {
+            check("foo.a in (select a from bar where baz.a = bar.a)", row);
+            fail();
+        }
+        catch (NoColumn e) {
+            assertEquals("The query optimizer shouldn't try to move subselects", 
+                e.getMessage());
+            // This would also be acceptable:
+//            assertEquals("no column baz.a", e.getMessage());
+        }
+
+        try {
+            check("foo.a in (select max(a) from bar)", row);
+            /* I think we might be able to not throw an exception here
+               without damage to the optimizer. */
+            fail();
+        }
+        catch (NoColumn e) {
+            assertEquals("The query optimizer shouldn't try to move subselects", 
+                e.getMessage());
+        }
+
     }
 
     private void assertNoBaz(String sql, ResultRow row) {

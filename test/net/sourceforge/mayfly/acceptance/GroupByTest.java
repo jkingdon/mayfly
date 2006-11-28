@@ -309,10 +309,6 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testHavingIsKeyExpression() throws Exception {
-        if (!dialect.wishThisWereTrue()) {
-            return;
-        }
-
         execute("create table foo (x integer, y integer, z integer)");
         execute("insert into foo(x, y, z) values (1, 10, 200)");
         execute("insert into foo(x, y, z) values (3, 10, 200)");

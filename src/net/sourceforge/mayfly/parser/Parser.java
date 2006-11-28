@@ -58,6 +58,7 @@ import net.sourceforge.mayfly.evaluation.condition.Like;
 import net.sourceforge.mayfly.evaluation.condition.Not;
 import net.sourceforge.mayfly.evaluation.condition.NotEqual;
 import net.sourceforge.mayfly.evaluation.condition.Or;
+import net.sourceforge.mayfly.evaluation.condition.SubselectedIn;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.ScalarSubselect;
 import net.sourceforge.mayfly.evaluation.expression.SearchedCase;
@@ -1027,11 +1028,20 @@ public class Parser {
     }
 
     private Condition parseIn(Expression left) {
+        Condition result;
+
         expectAndConsume(TokenType.KEYWORD_in);
         expectAndConsume(TokenType.OPEN_PAREN);
-        List expressions = parseExpressionList();
+        if (currentTokenType() == TokenType.KEYWORD_select) {
+            Select subselect = parseSelect();
+            result = new SubselectedIn(left, subselect);
+        }
+        else {
+            List expressions = parseExpressionList();
+            result = new In(left, expressions);
+        }
         expectAndConsume(TokenType.CLOSE_PAREN);
-        return new In(left, expressions);
+        return result;
     }
 
     private List parseExpressionList() {

@@ -31,7 +31,7 @@ public final class MayflyResultSet extends ResultSetStub {
         this.rows = rows;
     }
 
-    public boolean next() throws SQLException {
+    public boolean next() {
         ++pos;
         if (pos >= rows.size()) {
             return false;
@@ -245,16 +245,16 @@ public final class MayflyResultSet extends ResultSetStub {
         }
     }
 
-    private ResultRow currentRow() throws SQLException {
+    private ResultRow currentRow() throws MayflyException {
         return rows.row(checkedRowNumber());
     }
 
-    private int checkedRowNumber() throws SQLException {
+    private int checkedRowNumber() throws MayflyException {
         if (pos < 0) {
-            throw new SQLException("no current result row");
+            throw new MayflyException("no current result row");
         }
         if (pos >= rows.size()) {
-            throw new SQLException("already read last result row");
+            throw new MayflyException("already read last result row");
         }
         return pos;
     }
@@ -271,12 +271,7 @@ public final class MayflyResultSet extends ResultSetStub {
      * Return the result of a query which returns just a single cell.
      */
     public Cell scalar(Location location) {
-        if (selected.size() != 1) {
-            throw new MayflyException(
-                "attempt to specify " + selected.size() + 
-                " expressions in a subselect", 
-                location);
-        }
+        checkOneColumn(location);
         
         if (rows.size() == 0) {
             return NullCell.INSTANCE;
@@ -288,6 +283,21 @@ public final class MayflyResultSet extends ResultSetStub {
         }
         
         return rows.row(0).cell(0);
+    }
+    
+    public Cell singleColumn(Location location) {
+        checkOneColumn(location);
+        
+        return currentRow().cell(0);
+    }
+
+    private void checkOneColumn(Location location) {
+        if (selected.size() != 1) {
+            throw new MayflyException(
+                "attempt to specify " + selected.size() + 
+                " expressions in a subselect", 
+                location);
+        }
     }
 
 }

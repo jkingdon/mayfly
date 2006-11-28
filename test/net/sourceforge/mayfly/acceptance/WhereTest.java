@@ -288,21 +288,13 @@ public class WhereTest extends SqlTestCase {
         execute("insert into bar (c) values (2)");
         execute("insert into bar (c) values (3)");
 
-        String inWithSubselect = 
-            "select b from foo where foo.a in (select c from bar)";
-        if (dialect.wishThisWereTrue()) {
-            assertResultSet(
-                new String[] {
-                    "   4 ",
-                    "   9 ",
-                },
-                query(inWithSubselect)
-            );
-        }
-        else {
-            expectQueryFailure(inWithSubselect, 
-                "expected primary but got SELECT");
-        }
+        assertResultSet(
+            new String[] {
+                "   4 ",
+                "   9 ",
+            },
+            query("select b from foo where foo.a in (select c from bar)")
+        );
     }
     
     public void testReferToColumnAlias() throws Exception {

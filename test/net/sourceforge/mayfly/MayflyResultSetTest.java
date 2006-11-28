@@ -29,6 +29,28 @@ public class MayflyResultSetTest extends TestCase {
             ));
     }
 
+    /**
+      Here there are two error conditions: the 2 expressions, and also about
+      the number of rows.  Throw the exception about the 2 expressions,
+      because that is an error with the subselect as written and doesn't
+      depend at all on the data in the tables.  The developer will prefer
+      to fix those before worrying about data-dependent bugs.
+    */
+    public void testMoreThanOneExpressionAndAlsoMultipleRows() throws Exception {
+        Maximum maximum = new Maximum(new SingleColumn("a"), "max", false);
+        notAScalar(
+             "attempt to specify 2 expressions in a subselect", 
+             new MayflyResultSet(
+                 new Selected(ImmutableList.fromArray(new Expression[] { 
+                     maximum,
+                     new CountAll("Count")
+                 })),
+                 new ResultRows()
+                     .with(new ResultRow().with(maximum, new LongCell(44)))
+                     .with(new ResultRow().with(maximum, new LongCell(55)))
+             ));
+    }
+
     public void testNoRows() throws Exception {
         Cell scalar = new MayflyResultSet(
             new Selected(ImmutableList.fromArray(new Expression[] { 
