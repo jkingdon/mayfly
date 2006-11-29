@@ -110,6 +110,11 @@ public class SqlDumper {
             out.write(column.defaultValue().asSql());
         }
         
+        if (column.hasOnUpdateValue()) {
+            out.write(" ON UPDATE ");
+            out.write(column.getOnUpdateValue().asSql());
+        }
+        
         if (column.isAutoIncrement()) {
             out.write(" AUTO_INCREMENT");
         }

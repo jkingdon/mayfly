@@ -263,6 +263,12 @@ public class SqlDumperTest extends TestCase {
         }
     }
     
+    public void testOnUpdateValue() throws Exception {
+        database.execute("create table onup(a integer on update 5)");
+        assertEquals("CREATE TABLE onup(\n  a INTEGER ON UPDATE 5\n);\n\n",
+            dump());
+    }
+    
     public void testAutoIncrementNoData() throws Exception {
         database.execute("create table incr2(a integer auto_increment)");
         
@@ -367,6 +373,14 @@ public class SqlDumperTest extends TestCase {
             "constraint a_key foreign key(a) references name(a)," +
             "constraint b_key primary key(b)," +
             "constraint c_uniq unique(c))");
+
+        database.execute("create table refd(a integer primary key)");
+        database.execute("create table refr(d integer," +
+            "foreign key(d) references refd(a) " +
+            "on delete set null on update no action)");
+
+        database.execute("create table onup(" +
+            "a integer default 7 on update 5 not null)");
 
         database.execute("create table binary_table(a blob)");
         database.execute(
