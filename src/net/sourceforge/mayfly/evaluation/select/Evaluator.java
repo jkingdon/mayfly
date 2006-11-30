@@ -2,7 +2,8 @@ package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.evaluation.NoColumn;
+import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Location;
 
 /**
@@ -18,8 +19,10 @@ public abstract class Evaluator {
 
     abstract public String currentSchema();
 
-    public Cell lookup(String tableOrAlias, String columnName, Location location) {
-        throw new NoColumn(tableOrAlias, columnName, location);
+    public Cell lookup(ResultRow row, 
+        String tableOrAlias, String columnName, Location location) {
+        Expression found = row.findColumn(tableOrAlias, columnName, location);
+        return row.findValue(found);
     }
 
 }

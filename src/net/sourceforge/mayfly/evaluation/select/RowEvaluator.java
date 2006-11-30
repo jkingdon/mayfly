@@ -2,7 +2,7 @@ package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
-import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.parser.Location;
 
@@ -24,9 +24,14 @@ public class RowEvaluator extends Evaluator {
         return nestedEvaluator.store();
     }
     
-    public Cell lookup(String tableOrAlias, String columnName, Location location) {
-        Expression found = row.findColumn(tableOrAlias, columnName, location);
-        return row.findValue(found);
+    public Cell lookup(ResultRow row, 
+        String tableOrAlias, String columnName, Location location) {
+        try {
+            return super.lookup(row, tableOrAlias, columnName, location);
+        }
+        catch (NoColumn e) {
+            return nestedEvaluator.lookup(this.row, tableOrAlias, columnName, location);
+        }
     }
 
 }

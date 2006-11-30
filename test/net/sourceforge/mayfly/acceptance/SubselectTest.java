@@ -141,6 +141,21 @@ public class SubselectTest extends SqlTestCase {
     }
     
     public void testNestedSubselects() throws Exception {
+        execute("create table apples(a integer, ab integer, ac integer)");
+        execute("insert into apples(a, ab, ac) values(5, 8, 13)");
+        execute("insert into apples(a, ab, ac) values(6, 8, 12)");
+        execute("create table bananas(b integer, bc integer)");
+        execute("insert into bananas(b, bc) values(8, 13)");
+        execute("insert into bananas(b, bc) values(8, 14)");
+        execute("create table carrots(c integer)");
+        execute("insert into carrots(c) values(13)");
+        execute("insert into carrots(c) values(14)");
+        
+        assertResultSet(new String[] { " 5 " },
+            query("select a from apples where ab =" +
+                "(select b from bananas where bc =" +
+                    "(select c from carrots where c = ac))")
+        );
         /*
          select a from apples where . . .
            (select b from bananas where . . .
