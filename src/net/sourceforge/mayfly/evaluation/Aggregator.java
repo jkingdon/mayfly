@@ -10,6 +10,6 @@ public interface Aggregator {
 
     public abstract ResultRows group(ResultRows rows, Selected selected);
 
-    public abstract void check(ResultRow dummyRow, Selected selected);
+    public abstract ResultRow check(ResultRow dummyRow, Selected selected);
 
 }

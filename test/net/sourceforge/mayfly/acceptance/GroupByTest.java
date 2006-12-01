@@ -326,12 +326,17 @@ public class GroupByTest extends SqlTestCase {
     
     public void testHavingIsDisallowedOnUnaggregated() throws Exception {
         execute("create table foo (x integer, y integer)");
-        /* Mayfly is giving an error for much the right reason, but
-           "no column x" isn't really a clear enough message. */
         expectQueryFailure("select avg(x) from foo group by y having x < 5", 
-            dialect.wishThisWereTrue() ?
-                "x is not aggregate or mentioned in GROUP BY" :
-                "no column x");
+            messageForBadColumnInHavingOrOrderBy("x"));
+    }
+
+    /** For cases where Mayfly correctly detects that a column doesn't make
+       sense after GROUP BY, but isn't really giving a clear enough
+       error message ("no column x? It's right there!"). */
+    private String messageForBadColumnInHavingOrOrderBy(String columnName) {
+        return dialect.wishThisWereTrue() ?
+            columnName + " is not aggregate or mentioned in GROUP BY" :
+            "no column " + columnName;
     }
     
     public void testHavingWithoutGroupBy() throws Exception {
@@ -351,10 +356,55 @@ public class GroupByTest extends SqlTestCase {
     }
     
     public void testGroupByAndOrderBy() throws Exception {
-        // For example, select type, avg(price) order by avg(price)
-        // or the error case: select type group by type order by price
-        if (!dialect.wishThisWereTrue()) {
-            return;
+        execute("create table item(type varchar(255), price integer)");
+        execute("insert into item(type, price) values('book', 1495)");
+        execute("insert into item(type, price) values('book', 1695)");
+        execute("insert into item(type, price) values('pencil', 15)");
+        
+        String orderByAggregate = "select type, avg(price) from item " +
+                "group by type order by avg(price)";
+        if (dialect.canOrderByExpression()) {
+            assertResultList(
+                new String[] { " 'pencil', 15 ", " 'book', 1595 " },
+                query(orderByAggregate)
+            );
+        }
+        else {
+            expectQueryFailure(orderByAggregate, 
+                "expected identifier but got AVG",
+                1, 58, 1, 61);
+        }
+
+        String notAggregateOrGrouped = "select type, avg(price) from item " +
+            "group by type order by price";
+        if (dialect.errorIfNotAggregateOrGrouped()) {
+            expectQueryFailure(
+                notAggregateOrGrouped,
+                messageForBadColumnInHavingOrOrderBy("price"));
+        }
+        else {
+            assertResultSet(
+                new String[] { " 'pencil', 15 ", " 'book', 1595 " },
+                query(notAggregateOrGrouped)
+            );
+        }
+    }
+
+    public void testGroupByAndOrderByNoRows() throws Exception {
+        execute("create table item(type varchar(255), price integer)");
+
+        String notAggregateOrGrouped = "select type, avg(price) from item " +
+            "group by type order by price";
+        if (dialect.errorIfNotAggregateOrGrouped()) {
+            expectQueryFailure(
+                notAggregateOrGrouped,
+                messageForBadColumnInHavingOrOrderBy("price"));
+        }
+        else {
+            assertResultSet(
+                new String[] { },
+                query(notAggregateOrGrouped)
+            );
         }
     }
 
@@ -426,7 +476,8 @@ public class GroupByTest extends SqlTestCase {
         );
 
         if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression()) {
-            expectQueryFailure(notAggregateOrGrouped, "g.a is not aggregate or mentioned in GROUP BY");
+            expectQueryFailure(notAggregateOrGrouped, 
+                "g.a is not aggregate or mentioned in GROUP BY");
         }
         else {
             // Probably 6, 6 or 10, 10.  Doesn't really matter which bogus answer.

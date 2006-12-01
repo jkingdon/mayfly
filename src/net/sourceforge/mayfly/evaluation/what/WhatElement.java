@@ -19,5 +19,9 @@ abstract public class WhatElement {
     abstract public Selected selected(ResultRow dummyRow);
 
     abstract public String displayName();
+    
+    public String debugName() {
+        return displayName();
+    }
 
 }

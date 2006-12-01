@@ -35,7 +35,8 @@ public class NoGroupBy implements Aggregator {
         return firstAggregate != null;
     }
 
-    public void check(ResultRow dummyRow, Selected selected) {
+    public ResultRow check(ResultRow dummyRow, Selected selected) {
+        return dummyRow;
     }
     
 }

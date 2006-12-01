@@ -81,19 +81,26 @@ public class GroupedRows {
         ResultRows rowsForKey, Selected selected, ResultRow accumulator) {
         for (int i = 0; i < selected.size(); ++i) {
             Expression expression = selected.element(i);
-            if (keys.containsExpresion(expression)) {
-                /** Just let addColumnsForKeys add it. */
-            }
-            else if (expression.firstAggregate() != null) {
-                Cell aggregated = expression.aggregate(rowsForKey);
-                accumulator = accumulator.with(expression, aggregated);
-            }
-            else {
-                throw new MayflyException(
-                    expression.displayName() + 
-                    " is not aggregate or mentioned in GROUP BY"
-                );
-            }
+            accumulator = 
+                addColumnsForExpression(rowsForKey, expression, accumulator);
+        }
+        return accumulator;
+    }
+
+    private ResultRow addColumnsForExpression(
+        ResultRows rowsForKey, Expression expression, ResultRow accumulator) {
+        if (keys.containsExpresion(expression)) {
+            /** Just let addColumnsForKeys add it. */
+        }
+        else if (expression.firstAggregate() != null) {
+            Cell aggregated = expression.aggregate(rowsForKey);
+            accumulator = accumulator.with(expression, aggregated);
+        }
+        else {
+            throw new MayflyException(
+                expression.displayName() + 
+                " is not aggregate or mentioned in GROUP BY"
+            );
         }
         return accumulator;
     }

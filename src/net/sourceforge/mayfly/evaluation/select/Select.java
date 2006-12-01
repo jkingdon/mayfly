@@ -83,9 +83,9 @@ public class Select extends Command {
         
         where.evaluate(dummyRow, evaluator);
         where.rejectAggregates("WHERE");
-        groupBy.check(dummyRow, selected);
+        ResultRow groupedDummyRow = groupBy.check(dummyRow, selected);
 
-        orderBy.check(dummyRow);
+        orderBy.check(groupedDummyRow);
         
         if (orderBy.isEmpty() && limit.isSpecified()) {
             throw new MayflyException("Must specify ORDER BY with LIMIT");

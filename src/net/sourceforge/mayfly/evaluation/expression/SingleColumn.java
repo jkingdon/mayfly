@@ -66,6 +66,10 @@ public class SingleColumn extends Expression {
         return Column.displayName(originalTableOrAlias, columnName);
     }
 
+    public String debugName() {
+        return Column.displayName(tableOrAlias, columnName);
+    }
+
     public boolean matches(String target) {
         return matches(null, target);
     }

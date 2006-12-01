@@ -32,9 +32,16 @@ public class GroupBy implements Aggregator {
         return resultOfGrouping.select(having);
     }
     
-    public void check(ResultRow dummyRow, Selected selected) {
+    public ResultRow check(ResultRow dummyRow, 
+        Selected selected) {
         keys.resolve(dummyRow);
-        group(new ResultRows(dummyRow), selected);
+
+        GroupedRows grouped = makeGroupedRows(new ResultRows(dummyRow));
+        ResultRows resultOfGrouping = grouped.ungroup(selected);
+
+        resultOfGrouping.select(having);
+        
+        return resultOfGrouping.row(0);
     }
 
 }
