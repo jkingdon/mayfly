@@ -78,13 +78,15 @@
 
     </target>
 
-    <target name="jar" depends="compile,test">
+    <target name="jar" depends="compile,test"
+    	description="Build the Mayfly jar">
         <jar jarfile="build/mayfly-${version}.jar">
             <fileset dir="build/classes"/>
         </jar>
     </target>
 
-    <target name="dist" depends="jar,doc">
+    <target name="dist" depends="jar,doc" 
+    	description="Build .zip file for distribution">
         <zip destfile="build/mayfly-${version}-src-ide.zip">
             <fileset dir="src">
             	<include name="net/**" />
