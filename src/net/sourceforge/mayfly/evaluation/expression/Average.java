@@ -9,12 +9,12 @@ import java.util.Collection;
 
 public class Average extends AggregateExpression {
 
-    public Average(SingleColumn column, String functionName, boolean distinct,
+    public Average(Expression column, String functionName, boolean distinct,
         Location location) {
         super(column, functionName, distinct, location);
     }
 
-    public Average(SingleColumn column, String functionName, boolean distinct) {
+    public Average(Expression column, String functionName, boolean distinct) {
         this(column, functionName, distinct, Location.UNKNOWN);
     }
 
@@ -23,8 +23,8 @@ public class Average extends AggregateExpression {
     }
     
     public Expression resolve(ResultRow row) {
-        return new Average((SingleColumn) column.resolve(row), 
-            functionName, distinct);
+        return new Average(column.resolve(row), 
+            functionName, distinct, location);
     }
 
 }

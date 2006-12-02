@@ -1094,23 +1094,23 @@ public class Parser {
         }
         else if (argumentParser.parse(TokenType.KEYWORD_max, false)) {
             return new NonBooleanParserExpression(new Maximum(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
                 argumentParser.location));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_min, false)) {
             return new NonBooleanParserExpression(new Minimum(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
                 argumentParser.location));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_sum, false)) {
             return new NonBooleanParserExpression(new Sum(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
                 argumentParser.location
             ));
         }
         else if (argumentParser.parse(TokenType.KEYWORD_avg, false)) {
             return new NonBooleanParserExpression(new Average(
-                (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
                 argumentParser.location
             ));
         }
@@ -1121,7 +1121,7 @@ public class Parser {
                 );
             } else {
                 return new NonBooleanParserExpression(new Count(
-                    (SingleColumn) argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
+                    argumentParser.expression, argumentParser.functionName, argumentParser.distinct,
                     argumentParser.location
                 ));
             }
@@ -1138,12 +1138,15 @@ public class Parser {
             return expression;
         }
         else {
-            /* What's the right wording for this?  The average SQL programmer
-               shouldn't have to know what a "primary" is (it is sort
-               of a made-up word devised for writing a grammar, really).
-               Would "expression" work?
-            */
-            throw new ParserException("primary", currentToken());
+            /* I'm pretty sure the distinction between "expression", 
+               "primary", "term", etc, are just for the grammar - that
+               users will be happy thinking of it all as expressions. 
+               (these are basically concepts introduced so we can 
+               write a grammar, not really the way that programmers 
+               think of precedence).  */
+            /* Do we use the word expression for both boolean and
+               non-boolean? */
+            throw new ParserException("expression", currentToken());
         }
     }
 

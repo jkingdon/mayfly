@@ -9,11 +9,11 @@ import java.util.Collection;
 
 public class Minimum extends AggregateExpression {
 
-    public Minimum(SingleColumn column, String functionName, boolean distinct, Location location) {
+    public Minimum(Expression column, String functionName, boolean distinct, Location location) {
         super(column, functionName, distinct, location);
     }
     
-    public Minimum(SingleColumn column, String functionName, boolean distinct) {
+    public Minimum(Expression column, String functionName, boolean distinct) {
         this(column, functionName, distinct, Location.UNKNOWN);
     }
     
@@ -26,7 +26,7 @@ public class Minimum extends AggregateExpression {
     }
 
     public Expression resolve(ResultRow row) {
-        return new Minimum((SingleColumn) column.resolve(row), functionName, distinct, location);
+        return new Minimum(column.resolve(row), functionName, distinct, location);
     }
 
 }

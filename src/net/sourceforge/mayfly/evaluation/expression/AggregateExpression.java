@@ -18,22 +18,17 @@ import java.util.Iterator;
 
 public abstract class AggregateExpression extends Expression {
 
-    protected final SingleColumn column;
+    protected final Expression column;
     protected final String functionName;
     protected final boolean distinct;
 
-    protected AggregateExpression(SingleColumn column, String functionName, 
+    protected AggregateExpression(Expression column, String functionName, 
         boolean distinct, 
         Location location) {
         super(location);
         this.column = column;
         this.functionName = functionName;
         this.distinct = distinct;
-    }
-
-    protected AggregateExpression(SingleColumn column, String functionName, 
-        boolean distinct) {
-        this(column, functionName, distinct, Location.UNKNOWN);
     }
 
     /** 

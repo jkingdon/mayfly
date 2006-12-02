@@ -213,7 +213,7 @@ public class AggregateTest extends SqlTestCase {
             assertResultSet(new String[] { " 3 " }, query(distinctStar));
         }
         else {
-            expectQueryFailure(distinctStar, "expected primary but got '*'");
+            expectQueryFailure(distinctStar, "expected expression but got '*'");
         }
     }
 
@@ -257,18 +257,27 @@ public class AggregateTest extends SqlTestCase {
         }
     }
     
+    public void testExpression() throws Exception {
+        execute("create table foo (x integer, y integer)");
+        execute("insert into foo (x, y) values (10, 20)");
+        execute("insert into foo (x, y) values (30, 40)");
+        execute("insert into foo (x, y) values (15, 16)");
+        assertResultSet(new String[] { " 70 " }, 
+            query("select max(x + y) from foo"));
+    }
+    
     public void testAsteriskOnlyForCount() throws Exception {
         execute("create table foo (x integer, y integer)");
 
         String averageOfStar = "select avg(*) from foo";
         if (dialect.aggregateAsteriskIsForCountOnly()) {
-            expectQueryFailure(averageOfStar, "expected primary but got '*'");
+            expectQueryFailure(averageOfStar, "expected expression but got '*'");
             expectQueryFailure("select sum(*) from foo", 
-                "expected primary but got '*'");
+                "expected expression but got '*'");
             expectQueryFailure("select min(*) from foo", 
-                "expected primary but got '*'");
+                "expected expression but got '*'");
             expectQueryFailure("select max(*) from foo", 
-                "expected primary but got '*'");
+                "expected expression but got '*'");
         }
         else {
             ResultSet results = query(averageOfStar);

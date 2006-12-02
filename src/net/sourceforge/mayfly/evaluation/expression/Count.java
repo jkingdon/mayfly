@@ -10,7 +10,7 @@ import java.util.Collection;
 
 public class Count extends AggregateExpression {
 
-    public Count(SingleColumn column, String functionName, boolean distinct,
+    public Count(Expression column, String functionName, boolean distinct,
         Location location) {
         super(column, functionName, distinct, location);
     }
@@ -24,7 +24,7 @@ public class Count extends AggregateExpression {
     }
 
     public Expression resolve(ResultRow row) {
-        return new Count((SingleColumn) column.resolve(row), functionName, distinct, location);
+        return new Count(column.resolve(row), functionName, distinct, location);
     }
 
 }

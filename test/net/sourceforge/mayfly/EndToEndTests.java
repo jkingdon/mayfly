@@ -248,7 +248,7 @@ public class EndToEndTests extends SqlTestCase {
             fail();
         }
         catch (MayflySqlException e) {
-            assertEquals("expected primary but got TABLE", e.getMessage());
+            assertEquals("expected expression but got TABLE", e.getMessage());
             assertEquals("select table from foo where x < ?", 
                 e.failingCommand());
         }

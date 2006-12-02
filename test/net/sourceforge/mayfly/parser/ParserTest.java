@@ -453,8 +453,7 @@ public class ParserTest extends TestCase {
             parser.parseWhat();
             fail();
         } catch (ParserException e) {
-            // Really, primary->expression
-            assertEquals("expected primary but got '*'", e.getMessage());
+            assertEquals("expected expression but got '*'", e.getMessage());
         }
     }
 

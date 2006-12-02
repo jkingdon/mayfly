@@ -9,11 +9,11 @@ import net.sourceforge.mayfly.parser.Location;
 
 public class Maximum extends AggregateExpression {
 
-    public Maximum(SingleColumn column, String spellingOfMax, boolean distinct, Location location) {
+    public Maximum(Expression column, String spellingOfMax, boolean distinct, Location location) {
         super(column, spellingOfMax, distinct, location);
     }
     
-    public Maximum(SingleColumn column, String spellingOfMax, boolean distinct) {
+    public Maximum(Expression column, String spellingOfMax, boolean distinct) {
         this(column, spellingOfMax, distinct, Location.UNKNOWN);
     }
     
@@ -26,7 +26,7 @@ public class Maximum extends AggregateExpression {
     }
 
     public Expression resolve(ResultRow row) {
-        return new Maximum((SingleColumn) column.resolve(row), functionName, distinct);
+        return new Maximum(column.resolve(row), functionName, distinct, location);
     }
 
 }

@@ -9,13 +9,13 @@ import net.sourceforge.mayfly.parser.Location;
 
 public class Sum extends AggregateExpression {
 
-    public Sum(SingleColumn column, String functionName, boolean distinct) {
-        this(column, functionName, distinct, Location.UNKNOWN);
-    }
-
-    public Sum(SingleColumn column, String functionName, boolean distinct, 
+    public Sum(Expression column, String functionName, boolean distinct, 
         Location location) {
         super(column, functionName, distinct, location);
+    }
+
+    public Sum(Expression column, String functionName, boolean distinct) {
+        this(column, functionName, distinct, Location.UNKNOWN);
     }
 
     Cell aggregate(Collection values) {
@@ -23,7 +23,7 @@ public class Sum extends AggregateExpression {
     }
 
     public Expression resolve(ResultRow row) {
-        return new Sum((SingleColumn) column.resolve(row), functionName, distinct);
+        return new Sum(column.resolve(row), functionName, distinct, location);
     }
 
 }
