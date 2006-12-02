@@ -208,6 +208,26 @@ public class OrderByTest extends SqlTestCase {
         }
     }
 
+    public void testMixAggregateAndScalar() throws Exception {
+        execute("create table foo(a integer)");
+        execute("insert into foo(a) values(50)");
+        execute("insert into foo(a) values(50)");
+        execute("insert into foo(a) values(51)");
+        execute("insert into foo(a) values(52)");
+        execute("insert into foo(a) values(52)");
+        execute("insert into foo(a) values(53)");
+        
+        String orderByIsOdd = "select count(a) from foo order by a";
+        if (dialect.errorIfNotAggregateOrGrouped() && 
+            dialect.wishThisWereTrue()) {
+            expectQueryFailure(orderByIsOdd,
+                "");
+        }
+        else {
+            query(orderByIsOdd);
+        }
+    }
+
     // TODO: order by a   -- where a is in several columns, only one of which survives after the joins
     // TODO: what other cases involving resolving column names?
     
