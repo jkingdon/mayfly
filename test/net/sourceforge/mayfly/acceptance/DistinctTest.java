@@ -12,21 +12,15 @@ public class DistinctTest extends SqlTestCase {
         execute("insert into stations(name, line) values('Greenbelt', 'Green')");
         execute("insert into stations(name, line) values('Navy Yard', 'Green')");
         
-        String query = "select distinct line from stations order by line";
-        if (!dialect.wishThisWereTrue()) {
-            expectQueryFailure(query, "expected expression but got DISTINCT");
-        }
-        else {
-            assertResultList(new String[] { " 'Green' ", " 'Red' " },
-                query(query));
-            assertResultList(new String[] { " 'Green' ", " 'Green' ", " 'Red' " },
-                query("select all line from stations order by line"));
-    
-            assertResultSet(new String[] { " 'Greenbelt', 'Green' ", 
-                " 'Navy Yard', 'Green' ", 
-                " 'Tenleytown', 'Red' " },
-                query("select distinct name, line from stations"));
-        }
+        assertResultList(new String[] { " 'Green' ", " 'Red' " },
+            query("select distinct line from stations order by line"));
+        assertResultList(new String[] { " 'Green' ", " 'Green' ", " 'Red' " },
+            query("select all line from stations order by line"));
+
+        assertResultSet(new String[] { " 'Greenbelt', 'Green' ", 
+            " 'Navy Yard', 'Green' ", 
+            " 'Tenleytown', 'Red' " },
+            query("select distinct name, line from stations"));
     }
     
     public void testWithGroupBy() throws Exception {
@@ -36,21 +30,14 @@ public class DistinctTest extends SqlTestCase {
         execute("insert into foo(a) values(51)");
         execute("insert into foo(a) values(51)");
         
-        String query = "select all count(a) from foo group by a";
-        
-        if (!dialect.wishThisWereTrue()) {
-            expectQueryFailure(query, "expected expression but got ALL");
-        }
-        else {
-            assertResultList(
-                new String[] { " 2 ", " 2 " },
-                query(query)
-            );
-            assertResultList(
-                new String[] { " 2 " },
-                query("select distinct count(a) from foo group by a")
-            );
-        }
+        assertResultList(
+            new String[] { " 2 ", " 2 " },
+            query("select all count(a) from foo group by a")
+        );
+        assertResultList(
+            new String[] { " 2 " },
+            query("select distinct count(a) from foo group by a")
+        );
     }
 
     public void testWithLimit() throws Exception {
@@ -63,10 +50,7 @@ public class DistinctTest extends SqlTestCase {
         execute("insert into foo(a) values(53)");
         
         String withLimit = "select distinct a from foo order by a limit 2";
-        if (!dialect.wishThisWereTrue()) {
-            expectQueryFailure(withLimit, "expected expression but got DISTINCT");
-        }
-        else if (dialect.haveLimit()) {
+        if (dialect.haveLimit()) {
             assertResultList(
                 new String[] { " 50 ", " 51 " },
                 query(withLimit)
@@ -88,5 +72,7 @@ public class DistinctTest extends SqlTestCase {
     // select distinct a from foo order by b -> error?
     // select distinct a,b from foo order by a,b
     // select distinct a,b from foo order by b,a
+    
+    // nulls
 
 }

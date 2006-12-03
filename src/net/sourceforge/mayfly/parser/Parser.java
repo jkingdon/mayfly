@@ -820,6 +820,18 @@ public class Parser {
         Location start = currentToken().location;
         
         expectAndConsume(TokenType.KEYWORD_select);
+        
+        boolean distinct;
+        if (consumeIfMatches(TokenType.KEYWORD_all)) {
+            distinct = false;
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_distinct)) {
+            distinct = true;
+        }
+        else {
+            distinct = false;
+        }
+
         What what = parseWhat();
         expectAndConsume(TokenType.KEYWORD_from);
         From from = parseFromItems();
@@ -838,7 +850,7 @@ public class Parser {
                multiple threads, this can be a noop */
         }
 
-        return new Select(what, from, where, groupBy, orderBy, limit,
+        return new Select(what, from, where, groupBy, distinct, orderBy, limit,
             start);
     }
 

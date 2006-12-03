@@ -1,8 +1,10 @@
 package net.sourceforge.mayfly.evaluation.what;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.GroupByCells;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
@@ -84,6 +86,30 @@ public class Selected implements Iterable {
 
     public Expression element(int index) {
         return (Expression) expressions.get(index);
+    }
+
+    public GroupByCells evaluateAll(ResultRow row) {
+        GroupByCells result = new GroupByCells();
+        for (Iterator iter = expressions.iterator(); iter.hasNext();) {
+            Expression expression = (Expression) iter.next();
+            result.add(expression.evaluate(row));
+        }
+        return result;
+    }
+
+    public ResultRow toRow(GroupByCells cells) {
+        if (expressions.size() != cells.size()) {
+            throw new MayflyInternalException(
+                "matching " + expressions.size() + 
+                " expressions with " + cells.size() + " cells");
+        }
+
+        ResultRow result = new ResultRow();
+        for (int i = 0; i < cells.size(); ++i) {
+            Cell cell = cells.get(i);
+            result = result.with((Expression) expressions.get(i), cell);
+        }
+        return result;
     }
 
 }

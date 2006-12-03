@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.GroupByCells;
 import net.sourceforge.mayfly.evaluation.GroupByKeys;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
@@ -24,6 +25,8 @@ import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 public class Select extends Command {
 
@@ -43,6 +46,9 @@ public class Select extends Command {
      * Not immutable, because of {@link GroupByKeys}
      */
     private final Aggregator groupBy;
+
+    private final boolean distinct;
+
     /** Not immutable */
     private final OrderBy orderBy;
 
@@ -51,11 +57,12 @@ public class Select extends Command {
     public final Location location;
 
     public Select(What what, From from, Condition where, Aggregator groupBy, 
-        OrderBy orderBy, Limit limit, Location location) {
+        boolean distinct, OrderBy orderBy, Limit limit, Location location) {
         this.what = what;
         this.from = from;
         this.where = where;
         this.groupBy = groupBy;
+        this.distinct = distinct;
         this.orderBy = orderBy;
         this.limit = limit;
         this.location = location;
@@ -106,8 +113,39 @@ public class Select extends Command {
         
         ResultRows afterGrouping = groupBy.group(afterWhere, selected);
 
-        ResultRows sorted = orderBy.sort(afterGrouping, what);
+        ResultRows afterDistinct = distinct(selected, afterGrouping);
+
+        ResultRows sorted = orderBy.sort(afterDistinct, what);
         return limit.limit(sorted);
+    }
+
+    private ResultRows distinct(Selected selected, ResultRows rows) {
+        if (!distinct) {
+            return rows;
+        }
+
+        Set distinctRows = constructDistinctRows(selected, rows);
+        
+        return distinctRowsToResultRows(selected, distinctRows);
+    }
+
+    private ResultRows distinctRowsToResultRows(Selected selected, Set distinctRows) {
+        ResultRows result = new ResultRows();
+        for (Iterator iter = distinctRows.iterator(); iter.hasNext();) {
+            GroupByCells cells = (GroupByCells) iter.next();
+            result = result.with(selected.toRow(cells));
+        }
+        return result;
+    }
+
+    private Set constructDistinctRows(Selected selected, ResultRows rows) {
+        Set distinctRows = new LinkedHashSet();
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            ResultRow row = (ResultRow) iter.next();
+            GroupByCells cells = selected.evaluateAll(row);
+            distinctRows.add(cells);
+        }
+        return distinctRows;
     }
 
     public UpdateStore update(DataStore store, String schema) {
