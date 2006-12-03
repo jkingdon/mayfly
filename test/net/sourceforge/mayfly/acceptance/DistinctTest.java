@@ -69,9 +69,42 @@ public class DistinctTest extends SqlTestCase {
         }
     }
     
-    // select distinct a from foo order by b -> error?
-    // select distinct a,b from foo order by a,b
-    // select distinct a,b from foo order by b,a
+    public void testWithOrderBy() throws Exception {
+        execute("create table foo(a integer, b integer, c integer)");
+        
+        String orderByNotInSelectList = "select distinct a from foo order by c";
+        if (dialect.errorIfOrderByNotInSelectDistinct()) {
+            expectQueryFailure(orderByNotInSelectList, 
+                "ORDER BY expression c should be in SELECT DISTINCT list");
+            expectQueryFailure("select distinct a from foo order by d", 
+                "no column d");
+        }
+        else {
+            assertResultList(new String[] { },
+                query(orderByNotInSelectList));
+        }
+
+        execute("insert into foo(a, b, c) values(5, 10, 300)");
+        execute("insert into foo(a, b, c) values(5, 10, 200)");
+        execute("insert into foo(a, b, c) values(5, 12, 200)");
+        execute("insert into foo(a, b, c) values(6, 10, 100)");
+
+        if (dialect.errorIfOrderByNotInSelectDistinct()) {
+            expectQueryFailure(orderByNotInSelectList, 
+                "ORDER BY expression c should be in SELECT DISTINCT list");
+        }
+        else {
+            // MySQL (somehow) comes up with 6,5
+            // Derby applies the DISTINCT to c (so it seems): 6,5,5
+            // Either one seems dubious.
+            query(orderByNotInSelectList);
+        }
+
+        assertResultList(new String[] { "5, 10", "5, 12", "6, 10" },
+            query("select distinct a,b from foo order by a,b")); 
+        assertResultList(new String[] { "5, 10", "6, 10", "5, 12" },
+            query("select distinct a,b from foo order by b,a")); 
+    }
     
     // nulls
 

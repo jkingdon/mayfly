@@ -138,7 +138,8 @@ public class OrderByTest extends SqlTestCase {
         String orderByB = "select foo.*, a from foo order by 2";
         String orderBySecondA = "select foo.*, a from foo order by 3";
 
-        assertResultList(new String[] { "2", "3", "4", "5", "8" }, query("select a, foo.* from foo order by 1"));
+        assertResultList(new String[] { "2", "3", "4", "5", "8" }, 
+            query("select a, foo.* from foo order by 1"));
         String orderBySecondA2 = "select a, foo.* from foo order by 2";
 
         if (dialect.expectMayflyBehavior()) {

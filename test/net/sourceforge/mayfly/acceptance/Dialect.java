@@ -654,4 +654,8 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean errorIfOrderByNotInSelectDistinct() {
+        return true;
+    }
+
 }

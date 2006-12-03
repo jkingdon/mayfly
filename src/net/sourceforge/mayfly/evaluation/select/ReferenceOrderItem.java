@@ -36,7 +36,7 @@ public class ReferenceOrderItem extends OrderItem {
         }
     }
 
-    public void check(ResultRow dummyRow) {
+    public void check(ResultRow afterGroupByAndDistinct, ResultRow afterJoins) {
     }
 
 }

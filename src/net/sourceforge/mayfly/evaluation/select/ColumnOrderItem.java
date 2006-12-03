@@ -1,6 +1,8 @@
 package net.sourceforge.mayfly.evaluation.select;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.What;
@@ -24,8 +26,16 @@ public class ColumnOrderItem extends OrderItem {
         return cell1.compareTo(cell2, column.location);
     }
     
-    public void check(ResultRow dummyRow) {
-        column.evaluate(dummyRow);
+    public void check(ResultRow afterGroupByAndDistinct, ResultRow afterJoins) {
+        try {
+            column.evaluate(afterGroupByAndDistinct);
+        } catch (NoColumn e) {
+            column.evaluate(afterJoins);
+            throw new MayflyException(
+                "ORDER BY expression " + column.displayName() +
+                " should be in SELECT DISTINCT list",
+                column.location);
+        }
     }
     
 }

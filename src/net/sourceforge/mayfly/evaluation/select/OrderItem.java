@@ -18,6 +18,6 @@ abstract public class OrderItem {
 
     abstract protected int compareAscending(What what, ResultRow first, ResultRow second);
 
-    abstract public void check(ResultRow dummyRow);
+    abstract public void check(ResultRow afterGroupByAndDistinct, ResultRow afterJoins);
 
 }

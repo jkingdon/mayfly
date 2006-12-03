@@ -229,5 +229,9 @@ public class DerbyDialect extends Dialect {
     public boolean deleteAllRowsIsSmartAboutForeignKeys() {
         return true;
     }
+    
+    public boolean errorIfOrderByNotInSelectDistinct() {
+        return false;
+    }
 
 }

@@ -32,8 +32,7 @@ public class GroupBy implements Aggregator {
         return resultOfGrouping.select(having);
     }
     
-    public ResultRow check(ResultRow dummyRow, 
-        Selected selected) {
+    public ResultRow check(ResultRow dummyRow, Selected selected) {
         keys.resolve(dummyRow);
 
         GroupedRows grouped = makeGroupedRows(new ResultRows(dummyRow));
@@ -41,7 +40,7 @@ public class GroupBy implements Aggregator {
 
         resultOfGrouping.select(having);
         
-        return resultOfGrouping.row(0);
+        return resultOfGrouping.singleRow();
     }
 
 }

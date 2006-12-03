@@ -98,8 +98,7 @@ public class SelectTest extends TestCase {
 
 
         ResultRows rows = query(evaluator, "select * from foo, bar");
-        assertEquals(1, rows.size());
-        assertRow("foo", "colA", "1a", "bar", "colX", "barXValue", rows.row(0));
+        assertRow("foo", "colA", "1a", "bar", "colX", "barXValue", rows.singleRow());
     }
 
     public void testSimpleWhere() throws Exception {

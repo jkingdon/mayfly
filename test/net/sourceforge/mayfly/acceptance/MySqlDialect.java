@@ -303,5 +303,9 @@ public class MySqlDialect extends Dialect {
     public boolean addingColumnCountsAsAffectedRow() {
         return true;
     }
+    
+    public boolean errorIfOrderByNotInSelectDistinct() {
+        return false;
+    }
 
 }

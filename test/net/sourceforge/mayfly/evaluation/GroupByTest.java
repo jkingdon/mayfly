@@ -48,8 +48,7 @@ public class GroupByTest extends TestCase {
         ResultRows eightRows =
             grouped.getRows(new GroupByCells(new LongCell(8)))
         ;
-        assertEquals(1, eightRows.size());
-        expectRow(8, 52, eightRows.row(0));
+        expectRow(8, 52, eightRows.singleRow());
     }
 
     private void expectRow(int expectedA, int expectedB, ResultRow fifty) {
@@ -92,8 +91,7 @@ public class GroupByTest extends TestCase {
         ResultRows seven50 = 
             grouped.getRows(new GroupByCells(new LongCell(7), new LongCell(50)))
         ;
-        assertEquals(1, seven50.size());
-        ResultRow seven50Row = seven50.row(0);
+        ResultRow seven50Row = seven50.singleRow();
         MayflyAssert.assertColumn("foo", "a", 7, seven50Row, 0);
         MayflyAssert.assertColumn("foo", "b", 50, seven50Row, 1);
         MayflyAssert.assertColumn("foo", "c", 400, seven50Row, 2);
@@ -101,7 +99,7 @@ public class GroupByTest extends TestCase {
         ResultRows seven51 =
             grouped.getRows(new GroupByCells(new LongCell(7), new LongCell(51)))
         ;
-        ResultRow seven51Row = seven51.row(0);
+        ResultRow seven51Row = seven51.singleRow();
         MayflyAssert.assertColumn("foo", "a", 7, seven51Row, 0);
         MayflyAssert.assertColumn("foo", "b", 51, seven51Row, 1);
         MayflyAssert.assertColumn("foo", "c", 400, seven51Row, 2);

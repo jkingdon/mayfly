@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation;
 
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -76,6 +77,13 @@ public class ResultRows {
             }
         }
         return new ResultRows(new ImmutableList(result));
+    }
+    
+    public ResultRow singleRow() {
+        if (size() != 1) {
+            throw new MayflyInternalException("expected one row, got " + size());
+        }
+        return row(0);
     }
 
 }
