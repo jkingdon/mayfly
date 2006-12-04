@@ -26,11 +26,24 @@ public class ColumnOrderItem extends OrderItem {
         return cell1.compareTo(cell2, column.location);
     }
     
-    public void check(ResultRow afterGroupByAndDistinct, ResultRow afterJoins) {
+    public void check(ResultRow afterGroupByAndDistinct, 
+        ResultRow afterGroupBy, ResultRow afterJoins) {
         try {
             column.evaluate(afterGroupByAndDistinct);
-        } catch (NoColumn e) {
-            column.evaluate(afterJoins);
+        }
+        catch (NoColumn doesNotSurviveDistinct) {
+            /* We're going to throw some exception, we just need to figure
+               out which one.  */
+            try {
+                column.evaluate(afterGroupBy);
+            }
+            catch (NoColumn doesNotSurviveGroupBy) {
+                column.evaluate(afterJoins);
+                throw new MayflyException(column.displayName() + 
+                    " is not aggregate or mentioned in GROUP BY",
+                    column.location);
+            }
+
             throw new MayflyException(
                 "ORDER BY expression " + column.displayName() +
                 " should be in SELECT DISTINCT list",

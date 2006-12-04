@@ -177,12 +177,14 @@ public class GroupByTest extends SqlTestCase {
     public void testSelectSomethingNotGroupedNoRows() throws Exception {
         execute("create table books (author varchar(255), title varchar(255))");
         
-        String notAggegateOrGrouped = "select author, title, count(*) from books group by author";
+        String notAggregateOrGrouped = 
+            "select author, title, count(*) from books group by author";
 
         if (dialect.errorIfNotAggregateOrGrouped()) {
-            expectQueryFailure(notAggegateOrGrouped, "title is not aggregate or mentioned in GROUP BY");
+            expectQueryFailure(notAggregateOrGrouped, 
+                "title is not aggregate or mentioned in GROUP BY");
         } else {
-            assertResultList(new String[] {}, query(notAggegateOrGrouped));
+            assertResultList(new String[] {}, query(notAggregateOrGrouped));
         }
     }
     
@@ -301,9 +303,8 @@ public class GroupByTest extends SqlTestCase {
             assertResultList(new String[] { " 2 " }, query(sql));
         }
         else {
-            // this doesn't really make sense, but it is better
-            // than returning bogus results.
-            expectQueryFailure(sql, "no column x");
+            expectQueryFailure(sql, 
+                "aggregates in HAVING not yet fully implemented");
         }
         
     }
@@ -327,18 +328,9 @@ public class GroupByTest extends SqlTestCase {
     public void testHavingIsDisallowedOnUnaggregated() throws Exception {
         execute("create table foo (x integer, y integer)");
         expectQueryFailure("select avg(x) from foo group by y having x < 5", 
-            messageForBadColumnInHavingOrOrderBy("x"));
+            "x is not aggregate or mentioned in GROUP BY");
     }
 
-    /** For cases where Mayfly correctly detects that a column doesn't make
-       sense after GROUP BY, but isn't really giving a clear enough
-       error message ("no column x? It's right there!"). */
-    private String messageForBadColumnInHavingOrOrderBy(String columnName) {
-        return dialect.wishThisWereTrue() ?
-            columnName + " is not aggregate or mentioned in GROUP BY" :
-            "no column " + columnName;
-    }
-    
     public void testHavingWithoutGroupBy() throws Exception {
         execute("create table foo (x integer, y integer)");
         String havingWithoutGroupBy = "select x from foo having x < 5";
@@ -380,7 +372,7 @@ public class GroupByTest extends SqlTestCase {
         if (dialect.errorIfNotAggregateOrGrouped()) {
             expectQueryFailure(
                 notAggregateOrGrouped,
-                messageForBadColumnInHavingOrOrderBy("price"));
+                "price is not aggregate or mentioned in GROUP BY");
         }
         else {
             assertResultSet(
@@ -398,7 +390,7 @@ public class GroupByTest extends SqlTestCase {
         if (dialect.errorIfNotAggregateOrGrouped()) {
             expectQueryFailure(
                 notAggregateOrGrouped,
-                messageForBadColumnInHavingOrOrderBy("price"));
+                "price is not aggregate or mentioned in GROUP BY");
         }
         else {
             assertResultSet(
@@ -457,9 +449,6 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into foo(a) values(6)");
         execute("insert into foo(a) values(10)");
         
-        String selectOk = "select f.*, avg(g.a) from foo f, foo g group by f.a order by f.a";
-        String notAggregateOrGrouped = "select g.* from foo f, foo g group by f.a order by f.a";
-        
         // Just for illustration:
         assertResultSet(new String[] {
             "6, 6",
@@ -472,9 +461,11 @@ public class GroupByTest extends SqlTestCase {
         assertResultSet(new String[] {
             "6, 8",
             "10, 8"
-        }, query(selectOk)
+        }, query("select f.*, avg(g.a) from foo f, foo g group by f.a order by f.a")
         );
 
+        String notAggregateOrGrouped = 
+            "select g.* from foo f, foo g group by f.a order by f.a";
         if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression()) {
             expectQueryFailure(notAggregateOrGrouped, 
                 "g.a is not aggregate or mentioned in GROUP BY");

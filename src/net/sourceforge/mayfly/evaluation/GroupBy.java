@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.evaluation;
 
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
@@ -32,15 +34,32 @@ public class GroupBy implements Aggregator {
         return resultOfGrouping.select(having);
     }
     
-    public ResultRow check(ResultRow dummyRow, Selected selected) {
-        keys.resolve(dummyRow);
+    public ResultRow check(ResultRow afterJoins, Selected selected) {
+        keys.resolve(afterJoins);
 
-        GroupedRows grouped = makeGroupedRows(new ResultRows(dummyRow));
+        GroupedRows grouped = makeGroupedRows(new ResultRows(afterJoins));
         ResultRows resultOfGrouping = grouped.ungroup(selected);
 
-        resultOfGrouping.select(having);
-        
-        return resultOfGrouping.singleRow();
+        ResultRow afterGroupBy = resultOfGrouping.singleRow();
+        checkHaving(afterJoins, afterGroupBy);
+        return afterGroupBy;
+    }
+
+    private void checkHaving(ResultRow afterJoins, ResultRow afterGroupBy) {
+        try {
+            having.evaluate(afterGroupBy);
+        }
+        catch (NoColumn doesNotSurviveGroupBy) {
+            if (having.isAggregate()) {
+                throw new UnimplementedException(
+                    "aggregates in HAVING not yet fully implemented");
+            }
+
+            having.evaluate(afterJoins);
+            throw new MayflyException(doesNotSurviveGroupBy.displayName() + 
+                " is not aggregate or mentioned in GROUP BY",
+                having.location());
+        }
     }
 
 }

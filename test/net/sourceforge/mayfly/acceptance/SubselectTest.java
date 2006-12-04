@@ -129,6 +129,9 @@ public class SubselectTest extends SqlTestCase {
             query("select x from foo where " +
                 "(select y from bar where y = x) is null"));
 
+        /* Question here is whether we want to always return null for
+           the zero row case, or whether there are times we want to
+           throw an error or something. */
 //        expectQueryFailure(
 //            "select x from foo where x = \n" +
 //                "(select y from bar where y = 77)", 
@@ -156,16 +159,10 @@ public class SubselectTest extends SqlTestCase {
                 "(select b from bananas where bc =" +
                     "(select c from carrots where c = ac))")
         );
-        /*
-         select a from apples where . . .
-           (select b from bananas where . . .
-             (select c from carrots where
-               apples.a . . .
-         */
-        // the reference to apples.a will fail because mayfly currently
-        // can only look in the next subselect out, not follow the
-        // whole chain.  Need to move the catch of NoColumn into
-        // a method in Evaluator, I think.
+    }
+    
+    public void testHaving() throws Exception {
+        // TODO: subselect in HAVING condition
     }
     
 }

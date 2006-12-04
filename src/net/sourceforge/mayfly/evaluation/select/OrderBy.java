@@ -54,10 +54,11 @@ public class OrderBy {
         return new ResultRows(new ImmutableList(rowList));
     }
 
-    public void check(ResultRow afterGroupByAndDistinct, ResultRow afterJoins) {
+    public void check(ResultRow afterGroupByAndDistinct, 
+        ResultRow afterGroupBy, ResultRow afterJoins) {
         for (Iterator iter = elements.iterator(); iter.hasNext();) {
             OrderItem item = (OrderItem) iter.next();
-            item.check(afterGroupByAndDistinct, afterJoins);
+            item.check(afterGroupByAndDistinct, afterGroupBy, afterJoins);
         }
     }
 

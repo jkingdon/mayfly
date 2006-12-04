@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
+import net.sourceforge.mayfly.parser.Location;
 
 public abstract class Condition {
 
@@ -40,6 +41,14 @@ public abstract class Condition {
             throw new MayflyException(
                 "aggregate " + firstAggregate + " not valid in " + context);
         }
+    }
+    
+    public final boolean isAggregate() {
+        return firstAggregate() != null;
+    }
+    
+    public Location location() {
+        return Location.UNKNOWN;
     }
 
 }
