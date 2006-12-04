@@ -18,8 +18,8 @@ public class MySqlDialect extends Dialect {
        think, although I don't know whether there is a way to
        give selective access to CREATE/DROP DATABASE.  We don't
        need access to more than mayflytest, but we do need a way
-       to clear that database on each test (unless we start
-       testing schemas).
+       to clear that database on each test.  Of course, if we
+       were to start testing schemas, we would need more than mayflytest.
        
        Oh, yeah, and we should read the password from a 
        file/property/environment-variable and all that
@@ -153,6 +153,8 @@ public class MySqlDialect extends Dialect {
     }
     
     public boolean errorIfNotAggregateOrGrouped() {
+        /* This is documented behavior.
+           See the ONLY_FULL_GROUP_BY SQL mode to change it. */
         return false;
     }
     

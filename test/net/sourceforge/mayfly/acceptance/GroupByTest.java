@@ -163,7 +163,7 @@ public class GroupByTest extends SqlTestCase {
                 "title is not aggregate or mentioned in GROUP BY");
         } else {
             // MySQL seems to supply some random row for the title.
-            // That seems fishy.
+            // That seems fishy, but is documented.
             assertResultList(
                 new String[] {
                     " 'Bowman', 'Practical SQL', 2 ", 
