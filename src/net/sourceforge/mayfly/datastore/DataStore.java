@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.ValueList;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
@@ -214,6 +215,12 @@ public class DataStore {
             table.schema(), 
             existing.addConstraint(table.tableName(), key)
         );
+    }
+
+    public boolean hasTable(
+        UnresolvedTableReference table, String defaultSchema) {
+        Schema schema = schema(table.schema(defaultSchema));
+        return schema.hasTable(table.tableName());
     }
 
 }

@@ -365,12 +365,12 @@ public class Parser {
             expectAndConsume(TokenType.KEYWORD_exists);
             ifExists = true;
         }
-        String tableName = consumeIdentifier();
+        UnresolvedTableReference table = parseTableReference();
         if (consumeIfMatches(TokenType.KEYWORD_if)) {
             expectAndConsume(TokenType.KEYWORD_exists);
             ifExists = true;
         }
-        return new DropTable(tableName, ifExists);
+        return new DropTable(table, ifExists);
     }
 
     private CreateSchema parseCreateSchema() {

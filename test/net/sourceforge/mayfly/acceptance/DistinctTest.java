@@ -105,7 +105,56 @@ public class DistinctTest extends SqlTestCase {
         assertResultList(new String[] { "5, 10", "6, 10", "5, 12" },
             query("select distinct a,b from foo order by b,a")); 
     }
-    
-    // nulls
+
+    /**
+     * @internal
+     * Similar to {@link #testWithOrderBy()} but attempts to show one
+     * scenario where this can come up (especially via Hibernate-generated
+     * SQL).
+     */
+    public void testOrderByTwoTableAliases() throws Exception {
+        execute("create table country(id integer, name varchar(255))");
+        execute("insert into country(id, name) values(5, 'Sri Lanka')");
+        execute("insert into country(id, name) values(4, 'India')");
+        
+        execute("create table cities(name varchar(80), country integer)");
+        execute("insert into cities(name, country) values('Colombo', 5)");
+        execute("insert into cities(name, country) values('Mumbai', 4)");
+        execute("insert into cities(name, country) values('Delhi', 4)");
+        
+        String sql = "select distinct country1.name " +
+            "from cities inner join country country1 " +
+            "on cities.country = country1.id " +
+            "inner join country country2 " +
+            "on cities.country = country2.id " +
+            "order by country2.name";
+        if (dialect.errorIfOrderByNotInSelectDistinct()) {
+            expectQueryFailure(sql, 
+                "ORDER BY expression country2.name should be in SELECT DISTINCT list");
+        }
+        else {
+            assertResultList(
+                new String[] { " 'India' ", " 'Sri Lanka' " },
+                query(sql));
+        }
+    }
+
+    public void testNull() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        execute("insert into foo(a, b) values(null, 5)");
+        execute("insert into foo(a, b) values(null, 7)");
+        
+        /* The fact that these are collapsed in DISTINCT kind of makes it look
+           like the one null is equal to the other null, so I'm not sure
+           how consistent this is with the general semantics of null.
+           However, the behavior here seems to be pretty universal among
+           SQL implementations.
+           The only examples I can think of are pretty contrived, so I'm
+           not sure what the real world impact is, one way or the other. */
+        assertResultList(new String[] { " null " },
+            query("select distinct a from foo"));
+        assertResultList(new String[] { " null ", " null " },
+            query("select all a from foo"));
+    }
 
 }

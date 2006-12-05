@@ -1,28 +1,31 @@
 package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.TableReference;
 
 public class DropTable extends Command {
 
-    private final String table;
+    private final UnresolvedTableReference table;
     final boolean ifExists;
 
-    public DropTable(String table, boolean ifExists) {
+    public DropTable(UnresolvedTableReference table, boolean ifExists) {
         this.table = table;
         this.ifExists = ifExists;
     }
     
-    public String table() {
+    public UnresolvedTableReference table() {
         return table;
     }
 
     public UpdateStore update(DataStore store, String schema) {
         if (ifExists) {
-            if (!store.schema(schema).hasTable(table)) {
+            if (!store.hasTable(table, schema)) {
                 return new UpdateStore(store, 0);
             }
         }
-        DataStore newStore = store.dropTable(schema, table);
+        TableReference resolved = table.resolve(store, schema, null);
+        DataStore newStore = store.dropTable(
+            resolved.schema(), resolved.tableName());
         return new UpdateStore(newStore, 0);
     }
 

@@ -8,7 +8,7 @@ public class CommandTest extends TestCase {
 
     public void testParse() throws Exception {
         DropTable command = (DropTable) Command.fromSql("drop table FOO");
-        assertEquals("FOO", command.table());
+        assertEquals("FOO", command.table().tableName());
         assertFalse(command.ifExists);
     }
     

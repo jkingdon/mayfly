@@ -142,18 +142,16 @@ public class ForeignKeyTest extends SqlTestCase {
             "a foreign key in table urboj.cities refers to it");
 
         execute("set schema urboj");
-        String sql = "drop table landoj.countries";
-        if (dialect.wishThisWereTrue()) {
-            expectExecuteFailure(sql,
-                "cannot drop countries because " +
-                "a foreign key in table cities refers to it");
-        }
-        else {
-            expectExecuteFailure(sql, "expected end of file but got '.'");
-        }
+        expectExecuteFailure("drop table landoj.countries",
+            dialect.wishThisWereTrue() ? 
+            "cannot drop landoj.countries because " +
+            "a foreign key in table cities refers to it" :
+            "cannot drop countries because " +
+            "a foreign key in table urboj.cities refers to it"
+        );
+
         execute("drop table cities");
-        execute("set schema landoj");
-        execute("drop table countries");
+        execute("drop table landoj.countries");
     }
     
     public void testReferenceNonexistentTable() throws Exception {
