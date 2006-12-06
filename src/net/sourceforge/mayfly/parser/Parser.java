@@ -16,6 +16,7 @@ import net.sourceforge.mayfly.datastore.constraint.SetNull;
 import net.sourceforge.mayfly.datastore.types.BinaryDataType;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DateDataType;
+import net.sourceforge.mayfly.datastore.types.DecimalDataType;
 import net.sourceforge.mayfly.datastore.types.DefaultDataType;
 import net.sourceforge.mayfly.datastore.types.IntegerDataType;
 import net.sourceforge.mayfly.datastore.types.TimestampDataType;
@@ -743,17 +744,11 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_decimal)) {
             expectAndConsume(TokenType.OPEN_PAREN);
-            int digits1 = consumeInteger();
+            int precision = consumeInteger();
             expectAndConsume(TokenType.COMMA);
-            int digits2 = consumeInteger();
+            int scale = consumeInteger();
             expectAndConsume(TokenType.CLOSE_PAREN);
-            type = new DefaultDataType(
-                TokenType.KEYWORD_decimal.description() +
-                "(" +
-                digits1 +
-                "," +
-                digits2 +
-                ")");
+            type = new DecimalDataType(precision, scale);
         }
         else if (currentTokenType() == TokenType.IDENTIFIER) {
             // These shouldn't be reserved if they are not in the

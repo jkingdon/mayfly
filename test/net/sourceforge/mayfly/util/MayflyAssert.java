@@ -5,8 +5,10 @@ import junit.framework.Assert;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.StringCell;
+import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
@@ -95,6 +97,10 @@ public class MayflyAssert {
         Assert.assertTrue(cell2.sqlEquals(cell1));
         Assert.assertEquals(0, cell1.compareTo(cell2));
         Assert.assertEquals(0, cell2.compareTo(cell1));
+    }
+
+    public static Cell coerce(DataType type, Cell cell) {
+        return type.coerce(new Value(cell), "test_column");
     }
 
 }

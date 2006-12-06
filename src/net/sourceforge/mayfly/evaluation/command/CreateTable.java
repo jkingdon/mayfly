@@ -19,13 +19,9 @@ public class CreateTable extends Command {
     private Columns columns;
     private List constraints = new ArrayList();
 
-    public CreateTable(String table, List columnNames) {
-        this.table = table;
-        this.columns = Columns.fromColumnNames(columnNames);
-    }
-
     public CreateTable(String table) {
-        this(table, new ArrayList());
+        this.table = table;
+        this.columns = new Columns(new ImmutableList());
     }
 
     public String table() {

@@ -127,10 +127,6 @@ public class MayflyDialect extends Dialect {
         return true;
     }
 
-    public boolean decimalScaleIsFromType() {
-        return wishThisWereTrue();
-    }
-    
     public boolean trailingSpacesConsultedInComparisons() {
         // I guess we should go with the standard instead of hypersonic...
         // I don't know, are there any strong arguments one way or the other?

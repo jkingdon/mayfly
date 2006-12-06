@@ -8,31 +8,27 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TimestampCell;
-import net.sourceforge.mayfly.evaluation.Value;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class TimestampDataTypeTest extends TestCase {
     
     public void testCoerce() throws Exception {
-        TimestampCell cell = (TimestampCell) coerce(
+        TimestampCell cell = (TimestampCell) MayflyAssert.coerce(
             new TimestampDataType(), new StringCell("2038-12-01 03:43:07"));
         assertEquals(2038, cell.year());
     }
     
     public void testCallsGenericCoerce() throws Exception {
         Cell coerced = 
-            coerce(new TimestampDataType(), NullCell.INSTANCE);
+            MayflyAssert.coerce(new TimestampDataType(), NullCell.INSTANCE);
         ObjectAssert.assertInstanceOf(NullCell.class, coerced);
     }
     
     public void testCoerceFromTimestamp() throws Exception {
         TimestampCell in = new TimestampCell(2003, 1, 7, 13, 45, 00);
-        TimestampCell coerced = (TimestampCell) coerce(
+        TimestampCell coerced = (TimestampCell) MayflyAssert.coerce(
             new TimestampDataType(), in);
         assertEquals(13, coerced.hour());
-    }
-
-    private Cell coerce(DataType type, Cell cell) {
-        return type.coerce(new Value(cell), "test_column");
     }
 
     public void testStringToDate() throws Exception {

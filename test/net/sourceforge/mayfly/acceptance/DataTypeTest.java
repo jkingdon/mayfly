@@ -184,9 +184,13 @@ public class DataTypeTest extends SqlTestCase {
         {
             ResultSet results = query("select price, list_price from foo");
             assertTrue(results.next());
-            assertEquals(9500, results.getBigDecimal(1).movePointRight(2).intValue());
-            assertEquals(9995, results.getBigDecimal("list_price").movePointRight(2).intValue());
+
+            checkDecimal(9500, dialect.decimalScaleIsFromType() ? 2 : 1, 
+                results.getBigDecimal(1));
+            checkDecimal(9995, 2, results.getBigDecimal("list_price"));
+
             assertFalse(results.next());
+
             results.close();
         }
 
@@ -197,17 +201,19 @@ public class DataTypeTest extends SqlTestCase {
             ResultSet results = query("select price, list_price from foo");
             assertTrue(results.next());
 
-            BigDecimal price = (BigDecimal) results.getObject(1);
-            assertEquals(9500, price.movePointRight(2).intValue());
-            assertEquals(dialect.decimalScaleIsFromType() ? 2 : 1, price.scale());
-
-            BigDecimal listPrice = (BigDecimal) results.getObject("list_price");
-            assertEquals(9995, listPrice.movePointRight(2).intValue());
-            assertEquals(2, listPrice.scale());
+            checkDecimal(9500, dialect.decimalScaleIsFromType() ? 2 : 1, 
+                (BigDecimal) results.getObject(1));
+            checkDecimal(9995, 2, (BigDecimal) results.getObject("list_price"));
 
             assertFalse(results.next());
             results.close();
         }
+    }
+
+    private void checkDecimal(int expectedCents, int expectedScale, 
+        BigDecimal actual) {
+        assertEquals(expectedCents, actual.movePointRight(2).intValue());
+        assertEquals(expectedScale, actual.scale());
     }
     
     public void testSetDecimal() throws Exception {
