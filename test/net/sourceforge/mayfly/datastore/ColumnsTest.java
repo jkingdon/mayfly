@@ -3,9 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.datastore.Column;
-import net.sourceforge.mayfly.datastore.Columns;
-import net.sourceforge.mayfly.datastore.types.DefaultDataType;
+import net.sourceforge.mayfly.datastore.types.FakeDataType;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 
@@ -62,7 +60,7 @@ public class ColumnsTest extends TestCase {
             })));
         Columns newColumns = columns.replace(
             new Column("b", new LongCell(42), null, true,
-                new DefaultDataType(), false)
+                new FakeDataType(), false)
         );
         
         assertFalse(columns.columnFromName("b").isAutoIncrement());

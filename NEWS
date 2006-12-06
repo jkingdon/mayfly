@@ -1,8 +1,8 @@
 Changes since 0.2:
 
-Mayfly supports the kind of subselect which returns a single value,
-for example:
+Mayfly now supports many subselects, for example:
     select name from foo where x = (select max(y) from bar)
+    select name from foo where x in (select y from bar)
 
 The new SqlDumper class can dump a database as an SQL script.
 

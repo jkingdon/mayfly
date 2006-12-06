@@ -17,7 +17,7 @@ import net.sourceforge.mayfly.datastore.types.BinaryDataType;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.datastore.types.DecimalDataType;
-import net.sourceforge.mayfly.datastore.types.DefaultDataType;
+import net.sourceforge.mayfly.datastore.types.StringDataType;
 import net.sourceforge.mayfly.datastore.types.IntegerDataType;
 import net.sourceforge.mayfly.datastore.types.TimestampDataType;
 import net.sourceforge.mayfly.evaluation.Aggregator;
@@ -736,7 +736,7 @@ public class Parser {
             expectAndConsume(TokenType.OPEN_PAREN);
             long size = consumeLong();
             expectAndConsume(TokenType.CLOSE_PAREN);
-            type = new DefaultDataType(
+            type = new StringDataType(
                 TokenType.KEYWORD_varchar.description() +
                 "(" +
                 size +
@@ -762,7 +762,7 @@ public class Parser {
                 type = new IntegerDataType("BIGINT");
             }
             else if (currentText.equalsIgnoreCase("text")) {
-                type = new DefaultDataType("TEXT");
+                type = new StringDataType("TEXT");
             }
             else if (currentText.equalsIgnoreCase("blob")) {
                 if (consumeIfMatches(TokenType.OPEN_PAREN)) {

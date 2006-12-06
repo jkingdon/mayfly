@@ -15,6 +15,7 @@ public class DataTypeTest extends TestCase {
         checkStoreInteger("date", new DateDataType());
         checkStoreInteger("timestamp", new TimestampDataType());
         checkStoreInteger("binary", new BinaryDataType());
+        checkStoreInteger("string", new StringDataType("varchar(255)"));
     }
 
     private void checkStoreString(String whatKindOfColumn, DataType type) {

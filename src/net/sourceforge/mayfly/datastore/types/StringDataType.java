@@ -1,26 +1,19 @@
 package net.sourceforge.mayfly.datastore.types;
 
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.Value;
 
-public class DefaultDataType extends DataType {
+public class StringDataType extends DataType {
 
     private final String dumpName;
 
-    /**
-     * @internal
-     * For convenience within tests.
-     */
-    public DefaultDataType() {
-        this("undumpable_type");
-    }
-
-    public DefaultDataType(String dumpName) {
+    public StringDataType(String dumpName) {
         this.dumpName = dumpName;
     }
 
     public Cell coerce(Value value, String columnName) {
-        return value.value;
+        return genericCoerce(value, columnName, "string", StringCell.class);
     }
     
     public String dumpName() {

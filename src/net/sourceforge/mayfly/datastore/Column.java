@@ -3,7 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.types.DataType;
-import net.sourceforge.mayfly.datastore.types.DefaultDataType;
+import net.sourceforge.mayfly.datastore.types.FakeDataType;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.parser.Location;
@@ -41,7 +41,7 @@ public class Column {
      */
     public Column(String columnName) {
         this(columnName, NullCell.INSTANCE, null, 
-            false, new DefaultDataType(), false);
+            false, new FakeDataType(), false);
     }
 
     public String columnName() {
