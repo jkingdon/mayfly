@@ -620,8 +620,17 @@ public abstract class Dialect {
         return false;
     }
 
-    public boolean canCompareStringColumnToIntegerLiteral() {
+    /**
+     * @internal
+     * For cases not covered by {@link #canSetIntegerOnStringColumn()} or
+     * other more specific cases.
+     */
+    public boolean canMixStringAndInteger() {
         return false;
+    }
+
+    public boolean canSetIntegerOnStringColumn() {
+        return !expectMayflyBehavior();
     }
 
     public boolean onUpdateSetNullAndCascadeMissing() {

@@ -182,7 +182,7 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
-    public boolean canCompareStringColumnToIntegerLiteral() {
+    public boolean canMixStringAndInteger() {
         return true;
     }
 

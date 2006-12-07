@@ -5,9 +5,13 @@ import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.SQLException;
 
 public class DecimalCell extends Cell {
+    
+    public static BigInteger LONG_MIN = BigInteger.valueOf(Long.MIN_VALUE);
+    public static BigInteger LONG_MAX = BigInteger.valueOf(Long.MAX_VALUE);
  
     private final BigDecimal value;
 
@@ -21,42 +25,65 @@ public class DecimalCell extends Cell {
 
     public byte asByte() throws SQLException {
         try {
-            return value.byteValueExact();
+            return longToByte(asLong("a byte"));
         }
-        catch (ArithmeticException e) {
-            throw new SQLException(
-                "Value " + value.toString() + " does not fit in a byte");
+        catch (MayflyException e) {
+            throw e.asSqlException();
         }
     }
 
     public short asShort() throws SQLException {
         try {
-            return value.shortValueExact();
+            return longToShort(asLong("a short"));
         }
-        catch (ArithmeticException e) {
-            throw new SQLException(
-                "Value " + value.toString() + " does not fit in a short");
+        catch (MayflyException e) {
+            throw e.asSqlException();
         }
     }
 
     public int asInt() throws SQLException {
         try {
-            return value.intValueExact();
+            return longToInt(asLong("an int"));
         }
-        catch (ArithmeticException e) {
-            throw new SQLException(
-                "Value " + value.toString() + " does not fit in an int");
+        catch (MayflyException e) {
+            throw e.asSqlException();
         }
     }
 
     public long asLong() {
-        try {
-            return value.longValueExact();
+        /**
+         * Could call {@link BigDecimal#longValueExact()} if we wanted to
+         * assume Java 1.5.
+         */
+        return asLong("a long");
+    }
+
+    private long asLong(String intoWhat) {
+        BigInteger integer = toInteger(intoWhat);
+        if (integer.compareTo(LONG_MIN) < 0) {
+            throw doesNotFit(intoWhat);
         }
-        catch (ArithmeticException e) {
-            throw new MayflyException(
-                "Value " + value.toString() + " does not fit in a long");
+        else if (integer.compareTo(LONG_MAX) > 0) {
+            throw doesNotFit(intoWhat);
         }
+        else {
+            return integer.longValue();
+        }
+    }
+
+    private BigInteger toInteger(String intoWhat) {
+        BigInteger bigInteger = value.toBigInteger();
+        BigDecimal integerPart = new BigDecimal(bigInteger);
+        BigDecimal difference = value.subtract(integerPart);
+        if (difference.signum() != 0) {
+            throw doesNotFit(intoWhat);
+        }
+        return bigInteger;
+    }
+
+    private MayflyException doesNotFit(String intoWhat) {
+        return new MayflyException(
+            "Value " + value.toString() + " does not fit in " + intoWhat);
     }
 
     public String asString() {

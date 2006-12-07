@@ -27,23 +27,33 @@ public class DecimalCellTest extends TestCase {
         assertEquals(Long.MAX_VALUE, 
             new DecimalCell("9223372036854775807").asLong());
         
-        try {
-            new DecimalCell("-9223372036854775809").asLong();
-            fail();
-        }
-        catch (MayflyException e) {
-            assertEquals(
-                "Value -9223372036854775809 does not fit in a long", 
-                e.getMessage());
-        }
+        assertDoesNotFitInLong("-9223372036854775809");
+        assertDoesNotFitInLong("9223372036854775808");
+    }
 
+    public void testLongAndDecimals() throws Exception {
+        assertDoesNotFitInLong("3.14");
+
+        assertEquals(0, new DecimalCell("0.0").asLong());
+        assertEquals(0, new DecimalCell("-0.0").asLong());
+        assertEquals(1, new DecimalCell("1.0").asLong());
+        assertDoesNotFitInLong("0.0001");
+        assertDoesNotFitInLong("0.0000000000000000000000000000000000000000001");
+        assertDoesNotFitInLong(
+            "9223372036854775800." +
+                "0000000000000000000000000000000000000000001");
+    }
+
+    private void assertDoesNotFitInLong(String value) {
         try {
-            new DecimalCell("3.14").asLong();
+            new DecimalCell(value).asLong();
             fail();
         }
         catch (MayflyException e) {
             assertEquals(
-                "Value 3.14 does not fit in a long", 
+                "Value " +
+                value +
+                " does not fit in a long", 
                 e.getMessage());
         }
     }
@@ -58,6 +68,37 @@ public class DecimalCellTest extends TestCase {
         catch (SQLException e) {
             assertEquals("Value 128 does not fit in a byte", e.getMessage());
         }
+
+        try {
+            new DecimalCell("1.1").asByte();
+            fail();
+        }
+        catch (SQLException e) {
+            assertEquals("Value 1.1 does not fit in a byte", e.getMessage());
+        }
+    }
+    
+    public void testAsShort() throws Exception {
+        assertEquals(32767, 
+            new DecimalCell("32767").asShort());
+        
+        try {
+            new DecimalCell("32768").asShort();
+            fail();
+        }
+        catch (SQLException e) {
+            assertEquals("Value 32768 does not fit in a short", 
+                e.getMessage());
+        }
+
+        try {
+            new DecimalCell("1.1").asShort();
+            fail();
+        }
+        catch (SQLException e) {
+            assertEquals("Value 1.1 does not fit in a short", 
+                e.getMessage());
+        }
     }
     
     public void testAsInt() throws Exception {
@@ -70,6 +111,15 @@ public class DecimalCellTest extends TestCase {
         }
         catch (SQLException e) {
             assertEquals("Value -2147483649 does not fit in an int", 
+                e.getMessage());
+        }
+
+        try {
+            new DecimalCell("-5.1").asInt();
+            fail();
+        }
+        catch (SQLException e) {
+            assertEquals("Value -5.1 does not fit in an int", 
                 e.getMessage());
         }
     }

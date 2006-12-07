@@ -131,6 +131,10 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    public boolean trailingSpacesConsultedInComparisons() {
+        return true;
+    }
+
     public boolean schemasMissing() {
         // Haven't really looked too much at what postgres has
         // for schemas.  "create schema authorization mayflytest"
@@ -171,7 +175,7 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
-    public boolean canCompareStringColumnToIntegerLiteral() {
+    public boolean canMixStringAndInteger() {
         return true;
     }
     

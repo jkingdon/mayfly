@@ -294,7 +294,7 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
-    public boolean canCompareStringColumnToIntegerLiteral() {
+    public boolean canMixStringAndInteger() {
         return true;
     }
     

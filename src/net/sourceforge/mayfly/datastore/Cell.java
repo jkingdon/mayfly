@@ -130,4 +130,31 @@ public abstract class Cell extends ValueObject {
         );
     }
 
+    static int longToInt(long localValue) throws SQLException {
+        if (localValue >= Integer.MIN_VALUE && localValue <= Integer.MAX_VALUE) {
+            return (int) localValue;
+        }
+        else {
+            throw new SQLException("Value " + localValue + " does not fit in an int");
+        }
+    }
+
+    static short longToShort(long value) throws SQLException {
+        if (value >= Short.MIN_VALUE && value <= Short.MAX_VALUE) {
+            return (short) value;
+        }
+        else {
+            throw new SQLException("Value " + value + " does not fit in a short");
+        }
+    }
+
+    static byte longToByte(long value) throws SQLException {
+        if (value >= Byte.MIN_VALUE && value <= Byte.MAX_VALUE) {
+            return (byte) value;
+        }
+        else {
+            throw new SQLException("Value " + value + " does not fit in a byte");
+        }
+    }
+
 }

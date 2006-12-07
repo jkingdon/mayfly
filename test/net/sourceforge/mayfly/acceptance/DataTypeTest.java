@@ -370,7 +370,7 @@ public class DataTypeTest extends SqlTestCase {
         }
 
         String stringColumnIntegerLiteral = "select y from foo where y < 99";
-        if (dialect.canCompareStringColumnToIntegerLiteral()) {
+        if (dialect.canMixStringAndInteger()) {
             /* The obvious question here is what kind of comparison is
                done - string or literal.  But we don't test that. */
             query(stringColumnIntegerLiteral);
@@ -381,6 +381,62 @@ public class DataTypeTest extends SqlTestCase {
         }
     }
     
+    public void testIntegerToFromStringColumn() throws Exception {
+        execute("create table foo(x varchar(255))");
+        
+        String insertInteger = "insert into foo(x) values(9)";
+        if (dialect.canMixStringAndInteger()) {
+            execute(insertInteger);
+        }
+        else {
+            expectExecuteFailure(insertInteger, 
+                "attempt to store number 9 into string column x");
+            execute("insert into foo(x) values('9')");
+        }
+
+        PreparedStatement statement = connection.prepareStatement(
+            "insert into foo(x) values(?)");
+        statement.setInt(1, 10);
+        if (dialect.canSetIntegerOnStringColumn()) {
+            statement.executeUpdate();
+        }
+        else {
+            try {
+                statement.executeUpdate();
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage(
+                    "attempt to store number 10 into string column x", e);
+            }
+            execute("insert into foo(x) values('10')");
+        }
+    
+        ResultSet results = query("select x from foo order by x");
+    
+        assertTrue(results.next());
+        if (dialect.expectMayflyBehavior()) {
+            try {
+                results.getInt(1);
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage("attempt to read string '10' as an int", e);
+            }
+            assertEquals("10", results.getString(1));
+            assertTrue(results.next());
+            assertEquals("9", results.getString(1));
+            assertFalse(results.next());
+        }
+        else {
+            assertEquals(10, results.getInt(1));
+            assertTrue(results.next());
+            assertEquals(9, results.getInt(1));
+            assertFalse(results.next());
+        }
+    
+    }
+
     public void testIntegerToFloat() throws Exception {
         execute("create table foo (x bigint, y smallint)");
         // 4503599627370495 is, I believe, the largest integer value which can be
