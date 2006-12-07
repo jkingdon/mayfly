@@ -144,6 +144,10 @@ public class PostgresDialect extends Dialect {
     }
     
     public boolean canInsertNoValues() {
+        /* The hibernate dialect makes it look like
+           the postgres syntax is "insert into foo default values"
+           which actually seems fairly sensible.  Verify this.
+         */
         return false;
     }
 

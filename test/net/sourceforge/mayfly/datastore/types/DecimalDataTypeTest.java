@@ -3,7 +3,9 @@ package net.sourceforge.mayfly.datastore.types;
 import junit.framework.TestCase;
 import junitx.framework.ObjectAssert;
 
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DecimalCell;
+import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
@@ -26,12 +28,30 @@ public class DecimalDataTypeTest extends TestCase {
         ObjectAssert.assertInstanceOf(NullCell.class, 
             MayflyAssert.coerce(type, NullCell.INSTANCE));
     }
-
-    private void check(int expectedScale, int expectedDigits, String in, DecimalDataType type) {
+    
+    public void testFromInteger() throws Exception {
+        DecimalDataType type = new DecimalDataType(10, 2);
         DecimalCell coerced = (DecimalCell) 
-            MayflyAssert.coerce(type, new DecimalCell(new BigDecimal(in)));
+            MayflyAssert.coerce(type, new LongCell(2333444555L));
+        assertEquals(2, coerced.asBigDecimal().scale());
+        assertEquals("2333444555.00", 
+            coerced.asBigDecimal().toString());
+    }
+
+    private void check(int expectedScale, int expectedDigits, 
+        String in, DecimalDataType type) {
+        check(expectedScale, expectedDigits, 
+            new DecimalCell(new BigDecimal(in)), 
+            type);
+    }
+
+    private void check(int expectedScale, int expectedDigits, 
+        Cell inputCell, DecimalDataType type) {
+        DecimalCell coerced = (DecimalCell) 
+            MayflyAssert.coerce(type, inputCell);
         assertEquals(expectedScale, coerced.asBigDecimal().scale());
-        assertEquals(expectedDigits, coerced.asBigDecimal().movePointRight(2).intValue());
+        assertEquals(expectedDigits, 
+            coerced.asBigDecimal().movePointRight(2).intValue());
     }
 
 }

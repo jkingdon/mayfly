@@ -33,7 +33,7 @@ public class TimestampCellTest extends TestCase {
     }
     
     public void testCompare() throws Exception {
-        MayflyAssert.assertIsEquals(
+        MayflyAssert.assertComparesSqlEqual(
             new TimestampCell(1990, 3, 1, 5, 43, 2), 
             new TimestampCell(1990, 3, 1, 5, 43, 2));
         MayflyAssert.assertLessThan(

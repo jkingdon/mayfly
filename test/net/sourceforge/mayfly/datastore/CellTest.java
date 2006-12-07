@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.LongLiteral;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class CellTest extends TestCase {
     public void testAsInt() throws Exception {
@@ -23,27 +24,26 @@ public class CellTest extends TestCase {
     
     public void testCompare() throws Exception {
         assertComparesEqual(new LongCell(6), new LongCell(6));
-        assertLessThan(new LongCell(6), new LongCell(7));
+        MayflyAssert.assertLessThan(new LongCell(6), new LongCell(7));
         
         assertComparesEqual(new StringCell("foo"), new StringCell("foo"));
-        assertLessThan(new StringCell("11"), new StringCell("5"));
+        MayflyAssert.assertLessThan(new StringCell("11"), new StringCell("5"));
 
         assertComparesEqual(NullCell.INSTANCE, NullCell.INSTANCE);
-        assertLessThan(NullCell.INSTANCE, new StringCell(""));
-        assertLessThan(NullCell.INSTANCE, new LongCell(0));
+        MayflyAssert.assertLessThan(NullCell.INSTANCE, new StringCell(""));
+        MayflyAssert.assertLessThan(NullCell.INSTANCE, new LongCell(0));
     }
     
     public void testDateVsString() throws Exception {
-        assertLessThan(
+        MayflyAssert.assertLessThan(
             new DateCell(2008, 2, 29), new StringCell("2008-03-01"));
-        assertLessThan(
+        MayflyAssert.assertLessThan(
             new StringCell("1999-12-31"), new DateCell(2000, 01, 01));
-        assertComparesSqlEqual(
+        MayflyAssert.assertComparesSqlEqual(
             new DateCell(2008, 11, 23), new StringCell("2008-11-23"));
         
         try {
-            assertLessThan(
-                new DateCell(2008, 2, 29), new StringCell("someday"));
+            MayflyAssert.assertLessThan(new DateCell(2008, 2, 29), new StringCell("someday"));
             fail();
         }
         catch (MayflyException e) {
@@ -67,31 +67,13 @@ public class CellTest extends TestCase {
            they might be sqlEquals.  So what is the impact on GROUP BY?
            (perhaps none, if we enforce column types, but this might require
            a bit more looking).
+           
+           Also consider decimals with the same value but different scales.
          */
         assertEquals(first, second);
         assertEquals(second, first);
     }
 
-    private void assertComparesSqlEqual(Cell first, Cell second) {
-        assertEquals(0, first.compareTo(second));
-        assertEquals(0, second.compareTo(first));
-        
-        assertTrue(first.sqlEquals(second));
-        assertTrue(second.sqlEquals(first));
-    }
-
-    private void assertLessThan(Cell first, Cell second) {
-        {
-            int comparison = first.compareTo(second);
-            assertTrue("expected <0 but was " + comparison, comparison < 0);
-        }
-
-        {
-            int comparison = second.compareTo(first);
-            assertTrue("expected >0 but was " + comparison, comparison > 0);
-        }
-    }
-    
     public void testSqlEquals() throws Exception {
         assertSqlEqual(new LongCell(6), new LongCell(6));
         assertNotSqlEqual(new LongCell(6), new LongCell(7));

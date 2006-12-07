@@ -92,7 +92,7 @@ public class MayflyAssert {
         Assert.assertTrue(cell2.compareTo(cell1) > 0);
     }
 
-    public static void assertIsEquals(Cell cell1, Cell cell2) {
+    public static void assertComparesSqlEqual(Cell cell1, Cell cell2) {
         Assert.assertTrue(cell1.sqlEquals(cell2));
         Assert.assertTrue(cell2.sqlEquals(cell1));
         Assert.assertEquals(0, cell1.compareTo(cell2));

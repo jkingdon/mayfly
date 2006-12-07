@@ -31,7 +31,6 @@ public class DataTypeTest extends SqlTestCase {
     }
 
     // Here's a small sample of other types we don't test for yet:
-    // CHARACTER VARYING (synonym for VARCHAR)
     //NUMERIC
     //REAL, FLOAT, DOUBLE - precision can be given in binary digits (24 or 53, typically)
     // BIT and BIT VARYING; BOOLEAN
@@ -39,6 +38,14 @@ public class DataTypeTest extends SqlTestCase {
     // BLOB/CLOB
     //   sorting and comparison (binary for BLOB, Unicode-based or some such for CLOB)
     //   JDBC CLOB for a TEXT column
+    
+    /* Here are some we don't test for (or have in Mayfly), but which
+       I'm not sure are actually used enough to warrant the clutter:
+       CHARACTER VARYING (synonym for VARCHAR)
+       CHARACTER (non-VARYING) - this one seems to be the source of many
+         implementation headaches (trailing spaces and such), and I'm
+         not sure there is any good reason to prefer it over VARCHAR.
+       */
     
     public void testInteger() throws Exception {
         execute("create table foo (waist integer, inseam integer)");
@@ -216,6 +223,26 @@ public class DataTypeTest extends SqlTestCase {
         assertEquals(expectedScale, actual.scale());
     }
     
+    public void testIntegerToFromDecimalColumn() throws Exception {
+        execute("create table foo(price decimal(4,2))");
+        execute("insert into foo(price) values(5)");
+        PreparedStatement statement = connection.prepareStatement(
+            "insert into foo(price) values(?)");
+        statement.setInt(1, 77);
+        statement.executeUpdate();
+
+        ResultSet results = query("select price from foo order by price");
+
+        assertTrue(results.next());
+        assertEquals(5, results.getInt(1));
+        checkDecimal(500, dialect.decimalScaleIsFromType() ? 2 : 0, 
+            results.getBigDecimal(1));
+
+        assertTrue(results.next());
+        assertEquals(77, results.getInt(1));
+        assertFalse(results.next());
+    }
+
     public void testSetDecimal() throws Exception {
         execute("create table foo (price decimal(4, 2), y decimal(11,3))");
         PreparedStatement statement = connection.prepareStatement(

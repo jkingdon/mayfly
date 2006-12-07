@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.parser.Location;
 
@@ -14,20 +15,48 @@ public class DecimalCell extends Cell {
         this.value = value;
     }
 
+    public DecimalCell(String string) {
+        this(new BigDecimal(string));
+    }
+
     public byte asByte() throws SQLException {
-        throw new UnimplementedException("Can't yet convert decimal to byte, even if the value is in range");
+        try {
+            return value.byteValueExact();
+        }
+        catch (ArithmeticException e) {
+            throw new SQLException(
+                "Value " + value.toString() + " does not fit in a byte");
+        }
     }
 
     public short asShort() throws SQLException {
-        throw new UnimplementedException("Can't yet convert decimal to short, even if the value is in range");
+        try {
+            return value.shortValueExact();
+        }
+        catch (ArithmeticException e) {
+            throw new SQLException(
+                "Value " + value.toString() + " does not fit in a short");
+        }
     }
 
     public int asInt() throws SQLException {
-        throw new UnimplementedException("Can't yet convert decimal to int, even if the value is in range");
+        try {
+            return value.intValueExact();
+        }
+        catch (ArithmeticException e) {
+            throw new SQLException(
+                "Value " + value.toString() + " does not fit in an int");
+        }
     }
 
     public long asLong() {
-        throw new UnimplementedException("Can't yet convert decimal to long, even if the value is in range");
+        try {
+            return value.longValueExact();
+        }
+        catch (ArithmeticException e) {
+            throw new MayflyException(
+                "Value " + value.toString() + " does not fit in a long");
+        }
     }
 
     public String asString() {
@@ -54,8 +83,19 @@ public class DecimalCell extends Cell {
     }
 
     public int compareTo(Cell otherCell, Location location) {
-        // want test
-        throw new UnimplementedException("Can't yet compare decimals", location);
+        if (otherCell instanceof DecimalCell) {
+            return compareDecimals(value, ((DecimalCell) otherCell).value);
+        }
+        else if (otherCell instanceof NullCell) {
+            return 1;
+        }
+        else {
+            throw cannotCompare(otherCell, location);
+        }
+    }
+
+    private int compareDecimals(BigDecimal value2, BigDecimal value3) {
+        return value2.compareTo(value3);
     }
 
     public String displayName() {

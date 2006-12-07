@@ -1,11 +1,12 @@
 package net.sourceforge.mayfly.datastore.types;
 
-import java.math.BigDecimal;
-
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DecimalCell;
+import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.parser.TokenType;
+
+import java.math.BigDecimal;
 
 public class DecimalDataType extends DataType {
 
@@ -39,7 +40,16 @@ public class DecimalDataType extends DataType {
                 return decimal;
             }
         }
-        return genericCoerce(value, columnName, "decimal", null);
+        else if (value.value instanceof LongCell) {
+            LongCell integer = (LongCell) value.value;
+            return new DecimalCell(
+                new BigDecimal(integer.asLong())
+                    .setScale(scale)
+            );
+        }
+        else {
+            return genericCoerce(value, columnName, "decimal", null);
+        }
     }
 
 }

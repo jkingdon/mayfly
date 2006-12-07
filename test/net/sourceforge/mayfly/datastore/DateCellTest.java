@@ -20,7 +20,7 @@ public class DateCellTest extends TestCase {
     }
     
     public void testCompare() throws Exception {
-        MayflyAssert.assertIsEquals(
+        MayflyAssert.assertComparesSqlEqual(
             new DateCell(1990, 3, 1), new DateCell(1990, 3, 1));
         MayflyAssert.assertLessThan(
             new DateCell(1988, 2, 29), new DateCell(1988, 3, 1));
