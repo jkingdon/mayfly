@@ -38,15 +38,19 @@ public class LongCell extends Cell {
     }
 
     public String asString() {
+        return stringValue();
+    }
+
+    private String stringValue() {
         return String.valueOf(value);
     }
     
     public String displayName() {
-        return "number " + asString();
+        return "number " + stringValue();
     }
     
     public String asSql() {
-        return asString();
+        return stringValue();
     }
 
     public int compareTo(Cell otherCell, Location location) {

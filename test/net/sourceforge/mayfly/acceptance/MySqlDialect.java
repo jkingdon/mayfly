@@ -298,6 +298,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean canSetStringOnDecimalColumn() {
+        return true;
+    }
+
     public boolean allowHexForInteger() {
         return true;
     }

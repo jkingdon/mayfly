@@ -437,6 +437,118 @@ public class DataTypeTest extends SqlTestCase {
     
     }
 
+    public void testDecimalToFromStringColumn() throws Exception {
+        execute("create table foo(x varchar(255))");
+        
+        String insertDecimal = "insert into foo(x) values(9.5)";
+        if (dialect.canMixStringAndInteger()) {
+            execute(insertDecimal);
+        }
+        else {
+            expectExecuteFailure(insertDecimal, 
+                "attempt to store decimal 9.5 into string column x");
+            execute("insert into foo(x) values('9.5')");
+        }
+
+        PreparedStatement statement = connection.prepareStatement(
+            "insert into foo(x) values(?)");
+        statement.setBigDecimal(1, new BigDecimal("10.05"));
+        if (dialect.canSetIntegerOnStringColumn()) {
+            statement.executeUpdate();
+        }
+        else {
+            try {
+                statement.executeUpdate();
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage(
+                    "attempt to store decimal 10.05 into string column x", e);
+            }
+            execute("insert into foo(x) values('10.05')");
+        }
+    
+        ResultSet results = query("select x from foo order by x");
+    
+        assertTrue(results.next());
+        if (dialect.expectMayflyBehavior()) {
+            try {
+                results.getBigDecimal(1);
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage("attempt to read string '10.05' as a decimal", e);
+            }
+            assertEquals("10.05", results.getString(1));
+            assertTrue(results.next());
+            assertEquals("9.5", results.getString(1));
+            assertFalse(results.next());
+        }
+        else {
+            checkDecimal(1005, 2, results.getBigDecimal(1));
+            assertTrue(results.next());
+            checkDecimal(950, 1, results.getBigDecimal(1));
+            assertFalse(results.next());
+        }
+    }
+
+    public void testStringToFromDecimalColumn() throws Exception {
+        execute("create table foo(x decimal(10,2))");
+        
+        String insertString = "insert into foo(x) values('9.5')";
+        if (dialect.canMixStringAndInteger()) {
+            execute(insertString);
+        }
+        else {
+            expectExecuteFailure(insertString, 
+                "attempt to store string '9.5' into decimal column x");
+            execute("insert into foo(x) values(9.5)");
+        }
+
+        PreparedStatement statement = connection.prepareStatement(
+            "insert into foo(x) values(?)");
+        statement.setString(1, "10.05");
+        if (dialect.canSetStringOnDecimalColumn()) {
+            statement.executeUpdate();
+        }
+        else {
+            try {
+                statement.executeUpdate();
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage(
+                    "attempt to store string '10.05' into decimal column x", e);
+            }
+            execute("insert into foo(x) values(10.05)");
+        }
+    
+        ResultSet results = query("select x from foo order by x");
+    
+        assertTrue(results.next());
+        if (dialect.expectMayflyBehavior()) {
+            try {
+                results.getString(1);
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage("attempt to read decimal 9.50 as a string", e);
+            }
+            checkDecimal(950, 2, results.getBigDecimal(1));
+            assertTrue(results.next());
+            checkDecimal(1005, 2, results.getBigDecimal(1));
+            assertFalse(results.next());
+        }
+        else {
+            assertEquals(
+                dialect.decimalScaleIsFromType() ? "9.50" : "9.5", 
+                results.getString(1));
+            assertTrue(results.next());
+            assertEquals("10.05", results.getString(1));
+            assertFalse(results.next());
+        }
+    }
+
     public void testIntegerToFloat() throws Exception {
         execute("create table foo (x bigint, y smallint)");
         // 4503599627370495 is, I believe, the largest integer value which can be

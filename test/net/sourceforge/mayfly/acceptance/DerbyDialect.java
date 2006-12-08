@@ -157,6 +157,10 @@ public class DerbyDialect extends Dialect {
     public boolean canInsertNoValues() {
         return false;
     }
+    
+    public boolean canSetStringOnDecimalColumn() {
+        return true;
+    }
 
     /**
        @internal

@@ -46,7 +46,13 @@ public abstract class Cell extends ValueObject {
             "attempt to read " + displayName() + " as an object");
     }
 
-    public String asString() {
+    public String asString() throws MayflyException {
+        /** TODO: This method is semantically overloaded; it goes into
+           various messages, and also implements
+           {@link java.sql.ResultSet#getString(int)}
+           Clean this up or else we'll be buggy about things
+           like UNIQUE constraints on type DECIMAL.
+           */
         throw new MayflyException(
             "attempt to read " + displayName() + " as a string");
     }

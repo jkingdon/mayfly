@@ -179,6 +179,10 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    public boolean canSetStringOnDecimalColumn() {
+        return false;
+    }
+    
     public boolean haveDropTableFooIfExists() {
         return false;
     }

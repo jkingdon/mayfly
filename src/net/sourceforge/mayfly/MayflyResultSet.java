@@ -124,11 +124,21 @@ public final class MayflyResultSet extends ResultSetStub {
     }
 
     public String getString(String columnName) throws SQLException {
-        return cellFromName(columnName).asString();
+        try {
+            return cellFromName(columnName).asString();
+        }
+        catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
 
     public String getString(int oneBasedColumn) throws SQLException {
-        return cellFromIndex(oneBasedColumn).asString();
+        try {
+            return cellFromIndex(oneBasedColumn).asString();
+        }
+        catch (MayflyException e) {
+            throw e.asSqlException();
+        }
     }
     
     public Reader getCharacterStream(String columnName) throws SQLException {

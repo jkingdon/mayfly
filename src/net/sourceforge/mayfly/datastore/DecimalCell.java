@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.math.BigDecimal;
@@ -86,13 +85,6 @@ public class DecimalCell extends Cell {
             "Value " + value.toString() + " does not fit in " + intoWhat);
     }
 
-    public String asString() {
-        /** What do other databases do?  I guess do it like {@link LongCell},
-            but something makes me want to make sure I check this out and write a test. 
-         */ 
-        throw new UnimplementedException("Can't yet convert decimal to string");
-    }
-
     public Object asObject() {
         return value;
     }
@@ -126,7 +118,7 @@ public class DecimalCell extends Cell {
     }
 
     public String displayName() {
-        return value.toString();
+        return "decimal " + value.toString();
     }
 
 }

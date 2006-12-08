@@ -633,6 +633,10 @@ public abstract class Dialect {
         return !expectMayflyBehavior();
     }
 
+    public boolean canSetStringOnDecimalColumn() {
+        return false;
+    }
+
     public boolean onUpdateSetNullAndCascadeMissing() {
         return false;
     }

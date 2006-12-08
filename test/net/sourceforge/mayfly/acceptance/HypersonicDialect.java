@@ -185,6 +185,10 @@ public class HypersonicDialect extends Dialect {
     public boolean canMixStringAndInteger() {
         return true;
     }
+    
+    public boolean canSetStringOnDecimalColumn() {
+        return true;
+    }
 
     public boolean decimalScaleIsFromType() {
         return false;
