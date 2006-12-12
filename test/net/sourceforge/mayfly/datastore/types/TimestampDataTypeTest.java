@@ -2,13 +2,26 @@ package net.sourceforge.mayfly.datastore.types;
 
 import junit.framework.TestCase;
 import junitx.framework.ObjectAssert;
+import junitx.framework.StringAssert;
 
+import net.sourceforge.mayfly.Database;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TimestampCell;
+import net.sourceforge.mayfly.evaluation.command.CreateTable;
+import net.sourceforge.mayfly.evaluation.expression.TestTimeSource;
+import net.sourceforge.mayfly.parser.Lexer;
+import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.MayflyAssert;
+
+import org.joda.time.LocalDateTime;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 
 public class TimestampDataTypeTest extends TestCase {
     
@@ -94,6 +107,38 @@ public class TimestampDataTypeTest extends TestCase {
                 input +
                 "' is not in format yyyy-mm-dd hh:mm:ss", e.getMessage());
         }
+    }
+    
+    public void testEvaluationIsDelayed() throws Exception {
+        TestTimeSource timeSource = new TestTimeSource();
+        String sql = "create table foo(a timestamp default current_timestamp)";
+        Parser parser = new Parser(
+            new Lexer(sql).tokens(), 
+            false, timeSource);
+        timeSource.advanceTo(1976, 7);
+        CreateTable command = (CreateTable) parser.parse();
+        timeSource.advanceTo(1976, 8);
+
+        Database database = new Database();
+        database.executeUpdate(command, DataStore.ANONYMOUS_SCHEMA_NAME);
+        timeSource.advanceTo(1976, 9);
+        database.execute("insert into foo() values()");
+        timeSource.advanceTo(1976, 10);
+        database.execute("insert into foo() values()");
+        timeSource.advanceTo(1976, 11);
+
+        ResultSet results = database.query("select a from foo order by a");
+        assertTrue(results.next());
+        StringAssert.assertStartsWith("1976-09", getStamp(results));
+        assertTrue(results.next());
+        StringAssert.assertStartsWith("1976-10", getStamp(results));
+        assertFalse(results.next());
+    }
+
+    private String getStamp(ResultSet results) throws SQLException {
+        Timestamp timestamp = results.getTimestamp(1);
+        return new LocalDateTime(timestamp.getTime())
+            .toString(TimestampCell.FORMATTER);
     }
 
 }

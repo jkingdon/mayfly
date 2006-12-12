@@ -154,12 +154,12 @@ public class SqlDumper {
         out.write(column.type.dumpName());
         if (column.hasDefault()) {
             out.write(" DEFAULT ");
-            out.write(column.defaultValue().asSql());
+            out.write(column.defaultValueAsSql());
         }
         
         if (column.hasOnUpdateValue()) {
             out.write(" ON UPDATE ");
-            out.write(column.getOnUpdateValue().asSql());
+            out.write(column.onUpdateValueAsSql());
         }
         
         if (column.isAutoIncrement()) {

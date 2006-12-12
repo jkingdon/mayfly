@@ -8,8 +8,16 @@ import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
+import net.sourceforge.mayfly.parser.Location;
 
 public class CurrentTimestampExpression extends Expression {
+    
+    private TimeSource timeSource;
+
+    public CurrentTimestampExpression(Location location, TimeSource timeSource) {
+        super(location);
+        this.timeSource = timeSource;
+    }
 
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         return valueAsCell();
@@ -20,13 +28,8 @@ public class CurrentTimestampExpression extends Expression {
     }
 
     private Cell valueAsCell() {
-        /* Someday we might need to worry about getting the "current" time
-           from a transaction log or synchronized across replicated databases
-           or something.  That day is not yet here.
-           
-           Do note that the timezone here is the one of the current machine.
-        */
-        return new TimestampCell(new LocalDateTime(System.currentTimeMillis()));
+        /* Note that the timezone here is the one of the current machine. */
+        return new TimestampCell(new LocalDateTime(timeSource.current()));
     }
 
     public boolean sameExpression(Expression other) {
@@ -35,6 +38,10 @@ public class CurrentTimestampExpression extends Expression {
 
     public String displayName() {
         return "current_timestamp";
+    }
+    
+    public String asSql() {
+        return "CURRENT_TIMESTAMP";
     }
 
 }

@@ -5,13 +5,17 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.FakeDataType;
 import net.sourceforge.mayfly.evaluation.Checker;
+import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.Value;
+import net.sourceforge.mayfly.evaluation.expression.DefaultValue;
+import net.sourceforge.mayfly.evaluation.expression.SpecifiedDefaultValue;
 import net.sourceforge.mayfly.parser.Location;
 
 public class Column {
     private final String columnName;
-    private final Cell defaultValue;
-    private final Cell onUpdateValue;
+    private final DefaultValue defaultValue;
+    private final Expression onUpdateValue;
     private final boolean isAutoIncrement;
     public final DataType type;
     
@@ -23,7 +27,8 @@ public class Column {
      */
     public final boolean isNotNull;
 
-    public Column(String name, Cell defaultValue, Cell onUpdateValue, 
+    public Column(String name, DefaultValue defaultValue, 
+        Expression onUpdateValue, 
         boolean isAutoIncrement,
         DataType type, boolean isNotNull) {
         this.columnName = name;
@@ -40,7 +45,7 @@ public class Column {
      * column, rather than create one.
      */
     public Column(String columnName) {
-        this(columnName, NullCell.INSTANCE, null, 
+        this(columnName, DefaultValue.NOT_SPECIFIED, null, 
             false, new FakeDataType(), false);
     }
 
@@ -70,7 +75,11 @@ public class Column {
     }
 
     public Cell defaultValue() {
-        return defaultValue;
+        return defaultValue.cell();
+    }
+
+    public String defaultValueAsSql() {
+        return defaultValue.asSql();
     }
 
     public boolean isAutoIncrement() {
@@ -78,8 +87,10 @@ public class Column {
     }
 
     public Column afterAutoIncrement(Checker checker) {
-        Cell valueJustInserted = defaultValue;
-        Cell newDefault = new LongCell(valueJustInserted.asLong() + 1L);
+        Cell valueJustInserted = defaultValue();
+        DefaultValue newDefault = 
+            new SpecifiedDefaultValue(
+                new LongCell(valueJustInserted.asLong() + 1L));
         checker.setIdentityValue(valueJustInserted);
         return new Column(columnName, newDefault, onUpdateValue, isAutoIncrement,
             type, isNotNull);
@@ -98,7 +109,7 @@ public class Column {
     }
 
     public Cell newColumnValue() {
-        if (isNotNull && defaultValue instanceof NullCell) {
+        if (isNotNull && !defaultValue.isSpecified()) {
             throw new MayflyException(
                 "no default value for column " + columnName(),
                 Location.UNKNOWN);
@@ -112,16 +123,20 @@ public class Column {
 
     public Cell getOnUpdateValue() {
         if (hasOnUpdateValue()) {
-            return onUpdateValue;
+            return onUpdateValue.evaluate((ResultRow)null);
         }
         else {
             throw new MayflyInternalException(
                 "Column " + columnName + " does not have ON UPDATE value");
         }
     }
+    
+    public String onUpdateValueAsSql() {
+        return onUpdateValue.asSql();
+    }
 
     public boolean hasDefault() {
-        if (defaultValue() instanceof NullCell) {
+        if (!defaultValue.isSpecified()) {
             return false;
         }
         if (isAutoIncrement) {

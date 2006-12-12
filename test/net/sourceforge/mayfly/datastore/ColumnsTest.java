@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.types.FakeDataType;
+import net.sourceforge.mayfly.evaluation.expression.DefaultValue;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 
@@ -59,7 +60,7 @@ public class ColumnsTest extends TestCase {
                 new Column("b"),
             })));
         Columns newColumns = columns.replace(
-            new Column("b", new LongCell(42), null, true,
+            new Column("b", DefaultValue.NOT_SPECIFIED, null, true,
                 new FakeDataType(), false)
         );
         

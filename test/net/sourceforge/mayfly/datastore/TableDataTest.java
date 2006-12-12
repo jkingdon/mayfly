@@ -11,6 +11,7 @@ import net.sourceforge.mayfly.datastore.types.FakeDataType;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.expression.DefaultValue;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -45,7 +46,7 @@ public class TableDataTest extends TestCase {
     }
     
     public void testModifyColumn() throws Exception {
-        Column a = new Column("a", NullCell.INSTANCE, null, 
+        Column a = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
             false, new FakeDataType(), true);
         Row row = new TupleBuilder()
             .append(a, new LongCell(7))
@@ -53,7 +54,7 @@ public class TableDataTest extends TestCase {
         TableData table = new TableData(
             Columns.singleton(a), new Constraints(), new Rows(row));
         
-        Column newA = new Column("a", NullCell.INSTANCE, null, 
+        Column newA = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
             false, new FakeDataType(), false);
         TableData newTable = table.modifyColumn(newA);
 
@@ -62,7 +63,7 @@ public class TableDataTest extends TestCase {
     }
 
     public void testCoerceOnUpdate() throws Exception {
-        Column a = new Column("a", NullCell.INSTANCE, null, 
+        Column a = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
             false, new DateDataType(), false);
         Row row = new TupleBuilder()
             .append(a, new LongCell(7))
@@ -84,7 +85,7 @@ public class TableDataTest extends TestCase {
     }
     
     public void testDelete() throws Exception {
-        Column a = new Column("a", NullCell.INSTANCE, null, 
+        Column a = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
             false, new FakeDataType(), false);
         Row one = new TupleBuilder()
             .append(a, new LongCell(1))

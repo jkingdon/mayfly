@@ -7,7 +7,6 @@ import net.sourceforge.mayfly.datastore.BinaryCell;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.LongCell;
-import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.constraint.Action;
 import net.sourceforge.mayfly.datastore.constraint.Cascade;
 import net.sourceforge.mayfly.datastore.constraint.NoAction;
@@ -17,8 +16,8 @@ import net.sourceforge.mayfly.datastore.types.BinaryDataType;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.DateDataType;
 import net.sourceforge.mayfly.datastore.types.DecimalDataType;
-import net.sourceforge.mayfly.datastore.types.StringDataType;
 import net.sourceforge.mayfly.datastore.types.IntegerDataType;
+import net.sourceforge.mayfly.datastore.types.StringDataType;
 import net.sourceforge.mayfly.datastore.types.TimestampDataType;
 import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.Expression;
@@ -61,12 +60,11 @@ import net.sourceforge.mayfly.evaluation.condition.NotEqual;
 import net.sourceforge.mayfly.evaluation.condition.Or;
 import net.sourceforge.mayfly.evaluation.condition.SubselectedIn;
 import net.sourceforge.mayfly.evaluation.expression.Average;
-import net.sourceforge.mayfly.evaluation.expression.ScalarSubselect;
-import net.sourceforge.mayfly.evaluation.expression.SearchedCase;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.Count;
 import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.CurrentTimestampExpression;
+import net.sourceforge.mayfly.evaluation.expression.DefaultValue;
 import net.sourceforge.mayfly.evaluation.expression.Divide;
 import net.sourceforge.mayfly.evaluation.expression.Maximum;
 import net.sourceforge.mayfly.evaluation.expression.Minimum;
@@ -74,8 +72,13 @@ import net.sourceforge.mayfly.evaluation.expression.Minus;
 import net.sourceforge.mayfly.evaluation.expression.Multiply;
 import net.sourceforge.mayfly.evaluation.expression.NullExpression;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
+import net.sourceforge.mayfly.evaluation.expression.RealTimeSource;
+import net.sourceforge.mayfly.evaluation.expression.ScalarSubselect;
+import net.sourceforge.mayfly.evaluation.expression.SearchedCase;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
+import net.sourceforge.mayfly.evaluation.expression.SpecifiedDefaultValue;
 import net.sourceforge.mayfly.evaluation.expression.Sum;
+import net.sourceforge.mayfly.evaluation.expression.TimeSource;
 import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
 import net.sourceforge.mayfly.evaluation.expression.literal.DecimalLiteral;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
@@ -118,6 +121,7 @@ public class Parser {
 
     private List tokens;
     private final boolean allowParameters;
+    private final TimeSource timeSource;
 
     public Parser(String sql) {
         this(new Lexer(sql).tokens());
@@ -141,8 +145,13 @@ public class Parser {
     }
     
     public Parser(List tokens, boolean allowParameters) {
+        this(tokens, allowParameters, new RealTimeSource());
+    }
+
+    public Parser(List tokens, boolean allowParameters, TimeSource timeSource) {
         this.tokens = tokens;
         this.allowParameters = allowParameters;
+        this.timeSource = timeSource;
     }
 
     public List parseCommands() {
@@ -634,16 +643,16 @@ public class Parser {
         ParsedDataType parsed = parseDataType();
         boolean isAutoIncrement = parsed.isAutoIncrement;
 
-        Cell defaultValue = parseDefaultClause(name);
+        DefaultValue defaultValue = parseDefaultClause(name);
         
-        Cell onUpdateValue = parseOnUpdateValue(name);
+        Expression onUpdateValue = parseOnUpdateValue(name);
 
         if (consumeNonReservedWordIfMatches("auto_increment")) {
             isAutoIncrement = true;
         }
 
-        if (isAutoIncrement && defaultValue instanceof NullCell) {
-            defaultValue = new LongCell(1);
+        if (isAutoIncrement && !(defaultValue.isSpecified())) {
+            defaultValue = new SpecifiedDefaultValue(new LongCell(1));
         }
 
         boolean isNotNull = parseColumnConstraints(table, name);
@@ -652,20 +661,20 @@ public class Parser {
             parsed.type, isNotNull);
     }
 
-    private Cell parseDefaultClause(String name) {
+    private DefaultValue parseDefaultClause(String name) {
         if (consumeIfMatches(TokenType.KEYWORD_default)) {
             Expression expression = parseDefaultValue(name);
-            return expression.evaluate((ResultRow)null);
+            return new SpecifiedDefaultValue(expression);
         }
         else {
-            return NullCell.INSTANCE;
+            return DefaultValue.NOT_SPECIFIED;
         }
     }
     
-    private Cell parseOnUpdateValue(String columnName) {
+    private Expression parseOnUpdateValue(String columnName) {
         if (consumeIfMatches(TokenType.KEYWORD_on)) {
             expectAndConsume(TokenType.KEYWORD_update);
-            return parseDefaultValue(columnName).evaluate((ResultRow)null);
+            return parseDefaultValue(columnName);
         }
         else {
             return null;
@@ -692,7 +701,7 @@ public class Parser {
             return new NullExpression(start);
         }
         else if (consumeIfMatches(TokenType.KEYWORD_current_timestamp)) {
-            return new CurrentTimestampExpression();
+            return new CurrentTimestampExpression(start, timeSource);
         }
         else {
             throw new ParserException(

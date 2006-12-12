@@ -72,4 +72,8 @@ abstract public class Expression extends WhatElement {
         return false;
     }
 
+    public String asSql() {
+        return evaluate((ResultRow) null).asSql();
+    }
+
 }

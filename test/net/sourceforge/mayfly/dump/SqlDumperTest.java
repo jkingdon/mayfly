@@ -304,6 +304,20 @@ public class SqlDumperTest extends TestCase {
         assertEquals(dump1, dump2);
     }
     
+    public void testCurrentTimestamp() throws Exception {
+        database.execute("create table nowish(" +
+            "a timestamp default current_timestamp " +
+                "on update current_timestamp " +
+            ")");
+        
+        assertEquals(
+            "CREATE TABLE nowish(\n" +
+            "  a TIMESTAMP DEFAULT CURRENT_TIMESTAMP " +
+                "ON UPDATE CURRENT_TIMESTAMP\n" +
+            ");\n\n",
+            dump());
+    }
+    
     public void testQuotedIdentifiers() throws Exception {
         database.execute("create table \"join\" (" +
             "\"null\" integer, \"=\" integer, \"\u00a1\" integer," +
@@ -395,6 +409,11 @@ public class SqlDumperTest extends TestCase {
         database.execute("insert into incr(a, b) values(7, 'seven')");
         database.execute("insert into incr(b) values('before dump')");
 
+        database.execute("create table nowish(" +
+            "a timestamp default current_timestamp " +
+                "on update current_timestamp " +
+            ")");
+        
         // Optionally load the large SQL file of your choice here
         
         checkRoundTrip(database.dataStore());
