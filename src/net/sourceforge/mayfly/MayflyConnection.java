@@ -3,14 +3,20 @@ package net.sourceforge.mayfly;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TableData;
+import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.select.StoreEvaluator;
+import net.sourceforge.mayfly.evaluation.what.Selected;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -115,6 +121,25 @@ public class MayflyConnection {
            be so bad.
          */
 //        database.setDataStore(rollbackPoint);
+    }
+
+    public ResultSet getColumns(String table, String targetColumn) {
+        SingleColumn nameExpression = new SingleColumn("COLUMN_NAME");
+        Selected columnColumns = new Selected(nameExpression);
+        
+        ResultRows rows = new ResultRows();
+        List names = columnNames(table);
+        for (Iterator iter = names.iterator(); iter.hasNext();) {
+            String column = (String) iter.next();
+            if (targetColumn.equalsIgnoreCase(column)) {
+                rows = rows.with(columnToMetaRow(nameExpression, column));
+            }
+        }
+        return new MayflyResultSet(columnColumns, rows);
+    }
+
+    private ResultRow columnToMetaRow(SingleColumn nameExpression, String column) {
+        return new ResultRow().with(nameExpression, new StringCell(column));
     }
 
 }

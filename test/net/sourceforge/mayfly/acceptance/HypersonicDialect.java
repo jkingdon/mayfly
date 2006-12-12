@@ -60,7 +60,7 @@ public class HypersonicDialect extends Dialect {
         return true;
     }
     
-    public boolean canOrderByExpression() {
+    public boolean canOrderByExpression(boolean isAggregate) {
         return true;
     }
     
@@ -235,6 +235,10 @@ public class HypersonicDialect extends Dialect {
            being ignored.
            */
         return false;
+    }
+    
+    public boolean listColumnsDoesNotFindThem() {
+        return true;
     }
 
 }

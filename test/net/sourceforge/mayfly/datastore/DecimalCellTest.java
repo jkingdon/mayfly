@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import junit.framework.TestCase;
+import junitx.framework.StringAssert;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.util.MayflyAssert;
@@ -38,7 +39,18 @@ public class DecimalCellTest extends TestCase {
         assertEquals(0, new DecimalCell("-0.0").asLong());
         assertEquals(1, new DecimalCell("1.0").asLong());
         assertDoesNotFitInLong("0.0001");
-        assertDoesNotFitInLong("0.0000000000000000000000000000000000000000001");
+
+        try {
+            new DecimalCell("0.0000000000000000000000000000000000000000001")
+                .asLong();
+            fail();
+        }
+        catch (MayflyException e) {
+            // Sun Java 1.5 says "1E-43".  libgcj gives the decimal.
+            StringAssert.assertContains(" does not fit in a long", 
+                e.getMessage());
+        }
+
         assertDoesNotFitInLong(
             "9223372036854775800." +
                 "0000000000000000000000000000000000000000001");

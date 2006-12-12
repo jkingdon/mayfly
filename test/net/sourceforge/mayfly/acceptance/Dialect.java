@@ -247,7 +247,7 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean canOrderByExpression() {
+    public boolean canOrderByExpression(boolean isAggregate) {
         return false;
     }
 
@@ -669,6 +669,10 @@ public abstract class Dialect {
 
     public boolean errorIfOrderByNotInSelectDistinct() {
         return true;
+    }
+
+    public boolean listColumnsDoesNotFindThem() {
+        return false;
     }
 
 }

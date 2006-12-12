@@ -78,7 +78,7 @@ public class PostgresDialect extends Dialect {
         return "offset".equalsIgnoreCase(word);
     }
     
-    public boolean canOrderByExpression() {
+    public boolean canOrderByExpression(boolean isAggregate) {
         return true;
     }
     

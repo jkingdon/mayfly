@@ -75,7 +75,7 @@ public class OrderByTest extends SqlTestCase {
 
         assertResultList(new String[] { "2", "3", "4", "5", "8" }, query(reference));
         assertResultList(new String[] { "8", "5", "4", "3", "2" }, query(referenceDescending));
-        if (dialect.canOrderByExpression()) {
+        if (dialect.canOrderByExpression(false)) {
             assertResultList(new String[] { "5", "8", "3", "4", "2" }, query(expression));
             // Evil!  We can at the very least give an error on a constant expression, I hope
             assertResultList(new String[] { "5", "8", "3", "4", "2" }, query(constantExpression));
@@ -98,7 +98,7 @@ public class OrderByTest extends SqlTestCase {
 
         String sql = "select a + b as total from foo order by total";
 
-        if (dialect.canOrderByExpression() && dialect.haveColumnAlias()) {
+        if (dialect.canOrderByExpression(false) && dialect.haveColumnAlias()) {
             assertResultList(new String[] { "35", "48", "53", }, query(sql));
         }
         else {

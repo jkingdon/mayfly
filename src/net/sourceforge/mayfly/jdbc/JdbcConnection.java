@@ -89,7 +89,7 @@ public class JdbcConnection implements Connection {
 
     public DatabaseMetaData getMetaData() throws SQLException {
         checkClosed();
-        return new JdbcMetaData();
+        return new JdbcMetaData(mayflyConnection);
     }
 
     public void setReadOnly(boolean readOnly) throws SQLException {

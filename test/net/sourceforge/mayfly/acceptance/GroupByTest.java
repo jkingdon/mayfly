@@ -355,7 +355,7 @@ public class GroupByTest extends SqlTestCase {
         
         String orderByAggregate = "select type, avg(price) from item " +
                 "group by type order by avg(price)";
-        if (dialect.canOrderByExpression()) {
+        if (dialect.canOrderByExpression(true)) {
             assertResultList(
                 new String[] { " 'pencil', 15 ", " 'book', 1595 " },
                 query(orderByAggregate)

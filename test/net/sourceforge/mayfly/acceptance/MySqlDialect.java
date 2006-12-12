@@ -130,7 +130,7 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
-    public boolean canOrderByExpression() {
+    public boolean canOrderByExpression(boolean isAggregate) {
         return true;
     }
     

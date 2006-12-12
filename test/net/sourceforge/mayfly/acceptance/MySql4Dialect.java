@@ -33,5 +33,9 @@ public class MySql4Dialect extends MySqlDialect {
     public boolean rightHandArgumentToJoinCanBeJoin(boolean withParentheses) {
         return true;
     }
+    
+    public boolean canOrderByExpression(boolean isAggregate) {
+        return !isAggregate;
+    }
 
 }

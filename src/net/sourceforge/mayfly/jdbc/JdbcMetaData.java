@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.jdbc;
 
+import net.sourceforge.mayfly.MayflyConnection;
 import net.sourceforge.mayfly.UnimplementedException;
 
 import java.sql.Connection;
@@ -8,6 +9,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class JdbcMetaData implements DatabaseMetaData {
+
+    private final MayflyConnection mayflyConnection;
+
+    public JdbcMetaData(MayflyConnection mayflyConnection) {
+        this.mayflyConnection = mayflyConnection;
+    }
 
     public boolean allProceduresAreCallable() throws SQLException {
         throw new UnimplementedException();
@@ -57,8 +64,10 @@ public class JdbcMetaData implements DatabaseMetaData {
         throw new UnimplementedException();
     }
 
-    public ResultSet getColumns(String arg0, String arg1, String arg2, String arg3) throws SQLException {
-        throw new UnimplementedException();
+    public ResultSet getColumns(
+        String arg0, String arg1, String table, String column) 
+    throws SQLException {
+        return mayflyConnection.getColumns(table, column);
     }
 
     public Connection getConnection() throws SQLException {

@@ -45,5 +45,22 @@ public class MetaDataTest extends SqlTestCase {
         assertFalse("no second row", tables.next());
         tables.close();
     }
+    
+    public void testListColumns() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        ResultSet columns = connection.getMetaData().getColumns(
+            null, null, "foo", "a");
+        if (dialect.listColumnsDoesNotFindThem()) {
+            /* I don't know what the cause is here.  Perhaps
+               something about the two nulls?  Should they
+               be "%" or ""?*/
+            assertFalse(columns.next());
+        }
+        else {
+            assertTrue(columns.next());
+            assertEquals("a", columns.getString("COLUMN_NAME"));
+            assertFalse(columns.next());
+        }
+    }
 
 }

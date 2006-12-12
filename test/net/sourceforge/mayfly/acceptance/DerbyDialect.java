@@ -108,7 +108,7 @@ public class DerbyDialect extends Dialect {
         return false;
     }
 
-    public boolean canOrderByExpression() {
+    public boolean canOrderByExpression(boolean isAggregate) {
         return true;
     }
 
@@ -236,6 +236,10 @@ public class DerbyDialect extends Dialect {
     
     public boolean errorIfOrderByNotInSelectDistinct() {
         return false;
+    }
+
+    public boolean listColumnsDoesNotFindThem() {
+        return true;
     }
 
 }
