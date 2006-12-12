@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.dump.SqlDumperTest;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
@@ -185,6 +186,10 @@ public class Schema {
         return replaceTable(table, table(table).dropForeignKey(constraintName));
     }
 
+    /** @internal
+       The move to end is a moderately cheesy way to make 
+       {@link SqlDumperTest#testOrderOfForeignKeys()} 
+       work (in that case, not really the general case). */
     public Schema addConstraint(String table, Constraint key) {
         return replaceTable(table, table(table).addConstraint(key));
     }

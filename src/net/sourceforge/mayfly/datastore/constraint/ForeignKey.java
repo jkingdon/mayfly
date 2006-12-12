@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.TableReference;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.io.IOException;
@@ -223,6 +224,10 @@ public class ForeignKey extends Constraint {
             return targetColumn.equalsIgnoreCase(referencerColumn);
         }
         return super.canBeTargetOfForeignKey(targetColumn);
+    }
+    
+    public boolean refersTo(String table, Evaluator evaluator) {
+        return targetTable.matches(DataStore.ANONYMOUS_SCHEMA_NAME, table);
     }
 
     public void dump(Writer out) throws IOException {

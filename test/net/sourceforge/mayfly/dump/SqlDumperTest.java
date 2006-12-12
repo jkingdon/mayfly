@@ -399,6 +399,42 @@ public class SqlDumperTest extends TestCase {
         
         checkRoundTrip(database.dataStore());
     }
+    
+    public void testOrderOfForeignKeys() throws Exception {
+        database.execute("create table refr(a_id integer)");
+        database.execute("create table refd(a integer primary key)");
+        database.execute(
+            "alter table refr add foreign key(a_id) references refd(a)");
+        checkRoundTrip(database.dataStore());
+    }
+
+    public void testMoveToEndOnAddForeignKeysDoesNotSuffice() throws Exception {
+        database.execute("create table bb(a_id integer, b integer primary key)");
+        database.execute("create table aa(a integer primary key)");
+        database.execute("create table cc(b_id integer," +
+            "foreign key(b_id) references bb(b))");
+        database.execute(
+            "alter table bb add foreign key(a_id) references aa(a)");
+        checkRoundTrip(database.dataStore());
+    }
+    
+    public void testCircularForeignKeys() throws Exception {
+        database.execute("create table bb(a_id integer, b integer primary key)");
+        database.execute("create table aa(b_id integer, a integer primary key)");
+        database.execute(
+            "alter table bb add foreign key(a_id) references aa(a)");
+        database.execute(
+            "alter table aa add foreign key(b_id) references bb(b)");
+        try {
+            new SqlDumper().dump(database.dataStore());
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals(
+                "cannot dump: circular reference between tables bb and aa",
+                e.getMessage());
+        }
+    }
 
     /**
      * From a datastore, dump it, then load from that dump,

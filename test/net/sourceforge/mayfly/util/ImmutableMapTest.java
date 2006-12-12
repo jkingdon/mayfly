@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.util;
 import junit.framework.TestCase;
 
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -61,6 +62,20 @@ public class ImmutableMapTest extends TestCase {
         } catch (NoSuchKeyException expected) {
             
         }
+    }
+    
+    public void testReplaceAndOrder() throws Exception {
+        ImmutableMap twoEntries = 
+            new ImmutableMap().with("a", "A").with("b", "B");
+
+        {
+            ImmutableMap changeInPlace = twoEntries.with("a", "AAA");
+            Iterator iter = changeInPlace.entrySet().iterator();
+            assertEquals("AAA", ((Map.Entry)iter.next()).getValue());
+            assertEquals("B", ((Map.Entry)iter.next()).getValue());
+            assertFalse(iter.hasNext());
+        }
+
     }
 
 }

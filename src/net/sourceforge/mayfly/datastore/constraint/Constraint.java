@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TableReference;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 public abstract class Constraint {
@@ -81,6 +82,10 @@ public abstract class Constraint {
     }
 
     public boolean canBeTargetOfForeignKey(String targetColumn) {
+        return false;
+    }
+
+    public boolean refersTo(String table, Evaluator evaluator) {
         return false;
     }
 

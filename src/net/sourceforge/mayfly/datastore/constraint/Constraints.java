@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TableReference;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
@@ -60,11 +61,14 @@ public class Constraints {
      * Not-null is checked in 
      * {@link Column#coerce(net.sourceforge.mayfly.datastore.Cell, Location)}
      */
+    public static long cumulative = 0;
     public void check(Rows rows, Row newRow, Location location) {
+        long start = System.currentTimeMillis();
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
             constraint.check(rows, newRow, location);
         }
+        cumulative += (System.currentTimeMillis() - start);
     }
 
     public void checkInsert(
@@ -182,6 +186,17 @@ public class Constraints {
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
             if (constraint instanceof PrimaryKey) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean refersTo(String table, Evaluator evaluator) {
+        evaluator.store().table(table);
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
+            if (constraint.refersTo(table, evaluator)) {
                 return true;
             }
         }

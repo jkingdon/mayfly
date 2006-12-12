@@ -8,13 +8,20 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
+import net.sourceforge.mayfly.evaluation.select.StoreEvaluator;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.TokenType;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class SqlDumper {
 
@@ -35,11 +42,46 @@ public class SqlDumper {
     }
 
     private void definition(DataStore store, Writer out) throws IOException {
-        for (Iterator iter = store.anonymousSchema().tables().iterator(); 
+        Set tables = store.anonymousSchema().tables();
+        List sorted = sortTables(store, tables);
+        for (Iterator iter = sorted.iterator(); 
             iter.hasNext();) {
             String tableName = (String) iter.next();
             createTable(tableName, store.table(tableName), out);
         }
+    }
+
+    private List sortTables(final DataStore store, Set tables) {
+        List list = new ArrayList(tables);
+        final Evaluator evaluator = new StoreEvaluator(
+            store, DataStore.ANONYMOUS_SCHEMA_NAME);
+        Collections.sort(list, new Comparator() {
+
+            public int compare(Object left, Object right) {
+                String leftTable = (String) left;
+                String rightTable = (String) right;
+                boolean leftRefersToRight = 
+                    store.table(leftTable).constraints
+                        .refersTo(rightTable, evaluator);
+                boolean rightRefersToLeft = 
+                    store.table(rightTable).constraints
+                        .refersTo(leftTable, evaluator);
+                if (leftRefersToRight && rightRefersToLeft) {
+                    throw new MayflyException(
+                        "cannot dump: circular reference between tables " + 
+                        leftTable + " and " + rightTable);
+                }
+                if (leftRefersToRight) {
+                    return 1;
+                }
+                else if (rightRefersToLeft) {
+                    return -1;
+                }
+                return 0;
+            } 
+            
+        });
+        return list;
     }
 
     private void createTable(String tableName, TableData table, Writer out) 
