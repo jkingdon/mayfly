@@ -1416,13 +1416,15 @@ public class Parser {
     }
     
     public UnresolvedTableReference parseTableReference() {
-        String first = consumeIdentifier();
+        Token first = expectAndConsume(TokenType.IDENTIFIER);
         if (consumeIfMatches(TokenType.PERIOD)) {
-            String table = consumeIdentifier();
-            return new UnresolvedTableReference(first, table);
+            Token table = expectAndConsume(TokenType.IDENTIFIER);
+            return new UnresolvedTableReference(
+                first.getText(), table.getText(), 
+                first.location.combine(table.location));
         }
         else {
-            return new UnresolvedTableReference(first);
+            return new UnresolvedTableReference(first.getText(), first.location);
         }
     }
 

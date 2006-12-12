@@ -160,11 +160,14 @@ public class ForeignKeyTest extends SqlTestCase {
             "(id integer primary key, name varchar(255))" +
             dialect.tableTypeForForeignKeys());
         expectExecuteFailure(
-            "create table cities (name varchar(255), country integer, " +
-            "foreign key (country) references bad_table(id)" +
+            "create table cities (name varchar(255), country integer, \n" +
+            "foreign key (country) references \n" +
+            "bad_table(id)\n" +
             ")" +
             dialect.tableTypeForForeignKeys(),
-            "no table bad_table");
+            "no table bad_table",
+            3, 1, 3, 10
+            );
     }
 
     public void testNoAction() throws Exception {

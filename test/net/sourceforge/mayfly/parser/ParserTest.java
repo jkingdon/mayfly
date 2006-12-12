@@ -12,6 +12,7 @@ import net.sourceforge.mayfly.datastore.constraint.SetNull;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.condition.Greater;
 import net.sourceforge.mayfly.evaluation.expression.Average;
@@ -196,6 +197,22 @@ public class ParserTest extends TestCase {
         } catch (ParserException e) {
             assertEquals("expected identifier but got '='", e.getMessage());
         }
+    }
+    
+    public void testTableReference() throws Exception {
+        UnresolvedTableReference reference = 
+            new Parser("foo  ").parseTableReference();
+        assertEquals("foo", reference.tableName());
+        assertEquals("my_default", reference.schema("my_default"));
+        MayflyAssert.assertLocation(1, 1, 1, 4, reference.location);
+    }
+
+    public void testTableReferenceWithSchema() throws Exception {
+        UnresolvedTableReference reference = 
+            new Parser("mars.foo  ").parseTableReference();
+        assertEquals("foo", reference.tableName());
+        assertEquals("mars", reference.schema("my_default"));
+        MayflyAssert.assertLocation(1, 1, 1, 9, reference.location);
     }
 
     public void testBadTokenAfterIs() throws Exception {

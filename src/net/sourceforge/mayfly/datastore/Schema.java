@@ -9,6 +9,7 @@ import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableMap;
 
 import java.util.Iterator;
@@ -91,9 +92,13 @@ public class Schema {
     }
 
     public String lookUpTable(String target) {
+        return lookUpTable(target, Location.UNKNOWN);
+    }
+
+    public String lookUpTable(String target, Location location) {
         String canonicalName = lookUpTableOrNull(target);
         if (canonicalName == null) {
-            throw new MayflyException("no table " + target);
+            throw new MayflyException("no table " + target, location);
         }
         else {
             return canonicalName;
