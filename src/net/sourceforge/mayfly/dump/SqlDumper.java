@@ -71,13 +71,18 @@ public class SqlDumper {
                         "cannot dump: circular reference between tables " + 
                         leftTable + " and " + rightTable);
                 }
-                if (leftRefersToRight) {
+                else if (leftRefersToRight) {
                     return 1;
                 }
                 else if (rightRefersToLeft) {
                     return -1;
                 }
-                return 0;
+                else {
+                    /* We want to preserve their original order (the order
+                       in which they were created, probably).  Fortunately,
+                       Collections.sort is stable. */
+                    return 0;
+                }
             } 
             
         });
