@@ -64,12 +64,9 @@ public class TimestampDataTypeTest extends TestCase {
             new TimestampDataType().stringToDate("1890-02-31 00:00:01");
             fail();
         }
-        catch (org.joda.time.IllegalFieldValueException expected) {
-            // I'm thinking it is probably a mistake for Mayfly
-            // to wrap the exception just to hide the fact that
-            // mayfly is implemented using Joda.  Is it important
-            // that it get caught by the "catch SQLException" which
-            // tends to wrap most people's JDBC calls?
+        catch (MayflyException e) {
+            assertEquals("Value 31 for dayOfMonth must be in the range [1,28]", 
+                e.getMessage());
         }
     }
 

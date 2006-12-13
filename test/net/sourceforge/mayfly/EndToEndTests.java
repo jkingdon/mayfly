@@ -334,5 +334,17 @@ public class EndToEndTests extends SqlTestCase {
             connection.prepareStatement("create table foo(x integer)");
         assertEquals(noLimit, prepared.getQueryTimeout());
     }
+    
+    public void testBadTimestamp() throws Exception {
+        execute("create table foo(x timestamp)");
+        expectExecuteFailure(
+            "insert into foo(x) values('0000-00-00 00:00:00')", 
+            "Value 0 for monthOfYear must be in the range [1,12]",
+            1, 27, 1, 48);
+        expectExecuteFailure(
+            "insert into foo(x) values('2004-17-01 01:01:01')", 
+            "Value 17 for monthOfYear must be in the range [1,12]",
+            1, 27, 1, 48);
+    }
 
 }

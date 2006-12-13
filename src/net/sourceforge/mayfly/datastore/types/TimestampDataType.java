@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.parser.Location;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.joda.time.IllegalFieldValueException;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 
@@ -31,23 +32,28 @@ public class TimestampDataType extends DataType {
     }
 
     TimestampCell stringToDate(String text, Location location) {
-        LocalDateTime stamp = parseTimestamp(text);
-        if (stamp != null) {
-            return new TimestampCell(stamp);
-        }
-        else {
-            LocalDate date = DateDataType.parseDate(text);
-            if (date != null) {
-                LocalDateTime stampFromDate = new LocalDateTime(
-                    date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
-                    0, 0, 0, 000);
-                return new TimestampCell(stampFromDate);
+        try {
+            LocalDateTime stamp = parseTimestamp(text);
+            if (stamp != null) {
+                return new TimestampCell(stamp);
             }
+            else {
+                LocalDate date = DateDataType.parseDate(text);
+                if (date != null) {
+                    LocalDateTime stampFromDate = new LocalDateTime(
+                        date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(),
+                        0, 0, 0, 000);
+                    return new TimestampCell(stampFromDate);
+                }
+            }
+            throw new MayflyException(
+                "'" + StringEscapeUtils.escapeSql(text) + 
+                "' is not in format yyyy-mm-dd hh:mm:ss",
+                location);
         }
-        throw new MayflyException(
-            "'" + StringEscapeUtils.escapeSql(text) + 
-            "' is not in format yyyy-mm-dd hh:mm:ss",
-            location);
+        catch (IllegalFieldValueException e) {
+            throw new MayflyException(e.getMessage(), location);
+        }
     }
 
     public static LocalDateTime parseTimestamp(String text) {
