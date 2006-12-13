@@ -108,6 +108,9 @@ public class SyntaxTest extends SqlTestCase {
         // Part of ALTER TABLE foo MODIFY COLUMN,
         // which isn't in SQL92
         checkReserved("modify");
+        
+        // Part of CREATE TABLE, CREATE INDEX, etc
+        checkReserved("index");
     }
 
     private void checkReserved(String word) throws Exception {
@@ -126,8 +129,10 @@ public class SyntaxTest extends SqlTestCase {
 
     private void assertReserved(String keyword) throws Exception {
         expectExecuteFailure("create table foo (" + keyword + " integer)",
-            "expected column or table constraint but got " + 
-                keyword.toUpperCase()
+            "index".equals(keyword) ?
+                "expected '(' but got INTEGER" :
+                "expected column or table constraint but got " + 
+                    keyword.toUpperCase()
         );
     }
     

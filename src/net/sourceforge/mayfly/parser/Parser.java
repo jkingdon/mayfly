@@ -509,6 +509,12 @@ public class Parser {
         else if (lookingAtConstraint()) {
             table.addConstraint(parseConstraint());
         }
+        else if (consumeIfMatches(TokenType.KEYWORD_index)) {
+            consumeIfMatches(TokenType.IDENTIFIER); // name
+            expectAndConsume(TokenType.OPEN_PAREN);
+            expectAndConsume(TokenType.IDENTIFIER); // column
+            expectAndConsume(TokenType.CLOSE_PAREN);
+        }
         else {
             throw new ParserException(
                 "column or table constraint",

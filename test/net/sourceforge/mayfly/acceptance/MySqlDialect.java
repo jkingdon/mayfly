@@ -64,7 +64,8 @@ public class MySqlDialect extends Dialect {
     }
     
     public boolean isReservedWord(String word) {
-        return word.equalsIgnoreCase("if");
+        return word.equalsIgnoreCase("if")
+            || word.equalsIgnoreCase("index");
     }
 
     public boolean verticalBarsMeanConcatenation() {
@@ -312,6 +313,10 @@ public class MySqlDialect extends Dialect {
     
     public boolean errorIfOrderByNotInSelectDistinct() {
         return false;
+    }
+    
+    public boolean createTableCanContainIndex() {
+        return true;
     }
 
 }

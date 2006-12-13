@@ -1,5 +1,9 @@
 Changes since 0.2:
 
+Accept the MySQL index syntax:
+    CREATE TABLE(a INTEGER, INDEX(a))
+as a noop.
+
 Mayfly now supports many subselects, for example:
     select name from foo where x = (select max(y) from bar)
     select name from foo where x in (select y from bar)

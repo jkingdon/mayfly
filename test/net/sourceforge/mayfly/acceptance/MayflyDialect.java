@@ -73,7 +73,13 @@ public class MayflyDialect extends Dialect {
         // kind of word that people probably aren't in the habit of trying
         // to use in identifiers, just because it is reserved in so many
         // other languages.
-        return word.equalsIgnoreCase("if");
+        return word.equalsIgnoreCase("if")
+        
+        /**
+         * Don't see how I can do the MySQL index syntax without INDEX keyword.
+         */
+            || word.equalsIgnoreCase("index")
+        ;
     }
         
     public boolean willReadUncommitted() {
@@ -194,6 +200,11 @@ public class MayflyDialect extends Dialect {
                to have a checking phase ahead of time.  */
             return true;
         }
+    }
+    
+    public boolean createTableCanContainIndex() {
+        // MySQL compatibility.
+        return true;
     }
     
 }

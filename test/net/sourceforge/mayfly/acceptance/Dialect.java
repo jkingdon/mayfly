@@ -675,4 +675,8 @@ public abstract class Dialect {
         return false;
     }
 
+    public boolean createTableCanContainIndex() {
+        return false;
+    }
+
 }
