@@ -27,6 +27,12 @@ public class DataDefinitionTest extends SqlTestCase {
     // featuring not just DROP but also the ability to let your Database
     // be garbage collected or call JdbcDriver.shutdown().
 
+    /**
+     * @internal
+     * Also see {@link ForeignKeyTest#testDropTable()} and
+     * {@link ForeignKeyTest#testDropTableWithSchemas()}.
+     */
+    
     public void testDropNonexisting() throws Exception {
         expectExecuteFailure("DROP TABLE FOO", "no table FOO");
     }
@@ -52,7 +58,4 @@ public class DataDefinitionTest extends SqlTestCase {
         }
     }
     
-    // TODO: DROP TABLE where there is a foreign key referencing
-    // the table.
-
 }

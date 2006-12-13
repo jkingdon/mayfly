@@ -187,7 +187,7 @@ public class ForeignKey extends Constraint {
     }
 
     public void checkDropTable(DataStore store, String schema, String table) {
-        if (tableIsMyTarget(schema, table)) {
+        if (tableIsMyTarget(schema, table) && !refersToSameTable()) {
             throw new MayflyException(
                 "cannot drop " + table +
                 " because a foreign key in table " + 

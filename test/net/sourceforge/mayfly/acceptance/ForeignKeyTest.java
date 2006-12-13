@@ -154,6 +154,18 @@ public class ForeignKeyTest extends SqlTestCase {
         execute("drop table landoj.countries");
     }
     
+    public void testDropTableWithReferenceToSelf() throws Exception {
+        execute(
+            "create table person " +
+            "(id integer primary key," +
+            "parent integer," +
+            "foreign key(parent) references person(id)" +
+            ")" +
+            dialect.tableTypeForForeignKeys());
+        execute("drop table person");
+        dialect.assertTableCount(0);
+    }
+    
     public void testReferenceNonexistentTable() throws Exception {
         execute(
             "create table countries " +
