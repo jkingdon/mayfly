@@ -671,7 +671,7 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean listColumnsDoesNotFindThem() {
+    public boolean metaDataExpectsUppercase() {
         return false;
     }
 

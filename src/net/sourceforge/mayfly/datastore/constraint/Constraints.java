@@ -200,4 +200,15 @@ public class Constraints {
         return false;
     }
 
+    public int requiredInsertionOrder(Row first, Row second) {
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
+            int requiredOrder = constraint.requiredInsertionOrder(first, second);
+            if (requiredOrder != 0) {
+                return requiredOrder;
+            }
+        }
+        return 0;
+    }
+
 }

@@ -237,7 +237,7 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
-    public boolean listColumnsDoesNotFindThem() {
+    public boolean metaDataExpectsUppercase() {
         return true;
     }
 

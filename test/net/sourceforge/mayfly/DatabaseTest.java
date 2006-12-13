@@ -74,6 +74,14 @@ public class DatabaseTest extends TestCase {
         assertEquals(Collections.singletonList("x"), database.columnNames("inAnonymousSchema"));
         database.execute("set schema mars");
         assertEquals(Collections.singletonList("y"), database.columnNames("foo"));
+        
+        try {
+            database.columnNames("nosuch");
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("no table nosuch", e.getMessage());
+        }
     }
     
     public void testQueryAndSchema() throws Exception {

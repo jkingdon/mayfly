@@ -98,7 +98,7 @@ public class ForeignKey extends Constraint {
                Check for the case in which the row we are in the
                process of inserting satisfies the constraint.
              */
-            if (targetTable.matches(referencerSchema, referencerTable)) {
+            if (refersToSameTable()) {
                 Cell newPossibleTarget = proposedRow.cell(targetColumn);
                 if (newPossibleTarget.sqlEquals(value, location)) {
                     return;
@@ -107,6 +107,36 @@ public class ForeignKey extends Constraint {
 
             throwInsertException(referencerSchema, value, location);
         }
+    }
+    
+    /**
+     * @internal
+     * Return -1 if first must be inserted before second,
+     * 1 if second must be inserted before first,
+     * or 0 if they can be inserted in either order (as
+     * far as can be determined by just looking at those two).
+     */
+    public int requiredInsertionOrder(Row first, Row second) {
+        if (refersToSameTable()) {
+            if (second.cell(referencerColumn)
+                .sqlEquals(first.cell(targetColumn))) {
+                return -1;
+            }
+            else if (first.cell(referencerColumn)
+                .sqlEquals(second.cell(targetColumn))) {
+                return 1;
+            }
+            else {
+                return 0;
+            }
+        }
+        else {
+            return 0;
+        }
+    }
+
+    private boolean refersToSameTable() {
+        return targetTable.matches(referencerSchema, referencerTable);
     }
 
     private void checkWeAreInTheRightPlace(String schema, String table) {

@@ -46,14 +46,11 @@ public class MetaDataTest extends SqlTestCase {
         tables.close();
     }
     
-    public void testListColumns() throws Exception {
+    public void testListColumnsWithLowercaseSearch() throws Exception {
         execute("create table foo(a integer, b integer)");
         ResultSet columns = connection.getMetaData().getColumns(
             null, null, "foo", "a");
-        if (dialect.listColumnsDoesNotFindThem()) {
-            /* I don't know what the cause is here.  Perhaps
-               something about the two nulls?  Should they
-               be "%" or ""?*/
+        if (dialect.metaDataExpectsUppercase()) {
             assertFalse(columns.next());
         }
         else {
@@ -61,6 +58,34 @@ public class MetaDataTest extends SqlTestCase {
             assertEquals("a", columns.getString("COLUMN_NAME"));
             assertFalse(columns.next());
         }
+    }
+
+    public void testListColumns() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        ResultSet columns = connection.getMetaData().getColumns(
+            null, null, "FOO", "A");
+        assertTrue(columns.next());
+        if (dialect.metaDataExpectsUppercase()) {
+            assertEquals("A", columns.getString("COLUMN_NAME"));
+        }
+        else {
+            assertEquals("a", columns.getString("COLUMN_NAME"));
+        }
+        assertFalse(columns.next());
+    }
+
+    public void testListColumnsNoColumns() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        ResultSet columns = connection.getMetaData().getColumns(
+            null, null, "FOO", "C");
+        assertFalse(columns.next());
+    }
+
+    public void testListColumnsNoTable() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        ResultSet columns = connection.getMetaData().getColumns(
+            null, null, "NO_SUCH_TABLE", "A");
+        assertFalse(columns.next());
     }
 
 }

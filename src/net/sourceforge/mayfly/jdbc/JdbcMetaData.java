@@ -65,7 +65,7 @@ public class JdbcMetaData implements DatabaseMetaData {
     }
 
     public ResultSet getColumns(
-        String arg0, String arg1, String table, String column) 
+        String catalog, String schemaPattern, String table, String column) 
     throws SQLException {
         return mayflyConnection.getColumns(table, column);
     }

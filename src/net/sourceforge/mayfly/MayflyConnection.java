@@ -3,6 +3,7 @@ package net.sourceforge.mayfly;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.NullCell;
+import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.evaluation.ResultRow;
@@ -16,6 +17,7 @@ import net.sourceforge.mayfly.evaluation.what.Selected;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -81,8 +83,22 @@ public class MayflyConnection {
     }
 
     public List columnNames(String tableName) {
-        TableData tableData = database.dataStore().table(currentSchema, tableName);
+        TableData tableData = currentSchema().table(tableName);
         return tableData.columnNames();
+    }
+
+    public List columnNamesOrEmpty(String tableName) {
+        Schema schema = currentSchema();
+        if (!schema.hasTable(tableName)) {
+            return Collections.EMPTY_LIST;
+        }
+        TableData tableData = schema.table(tableName);
+        return tableData.columnNames();
+    }
+
+    private Schema currentSchema() {
+        Schema schema = database.dataStore().schema(currentSchema);
+        return schema;
     }
 
     public int rowCount(String tableName) {
@@ -128,7 +144,7 @@ public class MayflyConnection {
         Selected columnColumns = new Selected(nameExpression);
         
         ResultRows rows = new ResultRows();
-        List names = columnNames(table);
+        List names = columnNamesOrEmpty(table);
         for (Iterator iter = names.iterator(); iter.hasNext();) {
             String column = (String) iter.next();
             if (targetColumn.equalsIgnoreCase(column)) {

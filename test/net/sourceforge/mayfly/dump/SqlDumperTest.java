@@ -455,6 +455,36 @@ public class SqlDumperTest extends TestCase {
         }
     }
 
+    public void xtestRowOrderWithForeignKeys() throws Exception {
+        database.execute("create table aa(a integer primary key, parent integer," +
+            "foreign key(parent) references aa(a))");
+        database.execute("insert into aa(a, parent) values(31, null)");
+        database.execute("insert into aa(a, parent) values(1, null)");
+        database.execute("insert into aa(a, parent) values(11, 1)");
+        database.execute("insert into aa(a, parent) values(12, 1)");
+        database.execute("insert into aa(a, parent) values(24, 11)");
+        database.execute("update aa set parent = 24 where a = 31");
+        checkRoundTrip(database.dataStore());
+    }
+
+    public void xtestCircularRowsWithForeignKeys() throws Exception {
+        database.execute("create table aa(a integer primary key, parent integer," +
+            "foreign key(parent) references aa(a))");
+        database.execute("insert into aa(a, parent) values(1, null)");
+        database.execute("insert into aa(a, parent) values(2, 1)");
+        database.execute("update aa set parent = 2 where a = 1");
+        try {
+            new SqlDumper().dump(database.dataStore());
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals(
+                "cannot dump: circular reference between " +
+                "rows with a 1 and 2 in table aa",
+                e.getMessage());
+        }
+    }
+
     /**
      * From a datastore, dump it, then load from that dump,
      * dump again, and compare the two dumps.
@@ -472,7 +502,9 @@ public class SqlDumperTest extends TestCase {
         }
         catch (MayflyException e) {
             throw new RuntimeException(
-                "failure in command: " + e.failingCommand(), e);
+                "failure in command: " + e.failingCommand() +
+                "\ndump was:\n" + dump
+                , e);
         }
         
         String dump2 = new SqlDumper().dump(database2.dataStore());

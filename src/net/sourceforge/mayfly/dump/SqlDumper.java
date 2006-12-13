@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -55,6 +56,10 @@ public class SqlDumper {
         List list = new ArrayList(tables);
         final Evaluator evaluator = new StoreEvaluator(
             store, DataStore.ANONYMOUS_SCHEMA_NAME);
+        /* I believe this is not really right - the Comparator
+         * isn't transitive and the circular reference detection
+         * is, uh, limited.
+         */
         Collections.sort(list, new Comparator() {
 
             public int compare(Object left, Object right) {
@@ -199,16 +204,47 @@ public class SqlDumper {
 
     private void rows(String tableName, TableData table, Writer out) 
     throws IOException {
-        for (int i = 0; i < table.rowCount(); ++i) {
-            Row row = table.row(i);
+        Collection rows = sortRows(table);
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
             row(tableName, row, out);
         }
         
-        if (table.rowCount() > 0) {
+        if (rows.size() > 0) {
             out.write("\n");
         }
     }
 
+    private Collection sortRows(final TableData table) {
+        List result = new ArrayList();
+        for (int i = 0; i < table.rowCount(); ++i) {
+            Row row = table.row(i);
+            result.add(row);
+        }
+        /* I believe this is not really right - the Comparator
+         * isn't transitive and the circular reference detection
+         * isn't there yet.
+         */
+        /* It seems like we need both a transitive closure and
+           a topological sort (that is, we know row A should go
+           before row B and row B before row C, so we need to
+           deduce that A goes before C, and arrange everything in
+           a single sorted list (throwing an exception if it
+           can't be done - that is, if there are cycles). */
+        /*
+        Collections.sort(result, new Comparator() {
+
+            public int compare(Object object1, Object object2) {
+                Row first = (Row) object1;
+                Row second = (Row) object2;
+                return table.constraints.requiredInsertionOrder(first, second);
+            } 
+            
+        });
+        */
+        return result;
+    }
+    
     private void row(String tableName, Row row, Writer out) throws IOException {
         out.write("INSERT INTO ");
         out.write(tableName);
