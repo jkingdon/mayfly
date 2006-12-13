@@ -2,14 +2,13 @@ package net.sourceforge.mayfly.dump;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
-import net.sourceforge.mayfly.evaluation.select.Evaluator;
-import net.sourceforge.mayfly.evaluation.select.StoreEvaluator;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.TokenType;
 
@@ -37,34 +36,44 @@ public class SqlDumper {
     }
 
     public void dump(DataStore store, Writer out) throws IOException {
-        definition(store, out);
+        List sortedTables = sortTables(store);
 
-        data(store, out);
+        definition(store, sortedTables, out);
+
+        data(store, sortedTables, out);
     }
 
-    private void definition(DataStore store, Writer out) throws IOException {
-        Set tables = store.anonymousSchema().tables();
-        List sorted = sortTables(store, tables);
-        for (Iterator iter = sorted.iterator(); 
-            iter.hasNext();) {
+    public void data(DataStore store, Writer out) 
+    throws IOException {
+        List sortedTables = sortTables(store);
+        data(store, sortedTables, out);
+    }
+
+    private void definition(DataStore store, List sortedTables, Writer out) 
+    throws IOException {
+        for (Iterator iter = sortedTables.iterator(); iter.hasNext();) {
             String tableName = (String) iter.next();
             createTable(tableName, store.table(tableName), out);
         }
     }
 
-    private List sortTables(final DataStore store, Set tables) {
+    private List sortTables(final DataStore store) {
+        Set tables = store.anonymousSchema().tables();
         List list = new ArrayList(tables);
+        /*
         final Evaluator evaluator = new StoreEvaluator(
             store, DataStore.ANONYMOUS_SCHEMA_NAME);
-        /* I believe this is not really right - the Comparator
-         * isn't transitive and the circular reference detection
-         * is, uh, limited.
-         */
+        */
         Collections.sort(list, new Comparator() {
 
             public int compare(Object left, Object right) {
                 String leftTable = (String) left;
                 String rightTable = (String) right;
+                /* I believe this is not really right - the Comparator
+                 * isn't transitive and the circular reference detection
+                 * is, uh, limited.
+                 */
+                /*
                 boolean leftRefersToRight = 
                     store.table(leftTable).constraints
                         .refersTo(rightTable, evaluator);
@@ -83,11 +92,23 @@ public class SqlDumper {
                     return -1;
                 }
                 else {
-                    /* We want to preserve their original order (the order
-                       in which they were created, probably).  Fortunately,
-                       Collections.sort is stable. */
-                    return 0;
+                */
+                    /* It might be desirable, in some contexts, to preserve
+                       original order (for example, if you want to look over
+                       the dump file and see related tables grouped together,
+                       assuming they were in the original script which loaded
+                       the data).
+                       
+                       However, for other things, like comparing two dumps,
+                       having the order not depend on the order tables was
+                       inserted is good.  This is what we implement for now.
+                       
+                       This may want to be an option some day.
+                    */
+                    return leftTable.compareTo(rightTable);
+                /*
                 }
+                */
             } 
             
         });
@@ -194,9 +215,9 @@ public class SqlDumper {
         }
     }
 
-    public void data(DataStore store, Writer out) throws IOException {
-        for (Iterator iter = store.anonymousSchema().tables().iterator(); 
-            iter.hasNext();) {
+    public void data(DataStore store, List sortedTables, Writer out) 
+    throws IOException {
+        for (Iterator iter = sortedTables.iterator(); iter.hasNext();) {
             String tableName = (String) iter.next();
             rows(tableName, store.table(tableName), out);
         }
@@ -221,27 +242,38 @@ public class SqlDumper {
             Row row = table.row(i);
             result.add(row);
         }
-        /* I believe this is not really right - the Comparator
-         * isn't transitive and the circular reference detection
-         * isn't there yet.
-         */
         /* It seems like we need both a transitive closure and
            a topological sort (that is, we know row A should go
            before row B and row B before row C, so we need to
            deduce that A goes before C, and arrange everything in
            a single sorted list (throwing an exception if it
            can't be done - that is, if there are cycles). */
-        /*
         Collections.sort(result, new Comparator() {
 
             public int compare(Object object1, Object object2) {
                 Row first = (Row) object1;
                 Row second = (Row) object2;
-                return table.constraints.requiredInsertionOrder(first, second);
+                /* I believe this is not really right - the Comparator
+                 * isn't transitive and the circular reference detection
+                 * isn't there yet.
+                 */
+//                return table.constraints.requiredInsertionOrder(first, second);
+                return naturalOrder(first, second);
+            }
+
+            private int naturalOrder(Row first, Row second) {
+                for (int i = 0; i < first.columnCount(); ++i) {
+                    Cell cellFromFirst = first.cell(i);
+                    Cell cellFromSecond = second.cell(i);
+                    int comparison = cellFromFirst.compareTo(cellFromSecond);
+                    if (comparison != 0) {
+                        return comparison;
+                    }
+                }
+                return 0;
             } 
             
         });
-        */
         return result;
     }
     
