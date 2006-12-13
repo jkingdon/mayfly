@@ -13,6 +13,9 @@ public class IndexTest extends SqlTestCase {
         }
     }
     
-    // TODO: Also consider Hypersonic/Derby syntax: CREATE INDEX, etc
+    /* TODO: Might want to insist that the index be on a NOT NULL
+       column the way that MySQL 5.1 does */
 
+    // TODO: Also consider Hypersonic/Derby syntax: CREATE INDEX, etc
+    
 }
