@@ -422,21 +422,22 @@ public class SqlDumperTest extends TestCase {
         database.execute("create table aa_refr(a_id integer)");
         database.execute("create table bb_refd(a integer primary key)");
         database.execute(
-            "alter table refr add foreign key(a_id) references refd(a)");
+            "alter table aa_refr add foreign key(a_id) references bb_refd(a)");
         checkRoundTrip(database.dataStore());
     }
 
     public void xtestMoveToEndOnAddForeignKeysDoesNotSuffice() throws Exception {
-        /* The original motive for this test is kind of lost, now that
-           tables are alphabetized.  But perhaps it still is relevant.
-        */
+        /* bb refers to aa, cc refers to bb */
+        /* The simple algorithm of just moving bb to after aa, or to
+         * the end, would not suffice.
+         */
         database.execute("create table order1_bb(" +
             "a_id integer, b integer primary key)");
-        database.execute("create table order2_aa(a integer primary key)");
-        database.execute("create table order3_cc(b_id integer," +
+        database.execute("create table order2_cc(b_id integer," +
             "foreign key(b_id) references order1_bb(b))");
+        database.execute("create table order3_aa(a integer primary key)");
         database.execute(
-            "alter table order1_bb add foreign key(a_id) references order2_aa(a)");
+            "alter table order1_bb add foreign key(a_id) references order3_aa(a)");
         checkRoundTrip(database.dataStore());
     }
     
@@ -462,9 +463,9 @@ public class SqlDumperTest extends TestCase {
         database.execute("create table aa(a integer primary key, parent integer," +
             "foreign key(parent) references aa(a))");
         database.execute("insert into aa(a, parent) values(31, null)");
-        database.execute("insert into aa(a, parent) values(1, null)");
-        database.execute("insert into aa(a, parent) values(11, 1)");
-        database.execute("insert into aa(a, parent) values(12, 1)");
+        database.execute("insert into aa(a, parent) values(1000, null)");
+        database.execute("insert into aa(a, parent) values(11, 1000)");
+        database.execute("insert into aa(a, parent) values(12, 1000)");
         database.execute("insert into aa(a, parent) values(24, 11)");
         database.execute("update aa set parent = 24 where a = 31");
         checkRoundTrip(database.dataStore());

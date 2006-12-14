@@ -58,8 +58,8 @@ public class SqlDumper {
     }
 
     private List sortTables(final DataStore store) {
-        Set tables = store.anonymousSchema().tables();
-        List list = new ArrayList(tables);
+        Set tableNames = store.anonymousSchema().tables();
+        List list = new ArrayList(tableNames);
         /*
         final Evaluator evaluator = new StoreEvaluator(
             store, DataStore.ANONYMOUS_SCHEMA_NAME);
