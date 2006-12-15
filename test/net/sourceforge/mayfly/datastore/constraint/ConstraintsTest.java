@@ -12,6 +12,9 @@ import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.evaluation.select.StoreEvaluator;
 import net.sourceforge.mayfly.util.ImmutableList;
 
+import java.util.Iterator;
+import java.util.List;
+
 public class ConstraintsTest extends TestCase {
     
     public void testDropColumn() throws Exception {
@@ -79,6 +82,38 @@ public class ConstraintsTest extends TestCase {
         catch (MayflyException e) {
             assertEquals("no table nonexist", e.getMessage());
         }
+    }
+    
+    public void testReferencedTables() throws Exception {
+        Database database = new Database();
+        database.execute("create table aa(a integer primary key)");
+        database.execute("create table bb(b integer primary key," +
+            "a_id integer," +
+            "foreign key(a_id) references aa(a))");
+        database.execute("create table cc(a_id integer," +
+            "foreign key(a_id) references aa(a)," +
+            "b_id integer," +
+            "foreign key(b_id) references bb(b))");
+        DataStore dataStore = database.dataStore();
+        Evaluator evaluator = new StoreEvaluator(
+            dataStore, DataStore.ANONYMOUS_SCHEMA_NAME);
+
+        Constraints aaConstraints = dataStore.table("aa").constraints;
+        List aaRefersTo = aaConstraints.referencedTables(evaluator);
+        assertEquals(0, aaRefersTo.size());
+        
+        Constraints bbConstraints = dataStore.table("bb").constraints;
+        Iterator bbRefersTo = 
+            bbConstraints.referencedTables(evaluator).iterator();
+        assertEquals("aa", bbRefersTo.next());
+        assertFalse(bbRefersTo.hasNext());
+        
+        Constraints ccConstraints = dataStore.table("cc").constraints;
+        Iterator ccRefersTo = 
+            ccConstraints.referencedTables(evaluator).iterator();
+        assertEquals("aa", ccRefersTo.next());
+        assertEquals("bb", ccRefersTo.next());
+        assertFalse(ccRefersTo.hasNext());
     }
 
 }

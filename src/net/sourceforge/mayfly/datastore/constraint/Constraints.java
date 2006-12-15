@@ -200,6 +200,15 @@ public class Constraints {
         return false;
     }
 
+    public List referencedTables(Evaluator evaluator) {
+        List result = new ArrayList();
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
+            result.addAll(constraint.referencedTables());
+        }
+        return result;
+    }
+
     public int requiredInsertionOrder(Row first, Row second) {
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();

@@ -49,9 +49,40 @@ public class GraphTest extends TestCase {
         }
     }
     
+    public void testBackupCompareIsZero() throws Exception {
+        graph.addNode(new StringNode("a"));
+        
+        try {
+            graph.addNode(new StringNode("a"));
+            fail();
+        }
+        catch (RuntimeException e) {
+            StringAssert.assertStartsWith("already have node ", e.getMessage());
+        }
+    }
+    
     public void testAddEdge() throws Exception {
         graph.addNode(a);
         graph.addNode(b);
+        graph.addEdge(a, b);
+        
+        assertEquals(0, graph.predecessors(a).size());
+
+        SortedSet bPredecessors = graph.predecessors(b);
+        assertEquals(1, bPredecessors.size());
+        assertSame(a, bPredecessors.iterator().next());
+        
+        assertEquals(0, graph.successors(b).size());
+
+        SortedSet aSuccessors = graph.successors(a);
+        assertEquals(1, aSuccessors.size());
+        assertSame(b, aSuccessors.iterator().next());
+    }
+
+    public void testAddEdgeAgainIsNoop() throws Exception {
+        graph.addNode(a);
+        graph.addNode(b);
+        graph.addEdge(a, b);
         graph.addEdge(a, b);
         
         assertEquals(0, graph.predecessors(a).size());

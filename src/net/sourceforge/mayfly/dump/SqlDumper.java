@@ -9,6 +9,10 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
+import net.sourceforge.mayfly.evaluation.select.StoreEvaluator;
+import net.sourceforge.mayfly.graph.CycleDetectedException;
+import net.sourceforge.mayfly.graph.Graph;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.TokenType;
 
@@ -59,60 +63,74 @@ public class SqlDumper {
 
     private List sortTables(final DataStore store) {
         Set tableNames = store.anonymousSchema().tables();
-        List list = new ArrayList(tableNames);
-        /*
-        final Evaluator evaluator = new StoreEvaluator(
-            store, DataStore.ANONYMOUS_SCHEMA_NAME);
-        */
-        Collections.sort(list, new Comparator() {
+        List tableNodes = namesToNodes(tableNames);
+        Graph graph = new Graph();
+        addTableNodes(graph, tableNodes);
+        addEdgesForForeignKeys(graph, tableNodes, store);
+        List sortedNodes = topologicalSort(graph);
+        return nodesToNames(sortedNodes);
+    }
 
-            public int compare(Object left, Object right) {
-                String leftTable = (String) left;
-                String rightTable = (String) right;
-                /* I believe this is not really right - the Comparator
-                 * isn't transitive and the circular reference detection
-                 * is, uh, limited.
-                 */
-                /*
-                boolean leftRefersToRight = 
-                    store.table(leftTable).constraints
-                        .refersTo(rightTable, evaluator);
-                boolean rightRefersToLeft = 
-                    store.table(rightTable).constraints
-                        .refersTo(leftTable, evaluator);
-                if (leftRefersToRight && rightRefersToLeft) {
-                    throw new MayflyException(
-                        "cannot dump: circular reference between tables " + 
-                        leftTable + " and " + rightTable);
-                }
-                else if (leftRefersToRight) {
-                    return 1;
-                }
-                else if (rightRefersToLeft) {
-                    return -1;
-                }
-                else {
-                */
-                    /* It might be desirable, in some contexts, to preserve
-                       original order (for example, if you want to look over
-                       the dump file and see related tables grouped together,
-                       assuming they were in the original script which loaded
-                       the data).
-                       
-                       However, for other things, like comparing two dumps,
-                       having the order not depend on the order tables was
-                       inserted is good.  This is what we implement for now.
-                       
-                       This may want to be an option some day.
-                    */
-                    return leftTable.compareTo(rightTable);
-                /*
-                }
-                */
-            } 
-            
-        });
-        return list;
+    private List topologicalSort(Graph graph) {
+        try {
+            return graph.topologicalSort();
+        }
+        catch (CycleDetectedException e) {
+            throw new MayflyException(
+                "cannot dump: circular foreign key references between tables");
+        }
+    }
+
+    private void addEdgesForForeignKeys(Graph graph, List tableNodes,
+        DataStore store) {
+        Evaluator evaluator = new StoreEvaluator(
+            store, DataStore.ANONYMOUS_SCHEMA_NAME);
+        for (Iterator iter = tableNodes.iterator(); iter.hasNext();) {
+            TableNode referringTable = (TableNode) iter.next();
+            List referenced = store.table(referringTable.name).constraints
+                .referencedTables(evaluator);
+            for (Iterator iterator = referenced.iterator(); iterator.hasNext();) {
+                String referencedTable = (String) iterator.next();
+                TableNode referencedNode = 
+                    findInList(tableNodes, referencedTable);
+                graph.addEdge(referencedNode, referringTable);
+            }
+        }
+    }
+    
+    TableNode findInList(List nodes, String name) {
+        for (Iterator iter = nodes.iterator(); iter.hasNext();) {
+            TableNode candidate = (TableNode) iter.next();
+            if (candidate.name.equalsIgnoreCase(name)) {
+                return candidate;
+            }
+        }
+        throw new MayflyInternalException("should have added " + name);
+    }
+
+    private void addTableNodes(Graph graph, List nodes) {
+        for (Iterator iter = nodes.iterator(); iter.hasNext();) {
+            TableNode table = (TableNode) iter.next();
+            graph.addNode(table);
+        }
+    }
+
+    private List namesToNodes(Collection tableNames) {
+        List result = new ArrayList();
+        for (Iterator iter = tableNames.iterator(); iter.hasNext();) {
+            String name = (String) iter.next();
+            result.add(new TableNode(name));
+        }
+        return result;
+    }
+
+    private List nodesToNames(Collection tableNodes) {
+        List result = new ArrayList();
+        for (Iterator iter = tableNodes.iterator(); iter.hasNext();) {
+            TableNode node = (TableNode) iter.next();
+            result.add(node.name);
+        }
+        return result;
     }
 
     private void createTable(String tableName, TableData table, Writer out) 

@@ -14,6 +14,8 @@ import net.sourceforge.mayfly.parser.Location;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
+import java.util.List;
 
 public class ForeignKey extends Constraint {
 
@@ -258,6 +260,15 @@ public class ForeignKey extends Constraint {
     
     public boolean refersTo(String table, Evaluator evaluator) {
         return targetTable.matches(DataStore.ANONYMOUS_SCHEMA_NAME, table);
+    }
+    
+    public List referencedTables() {
+        if (refersToSameTable()) {
+            return Collections.EMPTY_LIST;
+        }
+        else {
+            return Collections.singletonList(targetTable.tableName());
+        }
     }
 
     public void dump(Writer out) throws IOException {

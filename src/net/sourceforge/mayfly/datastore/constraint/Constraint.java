@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore.constraint;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -87,6 +88,10 @@ public abstract class Constraint {
 
     public boolean refersTo(String table, Evaluator evaluator) {
         return false;
+    }
+
+    public List referencedTables() {
+        return Collections.EMPTY_LIST;
     }
 
     abstract public void dump(Writer out) throws IOException;

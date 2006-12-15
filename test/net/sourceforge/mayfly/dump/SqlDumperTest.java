@@ -418,7 +418,7 @@ public class SqlDumperTest extends TestCase {
         checkRoundTrip(database.dataStore());
     }
     
-    public void xtestOrderOfForeignKeys() throws Exception {
+    public void testOrderOfForeignKeys() throws Exception {
         database.execute("create table aa_refr(a_id integer)");
         database.execute("create table bb_refd(a integer primary key)");
         database.execute(
@@ -426,7 +426,7 @@ public class SqlDumperTest extends TestCase {
         checkRoundTrip(database.dataStore());
     }
 
-    public void xtestMoveToEndOnAddForeignKeysDoesNotSuffice() throws Exception {
+    public void testMoveToEndOnAddForeignKeysDoesNotSuffice() throws Exception {
         /* bb refers to aa, cc refers to bb */
         /* The simple algorithm of just moving bb to after aa, or to
          * the end, would not suffice.
@@ -441,7 +441,7 @@ public class SqlDumperTest extends TestCase {
         checkRoundTrip(database.dataStore());
     }
     
-    public void xtestCircularForeignKeys() throws Exception {
+    public void testCircularForeignKeys() throws Exception {
         database.execute("create table bb(a_id integer, b integer primary key)");
         database.execute("create table aa(b_id integer, a integer primary key)");
         database.execute(
@@ -454,9 +454,26 @@ public class SqlDumperTest extends TestCase {
         }
         catch (MayflyException e) {
             assertEquals(
-                "cannot dump: circular reference between tables bb and aa",
+//                "cannot dump: circular reference between tables bb and aa",
+                "cannot dump: circular foreign key references between tables",
                 e.getMessage());
         }
+    }
+    
+    public void testSelfReference() throws Exception {
+        database.execute("create table foo(id integer," +
+            "parent integer," +
+            "foreign key(parent) references foo(id))");
+        checkRoundTrip(database.dataStore());
+    }
+    
+    public void testTwoForeignKeysFromBarToFoo() throws Exception {
+        database.execute("create table foo(a integer unique, b integer unique)");
+        database.execute("create table bar(a_id integer," +
+            "foreign key(a_id) references foo(a)," +
+            "b_id integer," +
+            "foreign key(b_id) references foo(b))");
+        checkRoundTrip(database.dataStore());
     }
 
     public void xtestRowOrderWithForeignKeys() throws Exception {
@@ -507,6 +524,20 @@ public class SqlDumperTest extends TestCase {
             "create table bb(b integer);", 
             "create table bb(b integer);" +
             "create table aa(a integer)");
+    }
+    
+    public void testCaseDoesNotAffectTableOrder() throws Exception {
+        TableNode aa = new TableNode("aa");
+        TableNode bb = new TableNode("BB");
+        TableNode upperAa = new TableNode("AA");
+        assertTrue(aa.backupOrdering(bb) < 0);
+        assertTrue(bb.backupOrdering(aa) > 0);
+        assertTrue(upperAa.backupOrdering(bb) < 0);
+        assertTrue(bb.backupOrdering(upperAa) > 0);
+
+        /* We don't find it interesting how aa compares to upperAa,
+           because they won't both be in the same schema.
+         */
     }
     
     public void testRowOrder() throws Exception {
