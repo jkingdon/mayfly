@@ -326,4 +326,17 @@ public class ValueTest extends SqlTestCase {
         assertFalse(results.next());
     }
     
+    /**
+     * @internal
+     * In allowing duplicate rows, SQL does not follow the relational model.
+     * But we are probably stuck with allowing the duplicates, I suspect.
+     */
+    public void testIdenticalRows() throws Exception {
+        execute("create table foo(x integer, y varchar(255))");
+        execute("insert into foo(x, y) values(5, 'dup')");
+        execute("insert into foo(x, y) values(5, 'dup')");
+        assertResultList(new String[] { " 5, 'dup' ", " 5, 'dup' " }, 
+            query("select x,y from foo"));
+    }
+    
 }

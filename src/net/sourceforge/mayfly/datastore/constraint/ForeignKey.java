@@ -118,22 +118,23 @@ public class ForeignKey extends Constraint {
      * or 0 if they can be inserted in either order (as
      * far as can be determined by just looking at those two).
      */
-    public int requiredInsertionOrder(Row first, Row second) {
+    public boolean mustInsertBefore(Row first, Row second) {
+        if (first == second) {
+            // A row which satisfies its own constraint is OK.
+            return false;
+        }
+
         if (refersToSameTable()) {
             if (second.cell(referencerColumn)
                 .sqlEquals(first.cell(targetColumn))) {
-                return -1;
-            }
-            else if (first.cell(referencerColumn)
-                .sqlEquals(second.cell(targetColumn))) {
-                return 1;
+                return true;
             }
             else {
-                return 0;
+                return false;
             }
         }
         else {
-            return 0;
+            return false;
         }
     }
 

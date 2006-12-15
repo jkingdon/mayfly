@@ -131,4 +131,11 @@ public class Graph {
         }
     }
 
+    public void addNodes(List nodes) {
+        for (Iterator iter = nodes.iterator(); iter.hasNext();) {
+            Node table = (Node) iter.next();
+            addNode(table);
+        }
+    }
+
 }

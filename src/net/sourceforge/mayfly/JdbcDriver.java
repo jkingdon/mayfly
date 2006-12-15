@@ -94,6 +94,19 @@ public class JdbcDriver implements Driver {
         return getMayflyDriver().createInDriver(dataStore);
     }
 
+    /** 
+     * Get a snapshot of the database which is accessed by the given JDBC
+     * URL.  The JDBC URL must point to a database managed by 
+     * {@link JdbcDriver} (including the default database).
+     */
+    public static DataStore snapshot(String url) {
+        try {
+            return getMayflyDriver().findDatabase(url).dataStore();
+        } catch (MayflySqlException e) {
+            throw e.asRuntimeException();
+        }
+    }
+
     /**
      * Destroy databases managed by {@link JdbcDriver}.
      * 
@@ -137,7 +150,7 @@ public class JdbcDriver implements Driver {
         return findDatabase(url).openConnection();
     }
 
-    private Database findDatabase(String url) throws SQLException {
+    private Database findDatabase(String url) throws MayflySqlException {
         if (DEFAULT_DATABASE.equals(url)) {
             if (!databases.containsKey(DEFAULT_DATABASE)) {
                 databases.put(DEFAULT_DATABASE, new Database());
@@ -147,7 +160,8 @@ public class JdbcDriver implements Driver {
         if (databases.containsKey(url)) {
             return (Database) databases.get(url);
         } else {
-            throw new SQLException("Mayfly JDBC URL " + url + " not recognized");
+            throw new MayflyException(
+                "Mayfly JDBC URL " + url + " not recognized").asSqlException();
         }
     }
 

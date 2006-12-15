@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.dump;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
@@ -21,8 +20,6 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -65,13 +62,13 @@ public class SqlDumper {
         Set tableNames = store.anonymousSchema().tables();
         List tableNodes = namesToNodes(tableNames);
         Graph graph = new Graph();
-        addTableNodes(graph, tableNodes);
+        graph.addNodes(tableNodes);
         addEdgesForForeignKeys(graph, tableNodes, store);
-        List sortedNodes = topologicalSort(graph);
+        List sortedNodes = topologicalSortOnTables(graph);
         return nodesToNames(sortedNodes);
     }
 
-    private List topologicalSort(Graph graph) {
+    private List topologicalSortOnTables(Graph graph) {
         try {
             return graph.topologicalSort();
         }
@@ -106,13 +103,6 @@ public class SqlDumper {
             }
         }
         throw new MayflyInternalException("should have added " + name);
-    }
-
-    private void addTableNodes(Graph graph, List nodes) {
-        for (Iterator iter = nodes.iterator(); iter.hasNext();) {
-            TableNode table = (TableNode) iter.next();
-            graph.addNode(table);
-        }
     }
 
     private List namesToNodes(Collection tableNames) {
@@ -243,7 +233,7 @@ public class SqlDumper {
 
     private void rows(String tableName, TableData table, Writer out) 
     throws IOException {
-        Collection rows = sortRows(table);
+        Collection rows = sortRows(table, tableName);
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             row(tableName, row, out);
@@ -254,47 +244,56 @@ public class SqlDumper {
         }
     }
 
-    private Collection sortRows(final TableData table) {
+    private Collection sortRows(final TableData table, String tableName) {
+        List rowNodes = rowNodes(table, tableName);
+        Graph graph = new Graph();
+        graph.addNodes(rowNodes);
+        addEdgesForRows(graph, rowNodes, table);
+        List sortedNodes = topologicalSortOnRows(graph, tableName);
+        return nodesToRows(sortedNodes);
+    }
+
+    private void addEdgesForRows(Graph graph, List rowNodes, TableData table) {
+        for (Iterator i = rowNodes.iterator(); i.hasNext();) {
+            RowNode left = (RowNode) i.next();
+            for (Iterator j = rowNodes.iterator(); j.hasNext();) {
+                RowNode right = (RowNode) j.next();
+                if (table.constraints.mustInsertBefore(left.row, right.row)) {
+                    graph.addEdge(left, right);
+                }
+            }
+        }
+    }
+
+    private List rowNodes(final TableData table, String tableName) {
         List result = new ArrayList();
         for (int i = 0; i < table.rowCount(); ++i) {
             Row row = table.row(i);
-            result.add(row);
+            result.add(new RowNode(row, tableName));
         }
-        /* It seems like we need both a transitive closure and
-           a topological sort (that is, we know row A should go
-           before row B and row B before row C, so we need to
-           deduce that A goes before C, and arrange everything in
-           a single sorted list (throwing an exception if it
-           can't be done - that is, if there are cycles). */
-        Collections.sort(result, new Comparator() {
-
-            public int compare(Object object1, Object object2) {
-                Row first = (Row) object1;
-                Row second = (Row) object2;
-                /* I believe this is not really right - the Comparator
-                 * isn't transitive and the circular reference detection
-                 * isn't there yet.
-                 */
-//                return table.constraints.requiredInsertionOrder(first, second);
-                return naturalOrder(first, second);
-            }
-
-            private int naturalOrder(Row first, Row second) {
-                for (int i = 0; i < first.columnCount(); ++i) {
-                    Cell cellFromFirst = first.cell(i);
-                    Cell cellFromSecond = second.cell(i);
-                    int comparison = cellFromFirst.compareTo(cellFromSecond);
-                    if (comparison != 0) {
-                        return comparison;
-                    }
-                }
-                return 0;
-            } 
-            
-        });
         return result;
     }
     
+    private List topologicalSortOnRows(Graph graph, String tableName) {
+        try {
+            return graph.topologicalSort();
+        }
+        catch (CycleDetectedException e) {
+            throw new MayflyException(
+                "cannot dump: circular reference between rows in table " + 
+                tableName);
+        }
+    }
+
+    private List nodesToRows(Collection rowNodes) {
+        List result = new ArrayList();
+        for (Iterator iter = rowNodes.iterator(); iter.hasNext();) {
+            RowNode node = (RowNode) iter.next();
+            result.add(node.row);
+        }
+        return result;
+    }
+
     private void row(String tableName, Row row, Writer out) throws IOException {
         out.write("INSERT INTO ");
         out.write(tableName);

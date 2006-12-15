@@ -476,7 +476,7 @@ public class SqlDumperTest extends TestCase {
         checkRoundTrip(database.dataStore());
     }
 
-    public void xtestRowOrderWithForeignKeys() throws Exception {
+    public void testRowOrderWithForeignKeys() throws Exception {
         database.execute("create table aa(a integer primary key, parent integer," +
             "foreign key(parent) references aa(a))");
         database.execute("insert into aa(a, parent) values(31, null)");
@@ -487,8 +487,41 @@ public class SqlDumperTest extends TestCase {
         database.execute("update aa set parent = 24 where a = 31");
         checkRoundTrip(database.dataStore());
     }
+    
+    public void testRowSatisfiesItsOwnConstraint() throws Exception {
+        database.execute("create table self(id integer primary key," +
+            "parent integer," +
+            "foreign key(parent) references self(id))");
+        database.execute("insert into self(id, parent) values(1, 1)");
+        checkRoundTrip(database.dataStore());
+    }
+    
+    public void testDifferentConstraintsImplyDifferentOrders() throws Exception {
+        // A particularly odd type of cycle.
+        database.execute("create table foo(a integer unique," +
+            "b integer unique," +
+            "a_ref integer," +
+            "foreign key(a_ref) references foo(a)," +
+            "b_ref integer," +
+            "foreign key(b_ref) references foo(b)" +
+            ")");
+        database.execute(
+            "insert into foo(a, b, a_ref, b_ref) values (1, 2, null, null)");
+        database.execute(
+            "insert into foo(a, b, a_ref, b_ref) values (8, 9, 1, null)");
+        database.execute("update foo set b_ref = 9 where a = 1");
+        try {
+            dump();
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals(
+                "cannot dump: circular reference between rows in table foo",
+                e.getMessage());
+        }
+    }
 
-    public void xtestCircularRowsWithForeignKeys() throws Exception {
+    public void testCircularRowsWithForeignKeys() throws Exception {
         database.execute("create table aa(a integer primary key, parent integer," +
             "foreign key(parent) references aa(a))");
         database.execute("insert into aa(a, parent) values(1, null)");
@@ -500,8 +533,10 @@ public class SqlDumperTest extends TestCase {
         }
         catch (MayflyException e) {
             assertEquals(
-                "cannot dump: circular reference between " +
-                "rows with a 1 and 2 in table aa",
+                // Would be nice to say something about which rows...
+//                "cannot dump: circular reference between " +
+//                "rows with a 1 and 2 in table aa",
+                "cannot dump: circular reference between rows in table aa",
                 e.getMessage());
         }
     }
@@ -557,6 +592,21 @@ public class SqlDumperTest extends TestCase {
             "insert into aa(a) values(4)" +
             "insert into aa(a) values(2)"
         );
+    }
+    
+    public void testIdenticalRows() throws Exception {
+        try {
+            dump(load(
+                "create table aa(a integer, b varchar(255));" +
+                "insert into aa(a, b) values(7, 'hi');" +
+                "insert into aa(a, b) values(7, 'hi');"
+                ));
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("cannot dump: table aa has duplicate rows",
+                e.getMessage());
+        }
     }
 
     private void assertCompareEqual(String first, String second) {

@@ -209,15 +209,15 @@ public class Constraints {
         return result;
     }
 
-    public int requiredInsertionOrder(Row first, Row second) {
+    public boolean mustInsertBefore(Row first, Row second) {
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
-            int requiredOrder = constraint.requiredInsertionOrder(first, second);
-            if (requiredOrder != 0) {
+            boolean requiredOrder = constraint.mustInsertBefore(first, second);
+            if (requiredOrder) {
                 return requiredOrder;
             }
         }
-        return 0;
+        return false;
     }
 
 }

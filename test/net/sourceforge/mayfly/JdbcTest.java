@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.acceptance.SqlTestCase;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.dump.SqlDumper;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -63,6 +64,33 @@ public class JdbcTest extends TestCase {
         query(restored2, new String[] {"2", "6"}, "select a from foo");
     }
     
+    public void testSnapshot() throws Exception {
+        String url = JdbcDriver.create(new DataStore());
+        update(url, 0, "create table foo(a integer)");
+        DataStore store = JdbcDriver.snapshot(url);
+        String dump = new SqlDumper().dump(store);
+        assertEquals("CREATE TABLE foo(\n  a INTEGER\n);\n\n", dump);
+    }
+    
+    public void testSnapshotOfDefault() throws Exception {
+        update("jdbc:mayfly:", 0, "create table foo(b integer)");
+        DataStore store = JdbcDriver.snapshot("jdbc:mayfly:");
+        String dump = new SqlDumper().dump(store);
+        assertEquals("CREATE TABLE foo(\n  b INTEGER\n);\n\n", dump);
+    }
+    
+    public void testSnapshotOfUnrecognized() throws Exception {
+        try {
+            JdbcDriver.snapshot("jdbc:mayfly:random:thing");
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals(
+                "Mayfly JDBC URL jdbc:mayfly:random:thing not recognized",
+                e.getMessage());
+        }
+    }
+
     public void testShutdown() throws Exception {
         String first = JdbcDriver.create(new Database().dataStore());
         JdbcDriver.shutdown();

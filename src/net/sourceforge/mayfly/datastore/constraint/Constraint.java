@@ -96,8 +96,8 @@ public abstract class Constraint {
 
     abstract public void dump(Writer out) throws IOException;
 
-    public int requiredInsertionOrder(Row first, Row second) {
-        return 0;
+    public boolean mustInsertBefore(Row first, Row second) {
+        return false;
     }
 
 }
