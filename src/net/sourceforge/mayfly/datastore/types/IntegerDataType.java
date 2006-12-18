@@ -21,7 +21,8 @@ public class IntegerDataType extends DataType {
     }
 
     public Cell coerce(Value value, String columnName) {
-        return genericCoerce(value, columnName, dumpName.toLowerCase(), LongCell.class);
+        return genericCoerce(value, columnName, dumpName.toLowerCase(), 
+            LongCell.class);
     }
     
     public String dumpName() {

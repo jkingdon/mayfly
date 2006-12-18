@@ -466,6 +466,19 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean expressionsAreTypeLong() {
+        return true;
+    }
+    
+    public Class typeFromAddingLongs() {
+        // Obvious question here is what about overflow?
+        return Long.class;
+    }
+    
+    public Class typeOfInteger() {
+        return Integer.class;
+    }
+
     public boolean allowHexForInteger() {
         return false;
     }

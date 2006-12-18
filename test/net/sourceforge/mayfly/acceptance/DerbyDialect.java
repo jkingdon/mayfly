@@ -144,6 +144,13 @@ public class DerbyDialect extends Dialect {
         return false;
     }
     
+    public boolean expressionsAreTypeLong() {
+        /* I suppose the question being what is maxint + maxint?
+           (not that forcing to long solves this, with maxint * maxint * maxint
+           being the obvious counterexample). */
+        return false;
+    }
+
     public boolean allowHexForBinary() {
         /* Derby has the x'00' syntax, but not for type BLOB.  I haven't
            checked what types it is allowed for. */

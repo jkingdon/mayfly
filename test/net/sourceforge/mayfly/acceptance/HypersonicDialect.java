@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -82,6 +83,12 @@ public class HypersonicDialect extends Dialect {
         else {
             return true;
         }
+    }
+    
+    public Class typeFromAddingLongs() {
+        /* Not such a bad idea.  I wonder when hypersonic promotes to
+           BigDecimal and when it doesn't */
+        return BigDecimal.class;
     }
     
     public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression() {

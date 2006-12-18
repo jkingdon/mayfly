@@ -207,4 +207,13 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    public Class typeOfInteger() {
+        /* Is it important to be compatible with other databases (which
+           have Integer.class here)?  There's also a potential speed/space
+           issue, but I'm guessing we're a while before the rest of Mayfly
+           is efficient enough for that to matter.
+         */
+        return Long.class;
+    }
+    
 }

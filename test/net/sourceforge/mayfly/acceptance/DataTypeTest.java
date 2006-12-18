@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.acceptance;
 
 import junitx.framework.ArrayAssert;
+import junitx.framework.ObjectAssert;
 
 import org.apache.commons.io.IOUtils;
 
@@ -11,6 +12,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * @internal
+ * See also:
+ * {@link StringTest}
+ * {@link DateTest}
+ */
 public class DataTypeTest extends SqlTestCase {
 
     public void testTextType() throws Exception {
@@ -69,6 +76,40 @@ public class DataTypeTest extends SqlTestCase {
             assertFalse(results.next());
             results.close();
         }
+    }
+    
+    public void testGetObject() throws Exception {
+        execute("create table foo(x " +
+                (dialect.haveTinyint() ? "tinyint" : "smallint") +
+                ", y smallint, z integer, w bigint)");
+        execute("insert into foo(x, y, z, w) " +
+            "values (127, 32767, -2147483648, 222111333444)");
+        execute("insert into foo(x, y, z, w) " +
+            "values (0, 70, 5, 62)");
+        ResultSet results = query("select x,y,z,w,y+z,z+w from foo");
+        assertTrue(results.next());
+        assertTypesOfRow(results);
+        assertTrue(results.next());
+        /* The interesting part about this is that all tested databases,
+           so far, base the returned type on the types in the expressions,
+           not the particular values from this execution. */
+        assertTypesOfRow(results);
+        assertFalse(results.next());
+    }
+
+    private void assertTypesOfRow(ResultSet results) throws SQLException {
+        ObjectAssert.assertInstanceOf(
+            dialect.typeOfInteger(), results.getObject("x"));
+        ObjectAssert.assertInstanceOf(
+            dialect.typeOfInteger(), results.getObject("y"));
+        ObjectAssert.assertInstanceOf(
+            dialect.typeOfInteger(), results.getObject("z"));
+        ObjectAssert.assertInstanceOf(Long.class, results.getObject("w"));
+        ObjectAssert.assertInstanceOf(
+            dialect.expressionsAreTypeLong() ? Long.class : Integer.class, 
+            results.getObject(5));
+        ObjectAssert.assertInstanceOf(
+            dialect.typeFromAddingLongs(), results.getObject(6));
     }
     
     public void testLongDoesNotFit() throws Exception {
