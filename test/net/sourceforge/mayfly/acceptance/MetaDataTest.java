@@ -61,7 +61,7 @@ public class MetaDataTest extends SqlTestCase {
     }
 
     public void testListColumns() throws Exception {
-        execute("create table foo(a integer, b integer)");
+        execute("create table FOO(a integer, b integer)");
         ResultSet columns = connection.getMetaData().getColumns(
             null, null, "FOO", "A");
         assertTrue(columns.next());
