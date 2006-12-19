@@ -1,8 +1,10 @@
 package net.sourceforge.mayfly.jdbc;
 
 import net.sourceforge.mayfly.Database;
+import net.sourceforge.mayfly.JdbcDriver;
 import net.sourceforge.mayfly.MayflyConnection;
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.datastore.DataStore;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -15,6 +17,15 @@ import java.sql.Statement;
 import java.util.Map;
 
 /**
+ * This is Mayfly's implementation of a JDBC connection.
+ * For the most part, standard JDBC methods should suffice,
+ * but there are a few Mayfly-specific methods.  This
+ * is so that you can take your connection, cast it to
+ * {@link JdbcConnection}, and then call a method such
+ * as {@link #snapshot()}.  An alternative is the methods
+ * in {@link JdbcDriver} such as {@link JdbcDriver#snapshot(String url)};
+ * it is a matter of convenience which you wish to call.
+ * 
  * @internal
  * The responsibility of this class is to handle the various
  * methods of JDBC, including the uninteresting ones.
@@ -232,6 +243,17 @@ public class JdbcConnection implements Connection {
         if (mayflyConnection == null) {
             throw new SQLException("connection is closed");
         }
+    }
+
+    /**
+     * Take a snapshot of this database.
+     * 
+     * Specifically, return the data store, which is
+     * an immutable object containing all the data, and table definitions, for this
+     * database.
+     */
+    public DataStore snapshot() {
+        return mayflyConnection.snapshot();
     }
 
 }

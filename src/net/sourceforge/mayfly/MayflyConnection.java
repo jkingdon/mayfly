@@ -158,4 +158,8 @@ public class MayflyConnection {
         return new ResultRow().with(nameExpression, new StringCell(column));
     }
 
+    public DataStore snapshot() {
+        return database.dataStore();
+    }
+
 }
