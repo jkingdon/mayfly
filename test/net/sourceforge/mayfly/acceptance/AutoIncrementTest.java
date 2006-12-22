@@ -98,6 +98,26 @@ public class AutoIncrementTest extends SqlTestCase {
         );
     }
     
+    /**
+     * @internal
+     * Much like {@link #check()} but just makes sure that it doesn't do
+     * anything special to avoid value conflicts.
+     */
+    public void testConflicting() throws Exception {
+        execute("create table foo(x " +
+            dialect.identityType() +
+            ", y integer)");
+        execute("insert into foo(x, y) values(1, 5)");
+        String insertAnotherOne = "insert into foo(y) values(6)";
+        if (dialect.autoIncrementIsRelativeToLastValue()) {
+            execute(insertAnotherOne);
+        }
+        else {
+            expectExecuteFailure(insertAnotherOne, 
+                "primary key x already has a value 1");
+        }
+    }
+
     public void testGetLastIdentityValue() throws Exception {
         execute("create table foo(x " +
             dialect.identityType() +
@@ -166,8 +186,6 @@ public class AutoIncrementTest extends SqlTestCase {
         }
     }
     
-    // "insert into foo values ( )"
-
     // Not valid in MySQL because this isn't a key:
     // execute("create table foo (x integer not null auto_increment, y varchar(255))");
     // On the other hand postgres does not require a primary key or unique constraint for serial

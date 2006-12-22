@@ -594,9 +594,11 @@ public abstract class Dialect {
      * @internal
      * Return the preferred (or one that will work) way to specify
      * an auto-increment column, including the type.
+     * 
+     * Generally should also declare it a primary key.
      */
     public String identityType() {
-        return "identity";
+        return "identity primary key";
     }
     
     public String lastIdentityValueQuery(String table, String column) {
