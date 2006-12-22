@@ -10,6 +10,7 @@ import org.joda.time.DateTimeZone;
 
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.SQLException;
 
 public abstract class Cell extends ValueObject {
@@ -101,6 +102,12 @@ public abstract class Cell extends ValueObject {
     }
 
     public InputStream asBinaryStream() throws SQLException {
+        throw new MayflyException(
+            "attempt to read " + displayName() + " as binary data")
+            .asSqlException();
+    }
+
+    public Blob asBlob() throws MayflySqlException {
         throw new MayflyException(
             "attempt to read " + displayName() + " as binary data")
             .asSqlException();

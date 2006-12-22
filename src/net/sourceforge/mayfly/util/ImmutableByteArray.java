@@ -75,4 +75,8 @@ public class ImmutableByteArray {
         }
     }
 
+    public long length() {
+        return bytes.length;
+    }
+
 }

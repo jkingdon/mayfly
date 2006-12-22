@@ -1,9 +1,12 @@
 package net.sourceforge.mayfly.datastore;
 
 import java.io.InputStream;
+import java.sql.Blob;
 import java.sql.SQLException;
 
+import net.sourceforge.mayfly.MayflySqlException;
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.jdbc.JdbcBlob;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableByteArray;
 
@@ -41,6 +44,10 @@ public class BinaryCell extends Cell {
     
     public InputStream asBinaryStream() throws SQLException {
         return data.asBinaryStream();
+    }
+    
+    public Blob asBlob() throws MayflySqlException {
+        return new JdbcBlob(data);
     }
     
     public byte[] asBytes() throws SQLException {

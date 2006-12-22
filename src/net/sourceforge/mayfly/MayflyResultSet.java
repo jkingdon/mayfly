@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -155,6 +156,14 @@ public final class MayflyResultSet extends ResultSetStub {
     
     public InputStream getBinaryStream(String columnName) throws SQLException {
         return cellFromName(columnName).asBinaryStream();
+    }
+    
+    public Blob getBlob(int columnIndex) throws SQLException {
+        return cellFromIndex(columnIndex).asBlob();
+    }
+    
+    public Blob getBlob(String columnName) throws SQLException {
+        return cellFromName(columnName).asBlob();
     }
     
     public byte[] getBytes(int columnIndex) throws SQLException {

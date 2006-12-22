@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -670,6 +671,39 @@ public class DataTypeTest extends SqlTestCase {
         byte[] viaBytes = results.getBytes("x");
         ArrayAssert.assertEquals(data, viaBytes);
 
+        assertFalse(results.next());
+        results.close();
+    }
+    
+    public void testGetBlob() throws Exception {
+        execute("create table foo (x " + dialect.binaryTypeName() + ")");
+
+        PreparedStatement insert = 
+            connection.prepareStatement("insert into foo(x) values(?)");
+        byte[] data = new byte[] { 0x1, 0x3, (byte)0xff, (byte)0x90 };
+        /**
+            Requiring the correct length here probably wouldn't be
+            as big a deal as in the {@link #testCharacterStream}
+            case, although I guess there are cases (e.g. reading
+            from a network stream) in which it could be inconvenient.
+        */
+        insert.setBinaryStream(1, new ByteArrayInputStream(data), data.length);
+        // TODO: probably want to test setBlob while we're at it.
+//        insert.setBlob(1, blob);
+        assertEquals(1, insert.executeUpdate());
+        insert.close();
+        
+        ResultSet results = query("select x from foo");
+        assertTrue(results.next());
+
+        Blob blob = results.getBlob(1);
+        assertEquals(4L, blob.length());
+        InputStream stream = blob.getBinaryStream();
+        byte[] contents = IOUtils.toByteArray(stream);
+        ArrayAssert.assertEquals(data, contents);
+        // Do we need to close this?
+        stream.close();
+        
         assertFalse(results.next());
         results.close();
     }
