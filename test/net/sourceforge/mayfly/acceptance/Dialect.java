@@ -689,6 +689,10 @@ public abstract class Dialect {
     public boolean metaDataExpectsUppercase() {
         return false;
     }
+    
+    public boolean metaDataProblemWithUppercaseTableName() {
+        return false;
+    }
 
     public boolean createTableCanContainIndex() {
         return false;

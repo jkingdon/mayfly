@@ -248,6 +248,10 @@ public class PostgresDialect extends Dialect {
         return false;
     }
     
+    public boolean metaDataProblemWithUppercaseTableName() {
+        return true;
+    }
+    
     public boolean deleteAllRowsIsSmartAboutForeignKeys() {
         return true;
     }

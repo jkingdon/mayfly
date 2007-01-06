@@ -8,7 +8,7 @@ import java.sql.Statement;
  * There is a question of whether our JDBC metadata should somehow be
  * limited to reflect what is portable against various JDBC drivers.
  * For now, it is merely limited by what we've gotten around to
- * implementing.  Which, at the time of writing, is nothing.
+ * implementing.
  * 
  * As for the general question of how portable DatabaseMetaData is,
  * there are issues.  See Hypersonic sources for example.
@@ -60,16 +60,29 @@ public class MetaDataTest extends SqlTestCase {
         }
     }
 
-    public void testListColumns() throws Exception {
+    public void testListColumnsMixedCase() throws Exception {
         execute("create table FOO(a integer, b integer)");
         ResultSet columns = connection.getMetaData().getColumns(
             null, null, "FOO", "A");
-        assertTrue(columns.next());
-        if (dialect.metaDataExpectsUppercase()) {
-            assertEquals("A", columns.getString("COLUMN_NAME"));
+        if (!dialect.metaDataProblemWithUppercaseTableName()) {
+            assertTrue(columns.next());
+            if (dialect.metaDataExpectsUppercase()) {
+                assertEquals("A", columns.getString("COLUMN_NAME"));
+            }
+            else {
+                assertEquals("a", columns.getString("COLUMN_NAME"));
+            }
         }
-        else {
-            assertEquals("a", columns.getString("COLUMN_NAME"));
+        assertFalse(columns.next());
+    }
+
+    public void testListColumnsSearchIsUppercase() throws Exception {
+        execute("create table FOO(A integer, b integer)");
+        ResultSet columns = connection.getMetaData().getColumns(
+            null, null, "FOO", "A");
+        if (!dialect.metaDataProblemWithUppercaseTableName()) {
+            assertTrue(columns.next());
+            assertEquals("A", columns.getString("COLUMN_NAME"));
         }
         assertFalse(columns.next());
     }
