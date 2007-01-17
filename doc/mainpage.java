@@ -69,37 +69,60 @@ production database.  Of course, this ideal is not 100% realized due
 to the wide variation in SQL dialects, and the fact that we simply
 haven't gotten around to adding everything to Mayfly which we'd like
 to.  Your odds are generally better if you stay close to standard
-SQL.
+SQL.  Mayfly does deliberately omit some syntaxes which seem to 
+be little-used and/or non-portable, but in this case there is an
+alternate syntax which will also work with non-Mayfly databases.
 
 This section describes the syntax supported in Mayfly.  In this description,
 Square brackets indicate optional
 elements, vertical bars indicate choices, curly braces simply group
-elements, and <tt>, ...</tt> indicates
-that the previous element can be repeated.
-Parentheses stand for themselves.
+elements, "..." indicates that the previous element can be repeated,
+and ", ..." indicates
+that the previous element can be repeated, with commas separating each
+repeat.  Parentheses stand for themselves.
 
-You may want to read these descriptions with reference to a more comprehensive
+These descriptions should be read with reference to a more comprehensive
 SQL guide, such as those found at <a href="http://www.sqlzoo.net/" >sqlzoo.net</a>.
 Here we emphasis conciseness and identifying our SQL subset, instead of a full
 description of the semantics and syntax.
 
 @subsection comments
 
-Text from -- to a newline is a comment. 
+Text from -- to a newline, or between 
+<tt>/*</tt> and <tt>*</tt><tt>/</tt>, is a comment. 
+
+@subsection alter ALTER TABLE
+
+<pre>
+ALTER TABLE <var>table-name</var> DROP COLUMN <var>column-name</var>
+ALTER TABLE <var>table-name</var> ADD COLUMN <var>column-definition</var>
+ALTER TABLE <var>table-name</var> MODIFY COLUMN <var>column-definition</var>
+ALTER TABLE <var>table-name</var> DROP FOREIGN KEY <var>constraint-name</var>
+ALTER TABLE <var>table-name</var> ADD <var>constraint</var>
+</pre>
+
+where <var>column-definition</var> is as in CREATE TABLE (a column
+name and data type, roughly), and <var>constraint</var> is as in
+CREATE TABLE (that is, starts with CONSTRAINT, UNIQUE, PRIMARY KEY,
+or FOREIGN KEY).
 
 @subsection create CREATE TABLE
 
 <pre>
-CREATE TABLE <var>name</var> (
+CREATE TABLE <var>table-name</var> (
   {
     {<var>column-name</var> <var>data-type</var> 
         [ DEFAULT <var>default-value</var> ]
         [ AUTO_INCREMENT ]
         {[ NOT NULL | UNIQUE | PRIMARY KEY ]}... 
     } |
-    UNIQUE(<var>column</var>, ...) |
-    PRIMARY KEY(<var>column</var>, ...)
-    FOREIGN KEY(<var>column</var>) REFERENCES <var>table</var>(<var>column</var>)
+
+    [ CONSTRAINT <var>name</var> ] UNIQUE(<var>column</var>, ...) |
+
+    [ CONSTRAINT <var>name</var> ] PRIMARY KEY(<var>column</var>, ...) |
+
+    [ CONSTRAINT <var>name</var> ]
+      FOREIGN KEY(<var>column</var>) REFERENCES <var>table</var>(<var>column</var>)
       [ ON DELETE <var>action</var> [ ON UPDATE <var>action</var> ] |
         ON UPDATE <var>action</var> [ ON DELETE <var>action</var> ]
       ]
@@ -107,9 +130,9 @@ CREATE TABLE <var>name</var> (
 )
 </pre>
 
-At the moment the data type is mostly ignored (what matters is what data you actually
-put into the database).  Future versions of Mayfly are expected to make more use
-of the data type.
+For the most part, the data type is enforced fairly strictly.  Mayfly
+does not automatically convert between one type and another as readily
+as some SQL databases.
 
 Supported data types for numbers are TINYINT, SMALLINT, INTEGER and BIGINT (8, 16, 32, and 64
 bit integers, respectively).  DECIMAL(x,y) is supported.
@@ -150,7 +173,10 @@ specified when creating the table is used.
 @subsection select SELECT
 
 <pre>
-SELECT { * | <var>alias</var>.* | [<var>alias</var> . ] <var>column</var>}, ...
+SELECT { 
+  * |
+  <var>alias</var>.* |
+  <var>expression</var> [ AS <var>column-alias</var> ], ...
 FROM <var>table-reference</var>, ...
 [ WHERE <var>condition</var> ]
 [ ORDER BY { [<var>alias</var> .] <var>column</var> }, ... ]
@@ -176,25 +202,42 @@ A <var>condition</var> is:
   <var>expression</var> { != | <> } <var>expression</var> |
   <var>expression</var> < <var>expression</var> |
   <var>expression</var> > <var>expression</var> |
+  <var>expression</var> <= <var>expression</var> |
+  <var>expression</var> >= <var>expression</var> |
   <var>expression</var> IS [ NOT ] NULL |
   <var>expression</var> IN ( <var>expression</var>, ... )
+  <var>expression</var> IN ( <var>subselect</var> )
+  <var>expression</var> LIKE <var>pattern</var> |
 </pre>
   
 An <var>expression</var> is:
 
 <pre>
   <var>0-9...</var> |
+  <var>x'<var>hexdigit</var>...'</var> |
   <var>'<var>character</var>...'</var> |
   [ <var>alias</var> . ] <var>column</var> |
-  MAX ( [ ALL | DISTINCT ] <var>expression</var> )
-  MIN ( [ ALL | DISTINCT ] <var>expression</var> )
-  SUM ( [ ALL | DISTINCT ] <var>expression</var> )
-  AVG ( [ ALL | DISTINCT ] <var>expression</var> )
-  COUNT ( { [ ALL | DISTINCT ] <var>expression</var> } | * )
-  NULL
+  <var>expression</var> + <var>expression</var> |
+  <var>expression</var> - <var>expression</var> |
+  <var>expression</var> * <var>expression</var> |
+  <var>expression</var> / <var>expression</var> |
+  <var>expression</var> || <var>expression</var> |
+  ( <var>expression</var> ) |
+  ( <var>subselect</var> ) |
+  MAX ( [ ALL | DISTINCT ] <var>expression</var> ) |
+  MIN ( [ ALL | DISTINCT ] <var>expression</var> ) |
+  SUM ( [ ALL | DISTINCT ] <var>expression</var> ) |
+  AVG ( [ ALL | DISTINCT ] <var>expression</var> ) |
+  COUNT ( { [ ALL | DISTINCT ] <var>expression</var> } | * ) }
+  NULL |
+  CASE { WHEN <var>condition</var> THEN <var>expression</var> }...
+    [ ELSE <var>else-expression</var> ]
+    END
 </pre>
 
-There is also some limited support for GROUP BY and HAVING.
+A <var>subselect</var> is just a SELECT statement.
+
+There is also some support for GROUP BY and HAVING.
 
 @subsection select UPDATE
 
@@ -228,6 +271,39 @@ It is not yet safe to share a database between several threads.
 Furthermore, even those aspects of transactions which are
 visible from within a single thread (for example, rollback),
 and not yet implemented.
+
+@section optimize Query Optimization
+
+For the most part, queries are un-optimized.  Most unit tests will
+only have a few rows in each table, and in that environment it will
+generally be faster for Mayfly to look at every row (a table scan)
+on read rather than build an index on writes.
+
+One can declare an index but this is a no-op.  For example:
+<pre>
+    CREATE TABLE(a INTEGER, INDEX(a))
+</pre>
+
+Having said that, it is now possible to,
+for example, implicitly join 3 tables of 1000 rows each, 
+in certain specific cases.  The query optimizer is still dead simple -
+it proceeds from left to right and can decompose a WHERE
+clause made up of AND.  For example, 
+"SELECT * from foo, bar, baz where foo.x = bar.x"
+will get optimized to
+<pre>
+inner join foo and bar on foo.x = bar.x
+inner join that with baz
+</pre>
+whereas
+"SELECT * from foo, bar, baz where bar.x = baz.x"
+will perform all the joins, and only
+then apply the WHERE (requiring temporary storage
+of the number of rows in foo times the number of rows
+in bar times the number of rows in baz).  Explicit
+joins are executed as they are written.  For example
+"SELECT * from foo, bar INNER JOIN baz ON bar.x = baz.x"
+will select based on the ON before joining with the foo table.
 
 @section References
 

@@ -24,8 +24,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The SQL dumper is able to dump a database as an SQL script which can 
+ * be run to create the database.  The script will order the statements
+ * so that foreign key constraints, for example, will be satisfied in
+ * reloading.  However, it is not yet able to handle circular foreign
+ * keys (in which neither row or table can be inserted first, but
+ * something fancier with UPDATE or ALTER TABLE is needed).
+ */
 public class SqlDumper {
 
+    /**
+     * Convenience method, which returns a string rather than writing
+     * to a writer.  Otherwise the same as {@link #dump(DataStore, Writer)}.
+     */
     public String dump(DataStore store) {
         StringWriter out = new StringWriter();
         try {
@@ -36,6 +48,9 @@ public class SqlDumper {
         return out.toString();
     }
 
+    /**
+     * Dump both the schema and the data of store to out.
+     */
     public void dump(DataStore store, Writer out) throws IOException {
         List sortedTables = sortTables(store);
 
@@ -44,12 +59,18 @@ public class SqlDumper {
         data(store, sortedTables, out);
     }
 
+    /**
+     * Dump only the data (not the schema) of store to out.
+     */
     public void data(DataStore store, Writer out) 
     throws IOException {
         List sortedTables = sortTables(store);
         data(store, sortedTables, out);
     }
 
+    /**
+     * Dump only the schema (not the data) of store to out.
+     */
     private void definition(DataStore store, List sortedTables, Writer out) 
     throws IOException {
         for (Iterator iter = sortedTables.iterator(); iter.hasNext();) {

@@ -43,7 +43,7 @@ public class JdbcConnection implements Connection {
 
     /**
      * Should only be called directly from within Mayfly.  External callers should call
-     * {@link Database.openConnection()} or {@link DriverManager.getConnection(String)}.
+     * {@link Database.openConnection()} or DriverManager.getConnection(String).
      */
     public JdbcConnection(Database database) {
         this.mayflyConnection = new MayflyConnection(database);
