@@ -36,7 +36,12 @@ public class NoGroupBy implements Aggregator {
     }
 
     public ResultRow check(ResultRow dummyRow, Selected selected) {
-        return dummyRow;
+        if (isAggregate(selected)) {
+            return new ResultRow();
+        }
+        else {
+            return dummyRow;
+        }
     }
     
 }

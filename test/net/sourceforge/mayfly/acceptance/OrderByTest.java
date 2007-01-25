@@ -218,14 +218,13 @@ public class OrderByTest extends SqlTestCase {
         execute("insert into foo(a) values(52)");
         execute("insert into foo(a) values(53)");
         
-        String orderByIsOdd = "select count(a) from foo order by a";
-        if (dialect.errorIfNotAggregateOrGrouped() && 
-            dialect.wishThisWereTrue()) {
-            expectQueryFailure(orderByIsOdd,
-                "");
+        String orderByWhenSelectingAggregate = "select count(a) from foo order by a";
+        if (dialect.errorIfNotAggregateOrGrouped()) {
+            expectQueryFailure(orderByWhenSelectingAggregate,
+                "a is not aggregate or mentioned in GROUP BY");
         }
         else {
-            query(orderByIsOdd);
+            query(orderByWhenSelectingAggregate);
         }
     }
 
