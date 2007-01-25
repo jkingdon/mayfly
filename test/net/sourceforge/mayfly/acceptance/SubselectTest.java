@@ -49,15 +49,8 @@ public class SubselectTest extends SqlTestCase {
         execute("insert into bar(y) values(2)");
         
         String sql = "delete from foo where x = (select max(y) from bar)";
-        if (dialect.wishThisWereTrue()) {
-            assertEquals(1,
-                execute(sql));
-            assertResultSet(new String[] { "4", "6" }, query("select x from foo"));
-        }
-        else {
-            expectExecuteFailure(sql, 
-                "subselects are not yet implemented in this context");
-        }
+        assertEquals(1, execute(sql));
+        assertResultSet(new String[] { "4", "6" }, query("select x from foo"));
     }
     
     public void testReferToRowInEnclosingQuery() throws Exception {

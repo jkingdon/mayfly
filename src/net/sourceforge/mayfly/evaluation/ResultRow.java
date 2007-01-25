@@ -143,12 +143,6 @@ public class ResultRow {
         return new ResultRow(elements.with(new Element(expression, value)));
     }
     
-    public String toString() {
-        // are we needing toString for anything?  debugString is probably
-        // better style if we are just using it for debugging.
-        return debugString();
-    }
-
     public String debugString() {
         StringBuilder out = new StringBuilder();
         out.append("Result Row:\n");

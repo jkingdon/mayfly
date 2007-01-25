@@ -4,6 +4,8 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
+import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.select.StoreEvaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 /**
@@ -76,6 +78,11 @@ public class Checker {
 
     public Cell newIdentityValue() {
         return newIdentityValue;
+    }
+    
+    public boolean evaluate(Condition condition, Row row, String tableName) {
+        return condition.evaluate(new ResultRow(row, tableName), 
+            new StoreEvaluator(store, schema)); 
     }
     
 }

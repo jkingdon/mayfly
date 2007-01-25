@@ -158,7 +158,7 @@ public class TableData {
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             
-            if (where.evaluate(row, tableName)) {
+            if (checker.evaluate(where, row, tableName)) {
                 ++rowsAffected;
                 checker.checkDelete(row, null);
             }
