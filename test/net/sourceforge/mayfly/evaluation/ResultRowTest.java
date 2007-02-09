@@ -3,8 +3,11 @@ package net.sourceforge.mayfly.evaluation;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
@@ -175,6 +178,17 @@ public class ResultRowTest extends TestCase {
         catch (MayflyException e) {
             assertEquals("duplicate table name or alias TABLE1", e.getMessage());
         }
+    }
+    
+    public void testOptions() throws Exception {
+        Options options = new Options(true);
+        Row row = new TupleBuilder()
+            .appendColumnCell("x", new LongCell(7))
+            .asRow();
+        ResultRow resultRow = new ResultRow(row, "foo", options);
+        assertEquals(1, resultRow.size());
+        SingleColumn column = (SingleColumn) resultRow.expression(0);
+        assertTrue(column.options.tableNamesCaseSensitive());
     }
     
 }

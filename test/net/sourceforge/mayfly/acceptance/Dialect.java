@@ -375,6 +375,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean errorIfBadTableInDeleteAndNoRows() {
+        return true;
+    }
+
     public boolean haveOnUpdateValue() {
         return false;
     }

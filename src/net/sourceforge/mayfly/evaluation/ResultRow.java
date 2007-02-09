@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
@@ -27,7 +28,11 @@ public class ResultRow {
     private final ImmutableList elements;
 
     public ResultRow(Row row, String table) {
-        this.elements = fromRow(row, table);
+        this(row, table, new Options());
+    }
+
+    public ResultRow(Row row, String table, Options options) {
+        this.elements = fromRow(row, table, options);
     }
 
     public ResultRow() {
@@ -38,12 +43,14 @@ public class ResultRow {
         this.elements = elements;
     }
 
-    private static ImmutableList fromRow(Row row, String table) {
+    private static ImmutableList fromRow(Row row, String table,
+        Options options) {
         List result = new ArrayList();
         for (Iterator iter = row.iterator(); iter.hasNext();) {
             TupleElement columnAndValue = (TupleElement) iter.next();
             result.add(new Element(
-                new SingleColumn(table, columnAndValue.columnName()), 
+                new SingleColumn(table, columnAndValue.columnName(),
+                    options), 
                 columnAndValue.cell()));
         }
         return new ImmutableList(result);

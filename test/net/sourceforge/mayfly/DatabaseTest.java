@@ -181,9 +181,10 @@ public class DatabaseTest extends TestCase {
         database.tableNamesCaseSensitive(true);
         database.execute("create table FOO(x integer)");
         expectExecuteFailure("delete from foo", "no table foo");
-//        expectExecuteFailure("delete from FOO where foo.x = 5", "no table foo");
+        expectExecuteFailure("delete from FOO where foo.x = 5", 
+            "no column foo.x");
     }
-
+    
     private void expectExecuteFailure(String sql, String message) {
         try {
             database.execute(sql);

@@ -16,7 +16,7 @@ public class UnresolvedTableReference {
     private final String tableName;
     private final String schema;
     public final Location location;
-    private Options options;
+    public final Options options;
 
     public UnresolvedTableReference(String tableName) {
         this(tableName, Location.UNKNOWN);

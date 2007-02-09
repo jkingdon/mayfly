@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation;
 
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
@@ -31,6 +32,7 @@ public class Checker {
     private DataStore store;
     private final Location location;
     private Cell newIdentityValue = null;
+    private final Options options;
 
     /**
      * @internal
@@ -45,11 +47,18 @@ public class Checker {
         this(store, evaluationSchema, evaluationTable, Location.UNKNOWN);
     }
 
-    public Checker(DataStore store, String evaluationSchema, String evaluationTable, Location location) {
+    public Checker(DataStore store, String evaluationSchema, String evaluationTable, 
+        Location location) {
+        this(store, evaluationSchema, evaluationTable, location, new Options());
+    }
+
+    public Checker(DataStore store, String evaluationSchema, String evaluationTable, 
+        Location location, Options options) {
         this.store = store;
         this.schema = evaluationSchema;
         this.table = evaluationTable;
         this.location = location;
+        this.options = options;
     }
 
     public void checkDelete(Row rowToDelete, Row replacementRow) {
@@ -81,8 +90,8 @@ public class Checker {
     }
     
     public boolean evaluate(Condition condition, Row row, String tableName) {
-        return condition.evaluate(new ResultRow(row, tableName), 
-            new StoreEvaluator(store, schema)); 
+        return condition.evaluate(new ResultRow(row, tableName, options), 
+            new StoreEvaluator(store, schema, options));
     }
     
 }

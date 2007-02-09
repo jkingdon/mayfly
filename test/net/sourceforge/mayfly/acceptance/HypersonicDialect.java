@@ -102,6 +102,10 @@ public class HypersonicDialect extends Dialect {
     public boolean errorIfAggregateInWhere() {
         return false;
     }
+    
+    public boolean errorIfBadTableInDeleteAndNoRows() {
+        return false;
+    }
 
     public boolean disallowColumnAndAggregateInExpression() {
         return false;

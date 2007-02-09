@@ -39,7 +39,7 @@ public class FromTable extends FromElement {
     }
 
     public ResultRow dummyRow(Evaluator evaluator) {
-        return applyAlias(evaluator.table(this).dummyRows(), evaluator.options());
+        return applyAlias(evaluator.table(this).dummyRow(), evaluator.options());
     }
 
     private ResultRows applyAlias(Rows storedRows, Options options) {

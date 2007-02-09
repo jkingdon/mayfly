@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.evaluation.Checker;
 import net.sourceforge.mayfly.evaluation.ValueList;
@@ -9,6 +10,7 @@ import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableMap;
 
@@ -138,8 +140,10 @@ public class DataStore {
         return replaceSchema(schema, result);
     }
 
-    public UpdateStore delete(String schema, String table, Condition where) {
-        Checker checker = new Checker(this, schema, table);
+    public UpdateStore delete(String schema, String table, Condition where,
+        Options options) {
+        Checker checker = new Checker(this, schema, table, 
+            Location.UNKNOWN, options);
         UpdateSchema result = schema(schema).delete(table, where, checker);
         
         /**

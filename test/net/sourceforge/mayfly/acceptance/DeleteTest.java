@@ -13,6 +13,32 @@ public class DeleteTest extends SqlTestCase {
         assertResultSet(new String[] { " 'Paris' "}, query("select b from foo"));
     }
 
+    public void testWhereErrorsNoRows() throws Exception {
+        execute("create table foo (a integer)");
+        execute("create table bar (a integer)");
+
+        String completelyUnknown = "delete from foo where xyz.a = 5";
+        String notMentionedInThisCommand = "delete from foo where bar.a = 5";
+        if (dialect.errorIfBadTableInDeleteAndNoRows()) {
+            expectExecuteFailure(completelyUnknown, "no column xyz.a");
+            expectExecuteFailure(notMentionedInThisCommand, "no column bar.a");
+        }
+        else {
+            execute(completelyUnknown);
+            execute(notMentionedInThisCommand);
+        }
+    }
+
+    public void testWhereErrorsWithRows() throws Exception {
+        execute("create table foo (a integer)");
+        execute("insert into foo(a) values(5)");
+        execute("create table bar (a integer)");
+        expectExecuteFailure("delete from foo where xyz.a = 5", 
+            "no column xyz.a");
+        expectExecuteFailure("delete from foo where bar.a = 5", 
+            "no column bar.a");
+    }
+
     public void testAggregateInWhere() throws Exception {
         execute("create table foo(a integer)");
         String aggregateInWhere = "delete from foo where max(a) > 10";

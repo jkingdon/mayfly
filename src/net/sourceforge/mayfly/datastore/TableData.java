@@ -153,6 +153,8 @@ public class TableData {
     }
 
     public UpdateTable delete(Condition where, Checker checker, String tableName) {
+        checker.evaluate(where, dummyRow(), tableName);
+        
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
@@ -211,7 +213,7 @@ public class TableData {
         return specified;
     }
     
-    public Row dummyRows() {
+    public Row dummyRow() {
 
         TupleBuilder tuple = new TupleBuilder();
         for (int i = 0; i < columns.columnCount(); ++i) {
