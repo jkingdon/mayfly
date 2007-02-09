@@ -3,6 +3,8 @@ package net.sourceforge.mayfly;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
+import net.sourceforge.mayfly.evaluation.select.StoreEvaluator;
 import net.sourceforge.mayfly.jdbc.JdbcConnection;
 import net.sourceforge.mayfly.parser.Parser;
 
@@ -55,6 +57,7 @@ public class Database {
 
     private DataStore dataStore;
     private final MayflyConnection defaultConnection;
+    private Options options = new Options();
 
     /**
      * Create an empty database (one with no tables).
@@ -90,7 +93,7 @@ public class Database {
      */
     public void executeScript(Reader script) throws MayflyException {
         try {
-            List commands = new Parser(script).parseCommands();
+            List commands = new Parser(script, options).parseCommands();
             for (Iterator iter = commands.iterator(); iter.hasNext();) {
                 Command command = (Command) iter.next();
                 defaultConnection.executeUpdate(command);
@@ -112,7 +115,8 @@ public class Database {
      * Only intended for use within Mayfly.
      */
     public UpdateStore executeUpdate(Command command, String currentSchema) {
-        UpdateStore result = command.update(dataStore, currentSchema);
+        Evaluator evaluator = new StoreEvaluator(dataStore, currentSchema);
+        UpdateStore result = command.update(evaluator);
         dataStore = result.store();
         return result;
     }
@@ -245,6 +249,14 @@ public class Database {
             throw new NullPointerException("Attempt to set data store to null");
         }
         dataStore = store;
+    }
+
+    public Options options() {
+        return options;
+    }
+
+    public void tableNamesCaseSensitive(boolean caseSensitive) {
+        options = options.tableNamesCaseSensitive(caseSensitive);
     }
 
 }

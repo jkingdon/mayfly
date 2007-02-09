@@ -1,12 +1,15 @@
 package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.ArrayList;
@@ -17,6 +20,7 @@ public class FromTable extends FromElement {
 
     public final String tableName;
     public final String alias;
+    public final Location location = Location.UNKNOWN;
 
     public FromTable(String tableName) {
         this(tableName, tableName);
@@ -31,32 +35,29 @@ public class FromTable extends FromElement {
     }
 
     public ResultRows tableContents(Evaluator evaluator) {
-        return applyAlias(
-            evaluator.store().table(evaluator.currentSchema(), tableName)
-                .rows());
+        return applyAlias(evaluator.table(this).rows(), evaluator.options());
     }
 
     public ResultRow dummyRow(Evaluator evaluator) {
-        return applyAlias(
-            evaluator.store().table(evaluator.currentSchema(), tableName)
-                .dummyRows());
+        return applyAlias(evaluator.table(this).dummyRows(), evaluator.options());
     }
 
-    private ResultRows applyAlias(Rows storedRows) {
+    private ResultRows applyAlias(Rows storedRows, Options options) {
         List rows = new ArrayList();
         for (Iterator iter = storedRows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
-            rows.add(applyAlias(row));
+            rows.add(applyAlias(row, options));
         }
         return new ResultRows(new ImmutableList(rows));
     }
 
-    private ResultRow applyAlias(Row row) {
+    private ResultRow applyAlias(Row row, Options options) {
         ResultRow result = new ResultRow();
         for (Iterator iter = row.iterator(); iter.hasNext(); ) {
             TupleElement entry = (TupleElement) iter.next();
-            result = result.withColumn(
-                alias, entry.columnName(), entry.cell());
+            result = result.with(
+                new SingleColumn(alias, entry.columnName(), options), 
+                entry.cell());
         }
         return result;
     }

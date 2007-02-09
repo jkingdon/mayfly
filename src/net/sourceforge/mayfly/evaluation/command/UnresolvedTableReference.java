@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.command;
 
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.parser.Location;
@@ -15,6 +16,7 @@ public class UnresolvedTableReference {
     private final String tableName;
     private final String schema;
     public final Location location;
+    private Options options;
 
     public UnresolvedTableReference(String tableName) {
         this(tableName, Location.UNKNOWN);
@@ -29,9 +31,15 @@ public class UnresolvedTableReference {
 
     public UnresolvedTableReference(
         String schema, String tableName, Location location) {
+        this(schema, tableName, location, new Options());
+    }
+
+    public UnresolvedTableReference(String schema, String tableName, 
+        Location location, Options options) {
         this.schema = schema;
         this.tableName = tableName;
         this.location = location;
+        this.options = options;
     }
 
     /**
@@ -65,7 +73,7 @@ public class UnresolvedTableReference {
         }
 
         String canonicalTableName = 
-            store.schema(schemaToUse).lookUpTable(tableName, location);
+            store.schema(schemaToUse).lookUpTable(tableName, location, options);
         return new TableReference(schemaToUse, canonicalTableName);
     }
 

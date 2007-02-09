@@ -140,4 +140,58 @@ public class DatabaseTest extends TestCase {
         }
     }
     
+    public void testOptions() throws Exception {
+        assertFalse(database.options().tableNamesCaseSensitive());
+        database.tableNamesCaseSensitive(true);
+        assertTrue(database.options().tableNamesCaseSensitive());
+    }
+    
+    public void testTableNamesCaseSensitive() throws Exception {
+        database.tableNamesCaseSensitive(true);
+        database.execute("create table Foo(x integer)");
+        expectQueryFailure("select x from FOO", "no table FOO");
+        expectQueryFailure("select x from Foo where FOO.x = 5", "no column FOO.x");
+        expectQueryFailure("select x from Foo group by FOO.x", "no column FOO.x");
+        expectQueryFailure("select x from Foo group by x having FOO.x > 5",
+            "no column FOO.x");
+        expectQueryFailure("select x from Foo order by FOO.x", "no column FOO.x");
+    }
+    
+    public void testTableNamesCaseSensitiveInJoins() throws Exception {
+        database.tableNamesCaseSensitive(true);
+        database.execute("create table foo(x integer)");
+        database.execute("create table bar(y integer)");
+        expectQueryFailure("select * from foo cross join BAR", "no table BAR");
+        expectQueryFailure("select * from FOO cross join bar", "no table FOO");
+    }
+
+    private void expectQueryFailure(String sql, String message) {
+        try {
+            database.query(sql);
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals(message, e.getMessage());
+        }
+    }
+    
+    // Other commands: update, alter table, etc
+
+    public void testTableNamesCaseSensitiveInDelete() throws Exception {
+        database.tableNamesCaseSensitive(true);
+        database.execute("create table FOO(x integer)");
+        expectExecuteFailure("delete from foo", "no table foo");
+//        expectExecuteFailure("delete from FOO where foo.x = 5", "no table foo");
+    }
+
+    private void expectExecuteFailure(String sql, String message) {
+        try {
+            database.execute(sql);
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals(message, e.getMessage());
+        }
+    }
+    
 }

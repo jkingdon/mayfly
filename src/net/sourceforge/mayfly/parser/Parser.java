@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.parser;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.BinaryCell;
 import net.sourceforge.mayfly.datastore.Cell;
@@ -121,7 +122,9 @@ public class Parser {
 
     private List tokens;
     private final boolean allowParameters;
+    
     private final TimeSource timeSource;
+    private final Options options;
 
     public Parser(String sql) {
         this(new Lexer(sql).tokens());
@@ -131,8 +134,8 @@ public class Parser {
      * Create a parser which reads input from a Reader.
      * The caller is responsible for closing the Reader.
      */
-    public Parser(Reader sql) {
-        this(new Lexer(sql).tokens());
+    public Parser(Reader sql, Options options) {
+        this(new Lexer(sql).tokens(), false, new RealTimeSource(), options);
     }
 
     /**
@@ -149,9 +152,15 @@ public class Parser {
     }
 
     public Parser(List tokens, boolean allowParameters, TimeSource timeSource) {
+        this(tokens, allowParameters, timeSource, new Options());
+    }
+
+    public Parser(List tokens, boolean allowParameters, 
+        TimeSource timeSource, Options options) {
         this.tokens = tokens;
         this.allowParameters = allowParameters;
         this.timeSource = timeSource;
+        this.options = options;
     }
 
     public List parseCommands() {
@@ -1357,10 +1366,12 @@ public class Parser {
         if (consumeIfMatches(TokenType.PERIOD)) {
             Token column = expectAndConsume(TokenType.IDENTIFIER);
             return new SingleColumn(firstIdentifier.getText(), column.getText(),
-                firstIdentifier.location.combine(column.location)
+                firstIdentifier.location.combine(column.location),
+                options
             );
         } else {
-            return new SingleColumn(firstIdentifier.getText(), firstIdentifier.location);
+            return new SingleColumn(firstIdentifier.getText(), 
+                firstIdentifier.location, options);
         }
     }
 
@@ -1436,10 +1447,12 @@ public class Parser {
             Token table = expectAndConsume(TokenType.IDENTIFIER);
             return new UnresolvedTableReference(
                 first.getText(), table.getText(), 
-                first.location.combine(table.location));
+                first.location.combine(table.location),
+                options);
         }
         else {
-            return new UnresolvedTableReference(first.getText(), first.location);
+            return new UnresolvedTableReference(
+                null, first.getText(), first.location, options);
         }
     }
 

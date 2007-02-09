@@ -1,14 +1,24 @@
 package net.sourceforge.mayfly.evaluation.select;
 
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Schema;
+import net.sourceforge.mayfly.datastore.TableData;
+import net.sourceforge.mayfly.datastore.TableReference;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
+import net.sourceforge.mayfly.evaluation.from.FromTable;
 
 public class StoreEvaluator extends Evaluator {
 
     private final DataStore store;
     private final String currentSchema;
+    private Options options;
 
     public StoreEvaluator(DataStore store, String currentSchema) {
+        this(store, currentSchema, new Options());
+    }
+
+    public StoreEvaluator(DataStore store, String currentSchema, Options options) {
         this.store = store;
         this.currentSchema = currentSchema;
         if (store == null) {
@@ -17,6 +27,8 @@ public class StoreEvaluator extends Evaluator {
         if (currentSchema == null) {
             throw new NullPointerException("no current schema");
         }
+        
+        this.options = options;
     }
 
     public StoreEvaluator(Schema schema) {
@@ -29,6 +41,17 @@ public class StoreEvaluator extends Evaluator {
 
     public String currentSchema() {
         return currentSchema;
+    }
+    
+    public TableData table(FromTable table) {
+        UnresolvedTableReference unresolved = new UnresolvedTableReference(
+            currentSchema, table.tableName, table.location, options);
+        TableReference resolved = unresolved.resolve(store, currentSchema, null);
+        return store().table(resolved);
+    }
+    
+    public Options options() {
+        return options;
     }
 
 }

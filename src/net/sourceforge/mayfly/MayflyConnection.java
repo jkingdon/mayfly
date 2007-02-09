@@ -47,18 +47,19 @@ public class MayflyConnection {
     }
 
     public ResultSet query(String sql) throws MayflyException {
-        Command select = Command.fromSql(sql);
+        Command select = Command.fromSql(sql, database.options());
         return query(select);
     }
 
     public ResultSet query(Command select) {
         return select.select(
-            new StoreEvaluator(database.dataStore(), currentSchema), 
+            new StoreEvaluator(database.dataStore(), currentSchema, 
+                database.options()), 
             lastIdentity);
     }
 
     public int execute(String sql) throws MayflyException {
-        Command command = Command.fromSql(sql);
+        Command command = Command.fromSql(sql, database.options());
         return executeUpdate(command);
     }
 
@@ -160,6 +161,10 @@ public class MayflyConnection {
 
     public DataStore snapshot() {
         return database.dataStore();
+    }
+
+    public Options options() {
+        return database.options();
     }
 
 }

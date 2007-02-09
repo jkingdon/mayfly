@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.evaluation.Expression;
@@ -14,30 +15,36 @@ public class SingleColumn extends Expression {
     private final String originalTableOrAlias;
     private final String tableOrAlias;
     private final String columnName;
+    public final Options options;
 
     public SingleColumn(String columnName) {
         this(null, columnName);
     }
 
-    public SingleColumn(String columnName, Location location) {
-        this(null, columnName, location);
+    public SingleColumn(String columnName, Location location, Options options) {
+        this(null, columnName, location, options);
     }
 
     public SingleColumn(String tableOrAlias, String columnName) {
-        this(tableOrAlias, columnName, Location.UNKNOWN);
+        this(tableOrAlias, columnName, new Options());
     }
 
-    public SingleColumn(String tableOrAlias, String columnName, Location location) {
+    public SingleColumn(String tableOrAlias, String columnName, Options options) {
+        this(tableOrAlias, columnName, Location.UNKNOWN, options);
+    }
+
+    public SingleColumn(String tableOrAlias, String columnName, 
+        Location location, Options options) {
+        this(tableOrAlias, tableOrAlias, columnName, location, options);
+    }
+
+    private SingleColumn(String tableOrAlias, String originalTableOrAlias, 
+        String columnName, Location location, Options options) {
         super(location);
-        this.tableOrAlias = tableOrAlias;
-        this.originalTableOrAlias = tableOrAlias;
-        this.columnName = columnName;
-    }
-
-    private SingleColumn(String tableOrAlias, String originalTableOrAlias, String columnName) {
         this.tableOrAlias = tableOrAlias;
         this.originalTableOrAlias = originalTableOrAlias;
         this.columnName = columnName;
+        this.options = options;
     }
 
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
@@ -86,13 +93,13 @@ public class SingleColumn extends Expression {
     }
 
     public boolean matchesAliasOrTable(String tableOrAlias) {
-        return tableOrAlias.equalsIgnoreCase(this.tableOrAlias);
+        return options.tableNamesEqual(tableOrAlias, this.tableOrAlias);
     }
 
     public boolean sameExpression(Expression other) {
         if (other instanceof SingleColumn) {
             SingleColumn column = (SingleColumn) other;
-            return possiblyNullEquals(tableOrAlias, column.tableOrAlias) &&
+            return possiblyNullTablesEqual(tableOrAlias, column.tableOrAlias) &&
                 columnName.equalsIgnoreCase(column.columnName);
         }
         else {
@@ -100,12 +107,12 @@ public class SingleColumn extends Expression {
         }
     }
 
-    public static boolean possiblyNullEquals(String one, String two) {
+    boolean possiblyNullTablesEqual(String one, String two) {
         if (one == null) {
             return two == null;
         }
         else {
-            return one.equalsIgnoreCase(two);
+            return options.tableNamesEqual(one, two);
         }
     }
     
@@ -116,7 +123,7 @@ public class SingleColumn extends Expression {
 //                throw new NullPointerException();
 //            }
             return new SingleColumn(column.tableOrAlias(), 
-                originalTableOrAlias, columnName);
+                originalTableOrAlias, columnName, location, options);
         }
         else {
             return this;

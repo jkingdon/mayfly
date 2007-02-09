@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.evaluation.Checker;
@@ -95,7 +96,11 @@ public class Schema {
     }
 
     public String lookUpTable(String target, Location location) {
-        String canonicalName = lookUpTableOrNull(target);
+        return lookUpTable(target, location, new Options());
+    }
+
+    public String lookUpTable(String target, Location location, Options options) {
+        String canonicalName = lookUpTableOrNull(target, options);
         if (canonicalName == null) {
             throw new MayflyException("no table " + target, location);
         }
@@ -105,9 +110,13 @@ public class Schema {
     }
 
     private String lookUpTableOrNull(String target) {
+        return lookUpTableOrNull(target, new Options());
+    }
+
+    private String lookUpTableOrNull(String target, Options options) {
         for (Iterator iter = tables.keySet().iterator(); iter.hasNext(); ) {
             String canonicalTable = (String) iter.next();
-            if (canonicalTable.equalsIgnoreCase(target)) {
+            if (options.tableNamesEqual(canonicalTable, target)) {
                 return canonicalTable;
             }
         }

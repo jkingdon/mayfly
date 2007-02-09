@@ -66,7 +66,7 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public ResultSet executeQuery() throws SQLException {
         try {
-            Command select = Command.fromTokens(substitutedTokens());
+            Command select = fromTokens();
             return mayflyConnection.query(select);
         } catch (MayflyException e) {
             throw e.asSqlException();
@@ -75,11 +75,15 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public int executeUpdate() throws SQLException {
         try {
-            Command command = Command.fromTokens(substitutedTokens());
+            Command command = fromTokens();
             return mayflyConnection.executeUpdate(command);
         } catch (MayflyException e) {
             throw e.asSqlException();
         }
+    }
+
+    private Command fromTokens() throws SQLException {
+        return Command.fromTokens(substitutedTokens(), mayflyConnection.options());
     }
 
     private List substitutedTokens() throws SQLException {

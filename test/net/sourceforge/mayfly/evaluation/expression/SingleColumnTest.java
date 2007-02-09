@@ -2,9 +2,12 @@ package net.sourceforge.mayfly.evaluation.expression;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.Options;
+import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
@@ -35,11 +38,32 @@ public class SingleColumnTest extends TestCase {
      }
      
     public void testPossiblyNullEquals() throws Exception {
-        assertTrue(SingleColumn.possiblyNullEquals("x", "X"));
-        assertFalse(SingleColumn.possiblyNullEquals("x", "xy"));
-        assertFalse(SingleColumn.possiblyNullEquals("x", null));
-        assertFalse(SingleColumn.possiblyNullEquals(null, "X"));
-        assertTrue(SingleColumn.possiblyNullEquals(null, null));
+        SingleColumn column = new SingleColumn("irrelevant");
+        assertTrue(column.possiblyNullTablesEqual("x", "X"));
+        assertFalse(column.possiblyNullTablesEqual("x", "xy"));
+        assertFalse(column.possiblyNullTablesEqual("x", null));
+        assertFalse(column.possiblyNullTablesEqual(null, "X"));
+        assertTrue(column.possiblyNullTablesEqual(null, null));
+    }
+    
+    public void testResolve() throws Exception {
+        ResultRow row = new ResultRow().withColumn("foo", "x", new LongCell(7));
+        SingleColumn resolved = (SingleColumn) 
+            new SingleColumn("x", new Location(5, 20, 7, 24), new Options())
+            .resolve(row);
+        assertEquals("foo", resolved.tableOrAlias());
+        assertEquals("x", resolved.columnName());
+        assertEquals(20, resolved.location.startColumn);
+    }
+    
+    public void testCaseSensitiveSameExression() throws Exception {
+        SingleColumn secondColumn = new SingleColumn("fOO", "x");
+        assertTrue(
+            new SingleColumn("foo", "x", new Options())
+            .sameExpression(secondColumn));
+        assertFalse(
+            new SingleColumn("foo", "x", new Options(true))
+            .sameExpression(secondColumn));
     }
 
 }
