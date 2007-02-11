@@ -254,7 +254,18 @@ public class Database {
     public Options options() {
         return options;
     }
-
+    
+    /**
+     * Set whether table names are case sensitive.
+     * The default is false (which is what is specified by the SQL standard).
+     * 
+     * This option exists if you want to be able to write SQL code with
+     * Mayfly, and check that it will run on MySQL
+     * (in which table names are case sensitive, but only if file names
+     * are, which usually means Unix vs. Windows).  Unless you have this
+     * situation, or perhaps a coding standard about the case of table
+     * names, you'll want to stick with the SQL standard behavior.
+     */
     public void tableNamesCaseSensitive(boolean caseSensitive) {
         options = options.tableNamesCaseSensitive(caseSensitive);
     }

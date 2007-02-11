@@ -1,5 +1,7 @@
 Changes since 0.2:
 
+New method in Database to set table names to case sensitive.
+
 Accept the MySQL index syntax:
     CREATE TABLE(a INTEGER, INDEX(a))
 as a noop.

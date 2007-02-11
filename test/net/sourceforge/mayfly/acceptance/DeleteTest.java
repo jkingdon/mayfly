@@ -19,7 +19,7 @@ public class DeleteTest extends SqlTestCase {
 
         String completelyUnknown = "delete from foo where xyz.a = 5";
         String notMentionedInThisCommand = "delete from foo where bar.a = 5";
-        if (dialect.errorIfBadTableInDeleteAndNoRows()) {
+        if (dialect.errorIfBadTableAndNoRows()) {
             expectExecuteFailure(completelyUnknown, "no column xyz.a");
             expectExecuteFailure(notMentionedInThisCommand, "no column bar.a");
         }

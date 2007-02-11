@@ -107,12 +107,14 @@ public class TableData {
 
     public UpdateTable update(Checker checker, List setClauses, 
         Condition where, String tableName) {
+        checker.evaluate(where, dummyRow(), tableName);
+
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             
-            if (where.evaluate(row, tableName)) {
+            if (checker.evaluate(where, row, tableName)) {
                 Row newRow = newRow(setClauses, row, tableName);
                 constraints.check(newRows, newRow, Location.UNKNOWN);
                 checker.checkInsert(constraints, newRow);

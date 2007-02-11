@@ -40,7 +40,8 @@ public class Cascade extends Action {
             ImmutableList.singleton(
                 new SetClause(referencerColumn, new CellExpression(newValue))
             ), 
-            where(oldValue, referencerTable, referencerColumn));
+            where(oldValue, referencerTable, referencerColumn),
+            new Options());
         throw new UnimplementedException();
     }
     

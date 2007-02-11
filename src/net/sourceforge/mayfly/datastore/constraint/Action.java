@@ -1,8 +1,6 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
-import java.io.IOException;
-import java.io.Writer;
-
+import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
@@ -14,6 +12,9 @@ import net.sourceforge.mayfly.evaluation.condition.Equal;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.CellExpression;
 import net.sourceforge.mayfly.util.ImmutableList;
+
+import java.io.IOException;
+import java.io.Writer;
 
 public abstract class Action {
 
@@ -33,7 +34,9 @@ public abstract class Action {
         UpdateStore update = store.update(referencerSchema, referencerTable,
             ImmutableList.singleton(
                 new SetClause(referencerColumn, valueToAssign)), 
-            where(oldValue, referencerTable, referencerColumn)
+            where(oldValue, referencerTable, referencerColumn),
+            //Location.UNKNOWN,
+            new Options()
         );
         return update.store();
     }

@@ -1,7 +1,10 @@
 package net.sourceforge.mayfly.evaluation.command;
 
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 import java.util.Iterator;
 import java.util.List;
@@ -18,11 +21,18 @@ public class Update extends Command {
         this.where = where;
     }
 
-    public UpdateStore update(DataStore store, String currentSchema) {
+    public UpdateStore update(Evaluator evaluator) {
         where.rejectAggregates("UPDATE");
         check();
+
+        DataStore store = evaluator.store();
+        String currentSchema = evaluator.currentSchema();
+
+        TableReference resolved = 
+            table.resolve(store, currentSchema, null);
         return store.update(
-            table.schema(currentSchema), table.tableName(), setClauses, where);
+            table.schema(currentSchema), resolved.tableName(), setClauses, where,
+            table.options);
     }
 
     private void check() {
@@ -30,6 +40,10 @@ public class Update extends Command {
             SetClause clause = (SetClause) iter.next();
             clause.rejectAggregates("UPDATE");
         }
+    }
+
+    public UpdateStore update(DataStore store, String currentSchema) {
+        throw new MayflyInternalException("should call the other update");
     }
 
 }

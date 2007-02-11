@@ -133,8 +133,9 @@ public class DataStore {
     }
 
     public UpdateStore update(String schema, String table, 
-        List setClauses, Condition where) {
-        Checker checker = new Checker(this, schema, table);
+        List setClauses, Condition where, Options options) {
+        Checker checker = new Checker(this, schema, table, 
+            Location.UNKNOWN, options);
         UpdateSchema result = 
             schema(schema).update(checker, table, setClauses, where);
         return replaceSchema(schema, result);

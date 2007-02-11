@@ -103,7 +103,7 @@ public class HypersonicDialect extends Dialect {
         return false;
     }
     
-    public boolean errorIfBadTableInDeleteAndNoRows() {
+    public boolean errorIfBadTableAndNoRows() {
         return false;
     }
 

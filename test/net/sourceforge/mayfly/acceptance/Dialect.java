@@ -375,7 +375,7 @@ public abstract class Dialect {
         return true;
     }
 
-    public boolean errorIfBadTableInDeleteAndNoRows() {
+    public boolean errorIfBadTableAndNoRows() {
         return true;
     }
 

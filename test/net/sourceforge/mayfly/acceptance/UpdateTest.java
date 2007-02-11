@@ -54,6 +54,17 @@ public class UpdateTest extends SqlTestCase {
         assertResultSet(new String[] { " 7 " }, query("select a from foo"));
     }
     
+    public void testBadTableNoRows() throws Exception {
+        execute("create table foo(a integer)");
+        String sql = "update foo set a = 5 where xyz.a = 5";
+        if (dialect.errorIfBadTableAndNoRows()) {
+            expectExecuteFailure(sql, "no column xyz.a");
+        }
+        else {
+            execute(sql);
+        }
+    }
+    
     public void testExpression() throws Exception {
         execute("create table foo (a integer, offset_value integer)");
         execute("insert into foo(a, offset_value) values (2, 1000)");
