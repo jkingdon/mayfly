@@ -23,7 +23,7 @@ public class Delete extends Command {
         TableReference resolved = 
             table.resolve(store, currentSchema, null);
         return store.delete(
-            table.schema(currentSchema), resolved.tableName(), where,
+            resolved.schema(), resolved.tableName(), where,
             table.options);
     }
 

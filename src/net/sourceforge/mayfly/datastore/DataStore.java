@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.evaluation.Checker;
+import net.sourceforge.mayfly.evaluation.RealChecker;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
 import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
@@ -90,9 +91,10 @@ public class DataStore {
         return (Schema) schemas.get(ANONYMOUS_SCHEMA);
     }
     
-    public DataStore dropTable(String schema, String table) {
-        Checker checker = new Checker(this, schema, table);
-        return replace(schema, schema(schema).dropTable(checker, table));
+    public DataStore dropTable(TableReference table) {
+        Checker checker = new RealChecker(this, table);
+        return replace(table.schema(), 
+            schema(table.schema()).dropTable(checker, table.tableName()));
     }
 
     public TableData table(String schema, String table) {
@@ -134,7 +136,7 @@ public class DataStore {
 
     public UpdateStore update(String schema, String table, 
         List setClauses, Condition where, Options options) {
-        Checker checker = new Checker(this, schema, table, 
+        Checker checker = new RealChecker(this, schema, table, 
             Location.UNKNOWN, options);
         UpdateSchema result = 
             schema(schema).update(checker, table, setClauses, where);
@@ -143,7 +145,7 @@ public class DataStore {
 
     public UpdateStore delete(String schema, String table, Condition where,
         Options options) {
-        Checker checker = new Checker(this, schema, table, 
+        Checker checker = new RealChecker(this, schema, table, 
             Location.UNKNOWN, options);
         UpdateSchema result = schema(schema).delete(table, where, checker);
         

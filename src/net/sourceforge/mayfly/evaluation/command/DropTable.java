@@ -24,8 +24,7 @@ public class DropTable extends Command {
             }
         }
         TableReference resolved = table.resolve(store, schema, null);
-        DataStore newStore = store.dropTable(
-            resolved.schema(), resolved.tableName());
+        DataStore newStore = store.dropTable(resolved);
         return new UpdateStore(newStore, 0);
     }
 

@@ -1,7 +1,9 @@
 package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.evaluation.Checker;
+import net.sourceforge.mayfly.evaluation.RealChecker;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -26,29 +28,27 @@ public class Insert extends Command {
         return table.tableName();
     }
 
-    public UpdateStore update(DataStore store, String currentSchema) {
-        String schema = schemaToUse(currentSchema);
-        Checker checker = new Checker(store, schema, table(), location);
+    public UpdateStore update(DataStore store, String defaultSchema) {
+        TableReference resolved = table.resolve(store, defaultSchema, null);
+        Checker checker = new RealChecker(store, resolved, location, table.options);
 
         return new UpdateStore(
-            insertOneRow(store, schema, checker),
+            insertOneRow(store, resolved, checker),
             1,
             checker.newIdentityValue()
         );
     }
 
-    private DataStore insertOneRow(DataStore store, String schema, Checker checker) {
+    private DataStore insertOneRow(DataStore store, TableReference resolved, 
+        Checker checker) {
         if (columnNames == null) {
-            return store.addRow(schema, table(), values, checker);
+            return store.addRow(resolved.schema(), resolved.tableName(), 
+                values, checker);
         }
         else {
-            return store.addRow(schema, table(), 
+            return store.addRow(resolved.schema(), resolved.tableName(), 
                 columnNames, values, checker);
         }
-    }
-
-    private String schemaToUse(String currentSchema) {
-        return table.schema(currentSchema);
     }
 
 }

@@ -2,6 +2,8 @@ package net.sourceforge.mayfly;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.datastore.TableReference;
+
 public class TableNamesCaseSensitiveTest extends TestCase {
 
     private Database database;
@@ -35,8 +37,6 @@ public class TableNamesCaseSensitiveTest extends TestCase {
         expectQueryFailure("select * from FOO cross join bar", "no table FOO");
     }
 
-    // Other commands: update, alter table, etc
-
     public void testDelete() throws Exception {
         database.execute("create table FOO(x integer)");
         expectExecuteFailure("delete from foo", "no table foo");
@@ -51,8 +51,37 @@ public class TableNamesCaseSensitiveTest extends TestCase {
             "no column Foo.x");
     }
     
-    // create table - should still reject another table which differs only in case.
+    public void testInsert() throws Exception {
+        database.execute("create table foo(x integer)");
+        expectExecuteFailure("insert into Foo(x) values(5)", "no table Foo");
+    }
     
+    public void testAddColumn() throws Exception {
+        database.execute("create table foo(x integer)");
+        expectExecuteFailure("alter table Foo add column y integer", 
+            "no table Foo");
+    }
+    
+    public void testCreateTable() throws Exception {
+        /* It does not seem desirable to allow table names which differ only
+           in case, even in the case sensitive case.  I can't think of a 
+           use case for wanting table names which differ only in case,
+           and generally the goal of all this is so we can check that a usage
+           is portable to databases which do and do not have case sensitive
+           table names. */
+        database.execute("create table foo(x integer)");
+        expectExecuteFailure("create table Foo(x integer)", 
+            "table foo already exists");
+    }
+    
+    /**
+     * Lots of cases here, it seems, in particular 
+     * {@link TableReference#matches(String, String)}.
+     */
+    public void testForeignKeys() throws Exception {
+        
+    }
+
     private void expectQueryFailure(String sql, String message) {
         try {
             database.query(sql);
