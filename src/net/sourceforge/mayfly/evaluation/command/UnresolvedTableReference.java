@@ -68,7 +68,7 @@ public class UnresolvedTableReference {
         
         String schemaToUse = schema(defaultSchema);
 
-        if (tableName.equalsIgnoreCase(additionalTable)) {
+        if (options.tableNamesEqual(tableName, additionalTable)) {
             return new TableReference(schemaToUse, additionalTable);
         }
 

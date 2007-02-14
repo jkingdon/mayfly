@@ -2,8 +2,6 @@ package net.sourceforge.mayfly;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.TableReference;
-
 public class TableNamesCaseSensitiveTest extends TestCase {
 
     private Database database;
@@ -74,12 +72,20 @@ public class TableNamesCaseSensitiveTest extends TestCase {
             "table foo already exists");
     }
     
-    /**
-     * Lots of cases here, it seems, in particular 
-     * {@link TableReference#matches(String, String)}.
-     */
     public void testForeignKeys() throws Exception {
-        
+        database.execute("create table refd(x integer primary key)");
+        expectExecuteFailure(
+            "create table refr(x_id integer, " +
+                "foreign key(x_id) references REFD(x))", 
+            "no table REFD");
+    }
+    
+    public void testForeignKeySelfReference() throws Exception {
+        expectExecuteFailure(
+            "create table foo(id integer primary key," +
+                "parent integer," +
+                "foreign key(parent) references FOO(id))", 
+            "no table FOO");
     }
 
     private void expectQueryFailure(String sql, String message) {
