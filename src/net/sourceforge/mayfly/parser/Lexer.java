@@ -496,6 +496,8 @@ public class Lexer {
                 return command(i);
             }
         }
+        /* This happens for semicolons and end-of-file tokens.
+           Anything else? */
         return null;
     }
 

@@ -200,6 +200,37 @@ public class JdbcTest extends TestCase {
         }
     }
     
+    public void testFailingCommandViaStatement() throws Exception {
+        Database database = new Database();
+        database.execute("create table foo(x integer not null)");
+        Connection connection = database.openConnection();
+        Statement statement = connection.createStatement();
+        try {
+            statement.executeUpdate("insert into foo(x) values(null)");
+            fail();
+        }
+        catch (MayflySqlException e) {
+            assertEquals("column x cannot be null", e.getMessage());
+            assertEquals("insert into foo(x) values(null)", e.failingCommand());
+        }
+    }
+    
+    public void testFailingCommandViaPreparedStatement() throws Exception {
+        Database database = new Database();
+        database.execute("create table foo(x integer not null)");
+        Connection connection = database.openConnection();
+        PreparedStatement statement = connection.prepareStatement(
+            "insert into foo(x) values(null)");
+        try {
+            statement.executeUpdate();
+            fail();
+        }
+        catch (MayflySqlException e) {
+            assertEquals("column x cannot be null", e.getMessage());
+            assertEquals("insert into foo(x) values(null)", e.failingCommand());
+        }
+    }
+    
     private void query(String jdbcUrl, String[] expectedResults, String sql) 
     throws SQLException {
         Connection connection = DriverManager.getConnection(jdbcUrl);

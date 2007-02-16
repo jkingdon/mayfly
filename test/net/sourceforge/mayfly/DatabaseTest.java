@@ -140,4 +140,16 @@ public class DatabaseTest extends TestCase {
         }
     }
     
+    public void testFailingCommandFromDatabase() throws Exception {
+        database.execute("create table foo(x integer not null)");
+        try {
+            database.execute("insert into foo(x) values(null)");
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("column x cannot be null", e.getMessage());
+            assertEquals("insert into foo(x) values(null)", e.failingCommand());
+        }
+    }
+    
 }
