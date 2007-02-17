@@ -171,7 +171,7 @@ If <var>expression</var> is DEFAULT, the default value that was
 specified when creating the table is used.
 
 <pre>
-INSERT INTO <var>table</var> SET { <var>column-name</var> = <var>expression</var> }...
+INSERT INTO <var>table</var> SET { <var>column-name</var> = <var>expression</var> }, ...
 </pre>
 
 This version is not standard SQL; it is an extension taken from MySQL.
@@ -268,7 +268,8 @@ but is not there now.
 The syntax of the schema commands is:
 
 <pre>
-CREATE SCHEMA name [AUTHORIZATION DBA] [ { <var>create-table-command</var> } ... ]
+CREATE SCHEMA name [AUTHORIZATION DBA] 
+  [ { <var>create-table-command</var> } ... ]
 
 SET SCHEMA name
 </pre>

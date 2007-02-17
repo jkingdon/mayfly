@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.parser.Location;
 
 /**
+   @internal
    A reference to a table which has not only been validated against the
    tables which really exist, but also potentially resides in the
    {@link DataStore} itself.  This means that it should not contain

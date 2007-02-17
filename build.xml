@@ -1,5 +1,5 @@
 <project default="test">
-    <property name="version" value="0.2"/>
+    <property name="version" value="0.3"/>
     <!--
     <property name="build.compiler" value="gcj"/>
     -->
@@ -31,6 +31,7 @@
         we generate the actual documentation with doxygen.  javadoc/gjdoc provide very little help
         for things like @internal, so going with doxygen seems nicer than writing
         a bunch of custom doclets. -->
+	<!-- TODO: Somehow get ${version} into the generated documentation -->
     <target name="doc" description="regenerate documentation from source">
         <mkdir dir="build/doc"/>
         <exec executable="doxygen">
@@ -80,12 +81,14 @@
 
     <target name="jar" depends="compile,test"
     	description="Build the Mayfly jar">
+    	<!-- TODO: Should put ${version} into the META-INF/MANIFEST.MF file
+    	     like Hibernate does. -->
         <jar jarfile="build/mayfly-${version}.jar">
             <fileset dir="build/classes"/>
         </jar>
     </target>
 
-    <target name="dist" depends="jar,doc" 
+    <target name="dist" depends="clean,jar,doc" 
     	description="Build .zip file for distribution">
         <zip destfile="build/mayfly-${version}-src-ide.zip">
             <fileset dir="src">

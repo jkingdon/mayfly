@@ -71,6 +71,12 @@ public class SqlDumper {
     /**
      * Dump only the schema (not the data) of store to out.
      */
+    public void definition(DataStore store, Writer out) 
+    throws IOException {
+        List sortedTables = sortTables(store);
+        definition(store, sortedTables, out);
+    }
+
     private void definition(DataStore store, List sortedTables, Writer out) 
     throws IOException {
         for (Iterator iter = sortedTables.iterator(); iter.hasNext();) {

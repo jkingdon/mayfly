@@ -178,6 +178,14 @@ public class SqlDumperTest extends TestCase {
         assertEquals("INSERT INTO foo(a) VALUES(x'0001027f4dc8ff00');\n\n", 
             dumpData());
     }
+    
+    public void testDumpDefinition() throws Exception {
+        database.execute("create table foo(a int)");
+        database.execute("insert into foo(a) values(5)");
+        StringWriter out = new StringWriter();
+        new SqlDumper().definition(database.dataStore(), out);
+        assertEquals("CREATE TABLE foo(\n  a INTEGER\n);\n\n", out.toString());
+    }
 
     public void testNullAndDefault() throws Exception {
         database.execute("create table foo(a integer default 5, b integer)");

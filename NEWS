@@ -1,4 +1,4 @@
-Changes since 0.2:
+Changes from 0.2 to 0.3:
 
 Accept the MySQL syntax:
     INSERT INTO table SET col = value, col2 = value2, ...
