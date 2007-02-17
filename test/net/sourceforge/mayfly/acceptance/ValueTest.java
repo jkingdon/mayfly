@@ -5,15 +5,6 @@ import java.sql.SQLException;
 
 public class ValueTest extends SqlTestCase {
 
-    public void testInsertWithBadColumnName() throws Exception {
-        execute("CREATE TABLE FOO (A integer)");
-        expectExecuteFailure("INSERT INTO FOO (b) values (5)", "no column b");
-    }
-    
-    public void testInsertIntoNonexistentTable() throws Exception {
-        expectExecuteFailure("INSERT INTO FOO (b) values (5)", "no table FOO");
-    }
-    
     public void testNull() throws Exception {
         execute("create table foo (a integer)");
         execute("insert into foo (a) values (null)");
@@ -231,6 +222,25 @@ public class ValueTest extends SqlTestCase {
         // Just the first might be better in terms of avoiding
         // information overload.
         expectExecuteFailure("insert into foo (b, c) values (5, 7)", "no column b");
+    }
+    
+    public void testInsertIntoNonexistentTable() throws Exception {
+        expectExecuteFailure("INSERT INTO FOO (b) values (5)", "no table FOO");
+    }
+    
+    public void testInsertSetSyntax() throws Exception {
+        execute("create table t(x integer, y integer)");
+        String sql = "insert into t set x=123, y=456";
+        if (dialect.haveInsertSetSyntax()) {
+            execute(sql);
+            assertResultSet(
+                new String[] { " 123, 456 " },
+                query("select x, y from t")
+            );
+        }
+        else {
+            expectExecuteFailure(sql, "expected VALUES but got SET");
+        }
     }
     
     public void testReferenceToColumn() throws Exception {

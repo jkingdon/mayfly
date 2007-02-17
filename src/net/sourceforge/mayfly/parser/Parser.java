@@ -246,6 +246,18 @@ public class Parser {
         expectAndConsume(TokenType.KEYWORD_insert);
         expectAndConsume(TokenType.KEYWORD_into);
         UnresolvedTableReference table = parseTableReference();
+        
+        if (consumeIfMatches(TokenType.KEYWORD_set)) {
+            List names = new ArrayList();
+            ValueList values = new ValueList(currentToken().location);
+            do {
+                names.add(consumeIdentifier());
+                expectAndConsume(TokenType.EQUAL);
+                values = values.with(parseAndEvaluate());
+            } while (consumeIfMatches(TokenType.COMMA));
+            return new Insert(table, new ImmutableList(names), values, 
+                start.combine(values.location));
+        }
 
         ImmutableList columnNames = parseColumnNamesForInsert();
         

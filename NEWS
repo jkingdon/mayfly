@@ -1,5 +1,13 @@
 Changes since 0.2:
 
+Accept the MySQL syntax:
+    INSERT INTO table SET col = value, col2 = value2, ...
+Although this syntax is supported by no/few databases other than
+MySQL, and it is merely a convenience, Mayfly does provide it,
+simply because the standard syntax
+    INSERT INTO table(col, col2) VALUES(value, value2)
+can be really hard to read if there are more than a few columns.
+
 New method in Database to set table names to case sensitive.
 
 Accept the MySQL index syntax:

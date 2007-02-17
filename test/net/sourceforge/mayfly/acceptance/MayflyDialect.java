@@ -207,6 +207,12 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    public boolean haveInsertSetSyntax() {
+        /* Only supported by MySQL as far as I know.  But it really
+           is a better syntax, seems like... */
+        return true;
+    }
+    
     public Class typeOfInteger() {
         /* Is it important to be compatible with other databases (which
            have Integer.class here)?  There's also a potential speed/space

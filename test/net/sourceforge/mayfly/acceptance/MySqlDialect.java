@@ -166,6 +166,10 @@ public class MySqlDialect extends Dialect {
     public boolean valuesClauseCanReferToColumn() {
         return true;
     }
+    
+    public boolean haveInsertSetSyntax() {
+        return true;
+    }
 
     public boolean canHaveHavingWithoutGroupBy() {
         return true;

@@ -307,6 +307,18 @@ public abstract class Dialect {
     public boolean canInsertNoValues() {
         return true;
     }
+    
+    /**
+     * @internal
+     * Do we have INSERT INTO foo SET a = value, b = value... ?
+     * Although this MySQL-ism doesn't provide any more power than
+     * the standard
+     * INSERT INTO foo(a, b) VALUES(value, value)
+     * the latter can get quite cumbersome with a lot of fields.
+     */
+    public boolean haveInsertSetSyntax() {
+        return false;
+    }
 
     public boolean canConcatenateStringAndInteger() {
         // Most databases seem to allow this.  I'm sure there

@@ -170,6 +170,15 @@ INSERT INTO <var>table</var> [ ( <var>column-name</var>, ... ) ]
 If <var>expression</var> is DEFAULT, the default value that was
 specified when creating the table is used.
 
+<pre>
+INSERT INTO <var>table</var> SET { <var>column-name</var> = <var>expression</var> }...
+</pre>
+
+This version is not standard SQL; it is an extension taken from MySQL.
+So don't use it if you want portability.  But the potential added readibility
+gained by putting the column name next to the corresponding expression may
+justify its use.
+
 @subsection select SELECT
 
 <pre>
