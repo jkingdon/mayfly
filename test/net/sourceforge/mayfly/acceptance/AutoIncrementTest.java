@@ -111,13 +111,31 @@ public class AutoIncrementTest extends SqlTestCase {
         String insertAnotherOne = "insert into foo(y) values(6)";
         if (dialect.autoIncrementIsRelativeToLastValue()) {
             execute(insertAnotherOne);
+            assertResultSet(new String[] { 
+                    " 1, 5 ",
+                    " 2, 6 "
+                }, 
+                query("select x, y from foo"));
         }
         else {
             expectExecuteFailure(insertAnotherOne, 
                 "primary key x already has a value 1");
         }
     }
-
+    
+    public void testInsertTwice() throws Exception {
+        execute("create table foo(x " +
+            dialect.identityType() +
+            ", y integer)");
+        execute("insert into foo(x, y) values(33, 5)");
+        execute("insert into foo(x, y) values(22, 6)");
+        assertResultSet(new String[] { 
+                " 33, 5 ",
+                " 22, 6 "
+            }, 
+            query("select x, y from foo"));
+    }
+    
     public void testGetLastIdentityValue() throws Exception {
         execute("create table foo(x " +
             dialect.identityType() +
