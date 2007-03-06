@@ -110,11 +110,7 @@ public class MayflyDialect extends Dialect {
     }
 
     public boolean haveSql200xAutoIncrement() {
-        /* 
-         * Not comletely sure how to parse this if
-         * GENERATED is non-reserved.
-         */
-        return wishThisWereTrue();
+        return true;
     }
     
     public boolean haveAutoUnderbarIncrement() {

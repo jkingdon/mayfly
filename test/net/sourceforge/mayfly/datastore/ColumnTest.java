@@ -8,5 +8,5 @@ public class ColumnTest extends TestCase {
         assertTrue(new Column("aaa").matches("aAa"));
         assertFalse(new Column("aaa").matches("aaB"));
     }
-
+    
 }

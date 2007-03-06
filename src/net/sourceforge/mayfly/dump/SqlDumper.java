@@ -223,7 +223,7 @@ public class SqlDumper {
             out.write(column.onUpdateValueAsSql());
         }
         
-        if (column.isAutoIncrement()) {
+        if (column.isSequenceOrAutoIncrement()) {
             out.write(" AUTO_INCREMENT");
         }
 

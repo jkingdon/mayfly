@@ -223,7 +223,15 @@ public class PostgresDialect extends Dialect {
     }
     
     public String identityType() {
-        return "serial not null";
+        return "serial primary key";
+    }
+    
+    /**
+     * According to discussion on postgres mailing lists, they plan on
+     * adding sql200x syntax only when they can give it sql200x semantics.
+     */
+    public boolean haveSql200xAutoIncrement() {
+        return false;
     }
     
     public boolean allowHexForBinary() {

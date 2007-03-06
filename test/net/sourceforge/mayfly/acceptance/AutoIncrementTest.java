@@ -18,7 +18,7 @@ public class AutoIncrementTest extends SqlTestCase {
             "y varchar(255))";
         if (dialect.haveAutoUnderbarIncrement()) {
             execute(sql);
-            check();
+            check(dialect.wishThisWereTrue());
         }
         else {
             expectExecuteFailure(sql, "expected ')' but got auto_increment");
@@ -29,7 +29,7 @@ public class AutoIncrementTest extends SqlTestCase {
         String sql = "create table foo (x serial, y varchar(255))";
         if (dialect.haveSerial()) {
             execute(sql);
-            check();
+            check(dialect.autoIncrementIsRelativeToLastValue());
         }
         else {
             expectExecuteFailure(sql, "expected data type but got serial");
@@ -40,7 +40,7 @@ public class AutoIncrementTest extends SqlTestCase {
         String sql = "create table foo (x identity, y varchar(255))";
         if (dialect.haveIdentity()) {
             execute(sql);
-            check();
+            check(dialect.wishThisWereTrue());
         }
         else {
             expectExecuteFailure(sql, "expected data type but got identity");
@@ -54,7 +54,7 @@ public class AutoIncrementTest extends SqlTestCase {
             "AS IDENTITY(START WITH 1) PRIMARY KEY, y varchar(255))";
         if (dialect.haveSql200xAutoIncrement()) {
             execute(sql);
-            check();
+            check(sql200xRelativeToLastValue());
         }
         else {
             expectExecuteFailure(sql, "expected ')' but got GENERATED");
@@ -66,21 +66,31 @@ public class AutoIncrementTest extends SqlTestCase {
             "AS IDENTITY PRIMARY KEY, y varchar(255))";
         if (dialect.haveSql200xAutoIncrement()) {
             execute(sql);
-            check();
+            check(sql200xRelativeToLastValue());
         }
         else {
             expectExecuteFailure(sql, "expected ')' but got GENERATED");
         }
     }
     
+    private boolean sql200xRelativeToLastValue() {
+        boolean relativeToLastValue = 
+            dialect.autoIncrementIsRelativeToLastValue();
+        if (dialect.expectMayflyBehavior()) {
+            // SQL200x syntax should inmply SQL200x semantics
+            relativeToLastValue = false;
+        }
+        return relativeToLastValue;
+    }
+
     // Derby also has GENERATED ALWAYS
 
-    private void check() throws SQLException {
+    private void check(boolean relativeToLastValue) throws SQLException {
         execute("insert into foo(x, y) values (92, 'a')");
         execute("insert into foo(y) values ('b')");
         execute("insert into foo(y) values ('c')");
         assertResultSet(
-            dialect.autoIncrementIsRelativeToLastValue()
+            relativeToLastValue
                 ?
                 new String[] {
                     " 92, 'a' ",
@@ -100,7 +110,7 @@ public class AutoIncrementTest extends SqlTestCase {
     
     /**
      * @internal
-     * Much like {@link #check()} but just makes sure that it doesn't do
+     * Much like {@link #check(boolean)} but just makes sure that it doesn't do
      * anything special to avoid value conflicts.
      */
     public void testConflicting() throws Exception {
@@ -186,10 +196,12 @@ public class AutoIncrementTest extends SqlTestCase {
             if (dialect.numberOfValuesMustMatchNumberOfColumns()) {
                 /* MySQL doesn't complain about this */
 //                expectExecuteFailure("insert into foo() values(5)", "");
+                
                 expectExecuteFailure("insert into foo(x) values()", 
                     "Too few values.\n" +
                     "Columns and values were:\n" +
                     "x (none)\n");
+
                 /* This one is allowed by MySQL, but Mayfly treats
                    foo as being the same as foo(x), and thus
                    an error */

@@ -674,8 +674,29 @@ public class Parser {
         
         Expression onUpdateValue = parseOnUpdateValue(name);
 
-        if (consumeNonReservedWordIfMatches("auto_increment")) {
-            isAutoIncrement = true;
+        if (currentTokenType() == TokenType.IDENTIFIER) {
+            String text = consumeIdentifier();
+            if (text.equalsIgnoreCase("auto_increment")) {
+                isAutoIncrement = true;
+            }
+            else if (text.equalsIgnoreCase("generated")) {
+                expectAndConsume(TokenType.KEYWORD_by);
+                expectAndConsume(TokenType.KEYWORD_default);
+                expectAndConsume(TokenType.KEYWORD_as);
+                expectIdentifier("identity");
+                if (consumeIfMatches(TokenType.OPEN_PAREN)) {
+                    expectIdentifier("start");
+                    expectAndConsume(TokenType.KEYWORD_with);
+                    defaultValue = 
+                        new SpecifiedDefaultValue(parseDefaultValue(name));
+                    expectAndConsume(TokenType.CLOSE_PAREN);
+                }
+                isAutoIncrement = true;
+            }
+            else {
+                throw new ParserException(
+                    "extraneous text " + text + " at end of column definition");
+            }
         }
 
         if (isAutoIncrement && !(defaultValue.isSpecified())) {
@@ -690,8 +711,7 @@ public class Parser {
 
     private DefaultValue parseDefaultClause(String name) {
         if (consumeIfMatches(TokenType.KEYWORD_default)) {
-            Expression expression = parseDefaultValue(name);
-            return new SpecifiedDefaultValue(expression);
+            return new SpecifiedDefaultValue(parseDefaultValue(name));
         }
         else {
             return DefaultValue.NOT_SPECIFIED;
@@ -1583,6 +1603,14 @@ public class Parser {
     private String consumeIdentifier() {
         Token token = expectAndConsume(TokenType.IDENTIFIER);
         return token.getText();
+    }
+
+    private void expectIdentifier(String expectedIdentifier) {
+        Token token = expectAndConsume(TokenType.IDENTIFIER);
+        String text = token.getText();
+        if (!text.equalsIgnoreCase(expectedIdentifier)) {
+            throw new ParserException(expectedIdentifier, token);
+        }
     }
 
     int consumeInteger() {

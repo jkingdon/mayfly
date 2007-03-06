@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.FakeDataType;
 import net.sourceforge.mayfly.evaluation.Checker;
@@ -82,8 +83,20 @@ public class Column {
         return defaultValue.asSql();
     }
 
+    /**
+     * Mostly called by old code from before when we distinguished
+     * between {@link #isSequence()} and {@link #isAutoIncrement()}.
+     */
+    public boolean isSequenceOrAutoIncrement() {
+        return isAutoIncrement;
+    }
+
     public boolean isAutoIncrement() {
         return isAutoIncrement;
+    }
+
+    public boolean isSequence() {
+        throw new UnimplementedException();
     }
 
     public Column afterAutoIncrement(Checker checker) {
@@ -92,7 +105,8 @@ public class Column {
             new SpecifiedDefaultValue(
                 new LongCell(valueJustInserted.asLong() + 1L));
         checker.setIdentityValue(valueJustInserted);
-        return new Column(columnName, newDefault, onUpdateValue, isAutoIncrement,
+        return new Column(columnName, newDefault, onUpdateValue, 
+            isAutoIncrement,
             type, isNotNull);
     }
 
@@ -139,7 +153,7 @@ public class Column {
         if (!defaultValue.isSpecified()) {
             return false;
         }
-        if (isAutoIncrement) {
+        if (isSequenceOrAutoIncrement()) {
             /* We implement the next value to be assigned as
                a default value.  At least for now, we dump it
                that way too.  But don't dump it if leaving it out

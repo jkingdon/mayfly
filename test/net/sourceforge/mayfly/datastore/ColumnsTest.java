@@ -64,8 +64,8 @@ public class ColumnsTest extends TestCase {
                 new FakeDataType(), false)
         );
         
-        assertFalse(columns.columnFromName("b").isAutoIncrement());
-        assertTrue(newColumns.columnFromName("b").isAutoIncrement());
+        assertFalse(columns.columnFromName("b").isSequenceOrAutoIncrement());
+        assertTrue(newColumns.columnFromName("b").isSequenceOrAutoIncrement());
     }
 
 }

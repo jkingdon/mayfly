@@ -108,6 +108,7 @@ public class TokenType {
     public static final TokenType KEYWORD_varchar = registerKeyword("varchar");
     public static final TokenType KEYWORD_when = registerKeyword("when");
     public static final TokenType KEYWORD_where = registerKeyword("where");
+    public static final TokenType KEYWORD_with = registerKeyword("with");
 
     public static TokenType lookupKeyword(String text) {
         return (TokenType) keywords.get(text.toLowerCase());

@@ -611,7 +611,8 @@ public abstract class Dialect {
      * Return the preferred (or one that will work) way to specify
      * an auto-increment column, including the type.
      * 
-     * Generally should also declare it a primary key.
+     * Generally should also declare it a primary key, even if your
+     * database allows auto-increment columsn which are not primary keys.
      */
     public String identityType() {
         return "identity primary key";
