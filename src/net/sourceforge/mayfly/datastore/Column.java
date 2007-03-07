@@ -107,12 +107,17 @@ public class Column {
 
     public Column afterAutoIncrement(Checker checker, Cell valueInserted,
         boolean isDefault) {
-        Cell valueJustInserted;
+        Cell previousValue;
         if (isDefault && isSequenceOrAutoIncrement()) {
-            valueJustInserted = defaultValue();
+            previousValue = defaultValue();
         }
         else if (isAutoIncrement) {
-            valueJustInserted = valueInserted;
+            if (valueInserted.compareTo(defaultValue()) >= 0) {
+                previousValue = valueInserted;
+            }
+            else {
+                return null;
+            }
         }
         else {
             return null;
@@ -120,8 +125,8 @@ public class Column {
 
         DefaultValue newDefault = 
             new SpecifiedDefaultValue(
-                new LongCell(valueJustInserted.asLong() + 1L));
-        checker.setIdentityValue(valueJustInserted);
+                new LongCell(previousValue.asLong() + 1L));
+        checker.setIdentityValue(previousValue);
         return new Column(columnName, newDefault, onUpdateValue, 
             isAutoIncrement, isSequence,
             type, isNotNull);

@@ -109,7 +109,7 @@ public class MayflyDialect extends Dialect {
         return false;
     }
 
-    public boolean haveSql200xAutoIncrement() {
+    public boolean haveSql2003AutoIncrement() {
         return true;
     }
     
@@ -123,6 +123,10 @@ public class MayflyDialect extends Dialect {
 
     public boolean haveSerial() {
         return true;
+    }
+    
+    public String autoIncrementType() {
+        return "integer auto_increment";
     }
     
     public boolean haveOnUpdateValue() {

@@ -602,20 +602,30 @@ public abstract class Dialect {
         return false;
     }
 
-    public boolean haveSql200xAutoIncrement() {
+    public boolean haveSql2003AutoIncrement() {
         return false;
     }
     
     /**
      * @internal
      * Return the preferred (or one that will work) way to specify
-     * an auto-increment column, including the type.
+     * an identity column, including the type.
      * 
      * Generally should also declare it a primary key, even if your
      * database allows auto-increment columsn which are not primary keys.
      */
     public String identityType() {
         return "identity primary key";
+    }
+    
+    /**
+     * @internal
+     * Return a to specify an auto-increment column,
+     * that is one for which {@link #autoIncrementIsRelativeToLastValue()}
+     * would be true, or null if there is no such type.
+     */
+    public String autoIncrementType() {
+        return null;
     }
     
     public String lastIdentityValueQuery(String table, String column) {

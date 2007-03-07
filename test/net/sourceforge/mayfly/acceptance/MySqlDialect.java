@@ -275,6 +275,10 @@ public class MySqlDialect extends Dialect {
         return "integer auto_increment primary key";
     }
     
+    public String autoIncrementType() {
+        return identityType();
+    }
+    
     public String lastIdentityValueQuery(String table, String column) {
         return "select last_insert_id()";
     }

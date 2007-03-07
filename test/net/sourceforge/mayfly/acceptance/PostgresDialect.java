@@ -230,7 +230,7 @@ public class PostgresDialect extends Dialect {
      * According to discussion on postgres mailing lists, they plan on
      * adding sql200x syntax only when they can give it sql200x semantics.
      */
-    public boolean haveSql200xAutoIncrement() {
+    public boolean haveSql2003AutoIncrement() {
         return false;
     }
     

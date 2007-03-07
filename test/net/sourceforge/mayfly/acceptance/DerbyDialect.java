@@ -203,7 +203,7 @@ public class DerbyDialect extends Dialect {
         return false;
     }
 
-    public boolean haveSql200xAutoIncrement() {
+    public boolean haveSql2003AutoIncrement() {
         return true;
     }
     
