@@ -60,7 +60,7 @@ public class ColumnsTest extends TestCase {
                 new Column("b"),
             })));
         Columns newColumns = columns.replace(
-            new Column("b", DefaultValue.NOT_SPECIFIED, null, true,
+            new Column("b", DefaultValue.NOT_SPECIFIED, null, true, false,
                 new FakeDataType(), false)
         );
         

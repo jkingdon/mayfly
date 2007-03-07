@@ -47,7 +47,7 @@ public class TableDataTest extends TestCase {
     
     public void testModifyColumn() throws Exception {
         Column a = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
-            false, new FakeDataType(), true);
+            false, false, new FakeDataType(), true);
         Row row = new TupleBuilder()
             .append(a, new LongCell(7))
             .asRow();
@@ -55,7 +55,7 @@ public class TableDataTest extends TestCase {
             Columns.singleton(a), new Constraints(), new Rows(row));
         
         Column newA = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
-            false, new FakeDataType(), false);
+            false, false, new FakeDataType(), false);
         TableData newTable = table.modifyColumn(newA);
 
         Column foundColumn = newTable.findColumn("a");
@@ -64,7 +64,7 @@ public class TableDataTest extends TestCase {
 
     public void testCoerceOnUpdate() throws Exception {
         Column a = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
-            false, new DateDataType(), false);
+            false, false, new DateDataType(), false);
         Row row = new TupleBuilder()
             .append(a, new LongCell(7))
             .asRow();
@@ -86,7 +86,7 @@ public class TableDataTest extends TestCase {
     
     public void testDelete() throws Exception {
         Column a = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
-            false, new FakeDataType(), false);
+            false, false, new FakeDataType(), false);
         Row one = new TupleBuilder()
             .append(a, new LongCell(1))
             .asRow();

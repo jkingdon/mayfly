@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.types.DataType;
 import net.sourceforge.mayfly.datastore.types.FakeDataType;
 import net.sourceforge.mayfly.evaluation.Checker;
@@ -18,6 +17,7 @@ public class Column {
     private final DefaultValue defaultValue;
     private final Expression onUpdateValue;
     private final boolean isAutoIncrement;
+    private final boolean isSequence;
     public final DataType type;
     
     /** We'll probably want not-null contraints to be implemented
@@ -31,13 +31,19 @@ public class Column {
     public Column(String name, DefaultValue defaultValue, 
         Expression onUpdateValue, 
         boolean isAutoIncrement,
+        boolean isSequence,
         DataType type, boolean isNotNull) {
         this.columnName = name;
         this.defaultValue = defaultValue;
         this.onUpdateValue = onUpdateValue;
         this.isAutoIncrement = isAutoIncrement;
+        this.isSequence = isSequence;
         this.type = type;
         this.isNotNull = isNotNull;
+        if (isAutoIncrement && isSequence) {
+            throw new MayflyInternalException(
+                "column " + name + " is both auto increment and sequence");
+        }
     }
 
     /**
@@ -47,7 +53,7 @@ public class Column {
      */
     public Column(String columnName) {
         this(columnName, DefaultValue.NOT_SPECIFIED, null, 
-            false, new FakeDataType(), false);
+            false, false, new FakeDataType(), false);
     }
 
     public String columnName() {
@@ -88,7 +94,7 @@ public class Column {
      * between {@link #isSequence()} and {@link #isAutoIncrement()}.
      */
     public boolean isSequenceOrAutoIncrement() {
-        return isAutoIncrement;
+        return isAutoIncrement || isSequence;
     }
 
     public boolean isAutoIncrement() {
@@ -96,17 +102,28 @@ public class Column {
     }
 
     public boolean isSequence() {
-        throw new UnimplementedException();
+        return isSequence;
     }
 
-    public Column afterAutoIncrement(Checker checker) {
-        Cell valueJustInserted = defaultValue();
+    public Column afterAutoIncrement(Checker checker, Cell valueInserted,
+        boolean isDefault) {
+        Cell valueJustInserted;
+        if (isDefault && isSequenceOrAutoIncrement()) {
+            valueJustInserted = defaultValue();
+        }
+        else if (isAutoIncrement) {
+            valueJustInserted = valueInserted;
+        }
+        else {
+            return null;
+        }
+
         DefaultValue newDefault = 
             new SpecifiedDefaultValue(
                 new LongCell(valueJustInserted.asLong() + 1L));
         checker.setIdentityValue(valueJustInserted);
         return new Column(columnName, newDefault, onUpdateValue, 
-            isAutoIncrement,
+            isAutoIncrement, isSequence,
             type, isNotNull);
     }
 

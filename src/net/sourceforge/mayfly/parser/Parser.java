@@ -668,7 +668,8 @@ public class Parser {
     Column parseColumnDefinition(CreateTable table) {
         String name = consumeIdentifier();
         ParsedDataType parsed = parseDataType();
-        boolean isAutoIncrement = parsed.isAutoIncrement;
+        boolean isAutoIncrement = false;
+        boolean isSequence = parsed.isAutoIncrement;
 
         DefaultValue defaultValue = parseDefaultClause(name);
         
@@ -691,7 +692,7 @@ public class Parser {
                         new SpecifiedDefaultValue(parseDefaultValue(name));
                     expectAndConsume(TokenType.CLOSE_PAREN);
                 }
-                isAutoIncrement = true;
+                isSequence = true;
             }
             else {
                 throw new ParserException(
@@ -699,13 +700,14 @@ public class Parser {
             }
         }
 
-        if (isAutoIncrement && !(defaultValue.isSpecified())) {
+        if ((isAutoIncrement || isSequence) && !(defaultValue.isSpecified())) {
             defaultValue = new SpecifiedDefaultValue(new LongCell(1));
         }
 
         boolean isNotNull = parseColumnConstraints(table, name);
 
-        return new Column(name, defaultValue, onUpdateValue, isAutoIncrement,
+        return new Column(name, defaultValue, onUpdateValue, 
+            isAutoIncrement, isSequence,
             parsed.type, isNotNull);
     }
 

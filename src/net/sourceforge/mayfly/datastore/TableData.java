@@ -99,9 +99,11 @@ public class TableData {
         
         tuple.append(new TupleElement(column, cell));
 
-        if (isDefault && column.isSequenceOrAutoIncrement()) {
-            newColumns = newColumns.replace(column.afterAutoIncrement(checker));
+        Column newColumn = column.afterAutoIncrement(checker, cell, isDefault);
+        if (newColumn != null) {
+            newColumns = newColumns.replace(newColumn);
         }
+
         return newColumns;
     }
 
