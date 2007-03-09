@@ -62,6 +62,11 @@ less than helpful message, we consider that to be a bug.  Please
 let us know, on the mayfly mailing list, what you were doing and what
 would have helped you find your problem faster.
 
+@section dump SQL Dumps
+
+Mayfly has the ability to dump a database as an SQL script.  See
+{@link net.sourceforge.mayfly.dump.SqlDumper}.
+
 @section syntax SQL Syntax
 
 We don't want you to have to rewrite your SQL for Mayfly versus your
