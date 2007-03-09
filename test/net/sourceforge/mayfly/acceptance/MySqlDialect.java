@@ -326,5 +326,9 @@ public class MySqlDialect extends Dialect {
     public boolean createTableCanContainIndex() {
         return true;
     }
+    
+    public boolean haveAddColumnAfter() {
+        return true;
+    }
 
 }

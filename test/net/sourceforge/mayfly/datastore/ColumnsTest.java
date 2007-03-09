@@ -67,5 +67,45 @@ public class ColumnsTest extends TestCase {
         assertFalse(columns.columnFromName("b").isSequenceOrAutoIncrement());
         assertTrue(newColumns.columnFromName("b").isSequenceOrAutoIncrement());
     }
+    
+    public void testAddLast() throws Exception {
+        Columns columns = Columns.fromColumnNames(ImmutableList.singleton("a"));
+        Columns newColumns = columns.with(new Column("b"));
+        assertEquals(Arrays.asList(new String[] { "a", "b" }),
+            newColumns.asNames());
+    }
+
+    public void testAddFirst() throws Exception {
+        Columns columns = Columns.fromColumnNames(ImmutableList.singleton("b"));
+        Columns newColumns = columns.with(new Column("a"), Position.FIRST);
+        assertEquals(Arrays.asList(new String[] { "a", "b" }),
+            newColumns.asNames());
+    }
+    
+    public void testAddAfter() throws Exception {
+        Columns columns = new Columns(new ImmutableList(Arrays.asList(
+            new Column[] {
+                new Column("a"),
+                new Column("c"),
+            })));
+        Columns newColumns = columns.with(new Column("b"), Position.after("a"));
+        assertEquals(Arrays.asList(new String[] { "a", "b", "c" }),
+            newColumns.asNames());
+    }
+
+    public void testAddAfterNotFound() throws Exception {
+        Columns columns = new Columns(new ImmutableList(Arrays.asList(
+            new Column[] {
+                new Column("a"),
+                new Column("c"),
+            })));
+        try {
+            columns.with(new Column("b"), Position.after("b"));
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("no column b", e.getMessage());
+        }
+    }
 
 }

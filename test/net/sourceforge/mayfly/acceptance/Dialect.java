@@ -537,6 +537,10 @@ public abstract class Dialect {
     public boolean notNullRequiresDefault() {
         return false;
     }
+    
+    public boolean haveAddColumnAfter() {
+        return false;
+    }
 
     public boolean haveDropColumn() {
         return true;

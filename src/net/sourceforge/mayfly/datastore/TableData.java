@@ -287,13 +287,13 @@ public class TableData {
         constraints.checkDropTable(store, schema, table);
     }
 
-    public TableData addColumn(Column newColumn) {
+    public TableData addColumn(Column newColumn, Position position) {
         if (columns.hasColumn(newColumn.columnName())) {
             throw new MayflyException(
                 "column " + newColumn.columnName() + " already exists");
         }
         return new TableData(
-            columns.with(newColumn), 
+            columns.with(newColumn, position), 
             constraints,
             rows.addColumn(newColumn)
         );

@@ -41,9 +41,10 @@ public class Schema {
         return new Schema(tables.with(table, new TableData(columns, constraints)));
     }
 
-    public Schema addColumn(String table, Column newColumn) {
+    public Schema addColumn(String table, Column newColumn, Position position) {
         TableData oldTable = table(table);
-        return new Schema(tables.with(table, oldTable.addColumn(newColumn)));
+        return new Schema(tables.with(table, 
+            oldTable.addColumn(newColumn, position)));
     }
 
     public Schema dropColumn(TableReference table, String column) {

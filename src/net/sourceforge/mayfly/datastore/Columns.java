@@ -119,7 +119,33 @@ public class Columns {
     }
     
     public Columns with(Column newColumn) {
-        return new Columns(columns.with(newColumn));
+        return with(newColumn, Position.LAST);
+    }
+
+    public Columns with(Column newColumn, Position position) {
+        boolean found = false;
+        List result = new ArrayList();
+        if (position.isFirst()) {
+            result.add(newColumn);
+            found = true;
+        }
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            Column existing = (Column) iter.next();
+            result.add(existing);
+            if (position.isAfter(existing.columnName())) {
+                result.add(newColumn);
+                found = true;
+            }
+        }
+        if (position.isLast()) {
+            result.add(newColumn);
+            found = true;
+        }
+        
+        if (!found) {
+            throw new MayflyException("no column " + position.afterWhat());
+        }
+        return new Columns(new ImmutableList(result));
     }
 
     public Columns without(String target) {

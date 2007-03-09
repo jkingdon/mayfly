@@ -207,6 +207,10 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    public boolean haveAddColumnAfter() {
+        return true;
+    }
+
     public boolean haveInsertSetSyntax() {
         /* Only supported by MySQL as far as I know.  But it really
            is a better syntax, seems like... */

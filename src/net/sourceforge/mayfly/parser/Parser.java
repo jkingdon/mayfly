@@ -8,6 +8,7 @@ import net.sourceforge.mayfly.datastore.BinaryCell;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.Position;
 import net.sourceforge.mayfly.datastore.constraint.Action;
 import net.sourceforge.mayfly.datastore.constraint.Cascade;
 import net.sourceforge.mayfly.datastore.constraint.NoAction;
@@ -483,8 +484,7 @@ public class Parser {
         else if (consumeIfMatches(TokenType.KEYWORD_add)) {
             // optional according to SQL92 but does anyone omit it?
             if (consumeIfMatches(TokenType.KEYWORD_column)) {
-                Column newColumn = parseColumnDisallowingMostConstraints(table);
-                return new AddColumn(table, newColumn);
+                return parseAddColumn(table);
             }
             else if (lookingAtConstraint()) {
                 UnresolvedConstraint key = parseConstraint();
@@ -503,6 +503,20 @@ public class Parser {
         else {
             throw new ParserException("alter table action", currentToken());
         }
+    }
+
+    private Command parseAddColumn(UnresolvedTableReference table) {
+        Position position = Position.LAST;
+        Column newColumn = parseColumnDisallowingMostConstraints(table);
+        if (consumeNonReservedWordIfMatches("after")) {
+            position = Position.after(consumeIdentifier());
+        }
+        else if (consumeNonReservedWordIfMatches("first")) {
+            /* first is a keyword in SQL92, but I guess we'll make
+               it one here when we need to. */
+            position = Position.FIRST;
+        }
+        return new AddColumn(table, newColumn, position);
     }
 
     /**
@@ -676,11 +690,13 @@ public class Parser {
         Expression onUpdateValue = parseOnUpdateValue(name);
 
         if (currentTokenType() == TokenType.IDENTIFIER) {
-            String text = consumeIdentifier();
+            String text = currentToken().getText();
             if (text.equalsIgnoreCase("auto_increment")) {
+                consumeIdentifier();
                 isAutoIncrement = true;
             }
             else if (text.equalsIgnoreCase("generated")) {
+                consumeIdentifier();
                 expectAndConsume(TokenType.KEYWORD_by);
                 expectAndConsume(TokenType.KEYWORD_default);
                 expectAndConsume(TokenType.KEYWORD_as);
@@ -695,8 +711,8 @@ public class Parser {
                 isSequence = true;
             }
             else {
-                throw new ParserException(
-                    "extraneous text " + text + " at end of column definition");
+                // Need to leave the identifier unconsumed, as it
+                // might be AFTER or FIRST from an ALTER TABLE
             }
         }
 

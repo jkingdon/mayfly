@@ -56,5 +56,53 @@ public class AddColumnTest extends SqlTestCase {
             execute("insert into foo(a, b) values (5, 7)");
         }
     }
+    
+    public void testLast() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        execute("insert into foo values(1, 10)");
+        execute("alter table foo add column c integer");
+        execute("insert into foo values(2, 20, 200)");
+        assertResultSet(new String[] { 
+                "1, 10, null",
+                "2, 20, 200"
+            }, 
+            query("select a, b, c from foo"));
+    }
+    
+    public void testAfter() throws Exception {
+        execute("create table foo(a integer, c integer)");
+        execute("insert into foo values(1, 100)");
+        String sql = "alter table foo add column b integer after a";
+        if (dialect.haveAddColumnAfter()) {
+            execute(sql);
+            execute("insert into foo values(2, 20, 200)");
+            assertResultSet(new String[] { 
+                    "1, null, 100",
+                    "2, 20, 200"
+                }, 
+                query("select a, b, c from foo"));
+        }
+        else {
+            expectExecuteFailure(sql, "expected end of file but got after");
+        }
+    }
+
+    public void testFirst() throws Exception {
+        execute("create table foo(b integer, c integer)");
+        execute("insert into foo values(10, 100)");
+        String sql = "alter table foo add column a integer first";
+        if (dialect.haveAddColumnAfter()) {
+            execute(sql);
+            execute("insert into foo values(2, 20, 200)");
+            assertResultSet(new String[] { 
+                    "null, 10, 100",
+                    "2, 20, 200"
+                }, 
+                query("select a, b, c from foo"));
+        }
+        else {
+            expectExecuteFailure(sql, "expected end of file but got after");
+        }
+    }
 
 }
