@@ -621,6 +621,18 @@ public class SqlDumperTest extends TestCase {
         }
     }
 
+    public void testAlterTableUsingAfterDump() throws Exception {
+        database.execute("create table foo(a integer, b integer, c integer)");
+        database.execute("insert into foo values(1, 2, 3)");
+        String before = new SqlDumper().dump(database.dataStore());
+        database.execute("alter table foo drop column b");
+        database.execute("alter table foo add column b integer after a");
+        database.execute("update foo set b = 2");
+        String after = new SqlDumper().dump(database.dataStore());
+        assertEquals(before, after);
+    }
+
+    
     public void testCircularRowsWithForeignKeys() throws Exception {
         database.execute("create table aa(a integer primary key, parent integer," +
             "foreign key(parent) references aa(a))");

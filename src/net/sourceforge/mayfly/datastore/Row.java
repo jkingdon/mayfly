@@ -1,6 +1,8 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.dump.SqlDumperTest;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.util.ImmutableList;
 
@@ -97,8 +99,37 @@ public class Row {
         return result.toString();
     }
 
-    public Row addColumn(Column newColumn) {
-        return new Row(elements.with(new TupleElement(newColumn, newColumn.newColumnValue())));
+    /** 
+     * @internal
+     * That this takes a position is to make 
+     * {@link SqlDumperTest#testAlterTableUsingAfterDump()}
+     * work.  But perhaps the dumper should follow the order in
+     * the {@link Columns} object?  Not sure...
+     */
+    public Row addColumn(Column newColumn, Position position) {
+        boolean found = false;
+        List result = new ArrayList();
+        if (position.isFirst()) {
+            result.add(new TupleElement(newColumn, newColumn.newColumnValue()));
+            found = true;
+        }
+        for (Iterator iter = elements.iterator(); iter.hasNext();) {
+            TupleElement existing = (TupleElement) iter.next();
+            result.add(existing);
+            if (position.isAfter(existing.columnName())) {
+                result.add(new TupleElement(newColumn, newColumn.newColumnValue()));
+                found = true;
+            }
+        }
+        if (position.isLast()) {
+            result.add(new TupleElement(newColumn, newColumn.newColumnValue()));
+            found = true;
+        }
+        
+        if (!found) {
+            throw new MayflyException("no column " + position.afterWhat());
+        }
+        return new Row(new ImmutableList(result));
     }
 
     public Row dropColumn(String columnName) {
