@@ -2,7 +2,6 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.dump.SqlDumperTest;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.util.ImmutableList;
 
@@ -102,7 +101,7 @@ public class Row {
     /** 
      * @internal
      * That this takes a position is to make 
-     * {@link SqlDumperTest#testAlterTableUsingAfterDump()}
+     * testAlterTableUsingAfterDump in SqlDumperTest
      * work.  But perhaps the dumper should follow the order in
      * the {@link Columns} object?  Not sure...
      */
