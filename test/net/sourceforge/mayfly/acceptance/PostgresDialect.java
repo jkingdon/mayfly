@@ -170,8 +170,20 @@ public class PostgresDialect extends Dialect {
         return false;
     }
     
+    public boolean expressionsAreTypeLong() {
+        return false;
+    }
+    
     public String binaryTypeName() {
         return "bytea";
+    }
+    
+    public boolean blobTypeWorks() {
+        /* The error I'm getting is: Bad value for type int: \001\003\377\220
+           I guess this is just a postgres bug (why would the type be "int"
+           when we declare it as bytea?).  This is postgres 8.1.8-1.fc6 as
+           shipped in Fedora.  */
+        return false;
     }
     
     public boolean canGetBytesOnNumber() {

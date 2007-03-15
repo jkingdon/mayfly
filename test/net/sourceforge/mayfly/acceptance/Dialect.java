@@ -511,6 +511,10 @@ public abstract class Dialect {
         return "blob(255)";
     }
     
+    public boolean blobTypeWorks() {
+        return true;
+    }
+    
     /** Is there a command DROP TABLE name IF EXISTS (with IF EXISTS after the name)? */
     public boolean haveDropTableFooIfExists() {
         return true;

@@ -696,13 +696,23 @@ public class DataTypeTest extends SqlTestCase {
         ResultSet results = query("select x from foo");
         assertTrue(results.next());
 
-        Blob blob = results.getBlob(1);
-        assertEquals(4L, blob.length());
-        InputStream stream = blob.getBinaryStream();
-        byte[] contents = IOUtils.toByteArray(stream);
-        ArrayAssert.assertEquals(data, contents);
-        // Do we need to close this?
-        stream.close();
+        if (dialect.blobTypeWorks()) {
+            Blob blob = results.getBlob(1);
+            assertEquals(4L, blob.length());
+            InputStream stream = blob.getBinaryStream();
+            byte[] contents = IOUtils.toByteArray(stream);
+            ArrayAssert.assertEquals(data, contents);
+            // Do we need to close this?
+            stream.close();
+        }
+        else {
+            try {
+                results.getBlob(1);
+                fail("Maybe postgres fixed their Blob bug?");
+            }
+            catch (SQLException expected) {
+            }
+        }
         
         assertFalse(results.next());
         results.close();

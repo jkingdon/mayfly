@@ -4,10 +4,10 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DateCell;
-import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
@@ -28,8 +28,10 @@ public class ConditionTest extends TestCase {
     public void testSelect() throws Exception {
         Condition where = new Parser("name='steve'").parseWhere();
 
-        Row row1 = new Row(new TupleElement(new Column("name"), new StringCell("steve")));
-        Row row2 = new Row(new TupleElement(new Column("name"), new StringCell("bob")));
+        Row row1 = new TupleBuilder()
+            .appendColumnCellContents("name", "steve").asRow();
+        Row row2 = new TupleBuilder()
+            .appendColumnCellContents("name", "bob").asRow();
 
         assertTrue(where.evaluate(row1, "table1"));
         assertFalse(where.evaluate(row2, "table1"));
@@ -37,8 +39,9 @@ public class ConditionTest extends TestCase {
     
     public void testNull() throws Exception {
         Condition where = new Equal(new SingleColumn("a"), new IntegerLiteral(5));
-        Row fiveRow = new Row(new TupleElement(new Column("a"), new LongCell(5)));
-        Row nullRow = new Row(new TupleElement(new Column("a"), NullCell.INSTANCE));
+        Row fiveRow = new TupleBuilder().appendColumnCellContents("a", 5).asRow();
+        Row nullRow = new TupleBuilder()
+            .appendColumnCell("a", NullCell.INSTANCE).asRow();
         
         assertTrue(where.evaluate(fiveRow, "table1"));
         assertFalse(where.evaluate(nullRow, "table1"));
