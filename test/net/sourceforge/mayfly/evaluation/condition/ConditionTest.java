@@ -2,13 +2,10 @@ package net.sourceforge.mayfly.evaluation.condition;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.DateCell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
-import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.command.Command;

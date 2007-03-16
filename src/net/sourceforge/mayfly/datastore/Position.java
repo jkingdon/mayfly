@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.parser.Location;
 
 public class Position {
     
@@ -15,8 +16,13 @@ public class Position {
             return true;
         }
     };
+    
+    public static Position after(String existingName) {
+        return after(existingName, Location.UNKNOWN);
+    }
 
-    public static Position after(final String existingName) {
+    public static Position after(final String existingName, 
+        final Location location) {
         return new Position() {
             public boolean isAfter(String candidate) {
                 return existingName.equalsIgnoreCase(candidate);
@@ -24,6 +30,10 @@ public class Position {
             
             public String afterWhat() {
                 return existingName;
+            }
+            
+            public Location location() {
+                return location;
             }
         };
     }
@@ -42,6 +52,10 @@ public class Position {
 
     public String afterWhat() {
         throw new MayflyInternalException("shouldn't need what for first/last");
+    }
+    
+    public Location location() {
+        return Location.UNKNOWN;
     }
 
 }

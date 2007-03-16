@@ -11,7 +11,6 @@ public class TupleBuilderTest extends TestCase {
             .appendColumnCellContents("a", "val")
             .asRow();
         assertEquals(1, builtRow.columnCount());
-        assertEquals("a", builtRow.columnName(0));
         MayflyAssert.assertString("val", builtRow.cell("a"));
     }
 

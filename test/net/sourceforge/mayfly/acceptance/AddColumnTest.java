@@ -11,7 +11,8 @@ public class AddColumnTest extends SqlTestCase {
     
     public void testColumnAlreadyExists() throws Exception {
         execute("create table foo(a integer)");
-        expectExecuteFailure("alter table foo add column a integer", "column a already exists");
+        expectExecuteFailure("alter table foo add column a integer", 
+            "column a already exists");
     }
     
     public void testExistingRow() throws Exception {

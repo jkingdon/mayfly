@@ -2,11 +2,8 @@ package net.sourceforge.mayfly.evaluation.condition;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.datastore.Column;
-import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
-import net.sourceforge.mayfly.datastore.TupleElement;
-import net.sourceforge.mayfly.evaluation.condition.In;
+import net.sourceforge.mayfly.datastore.TupleBuilder;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.parser.Parser;
@@ -35,7 +32,7 @@ public class InTest extends TestCase {
 	}
 
     private Row row(long aValue) {
-        return new Row(new TupleElement(new Column("a"), new LongCell(aValue)));
+        return new TupleBuilder().appendColumnCellContents("a", aValue).asRow();
     }
 
 }

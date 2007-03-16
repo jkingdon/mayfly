@@ -295,7 +295,7 @@ public class TableData {
         return new TableData(
             columns.with(newColumn, position), 
             constraints,
-            rows.addColumn(newColumn, position)
+            rows.addColumn(newColumn)
         );
     }
 

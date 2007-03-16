@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -11,6 +10,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Cells for each column.  The order of the columns here is arbitrary.
+ * If you want the columns in a predictable order, look up the order
+ * in {@link Columns} and then call {@link #cell(String)} for each.
+ */
 public class Row {
 
     private final ImmutableList elements;
@@ -19,10 +23,6 @@ public class Row {
         this(new ImmutableList());
     }
 
-    public Row(TupleElement element) {
-        this(ImmutableList.singleton(element));
-    }
-    
     public Row(TupleBuilder builder) {
         this(builder.asElements());
     }
@@ -98,37 +98,9 @@ public class Row {
         return result.toString();
     }
 
-    /** 
-     * @internal
-     * That this takes a position is to make 
-     * testAlterTableUsingAfterDump in SqlDumperTest
-     * work.  But perhaps the dumper should follow the order in
-     * the {@link Columns} object?  Not sure...
-     */
-    public Row addColumn(Column newColumn, Position position) {
-        boolean found = false;
-        List result = new ArrayList();
-        if (position.isFirst()) {
-            result.add(new TupleElement(newColumn, newColumn.newColumnValue()));
-            found = true;
-        }
-        for (Iterator iter = elements.iterator(); iter.hasNext();) {
-            TupleElement existing = (TupleElement) iter.next();
-            result.add(existing);
-            if (position.isAfter(existing.columnName())) {
-                result.add(new TupleElement(newColumn, newColumn.newColumnValue()));
-                found = true;
-            }
-        }
-        if (position.isLast()) {
-            result.add(new TupleElement(newColumn, newColumn.newColumnValue()));
-            found = true;
-        }
-        
-        if (!found) {
-            throw new MayflyException("no column " + position.afterWhat());
-        }
-        return new Row(new ImmutableList(result));
+    public Row addColumn(Column newColumn) {
+        return new Row(elements.with(
+            new TupleElement(newColumn, newColumn.newColumnValue())));
     }
 
     public Row dropColumn(String columnName) {
@@ -153,14 +125,6 @@ public class Row {
 
     public int columnCount() {
         return elements.size();
-    }
-
-    public String columnName(int index) {
-        return ((TupleElement)elements.get(index)).columnName();
-    }
-
-    public Cell cell(int index) {
-        return ((TupleElement)elements.get(index)).cell();
     }
 
 }

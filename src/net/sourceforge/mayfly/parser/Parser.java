@@ -509,7 +509,8 @@ public class Parser {
         Position position = Position.LAST;
         Column newColumn = parseColumnDisallowingMostConstraints(table);
         if (consumeNonReservedWordIfMatches("after")) {
-            position = Position.after(consumeIdentifier());
+            Token column = expectAndConsume(TokenType.IDENTIFIER);
+            position = Position.after(column.getText(), column.location);
         }
         else if (consumeNonReservedWordIfMatches("first")) {
             /* first is a keyword in SQL92, but I guess we'll make

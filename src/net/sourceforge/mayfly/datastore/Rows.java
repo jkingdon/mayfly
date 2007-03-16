@@ -40,14 +40,10 @@ public class Rows {
     }
 
     public Rows addColumn(Column newColumn) {
-        return addColumn(newColumn, Position.LAST);
-    }
-    
-    public Rows addColumn(Column newColumn, Position position) {
         Rows result = new Rows();
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
-            result = result.with(row.addColumn(newColumn, position));
+            result = result.with(row.addColumn(newColumn));
         }
         return result;
     }

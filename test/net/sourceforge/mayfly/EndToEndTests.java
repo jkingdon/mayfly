@@ -347,4 +347,13 @@ public class EndToEndTests extends SqlTestCase {
             1, 27, 1, 48);
     }
 
+    public void testAfterErrorHandling() throws Exception {
+        execute("create table foo(a integer, c integer)");
+        execute("insert into foo values(1, 100)");
+        expectExecuteFailure(
+            "alter table foo add column b integer after qqq",
+            "no column qqq", 
+            1, 44, 1, 47);
+    }
+
 }

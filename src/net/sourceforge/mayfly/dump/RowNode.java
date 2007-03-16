@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.dump;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.graph.Node;
 
@@ -9,10 +10,12 @@ public class RowNode extends Node {
 
     public final Row row;
     public final String tableName;
+    private final Columns columns;
 
-    public RowNode(Row row, String tableName) {
+    public RowNode(Row row, String tableName, Columns columns) {
         this.row = row;
         this.tableName = tableName;
+        this.columns = columns;
     }
 
     /**
@@ -26,9 +29,10 @@ public class RowNode extends Node {
         if (first == second) {
             return 0;
         }
-        for (int i = 0; i < first.columnCount(); ++i) {
-            Cell cellFromFirst = first.cell(i);
-            Cell cellFromSecond = second.cell(i);
+        for (int i = 0; i < columns.columnCount(); ++i) {
+            String name = columns.columnName(i);
+            Cell cellFromFirst = first.cell(name);
+            Cell cellFromSecond = second.cell(name);
             int comparison = cellFromFirst.compareTo(cellFromSecond);
             if (comparison != 0) {
                 return comparison;

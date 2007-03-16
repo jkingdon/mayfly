@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
@@ -297,9 +298,10 @@ public class SqlDumper {
     private void rows(String tableName, TableData table, Writer out) 
     throws IOException {
         Collection rows = sortRows(table, tableName);
+        Columns columns = table.columns();
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
-            row(tableName, row, out);
+            row(tableName, columns, row, out);
         }
         
         if (rows.size() > 0) {
@@ -329,10 +331,12 @@ public class SqlDumper {
     }
 
     private List rowNodes(final TableData table, String tableName) {
+        Columns columns = table.columns();
+
         List result = new ArrayList();
         for (int i = 0; i < table.rowCount(); ++i) {
             Row row = table.row(i);
-            result.add(new RowNode(row, tableName));
+            result.add(new RowNode(row, tableName, columns));
         }
         return result;
     }
@@ -357,20 +361,20 @@ public class SqlDumper {
         return result;
     }
 
-    private void row(String tableName, Row row, Writer out) throws IOException {
+    private void row(String tableName, Columns columns, Row row, Writer out) throws IOException {
         out.write("INSERT INTO ");
         out.write(tableName);
         out.write("(");
-        for (int i = 0; i < row.columnCount(); ++i) {
-            out.write(row.columnName(i));
-            if (i < row.columnCount() - 1) {
+        for (int i = 0; i < columns.columnCount(); ++i) {
+            out.write(columns.columnName(i));
+            if (i < columns.columnCount() - 1) {
                 out.write(", ");
             }
         }
         out.write(") VALUES(");
-        for (int i = 0; i < row.columnCount(); ++i) {
-            out.write(row.cell(i).asSql());
-            if (i < row.columnCount() - 1) {
+        for (int i = 0; i < columns.columnCount(); ++i) {
+            out.write(row.cell(columns.columnName(i)).asSql());
+            if (i < columns.columnCount() - 1) {
                 out.write(", ");
             }
         }

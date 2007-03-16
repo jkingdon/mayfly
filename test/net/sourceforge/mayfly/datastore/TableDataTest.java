@@ -42,7 +42,7 @@ public class TableDataTest extends TestCase {
         assertEquals(1, newTable.rowCount());
         Row newRow = newTable.row(0);
         assertEquals(1, newRow.columnCount());
-        assertEquals("a", newRow.columnName(0));
+        MayflyAssert.assertLong(7, newRow.cell("a"));
     }
     
     public void testModifyColumn() throws Exception {

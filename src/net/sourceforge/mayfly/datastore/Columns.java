@@ -143,7 +143,7 @@ public class Columns {
         }
         
         if (!found) {
-            throw new MayflyException("no column " + position.afterWhat());
+            throw new NoColumn(position.afterWhat(), position.location());
         }
         return new Columns(new ImmutableList(result));
     }
@@ -193,6 +193,10 @@ public class Columns {
         }
 
         return result;
+    }
+
+    public String columnName(int index) {
+        return column(index).columnName();
     }
 
 }
