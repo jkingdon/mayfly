@@ -50,6 +50,7 @@ public class TokenType {
     public static final TokenType KEYWORD_by = registerKeyword("by");
     public static final TokenType KEYWORD_case = registerKeyword("case");
     public static final TokenType KEYWORD_character = registerKeyword("character");
+    public static final TokenType KEYWORD_check = registerKeyword("check");
     public static final TokenType KEYWORD_column = registerKeyword("column");
     public static final TokenType KEYWORD_constraint = registerKeyword("constraint");
     public static final TokenType KEYWORD_count = registerKeyword("count");

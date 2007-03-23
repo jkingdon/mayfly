@@ -9,6 +9,8 @@ import net.sourceforge.mayfly.parser.Location;
 
 abstract public class Expression extends WhatElement {
     
+    /* Storing a location here is dubious because an expression can
+       go into the store. */
     public final Location location;
     
     protected Expression(Location location) {

@@ -224,6 +224,11 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean haveCheckConstraints() {
+        /* As of MySQL 5.1 CHECK is a no-op for all engines. */
+        return false;
+    }
+    
     public boolean onDeleteSetDefaultMissing(boolean tableCreateTime) {
         return true;
     }

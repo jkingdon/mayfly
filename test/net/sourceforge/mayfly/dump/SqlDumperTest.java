@@ -272,6 +272,10 @@ public class SqlDumperTest extends TestCase {
         }
     }
     
+    public void testCheckConstraint() throws Exception {
+        // test not written
+    }
+    
     public void testOnUpdateValue() throws Exception {
         database.execute("create table onup(a integer on update 5)");
         assertEquals("CREATE TABLE onup(\n  a INTEGER ON UPDATE 5\n);\n\n",

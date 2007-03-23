@@ -6,6 +6,14 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
+/**
+ * @internal
+ * The intention is that a condition should be immutable. Right now
+ * the condition subclasses themselves don't always enforce this but
+ * mutating the condition, after its initial construction, is not
+ * allowed as it is in the data store. (The subclass in question is
+ * {@link SubselectedIn}).
+ */
 public abstract class Condition {
 
     public static final Condition TRUE = new True();

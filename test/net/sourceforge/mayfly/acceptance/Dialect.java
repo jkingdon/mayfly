@@ -473,6 +473,10 @@ public abstract class Dialect {
     public boolean foreignKeyJustNeedsIndex() {
         return false;
     }
+    
+    public boolean haveCheckConstraints() {
+        return true;
+    }
 
     public boolean onDeleteSetDefaultMissing(boolean tableCreateTime) {
         return false;

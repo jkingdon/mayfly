@@ -43,6 +43,7 @@ import net.sourceforge.mayfly.evaluation.command.LastIdentity;
 import net.sourceforge.mayfly.evaluation.command.ModifyColumn;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
+import net.sourceforge.mayfly.evaluation.command.UnresolvedCheckConstraint;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedConstraint;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedForeignKey;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedPrimaryKey;
@@ -562,7 +563,8 @@ public class Parser {
         return currentTokenType() == TokenType.KEYWORD_primary
             || currentTokenType() == TokenType.KEYWORD_unique
             || currentTokenType() == TokenType.KEYWORD_foreign
-            || currentTokenType() == TokenType.KEYWORD_constraint;
+            || currentTokenType() == TokenType.KEYWORD_constraint
+            || currentTokenType() == TokenType.KEYWORD_check;
     }
 
     private UnresolvedConstraint parseConstraint() {
@@ -585,6 +587,12 @@ public class Parser {
         }
         else if (currentTokenType() == TokenType.KEYWORD_foreign) {
             return parseForeignKeyConstraint(constraintName);
+        }
+        else if (consumeIfMatches(TokenType.KEYWORD_check)) {
+            expectAndConsume(TokenType.OPEN_PAREN);
+            Condition condition = parseCondition().asBoolean();
+            expectAndConsume(TokenType.CLOSE_PAREN);
+            return new UnresolvedCheckConstraint(condition, constraintName);
         }
         else {
             throw new MayflyInternalException(
