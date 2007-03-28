@@ -733,6 +733,10 @@ public abstract class Dialect {
         return false;
     }
 
+    public String productName() {
+        return "dialect should override this";
+    }
+
     public boolean createTableCanContainIndex() {
         return false;
     }

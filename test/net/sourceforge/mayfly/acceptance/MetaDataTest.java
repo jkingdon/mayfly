@@ -100,5 +100,11 @@ public class MetaDataTest extends SqlTestCase {
             null, null, "NO_SUCH_TABLE", "A");
         assertFalse(columns.next());
     }
+    
+    public void testDatabaseName() throws Exception {
+        assertEquals(
+            dialect.productName(), 
+            connection.getMetaData().getDatabaseProductName());
+    }
 
 }

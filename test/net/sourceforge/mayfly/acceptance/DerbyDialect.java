@@ -248,5 +248,9 @@ public class DerbyDialect extends Dialect {
     public boolean metaDataExpectsUppercase() {
         return true;
     }
-
+    
+    public String productName() {
+        return "Apache Derby";
+    }
+    
 }

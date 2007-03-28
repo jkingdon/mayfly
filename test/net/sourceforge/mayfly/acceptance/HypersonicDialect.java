@@ -255,5 +255,9 @@ public class HypersonicDialect extends Dialect {
     public boolean metaDataExpectsUppercase() {
         return true;
     }
+    
+    public String productName() {
+        return "HSQL Database Engine";
+    }
 
 }

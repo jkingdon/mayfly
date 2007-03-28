@@ -226,4 +226,8 @@ public class MayflyDialect extends Dialect {
         return Long.class;
     }
     
+    public String productName() {
+        return "Mayfly";
+    }
+    
 }

@@ -275,6 +275,10 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    public String productName() {
+        return "PostgreSQL";
+    }
+    
     public boolean deleteAllRowsIsSmartAboutForeignKeys() {
         return true;
     }

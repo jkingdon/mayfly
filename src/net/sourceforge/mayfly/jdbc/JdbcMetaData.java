@@ -88,7 +88,7 @@ public class JdbcMetaData implements DatabaseMetaData {
     }
 
     public String getDatabaseProductName() throws SQLException {
-        throw new UnimplementedException();
+        return "Mayfly";
     }
 
     public String getDatabaseProductVersion() throws SQLException {

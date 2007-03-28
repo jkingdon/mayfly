@@ -335,5 +335,9 @@ public class MySqlDialect extends Dialect {
     public boolean haveAddColumnAfter() {
         return true;
     }
+    
+    public String productName() {
+        return "MySQL";
+    }
 
 }
