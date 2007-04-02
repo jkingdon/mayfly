@@ -20,7 +20,9 @@ public class TableNamesCaseSensitiveTest extends TestCase {
     
     public void testSelect() throws Exception {
         database.execute("create table Foo(x integer)");
-        expectQueryFailure("select x from FOO", "no table FOO");
+        expectQueryFailure("select x from FOO", 
+            "attempt to refer to table Foo as FOO " +
+            "(with case sensitive table names enabled)");
         expectQueryFailure("select x from Foo where FOO.x = 5", "no column FOO.x");
         expectQueryFailure("select x from Foo group by FOO.x", "no column FOO.x");
         expectQueryFailure("select x from Foo group by x having FOO.x > 5",
@@ -31,33 +33,44 @@ public class TableNamesCaseSensitiveTest extends TestCase {
     public void testJoins() throws Exception {
         database.execute("create table foo(x integer)");
         database.execute("create table bar(y integer)");
-        expectQueryFailure("select * from foo cross join BAR", "no table BAR");
-        expectQueryFailure("select * from FOO cross join bar", "no table FOO");
+        expectQueryFailure("select * from foo cross join BAR", 
+            "attempt to refer to table bar as BAR " +
+            "(with case sensitive table names enabled)");
+        expectQueryFailure("select * from FOO cross join bar", 
+            "attempt to refer to table foo as FOO " +
+            "(with case sensitive table names enabled)");
     }
 
     public void testDelete() throws Exception {
         database.execute("create table FOO(x integer)");
-        expectExecuteFailure("delete from foo", "no table foo");
+        expectExecuteFailure("delete from foo", 
+            "attempt to refer to table FOO as foo " +
+            "(with case sensitive table names enabled)");
         expectExecuteFailure("delete from FOO where foo.x = 5", 
             "no column foo.x");
     }
     
     public void testUpdate() throws Exception {
         database.execute("create table foo(x integer)");
-        expectExecuteFailure("update Foo set x = 5", "no table Foo");
+        expectExecuteFailure("update Foo set x = 5", 
+            "attempt to refer to table foo as Foo " +
+            "(with case sensitive table names enabled)");
         expectExecuteFailure("update foo set x = 5 where Foo.x = 7", 
             "no column Foo.x");
     }
     
     public void testInsert() throws Exception {
         database.execute("create table foo(x integer)");
-        expectExecuteFailure("insert into Foo(x) values(5)", "no table Foo");
+        expectExecuteFailure("insert into Foo(x) values(5)", 
+            "attempt to refer to table foo as Foo " +
+            "(with case sensitive table names enabled)");
     }
     
     public void testAddColumn() throws Exception {
         database.execute("create table foo(x integer)");
         expectExecuteFailure("alter table Foo add column y integer", 
-            "no table Foo");
+            "attempt to refer to table foo as Foo " +
+            "(with case sensitive table names enabled)");
     }
     
     public void testCreateTable() throws Exception {
@@ -77,7 +90,8 @@ public class TableNamesCaseSensitiveTest extends TestCase {
         expectExecuteFailure(
             "create table refr(x_id integer, " +
                 "foreign key(x_id) references REFD(x))", 
-            "no table REFD");
+                "attempt to refer to table refd as REFD " +
+                "(with case sensitive table names enabled)");
     }
     
     public void testForeignKeySelfReference() throws Exception {
@@ -87,7 +101,24 @@ public class TableNamesCaseSensitiveTest extends TestCase {
                 "foreign key(parent) references FOO(id))", 
             "no table FOO");
     }
+    
+    public void testDropTable() throws Exception {
+        database.execute("create table foo (x integer)");
 
+        expectExecuteFailure("DROP TABLE FOO IF EXISTS",
+            "attempt to refer to table foo as FOO " +
+            "(with case sensitive table names enabled)");
+
+        // Now check that it is not gone
+        expectExecuteFailure("create table foo (x integer)", 
+            "table foo already exists");
+
+        database.execute("DROP TABLE foo IF EXISTS");
+
+        // Now check that it is gone
+        database.execute("create table foo (x integer)");
+    }
+    
     private void expectQueryFailure(String sql, String message) {
         try {
             database.query(sql);

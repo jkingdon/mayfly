@@ -25,7 +25,10 @@ public class FromTableTest extends TestCase {
             fail();
         }
         catch (MayflyException e) {
-            assertEquals("no table Foo", e.getMessage());
+            assertEquals(
+                "attempt to refer to table foo as Foo " +
+                "(with case sensitive table names enabled)", 
+                e.getMessage());
         }
     }
 

@@ -101,13 +101,23 @@ public class Schema {
     }
 
     public String lookUpTable(String target, Location location, Options options) {
-        String canonicalName = lookUpTableOrNull(target, options);
-        if (canonicalName == null) {
-            throw new MayflyException("no table " + target, location);
+        for (Iterator iter = tables.keySet().iterator(); iter.hasNext(); ) {
+            String canonicalTable = (String) iter.next();
+            if (canonicalTable.equalsIgnoreCase(target)) {
+                if (options.tableNamesCaseSensitive()
+                    && !canonicalTable.equals(target)) {
+                    throw new MayflyException(
+                        "attempt to refer to table " + canonicalTable + 
+                        " as " + target + 
+                        " (with case sensitive table names enabled)",
+                        location);
+                }
+                else {
+                    return canonicalTable;
+                }
+            }
         }
-        else {
-            return canonicalName;
-        }
+        throw new MayflyException("no table " + target, location);
     }
 
     private String lookUpTableOrNull(String target) {

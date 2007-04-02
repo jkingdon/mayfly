@@ -265,6 +265,11 @@ public class Database {
      * are, which usually means Unix vs. Windows).  Unless you have this
      * situation, or perhaps a coding standard about the case of table
      * names, you'll want to stick with the SQL standard behavior.
+     * 
+     * Note that setting this to true does not enable the creation of
+     * several tables whose names differ only in case.  It merely makes it
+     * an error to refer to a table via a case other than the one
+     * with which it was created.
      */
     public void tableNamesCaseSensitive(boolean caseSensitive) {
         options = options.tableNamesCaseSensitive(caseSensitive);
