@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.datastore.Columns;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * @internal
  * Cells for each column.  The order of the columns here is arbitrary.
  * If you want the columns in a predictable order, look up the order
  * in {@link Columns} and then call {@link #cell(String)} for each.

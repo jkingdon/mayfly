@@ -111,6 +111,18 @@ name and data type, roughly), and <var>constraint</var> is as in
 CREATE TABLE (that is, starts with CONSTRAINT, UNIQUE, PRIMARY KEY,
 or FOREIGN KEY).
 
+@subsection createindex CREATE INDEX
+
+<pre>
+CREATE [UNIQUE] INDEX <var>index-name</var> ON <var>table</var>(<var>column</var>, ...)
+</pre>
+
+This is a no-op unless the word UNIQUE is specified in which case it
+is the same as defining a unique constraint (for example, in a
+CREATE TABLE statement).  The latter syntax is generally preferred,
+as it separates constraints (defining correct behavior) from indexes
+(performance optimization).
+
 @subsection create CREATE TABLE
 
 <pre>
