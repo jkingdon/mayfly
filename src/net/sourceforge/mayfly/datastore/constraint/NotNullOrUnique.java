@@ -22,6 +22,11 @@ public abstract class NotNullOrUnique extends Constraint {
 
     private final ColumnNames names;
 
+    /**
+     * Here we take {@link Columns} as opposed to {@link ColumnNames}
+     * merely as a way to express the concept that the names have
+     * been verified to exist in the store.
+     */
     protected NotNullOrUnique(Columns columns, String constraintName) {
         super(constraintName);
         this.names = ColumnNames.fromColumns(columns);

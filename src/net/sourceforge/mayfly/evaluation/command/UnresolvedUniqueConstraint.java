@@ -11,7 +11,7 @@ import java.util.List;
 
 public class UnresolvedUniqueConstraint extends UnresolvedConstraint {
 
-    private ColumnNames constraintColumns;
+    private final ColumnNames constraintColumns;
     private final String constraintName;
 
     public UnresolvedUniqueConstraint(List columns, String constraintName) {

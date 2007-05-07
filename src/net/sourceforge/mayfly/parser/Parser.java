@@ -32,6 +32,7 @@ import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.AddColumn;
 import net.sourceforge.mayfly.evaluation.command.AddConstraint;
 import net.sourceforge.mayfly.evaluation.command.Command;
+import net.sourceforge.mayfly.evaluation.command.CreateIndex;
 import net.sourceforge.mayfly.evaluation.command.CreateSchema;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
 import net.sourceforge.mayfly.evaluation.command.Delete;
@@ -203,6 +204,13 @@ public class Parser {
             else if (consumeIfMatches(TokenType.KEYWORD_table)) {
                 return parseCreateTable();
             }
+            else if (consumeIfMatches(TokenType.KEYWORD_index)) {
+                return parseCreateIndex(false);
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_unique)) {
+                expectAndConsume(TokenType.KEYWORD_index);
+                return parseCreateIndex(true);
+            }
             else {
                 throw new ParserException("create command",
                     currentToken());
@@ -227,6 +235,15 @@ public class Parser {
         else {
             throw new ParserException("command", currentToken());
         }
+    }
+
+    private Command parseCreateIndex(boolean unique) {
+        consumeIdentifier(); // name
+        expectAndConsume(TokenType.KEYWORD_on);
+        UnresolvedTableReference table = parseTableReference();
+        List columns = parseColumnNames();
+
+        return new CreateIndex(table, columns, unique);
     }
 
     private Command parseCall() {

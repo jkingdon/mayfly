@@ -207,6 +207,10 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    public boolean duplicateIndexNamesOk() {
+        return !wishThisWereTrue();
+    }
+    
     public boolean haveAddColumnAfter() {
         return true;
     }

@@ -740,5 +740,9 @@ public abstract class Dialect {
     public boolean createTableCanContainIndex() {
         return false;
     }
+    
+    public boolean duplicateIndexNamesOk() {
+        return false;
+    }
 
 }

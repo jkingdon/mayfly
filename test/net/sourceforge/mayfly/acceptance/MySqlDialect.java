@@ -332,6 +332,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean duplicateIndexNamesOk() {
+        return true;
+    }
+    
     public boolean haveAddColumnAfter() {
         return true;
     }
