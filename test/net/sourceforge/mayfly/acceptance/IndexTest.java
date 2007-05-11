@@ -71,6 +71,9 @@ public class IndexTest extends SqlTestCase {
         }
     }
     
-    // TODO: SqlDumper too
-
+    public void xtestIndexOnPartOfColumn() throws Exception {
+        execute("create table foo(a varchar(255))");
+        execute("create index my_index on foo(a(10))");
+    }
+    
 }
