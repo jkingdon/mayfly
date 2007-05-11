@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.parser.Location;
+import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.M;
 import net.sourceforge.mayfly.util.StringBuilder;
@@ -22,12 +23,15 @@ public class TableData {
     private final Columns columns;
     private final Rows rows;
     public final Constraints constraints;
+    public final ImmutableList /* <Index> */ indexes;
 
-    public TableData(Columns columns, Constraints constraints) {
-        this(columns, constraints, new Rows());
+    public TableData(Columns columns, Constraints constraints,
+        ImmutableList indexes) {
+        this(columns, constraints, new Rows(), indexes);
     }
     
-    TableData(Columns columns, Constraints constraints, Rows rows) {
+    TableData(Columns columns, Constraints constraints, Rows rows,
+        ImmutableList indexes) {
         this.constraints = constraints;
         if (constraints == null) {
             throw new NullPointerException("constraints is required");
@@ -35,6 +39,7 @@ public class TableData {
         columns.checkForDuplicates();
         this.columns = columns;
         this.rows = rows;
+        this.indexes = indexes;
     }
 
     public TableData addRow(Checker checker, List columnNames, ValueList values) {
@@ -73,7 +78,8 @@ public class TableData {
         constraints.check(rows, newRow, values.location);
         checker.checkInsert(constraints, newRow);
 
-        return new TableData(newColumns, constraints, rows.with(newRow));
+        return new TableData(
+            newColumns, constraints, rows.with(newRow), indexes);
     }
 
     private MayflyException makeException(String message, Columns columnsToInsert, ValueList values) {
@@ -131,7 +137,8 @@ public class TableData {
             }
 
         }
-        TableData newTable = new TableData(columns, constraints, newRows);
+        TableData newTable = new TableData(
+            columns, constraints, newRows, indexes);
         return new UpdateTable(newTable, rowsAffected);
     }
 
@@ -173,7 +180,8 @@ public class TableData {
             }
 
         }
-        TableData newTable = new TableData(columns, constraints, newRows);
+        TableData newTable = new TableData(
+            columns, constraints, newRows, indexes);
         return new UpdateTable(newTable, rowsAffected);
     }
 
@@ -295,15 +303,18 @@ public class TableData {
         return new TableData(
             columns.with(newColumn, position), 
             constraints,
-            rows.addColumn(newColumn)
+            rows.addColumn(newColumn),
+            indexes
         );
     }
 
     public TableData dropColumn(TableReference table, String column) {
+        // TODO: what if column is mentioned in indexes?
         return new TableData(
             columns.without(column),
             constraints.dropColumn(table, column),
-            rows.dropColumn(column)
+            rows.dropColumn(column),
+            indexes
         );
     }
 
@@ -330,7 +341,8 @@ public class TableData {
         return new TableData(
             columns.replace(newColumn),
             constraints,
-            rows
+            rows,
+            indexes
         );
     }
 
@@ -338,7 +350,8 @@ public class TableData {
         return new TableData(
             columns,
             constraints.dropForeignKey(constraintName),
-            rows
+            rows,
+            indexes
         );
     }
 
@@ -346,8 +359,17 @@ public class TableData {
         return new TableData(
             columns,
             constraints.addConstraint(key),
-            rows
+            rows,
+            indexes
         );
+    }
+
+    public TableData addIndex(Index index) {
+        return new TableData(
+            columns,
+            constraints,
+            rows,
+            indexes.with(index));
     }
 
     public boolean canBeTargetOfForeignKey(String targetColumn) {

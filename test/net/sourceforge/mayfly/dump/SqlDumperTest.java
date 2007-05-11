@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.Database;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.acceptance.SqlTestCase;
 import net.sourceforge.mayfly.datastore.DataStore;
 
@@ -224,6 +225,19 @@ public class SqlDumperTest extends TestCase {
             dump());
     }
     
+    public void testUniqueIndex() throws Exception {
+        database.execute("create table foo(a integer, b integer, c integer)");
+        database.execute("create unique index x on foo(b, c)");
+
+        /* We consistently apply the rule that indexes are one thing 
+           and constraints another.  That is, dump them separately. */
+        assertEquals(
+            "CREATE TABLE foo(\n  a INTEGER,\n  b INTEGER,\n  c INTEGER,\n" +
+                "  UNIQUE(b, c)\n);\n" +
+                "CREATE INDEX x ON foo(b, c)\n\n",
+            dump());
+    }
+    
     public void testConstraintNames() throws Exception {
         database.execute("create table name(a integer primary key)");
         database.execute("create table name2(" +
@@ -273,7 +287,36 @@ public class SqlDumperTest extends TestCase {
     }
     
     public void testCheckConstraint() throws Exception {
-        // test not written
+        database.execute("create table chk(a integer, check(a <> 55))");
+        
+        try {
+            assertEquals(
+                "CREATE TABLE chk(\n  a INTEGER,\n  CHECK(a <> 55)\n);\n\n",
+                dump()
+            );
+            fail("Hmm, looks like dumping check constaints got implemented");
+        }
+        catch (UnimplementedException expected) {
+        }
+    }
+    
+    public void testIndex() throws Exception {
+        database.execute("create table foo(a integer)");
+        database.execute("create index i on foo(a)");
+        assertEquals(
+            "CREATE TABLE foo(\n  a INTEGER\n);\n" +
+            "CREATE INDEX i ON foo(a)\n\n",
+            dump()
+        );
+    }
+    
+    public void testMysqlSyntaxIndex() throws Exception {
+        database.execute("create table foo(a integer, index(a))");
+        assertEquals(
+            "CREATE TABLE foo(\n  a INTEGER\n);\n" +
+            "CREATE INDEX an_index ON foo(a)\n\n",
+            dump()
+        );
     }
     
     public void testOnUpdateValue() throws Exception {

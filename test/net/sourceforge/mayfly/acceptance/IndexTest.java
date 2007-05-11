@@ -13,6 +13,16 @@ public class IndexTest extends SqlTestCase {
         }
     }
     
+    public void testMysqlSyntaxTwoColumns() throws Exception {
+        String sql = "create table foo(a integer, b integer, index(b, a))";
+        if (dialect.createTableCanContainIndex()) {
+            execute(sql);
+        }
+        else {
+            expectExecuteFailure(sql, "expected data type but got '('");
+        }
+    }
+    
     /* TODO: Might want to insist that the index be on a NOT NULL
        column the way that MySQL 5.1 does */
 

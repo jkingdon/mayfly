@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.evaluation.command.UpdateSchema;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.parser.Location;
+import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.ImmutableMap;
 
 import java.util.Iterator;
@@ -32,13 +33,16 @@ public class Schema {
         return createTable(
             table, 
             Columns.fromColumnNames(columnNames), 
-            new Constraints());
+            new Constraints(),
+            new ImmutableList());
     }
 
     public Schema createTable(
-        String table, Columns columns, Constraints constraints) {
+        String table, Columns columns, Constraints constraints,
+        ImmutableList indexes) {
         assertNoTable(table);
-        return new Schema(tables.with(table, new TableData(columns, constraints)));
+        return new Schema(tables.with(table, 
+            new TableData(columns, constraints, indexes)));
     }
 
     public Schema addColumn(String table, Column newColumn, Position position) {
@@ -210,8 +214,12 @@ public class Schema {
         return replaceTable(table, table(table).dropForeignKey(constraintName));
     }
 
-    public Schema addConstraint(String table, Constraint key) {
-        return replaceTable(table, table(table).addConstraint(key));
+    public Schema addConstraint(String table, Constraint constraint) {
+        return replaceTable(table, table(table).addConstraint(constraint));
+    }
+
+    public Schema addIndex(String table, Index index) {
+        return replaceTable(table, table(table).addIndex(index));
     }
 
 }

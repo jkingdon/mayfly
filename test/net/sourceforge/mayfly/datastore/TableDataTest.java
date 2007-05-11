@@ -33,7 +33,7 @@ public class TableDataTest extends TestCase {
             .asRow();
         Rows rows = new Rows(row);
         TableData table = new TableData(
-            columns, new Constraints(), rows);
+            columns, new Constraints(), rows, null);
         
         TableData newTable = table.dropColumn(null, "B");
         
@@ -52,7 +52,7 @@ public class TableDataTest extends TestCase {
             .append(a, new LongCell(7))
             .asRow();
         TableData table = new TableData(
-            Columns.singleton(a), new Constraints(), new Rows(row));
+            Columns.singleton(a), new Constraints(), new Rows(row), null);
         
         Column newA = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
             false, false, new FakeDataType(), false);
@@ -69,7 +69,7 @@ public class TableDataTest extends TestCase {
             .append(a, new LongCell(7))
             .asRow();
         TableData table = new TableData(
-            Columns.singleton(a), new Constraints(), new Rows(row));
+            Columns.singleton(a), new Constraints(), new Rows(row), null);
         
         UpdateTable update = table.update(new NullChecker(), 
             Collections.singletonList(
@@ -96,7 +96,8 @@ public class TableDataTest extends TestCase {
         TableData table = new TableData(
             Columns.singleton(a), 
             new Constraints(), 
-            new Rows(ImmutableList.fromArray(new Row[] { one, two }))
+            new Rows(ImmutableList.fromArray(new Row[] { one, two })),
+            null
         );
         
         Condition where = new Parser("a = 1").parseCondition().asBoolean();
@@ -122,7 +123,8 @@ public class TableDataTest extends TestCase {
                     new UniqueConstraint(Columns.singleton(new Column("c")))
                 })
             ), 
-            new Rows()
+            new Rows(),
+            null
         );
         
         assertTrue(table.canBeTargetOfForeignKey("a"));
@@ -134,7 +136,8 @@ public class TableDataTest extends TestCase {
         TableData table = new TableData(
             Columns.fromColumnNames(ImmutableList.singleton("a")),
             new Constraints(), 
-            new Rows()
+            new Rows(),
+            null
         );
         assertFalse(table.canBeTargetOfForeignKey("a"));
     }

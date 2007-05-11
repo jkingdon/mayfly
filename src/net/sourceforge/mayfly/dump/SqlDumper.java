@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Index;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
@@ -17,6 +18,7 @@ import net.sourceforge.mayfly.graph.CycleDetectedException;
 import net.sourceforge.mayfly.graph.Graph;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.TokenType;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -185,7 +187,9 @@ public class SqlDumper {
         out.write("(\n");
         columns(table, out);
         constraints(table.constraints, out);
-        out.write(");\n\n");
+        out.write(");\n");
+        indexes(tableName, table.indexes, out);
+        out.write("\n");
     }
 
     public static void identifier(String text, Writer out) throws IOException {
@@ -284,6 +288,26 @@ public class SqlDumper {
                 out.write(",");
             }
             out.write("\n");
+        }
+    }
+
+    private void indexes(String tableName, ImmutableList indexes, Writer out) 
+    throws IOException {
+        Iterator iterator = indexes.iterator();
+        while (iterator.hasNext()) {
+            Index index = (Index) iterator.next();
+            out.write("CREATE INDEX ");
+            if (index.hasName()) {
+                identifier(index.name(), out);
+            }
+            else {
+                out.write("an_index");
+            }
+            out.write(" ON ");
+            identifier(tableName, out);
+            out.write("(");
+            index.columns.dump(out);
+            out.write(")\n");
         }
     }
 

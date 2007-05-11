@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.BinaryCell;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Position;
 import net.sourceforge.mayfly.datastore.constraint.Action;
@@ -238,12 +239,12 @@ public class Parser {
     }
 
     private Command parseCreateIndex(boolean unique) {
-        consumeIdentifier(); // name
+        String indexName = consumeIdentifier();
         expectAndConsume(TokenType.KEYWORD_on);
         UnresolvedTableReference table = parseTableReference();
-        List columns = parseColumnNames();
+        ColumnNames columns = parseColumnNames();
 
-        return new CreateIndex(table, columns, unique);
+        return new CreateIndex(table, indexName, columns, unique);
     }
 
     private Command parseCall() {
@@ -336,7 +337,7 @@ public class Parser {
         }
     }
 
-    private ImmutableList parseColumnNames() {
+    private ColumnNames parseColumnNames() {
         expectAndConsume(TokenType.OPEN_PAREN);
 
         List columnNames = new ArrayList();
@@ -345,7 +346,7 @@ public class Parser {
         } while (consumeIfMatches(TokenType.COMMA));
 
         expectAndConsume(TokenType.CLOSE_PAREN);
-        return new ImmutableList(columnNames);
+        return new ColumnNames(new ImmutableList(columnNames));
     }
     
     ValueList parseValueConstructor() {
@@ -564,10 +565,15 @@ public class Parser {
             table.addConstraint(parseConstraint());
         }
         else if (consumeIfMatches(TokenType.KEYWORD_index)) {
-            consumeIfMatches(TokenType.IDENTIFIER); // name
-            expectAndConsume(TokenType.OPEN_PAREN);
-            expectAndConsume(TokenType.IDENTIFIER); // column
-            expectAndConsume(TokenType.CLOSE_PAREN);
+            String name;
+            if (currentTokenType() == TokenType.IDENTIFIER) {
+                name = consumeIdentifier();
+            }
+            else {
+                name = null;
+            }
+            ColumnNames columns = parseColumnNames();
+            table.addIndex(name, columns);
         }
         else {
             throw new ParserException(

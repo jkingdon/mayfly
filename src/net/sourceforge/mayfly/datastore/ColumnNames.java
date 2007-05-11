@@ -2,6 +2,8 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.util.ImmutableList;
 
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,13 +27,17 @@ public class ColumnNames {
             Column column = (Column) iter.next();
             names.add(column.columnName());
         }
-        return new ColumnNames(names);
+        return new ColumnNames(new ImmutableList(names));
+    }
+
+    public static ColumnNames singleton(String column) {
+        return new ColumnNames(ImmutableList.singleton(column));
     }
 
     private final ImmutableList names;
 
-    public ColumnNames(List names) {
-        this.names = new ImmutableList(names);
+    public ColumnNames(ImmutableList names) {
+        this.names = names;
     }
 
     public int size() {
@@ -60,6 +66,17 @@ public class ColumnNames {
             resolvedColumns.add(column);
         }
         return new Columns(new ImmutableList(resolvedColumns));
+    }
+
+    public void dump(Writer out) throws IOException {
+        Iterator iter = iterator();
+        while (iter.hasNext()) {
+            String column = (String) iter.next();
+            out.write(column);
+            if (iter.hasNext()) {
+                out.write(", ");
+            }
+        }
     }
 
 }

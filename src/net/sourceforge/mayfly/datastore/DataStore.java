@@ -216,11 +216,11 @@ public class DataStore {
         );
     }
 
-    public DataStore addConstraint(TableReference table, Constraint key) {
+    public DataStore addConstraint(TableReference table, Constraint constraint) {
         Schema existing = schema(table.schema());
         return replace(
             table.schema(), 
-            existing.addConstraint(table.tableName(), key)
+            existing.addConstraint(table.tableName(), constraint)
         );
     }
 
@@ -228,6 +228,14 @@ public class DataStore {
         UnresolvedTableReference table, String defaultSchema) {
         Schema schema = schema(table.schema(defaultSchema));
         return schema.hasTable(table.tableName());
+    }
+
+    public DataStore addIndex(TableReference table, Index index) {
+        Schema existing = schema(table.schema());
+        return replace(
+            table.schema(), 
+            existing.addIndex(table.tableName(), index)
+        );
     }
 
 }

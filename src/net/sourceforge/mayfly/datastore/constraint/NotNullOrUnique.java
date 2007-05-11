@@ -12,15 +12,13 @@ import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.StringBuilder;
 
-import java.io.IOException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public abstract class NotNullOrUnique extends Constraint {
 
-    private final ColumnNames names;
+    protected final ColumnNames names;
 
     /**
      * Here we take {@link Columns} as opposed to {@link ColumnNames}
@@ -108,17 +106,6 @@ public abstract class NotNullOrUnique extends Constraint {
         return message.toString();
     }
     
-    protected void dumpColumnNames(Writer out) throws IOException {
-        Iterator iter = names.iterator();
-        while (iter.hasNext()) {
-            String column = (String) iter.next();
-            out.write(column);
-            if (iter.hasNext()) {
-                out.write(", ");
-            }
-        }
-    }
-
     private List collectProposedValues(Row proposedRow) {
         List proposedValues = new ArrayList();
         for (Iterator iter = names.iterator(); iter.hasNext();) {

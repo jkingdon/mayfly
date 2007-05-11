@@ -25,7 +25,7 @@ public class UniqueConstraint extends NotNullOrUnique {
     
     public void dump(Writer out) throws IOException {
         out.write("UNIQUE(");
-        dumpColumnNames(out);
+        names.dump(out);
         out.write(")");
     }
 

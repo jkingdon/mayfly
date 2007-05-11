@@ -30,7 +30,7 @@ public class PrimaryKey extends NotNullOrUnique {
     
     public void dump(Writer out) throws IOException {
         out.write("PRIMARY KEY(");
-        dumpColumnNames(out);
+        names.dump(out);
         out.write(")");
     }
 

@@ -6,21 +6,18 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.UniqueConstraint;
 
-import java.util.Collections;
-import java.util.List;
-
 public class UnresolvedUniqueConstraint extends UnresolvedConstraint {
 
     private final ColumnNames constraintColumns;
     private final String constraintName;
 
-    public UnresolvedUniqueConstraint(List columns, String constraintName) {
+    public UnresolvedUniqueConstraint(ColumnNames columns, String constraintName) {
         this.constraintName = constraintName;
-        this.constraintColumns = new ColumnNames(columns);
+        this.constraintColumns = columns;
     }
 
     public UnresolvedUniqueConstraint(String column) {
-        this(Collections.singletonList(column), null);
+        this(ColumnNames.singleton(column), null);
     }
 
     private UniqueConstraint resolve(Columns tableColumns) {

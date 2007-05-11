@@ -2,8 +2,10 @@ package net.sourceforge.mayfly.evaluation.command;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Column;
+import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.datastore.Index;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -18,6 +20,7 @@ public class CreateTable extends Command {
     private String table;
     private Columns columns;
     private List constraints = new ArrayList();
+    private List indexes = new ArrayList();
 
     public CreateTable(String table) {
         this.table = table;
@@ -35,7 +38,8 @@ public class CreateTable extends Command {
 
     public Schema update(DataStore store, String schemaName, Schema schema) {
         Constraints constraints = makeTableConstraints(store, schemaName);
-        return schema.createTable(table(), columns, constraints);
+        return schema.createTable(table(), columns, constraints,
+            new ImmutableList(indexes));
     }
 
     private Constraints makeTableConstraints(
@@ -98,6 +102,10 @@ public class CreateTable extends Command {
     
     public Columns columns() {
         return columns;
+    }
+
+    public void addIndex(String name, ColumnNames indexColumns) {
+        indexes.add(new Index(name, indexColumns));
     }
 
 }

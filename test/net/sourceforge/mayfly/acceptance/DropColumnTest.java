@@ -76,5 +76,6 @@ public class DropColumnTest extends SqlTestCase {
     // unique or primary key constraint 
     //   (multi-column) references column
     // CASCADE (means also drop foreign keys or views which reference the column)
+    // index references column
 
 }
