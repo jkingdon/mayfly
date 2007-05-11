@@ -560,6 +560,9 @@ public class SqlDumperTest extends TestCase {
         database.execute("insert into incr5() values()");
         database.execute("delete from incr5");
 
+        database.execute("create table indexed(b varchar(255), c integer)");
+        database.execute("create unique index index1 on indexed(b, c)");
+
         // Optionally load the large SQL file of your choice here
         
         checkRoundTrip(database.dataStore());
