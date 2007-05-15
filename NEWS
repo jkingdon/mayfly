@@ -2,11 +2,12 @@ Changes since 0.3:
 
 Add CREATE INDEX (with a syntax which seems compatible with most other
 databases I tried):
-    CREATE [UNIQUE] INDEX index-name ON table(column, ...)
+    CREATE [UNIQUE] INDEX index-name ON table(column[(width)], ...)
 As with the MySQL INDEX syntax
     CREATE TABLE(a INTEGER, INDEX(a))
 the index is a no-op, but in this case UNIQUE is not a no-op - it
-has the same effect as any other unique constraint.
+has the same effect as any other unique constraint.  The optional
+width is for MySQL compatibility and is also a no-op.
 
 ALTER TABLE can now control the position of the added column,
 using the same syntax as MySQL:
