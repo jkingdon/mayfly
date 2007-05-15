@@ -336,6 +336,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
+    public boolean canIndexPartOfColumn() {
+        return true;
+    }
+    
     public boolean haveAddColumnAfter() {
         return true;
     }

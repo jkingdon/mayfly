@@ -71,9 +71,15 @@ public class IndexTest extends SqlTestCase {
         }
     }
     
-    public void xtestIndexOnPartOfColumn() throws Exception {
+    public void testIndexOnPartOfColumn() throws Exception {
         execute("create table foo(a varchar(255))");
-        execute("create index my_index on foo(a(10))");
+        String sql = "create index my_index on foo(a(10))";
+        if (dialect.canIndexPartOfColumn()) {
+            execute(sql);
+        }
+        else {
+            expectExecuteFailure(sql, "expected ')' but got '('");
+        }
     }
     
 }

@@ -207,6 +207,11 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    public boolean canIndexPartOfColumn() {
+        // MySQL compatibility.
+        return true;
+    }
+    
     public boolean duplicateIndexNamesOk() {
         return !wishThisWereTrue();
     }

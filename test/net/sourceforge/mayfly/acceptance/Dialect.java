@@ -744,5 +744,9 @@ public abstract class Dialect {
     public boolean duplicateIndexNamesOk() {
         return false;
     }
+    
+    public boolean canIndexPartOfColumn() {
+        return false;
+    }
 
 }

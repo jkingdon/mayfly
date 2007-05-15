@@ -242,7 +242,7 @@ public class Parser {
         String indexName = consumeIdentifier();
         expectAndConsume(TokenType.KEYWORD_on);
         UnresolvedTableReference table = parseTableReference();
-        ColumnNames columns = parseColumnNames();
+        ColumnNames columns = parseColumnNamesForIndex();
 
         return new CreateIndex(table, indexName, columns, unique);
     }
@@ -337,6 +337,22 @@ public class Parser {
         }
     }
 
+    private ColumnNames parseColumnNamesForIndex() {
+        expectAndConsume(TokenType.OPEN_PAREN);
+
+        List columnNames = new ArrayList();
+        do {
+            columnNames.add(consumeIdentifier());
+            if (consumeIfMatches(TokenType.OPEN_PAREN)) {
+                expectAndConsume(TokenType.NUMBER);
+                expectAndConsume(TokenType.CLOSE_PAREN);
+            }
+        } while (consumeIfMatches(TokenType.COMMA));
+
+        expectAndConsume(TokenType.CLOSE_PAREN);
+        return new ColumnNames(new ImmutableList(columnNames));
+    }
+    
     private ColumnNames parseColumnNames() {
         expectAndConsume(TokenType.OPEN_PAREN);
 
