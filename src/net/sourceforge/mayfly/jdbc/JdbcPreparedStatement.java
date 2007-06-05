@@ -222,11 +222,11 @@ public class JdbcPreparedStatement implements PreparedStatement {
 
     public void setObject(int parameterIndex, Object value, int targetSqlType)
             throws SQLException {
-        throw new UnimplementedException();
+        setParameter(parameterIndex, value);
     }
 
     public void setObject(int parameterIndex, Object value) throws SQLException {
-        throw new UnimplementedException();
+        setParameter(parameterIndex, value);
     }
 
     public boolean execute() throws SQLException {

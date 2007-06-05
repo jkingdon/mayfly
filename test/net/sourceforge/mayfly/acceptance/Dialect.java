@@ -149,6 +149,10 @@ public abstract class Dialect {
     public boolean requiresAllParameters() {
         return true;
     }
+    
+    public boolean canSetObjectNull() {
+        return true;
+    }
 
     public boolean stringComparisonsAreCaseInsensitive() {
         return false;
@@ -687,6 +691,12 @@ public abstract class Dialect {
         return !expectMayflyBehavior();
     }
 
+    /**
+     * Also applies to setting a string via setObject.
+     * Also applies to an integer column.
+     * Perhaps should be combined with 
+     * {@link #canSetIntegerOnStringColumn()}.
+     */
     public boolean canSetStringOnDecimalColumn() {
         return false;
     }

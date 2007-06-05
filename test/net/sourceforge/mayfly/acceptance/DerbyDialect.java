@@ -61,6 +61,10 @@ public class DerbyDialect extends Dialect {
         return false;
     }
     
+    public boolean canSetObjectNull() {
+        return false;
+    }
+    
     public boolean canCreateSchemaAndTablesInSameStatement() {
         return false;
     }

@@ -126,7 +126,8 @@ public class StatementTest extends SqlTestCase {
     public void testSetNull() throws Exception {
         execute("create table foo (x integer)");
         
-        PreparedStatement prepared = connection.prepareStatement("insert into foo (x) values (?)");
+        PreparedStatement prepared = connection.prepareStatement(
+            "insert into foo (x) values (?)");
         prepared.setNull(1, Types.INTEGER);
         prepared.executeUpdate();
         prepared.close();
@@ -134,10 +135,94 @@ public class StatementTest extends SqlTestCase {
         assertResultSet(new String[] { " null " }, query("select x from foo"));
     }
     
+    public void testSetObjectNull() throws Exception {
+        execute("create table foo (x integer)");
+        
+        PreparedStatement prepared = connection.prepareStatement(
+            "insert into foo (x) values (?)");
+        if (dialect.canSetObjectNull()) {
+            prepared.setObject(1, null);
+            prepared.executeUpdate();
+            
+            prepared.close();
+            
+            assertResultSet(
+                new String[] { " null " }, 
+                query("select x from foo"));
+        }
+        else {
+            try {
+                prepared.setObject(1, null);
+                fail();
+            }
+            catch (SQLException expected) {
+                assertMessage("expected data type integer but got null",
+                    expected);
+            }
+        }
+    }
+    
+    public void testSetObjectNullWithType() throws Exception {
+        execute("create table foo (x integer)");
+        
+        PreparedStatement prepared = connection.prepareStatement(
+            "insert into foo (x) values (?)");
+        prepared.setObject(1, null, Types.INTEGER);
+        prepared.executeUpdate();
+        
+        prepared.close();
+        
+        assertResultSet(
+            new String[] { " null " }, 
+            query("select x from foo"));
+    }
+    
+    public void testSetObjectInteger() throws Exception {
+        execute("create table foo (x integer)");
+        
+        PreparedStatement prepared = connection.prepareStatement(
+            "insert into foo (x) values (?)");
+        
+        prepared.setObject(1, new Integer(55));
+        prepared.executeUpdate();
+
+        assertResultSet(
+            new String[] { " 55 " }, 
+            query("select x from foo"));
+    }
+    
+    public void testSetObjectMismatchedTypes() throws Exception {
+        execute("create table foo (x integer)");
+        
+        PreparedStatement prepared = connection.prepareStatement(
+            "insert into foo (x) values (?)");
+
+        if (dialect.canSetStringOnDecimalColumn()) {
+            prepared.setObject(1, "66");
+            prepared.executeUpdate();
+
+            assertResultSet(
+                new String[] { " 66 " }, 
+                query("select x from foo"));
+        }
+        else {
+            try {
+                prepared.setObject(1, "66");
+                prepared.executeUpdate();
+                fail();
+            }
+            catch (SQLException e) {
+                assertMessage(
+                    "attempt to store string '66' into integer column x", e);
+            }
+        }
+    }
+
     public void testMissingSetCall() throws Exception {
         execute("create table foo (a Integer, b integer)");
 
-        PreparedStatement prepared = connection.prepareStatement("insert into foo (a, b) values (?, ?)");
+        PreparedStatement prepared = connection.prepareStatement(
+            "insert into foo (a, b) values (?, ?)");
         prepared.setInt(2, 90);
         if (dialect.requiresAllParameters()) {
             try {
