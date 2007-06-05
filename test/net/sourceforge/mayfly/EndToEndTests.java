@@ -355,5 +355,13 @@ public class EndToEndTests extends SqlTestCase {
             "no column qqq", 
             1, 44, 1, 47);
     }
+    
+    public void testAddAutoIncrementNoRows() throws Exception {
+        execute("create table foo(a integer)");
+        execute("alter table foo modify column " +
+            "a integer auto_increment not null");
+        execute("insert into foo() values()");
+        assertResultSet(new String[] { "1" }, query("select a from foo"));
+    }
 
 }

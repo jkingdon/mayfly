@@ -141,5 +141,27 @@ public class TableDataTest extends TestCase {
         );
         assertFalse(table.canBeTargetOfForeignKey("a"));
     }
+    
+    public void testHighest() throws Exception {
+        Column a = new Column("a", DefaultValue.NOT_SPECIFIED, null, 
+            false, false, new FakeDataType(), false);
+        Row one = new TupleBuilder()
+            .append(a, new LongCell(1))
+            .asRow();
+        Row two = new TupleBuilder()
+            .append(a, new LongCell(73))
+            .asRow();
+        Row three = new TupleBuilder()
+            .append(a, new LongCell(5))
+            .asRow();
+        TableData table = new TableData(
+            Columns.singleton(a), 
+            new Constraints(), 
+            new Rows(ImmutableList.fromArray(new Row[] { one, two, three })),
+            null
+        );
+        
+        MayflyAssert.assertLong(73, table.highest("a"));
+    }
 
 }

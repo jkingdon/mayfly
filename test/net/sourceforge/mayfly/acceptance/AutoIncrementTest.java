@@ -273,6 +273,30 @@ public class AutoIncrementTest extends SqlTestCase {
         }
     }
     
+    public void testDeleteRowAndSeeIfValueIsReused() throws Exception {
+        /*
+         * For MySQL 5.1, there is a case (where the auto_increment column
+         * is part of a multiple-column index) where the auto_increment
+         * value can be reused.  But we don't try to test for that
+         * case, just the simple case.
+         */
+        String autoIncrementType = dialect.autoIncrementType();
+        if (autoIncrementType == null) {
+            return;
+        }
+        execute("create table foo(" +
+            "a " + autoIncrementType + ", " +
+            "b varchar(80))");
+        execute("insert into foo(b) values('first')");
+        execute("insert into foo(b) values('delete me')");
+        execute("delete from foo where b = 'delete me'");
+        execute("insert into foo(b) values('after delete')");
+        assertResultSet(
+            new String[] { " 1, 'first' ", " 3, 'after delete' " },
+            query("select a, b from foo")
+        );
+    }
+    
     // Not valid in MySQL because this isn't a key:
     // execute("create table foo (x integer not null auto_increment, y varchar(255))");
     // On the other hand postgres does not require a primary key or unique constraint for serial

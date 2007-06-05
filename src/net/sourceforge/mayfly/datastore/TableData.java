@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.datastore.constraint.Constraint;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.evaluation.Checker;
@@ -338,12 +339,38 @@ public class TableData {
                     " NOT NULL because it contains null values");
             }
         }
+        
+        if (!oldColumn.isAutoIncrement() && newColumn.isAutoIncrement()) {
+            if (rows.rowCount() > 0) {
+                newColumn = 
+                    newColumn.withIncrementedDefault(
+                        highest(newColumn.columnName()));
+            }
+        }
+
         return new TableData(
             columns.replace(newColumn),
             constraints,
             rows,
             indexes
         );
+    }
+
+    Cell highest(String column) {
+        Iterator iter = rows.iterator(); 
+        if (!iter.hasNext()) {
+            throw new MayflyInternalException("no rows");
+        }
+        Row firstRow = (Row) iter.next();
+        Cell best = firstRow.cell(column);
+        while (iter.hasNext()) {
+            Row row = (Row) iter.next();
+            Cell value = row.cell(column);
+            if (value.compareTo(best) > 0) {
+                best = value;
+            }
+        }
+        return best;
     }
 
     public TableData dropForeignKey(String constraintName) {

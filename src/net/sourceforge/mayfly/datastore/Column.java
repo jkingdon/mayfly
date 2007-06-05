@@ -123,10 +123,14 @@ public class Column {
             return null;
         }
 
+        checker.setIdentityValue(previousValue);
+        return withIncrementedDefault(previousValue);
+    }
+
+    public Column withIncrementedDefault(Cell previousValue) {
         DefaultValue newDefault = 
             new SpecifiedDefaultValue(
                 new LongCell(previousValue.asLong() + 1L));
-        checker.setIdentityValue(previousValue);
         return new Column(columnName, newDefault, onUpdateValue, 
             isAutoIncrement, isSequence,
             type, isNotNull);

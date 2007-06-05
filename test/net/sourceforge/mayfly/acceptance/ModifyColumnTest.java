@@ -60,6 +60,22 @@ public class ModifyColumnTest extends SqlTestCase {
             "no column a");
     }
     
+    public void testAddAutoIncrement() throws Exception {
+        if (!dialect.haveModifyColumn()) {
+            return;
+        }
+
+        execute("create table foo(x integer, y varchar(50))");
+        execute("insert into foo(x, y) values(1, 'before')");
+        execute("alter table foo modify column " +
+            "x " +
+            dialect.autoIncrementType());
+        execute("insert into foo(y) values('after')");
+        assertResultSet(
+            new String[] { "1, 'before'", "2, 'after'" }, 
+            query("select x, y from foo"));
+    }
+    
     // change in type (not yet needed!)
 
 }
