@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.datastore;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.util.ImmutableList;
-import net.sourceforge.mayfly.datastore.Columns;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -122,6 +121,27 @@ public class Row {
         }
         else {
             throw new NoColumn(columnName);
+        }
+    }
+
+    public Row renameColumn(String oldName, String newName) {
+        boolean found = false;
+        TupleBuilder newRow = new TupleBuilder();
+        for (Iterator iter = elements.iterator(); iter.hasNext();) {
+            TupleElement element = (TupleElement) iter.next();
+            if (element.matchesName(oldName)) {
+                found = true;
+                newRow.append(new TupleElement(newName, element.cell()));
+            }
+            else {
+                newRow.append(element);
+            }
+        }
+        if (found) {
+            return newRow.asRow();
+        }
+        else {
+            throw new NoColumn(oldName);
         }
     }
 

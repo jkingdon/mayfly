@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.Columns;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Index;
+import net.sourceforge.mayfly.datastore.Indexes;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TableData;
@@ -18,7 +19,6 @@ import net.sourceforge.mayfly.graph.CycleDetectedException;
 import net.sourceforge.mayfly.graph.Graph;
 import net.sourceforge.mayfly.parser.Lexer;
 import net.sourceforge.mayfly.parser.TokenType;
-import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -291,7 +291,7 @@ public class SqlDumper {
         }
     }
 
-    private void indexes(String tableName, ImmutableList indexes, Writer out) 
+    private void indexes(String tableName, Indexes indexes, Writer out) 
     throws IOException {
         Iterator iterator = indexes.iterator();
         while (iterator.hasNext()) {
@@ -307,7 +307,7 @@ public class SqlDumper {
             identifier(tableName, out);
             out.write("(");
             index.columns.dump(out);
-            out.write(")\n");
+            out.write(");\n");
         }
     }
 

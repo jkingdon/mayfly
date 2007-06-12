@@ -192,20 +192,34 @@ public class DataStore {
     }
 
     public UpdateStore dropColumn(TableReference table, String column) {
-        for (Iterator iter = schemas.values().iterator(); iter.hasNext();) {
-            Schema potentialReferencer = (Schema) iter.next();
-            potentialReferencer.checkDropColumn(table, column);
-        }
+        checkForReferencesToColumn(table, column);
 
         Schema existing = schema(table.schema());
         Schema updatedSchema = existing.dropColumn(table, column);
         return new UpdateStore(replace(table.schema(), updatedSchema), 0);
     }
 
+    private void checkForReferencesToColumn(TableReference table, String column) {
+        for (Iterator iter = schemas.values().iterator(); iter.hasNext();) {
+            Schema potentialReferencer = (Schema) iter.next();
+            potentialReferencer.checkDropColumn(table, column);
+        }
+    }
+
     public UpdateStore modifyColumn(TableReference table, Column newColumn) {
         Schema existing = schema(table.schema());
         Schema updatedSchema = existing.modifyColumn(table.tableName(), newColumn);
         return new UpdateStore(replace(table.schema(), updatedSchema), 0);
+    }
+
+    public DataStore renameColumn(TableReference table, 
+        String oldName, String newName) {
+        checkForReferencesToColumn(table, oldName);
+
+        Schema existing = schema(table.schema());
+        Schema updatedSchema = existing.renameColumn(
+            table.tableName(), oldName, newName);
+        return replace(table.schema(), updatedSchema);
     }
 
     public DataStore dropForeignKey(TableReference table, String constraintName) {

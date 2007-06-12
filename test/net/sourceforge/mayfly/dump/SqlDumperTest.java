@@ -234,8 +234,10 @@ public class SqlDumperTest extends TestCase {
         assertEquals(
             "CREATE TABLE foo(\n  a INTEGER,\n  b INTEGER,\n  c INTEGER,\n" +
                 "  UNIQUE(b, c)\n);\n" +
-                "CREATE INDEX x ON foo(b, c)\n\n",
+                "CREATE INDEX x ON foo(b, c);\n\n",
             dump());
+        
+        checkRoundTrip(database.dataStore());
     }
     
     public void testConstraintNames() throws Exception {
@@ -305,16 +307,35 @@ public class SqlDumperTest extends TestCase {
         database.execute("create index i on foo(a)");
         assertEquals(
             "CREATE TABLE foo(\n  a INTEGER\n);\n" +
-            "CREATE INDEX i ON foo(a)\n\n",
+            "CREATE INDEX i ON foo(a);\n\n",
             dump()
         );
+        checkRoundTrip(database.dataStore());
+    }
+    
+    public void testTwoIndexes() throws Exception {
+        database.execute("create table foo(a integer, b integer)");
+        database.execute("create index a_index on foo(a)");
+        database.execute("create index b_index on foo(b)");
+        database.execute("insert into foo(a, b) values(5, 7)");
+        assertEquals(
+            "CREATE TABLE foo(\n" +
+            "  a INTEGER,\n" +
+            "  b INTEGER\n" +
+            ");\n" +
+            "CREATE INDEX a_index ON foo(a);\n" +
+            "CREATE INDEX b_index ON foo(b);\n\n" +
+            "INSERT INTO foo(a, b) VALUES(5, 7);\n\n",
+            dump()
+        );
+        checkRoundTrip(database.dataStore());
     }
     
     public void testMysqlSyntaxIndex() throws Exception {
         database.execute("create table foo(a integer, index(a))");
         assertEquals(
             "CREATE TABLE foo(\n  a INTEGER\n);\n" +
-            "CREATE INDEX an_index ON foo(a)\n\n",
+            "CREATE INDEX an_index ON foo(a);\n\n",
             dump()
         );
     }
@@ -786,19 +807,19 @@ public class SqlDumperTest extends TestCase {
     public void testRowOrder() throws Exception {
         assertCompareEqual(
             "create table aa(a integer);" +
-            "insert into aa(a) values(7)" +
-            "insert into aa(a) values(4)" +
-            "insert into aa(a) values(5)" +
-            "insert into aa(a) values(2)" +
-            "insert into aa(a) values(3)" +
-            "insert into aa(a) values(1)",
+            "insert into aa(a) values(7);" +
+            "insert into aa(a) values(4);" +
+            "insert into aa(a) values(5);" +
+            "insert into aa(a) values(2);" +
+            "insert into aa(a) values(3);" +
+            "insert into aa(a) values(1);",
             "create table aa(a integer);" +
-            "insert into aa(a) values(5)" +
-            "insert into aa(a) values(1)" +
-            "insert into aa(a) values(3)" +
-            "insert into aa(a) values(7)" +
-            "insert into aa(a) values(4)" +
-            "insert into aa(a) values(2)"
+            "insert into aa(a) values(5);" +
+            "insert into aa(a) values(1);" +
+            "insert into aa(a) values(3);" +
+            "insert into aa(a) values(7);" +
+            "insert into aa(a) values(4);" +
+            "insert into aa(a) values(2);"
         );
     }
     

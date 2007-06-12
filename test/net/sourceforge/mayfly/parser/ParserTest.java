@@ -710,6 +710,30 @@ public class ParserTest extends TestCase {
         assertEquals(1, commands.size());
     }
     
+    public void testMultipleCommandsEmpty() throws Exception {
+        List commands = 
+            new Parser("").parseCommands();
+        assertEquals(0, commands.size());
+    }
+    
+    public void testMultipleCommandsOnlySemicolons() throws Exception {
+        List commands = 
+            new Parser(";;;;").parseCommands();
+        assertEquals(0, commands.size());
+    }
+    
+    public void testMissingSemicolon() throws Exception {
+        try {
+            new Parser(
+                "select x from foo select x from bar").parseCommands();
+            fail();
+        }
+        catch (ParserException e) {
+            assertEquals("expected end of command but got SELECT", 
+                e.getMessage());
+        }
+    }
+    
     public void testDataType() throws Exception {
         try {
             new Parser("  foobar").parseDataType();

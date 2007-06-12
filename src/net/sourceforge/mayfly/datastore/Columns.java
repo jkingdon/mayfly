@@ -100,11 +100,15 @@ public class Columns {
     }
 
     public Columns replace(Column replacement) {
+        return replace(replacement.columnName(), replacement);
+    }
+
+    public Columns replace(String existingName, Column replacement) {
         boolean found = false;
         List result = new ArrayList();
         for (Iterator iter = iterator(); iter.hasNext(); ) {
             Column column = (Column) iter.next();
-            if (column.matches(replacement.columnName())) {
+            if (column.matches(existingName)) {
                 result.add(replacement);
                 found = true;
             }
@@ -113,7 +117,7 @@ public class Columns {
             }
         }
         if (!found) {
-            throw new NoColumn(replacement.columnName());
+            throw new NoColumn(existingName);
         }
         return new Columns(new ImmutableList(result));
     }

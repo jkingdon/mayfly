@@ -119,6 +119,17 @@ public class Constraints {
         }
     }
 
+    public Constraints renameColumn(String oldName, String newName) {
+        List newConstraints = new ArrayList();
+        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
+            Constraint constraint = (Constraint) iter.next();
+            Constraint newConstraint = 
+                constraint.renameColumn(oldName, newName);
+            newConstraints.add(newConstraint);
+        }
+        return new Constraints(new ImmutableList(newConstraints));
+    }
+
     public Constraints dropForeignKey(String constraintName) {
         return new Constraints(
             constraintsWithout(constraintName, ForeignKey.class));

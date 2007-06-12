@@ -47,6 +47,10 @@ public class ColumnNames {
     public Iterator iterator() {
         return names.iterator();
     }
+    
+    public String name(int index) {
+        return (String) names.get(index);
+    }
 
     public boolean hasColumn(String target) {
         for (int i = 0; i < names.size(); ++i) {
@@ -77,6 +81,20 @@ public class ColumnNames {
                 out.write(", ");
             }
         }
+    }
+
+    public ColumnNames renameColumn(String oldName, String newName) {
+        List result = new ArrayList();
+        for (Iterator iter = iterator(); iter.hasNext();) {
+            String columnName = (String) iter.next();
+            if (columnName.equalsIgnoreCase(oldName)) {
+                result.add(newName);
+            }
+            else {
+                result.add(columnName);
+            }
+        }
+        return new ColumnNames(new ImmutableList(result));
     }
 
 }

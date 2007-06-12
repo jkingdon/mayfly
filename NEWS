@@ -1,5 +1,9 @@
 Changes since 0.3:
 
+Add MySQL syntax for CHANGE COLUMN (which is like MODIFY COLUMN but
+also allows renaming the column):
+  ALTER TABLE table CHANGE COLUMN old-name column-definition
+
 Add CREATE INDEX (with a syntax which seems compatible with most other
 databases I tried):
     CREATE [UNIQUE] INDEX index-name ON table(column[(width)], ...)

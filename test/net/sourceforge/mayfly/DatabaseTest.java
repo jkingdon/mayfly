@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.acceptance.SqlTestCase;
 import net.sourceforge.mayfly.datastore.DataStore;
+import net.sourceforge.mayfly.dump.SqlDumper;
 
 import java.io.Reader;
 import java.io.StringReader;
@@ -152,4 +153,63 @@ public class DatabaseTest extends TestCase {
         }
     }
     
+    public void testRenameColumn() throws Exception {
+        Database database = new Database();
+        database.execute(
+            "create table foo(a integer, b integer, c integer, " +
+            "primary key(a, b))");
+        database.execute("create index an_index on foo(c)");
+        database.execute("alter table foo change column a aa integer");
+        database.execute("alter table foo change column c cc integer");
+
+        String dump = new SqlDumper().dump(database.dataStore());
+        assertEquals("CREATE TABLE foo(\n" +
+            "  aa INTEGER,\n" +
+            "  b INTEGER,\n" +
+            "  cc INTEGER,\n" +
+            "  PRIMARY KEY(aa, b)\n" +
+            ");\n" +
+            "CREATE INDEX an_index ON foo(cc);\n\n",
+            dump);
+    }
+
+    public void testRenameForeignKeyTarget() throws Exception {
+        Database database = new Database();
+        database.execute("create table foo(id integer primary key)");
+        database.execute("create table bar(foo_id integer," +
+            "foreign key(foo_id) references foo(id))");
+        String rename = 
+            "alter table foo change column id identifier integer";
+        if (false) {
+            database.execute(rename);
+    
+            String dump = new SqlDumper().dump(database.dataStore());
+            assertEquals("CREATE TABLE foo(\n" +
+                "  identifier INTEGER,\n" +
+                "  PRIMARY KEY(identifier)\n" +
+                ");\n\n" +
+                "CREATE TABLE bar(\n" +
+                "  foo_id INTEGER,\n" +
+                "  FOREIGN KEY(foo_id) REFERENCES foo(identifier)\n" +
+                ");\n\n",
+                dump);
+        }
+        else {
+            /* We wish we were able to just rename the identifier
+               in the foreign key.  But at a minimum, throw an
+               exception rather than leave the foreign key dangling
+               and pointing at a nonexistent column. */
+            try {
+                database.execute(rename);
+                fail();
+            }
+            catch (MayflyException e) {
+                assertEquals(
+                    "the column id is referenced by " +
+                    "a foreign key in table bar, column foo_id", 
+                    e.getMessage());
+            }
+        }
+    }
+
 }

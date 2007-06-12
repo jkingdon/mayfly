@@ -57,4 +57,13 @@ public class Rows {
         return result;
     }
 
+    public Rows renameColumn(String oldName, String newName) {
+        Rows result = new Rows();
+        for (Iterator iter = rows.iterator(); iter.hasNext();) {
+            Row row = (Row) iter.next();
+            result = result.with(row.renameColumn(oldName, newName));
+        }
+        return result;
+    }
+
 }

@@ -73,6 +73,12 @@ public class Schema {
             tables.with(tableName, oldTable.modifyColumn(newColumn)));
     }
 
+    public Schema renameColumn(String table, String oldName, String newName) {
+        TableData oldTable = table(table);
+        return new Schema(
+            tables.with(table, oldTable.renameColumn(oldName, newName)));
+    }
+
     private void assertNoTable(String table) {
         String existingTable = lookUpTableOrNull(table);
         if (existingTable != null) {

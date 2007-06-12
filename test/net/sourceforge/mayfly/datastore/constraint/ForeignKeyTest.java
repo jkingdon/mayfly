@@ -84,5 +84,15 @@ public class ForeignKeyTest extends TestCase {
         assertFalse(key.canBeTargetOfForeignKey("id"));
         assertFalse(key.canBeTargetOfForeignKey("x"));
     }
+    
+    public void testRename() throws Exception {
+        ForeignKey key = new ForeignKey(
+            "bar", "fu_id", "foo", "id");
+        ForeignKey result = (ForeignKey) key.renameColumn("fu_id", "foo_id");
+        assertEquals("bar", result.referencerTable);
+        assertEquals("foo_id", result.referencerColumn);
+        assertEquals("foo", result.targetTable.tableName());
+        assertEquals("id", result.targetColumn);
+    }
 
 }

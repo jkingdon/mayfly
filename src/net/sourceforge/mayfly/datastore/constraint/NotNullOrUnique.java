@@ -26,8 +26,12 @@ public abstract class NotNullOrUnique extends Constraint {
      * been verified to exist in the store.
      */
     protected NotNullOrUnique(Columns columns, String constraintName) {
+        this(ColumnNames.fromColumns(columns), constraintName);
+    }
+    
+    protected NotNullOrUnique(ColumnNames columns, String constraintName) {
         super(constraintName);
-        this.names = ColumnNames.fromColumns(columns);
+        this.names = columns;
         if (names.size() == 0) {
             throw new MayflyInternalException("must have at least one column for a constraint");
         }
@@ -132,7 +136,7 @@ public abstract class NotNullOrUnique extends Constraint {
         }
         return true;
     }
-
+    
     public boolean canBeTargetOfForeignKey(String targetColumn) {
         return names.size() == 1 && names.hasColumn(targetColumn);
     }

@@ -18,4 +18,8 @@ public class Index {
         return name;
     }
 
+    public Index renameColumn(String oldName, String newName) {
+        return new Index(name, columns.renameColumn(oldName, newName));
+    }
+
 }

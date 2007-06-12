@@ -51,8 +51,7 @@ public class RowTest extends TestCase {
         Row newRow = row.dropColumn("B");
         
         assertEquals(1, newRow.columnCount());
-        LongCell cell = (LongCell) newRow.cell("A");
-        assertEquals(7, cell.asLong());
+        MayflyAssert.assertLong(7, newRow.cell("A"));
     }
     
     public void testDropColumnNonexistent() throws Exception {
@@ -66,6 +65,33 @@ public class RowTest extends TestCase {
         }
         catch (MayflyException e) {
             assertEquals("no column B", e.getMessage());
+        }
+    }
+    
+    public void testRenameColumn() throws Exception {
+        Row row = new TupleBuilder()
+            .appendColumnCellContents("a", 5)
+            .appendColumnCellContents("c", 7)
+            .asRow();
+        
+        Row newRow = row.renameColumn("C", "b");
+        
+        assertEquals(2, newRow.columnCount());
+        MayflyAssert.assertLong(5, newRow.cell("A"));
+        MayflyAssert.assertLong(7, newRow.cell("B"));
+    }
+    
+    public void testRenameColumnNonexistent() throws Exception {
+        Row row = new TupleBuilder()
+            .appendColumnCellContents("a", 7)
+            .asRow();
+        
+        try {
+            row.renameColumn("AA", "b");
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("no column AA", e.getMessage());
         }
     }
     

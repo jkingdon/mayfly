@@ -1,11 +1,5 @@
 package net.sourceforge.mayfly.datastore.constraint;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.Row;
@@ -13,6 +7,12 @@ import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 
 public abstract class Constraint {
 
@@ -99,5 +99,7 @@ public abstract class Constraint {
     public boolean mustInsertBefore(Row first, Row second) {
         return false;
     }
+
+    abstract public Constraint renameColumn(String oldName, String newName);
 
 }

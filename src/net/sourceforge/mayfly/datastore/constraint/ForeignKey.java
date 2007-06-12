@@ -31,11 +31,11 @@ public class ForeignKey extends Constraint {
         FOREIGN_KEY_CAN_POINT_TO_FOREIGN_KEY = true;
 
     private final String referencerSchema;
-    private final String referencerTable;
-    private final String referencerColumn;
+    final String referencerTable;
+    final String referencerColumn;
 
-    private final TableReference targetTable;
-    private final String targetColumn;
+    final TableReference targetTable;
+    final String targetColumn;
 
     private final Action onDelete;
     private final Action onUpdate;
@@ -230,6 +230,18 @@ public class ForeignKey extends Constraint {
                 referencerTable +
                 ", column " + referencerColumn
                 );
+        }
+    }
+    
+    public Constraint renameColumn(String oldName, String newName) {
+        if (oldName.equalsIgnoreCase(referencerColumn)) {
+            return new ForeignKey(
+                referencerSchema, referencerTable, newName, 
+                targetTable, targetColumn, 
+                onDelete, onUpdate, constraintName);
+        }
+        else {
+            return this;
         }
     }
 

@@ -20,11 +20,10 @@ public class Column {
     private final boolean isSequence;
     public final DataType type;
     
-    /** We'll probably want not-null contraints to be implemented
-     * via a subclass of
+    /** If not-null contraints are managed (e.g. in ALTER TABLE)
+     * along with the column, rather than via named constraints,
+     * it is more natural to define them here than in a subclass of
      * {@link net.sourceforge.mayfly.datastore.constraint.Constraint}
-     * once we implement named constraints.  But we can
-     * worry about that then.
      */
     public final boolean isNotNull;
 
@@ -134,6 +133,11 @@ public class Column {
         return new Column(columnName, newDefault, onUpdateValue, 
             isAutoIncrement, isSequence,
             type, isNotNull);
+    }
+    
+    public Column withName(String name) {
+        return new Column(name, defaultValue, onUpdateValue, 
+            isAutoIncrement, isSequence, type, isNotNull);
     }
 
     /**

@@ -32,6 +32,7 @@ import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.command.AddColumn;
 import net.sourceforge.mayfly.evaluation.command.AddConstraint;
+import net.sourceforge.mayfly.evaluation.command.ChangeColumn;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.CreateIndex;
 import net.sourceforge.mayfly.evaluation.command.CreateSchema;
@@ -178,6 +179,10 @@ public class Parser {
             }
             else {
                 commands.add(parseCommand());
+                if (currentTokenType() != TokenType.END_OF_FILE
+                    && currentTokenType() != TokenType.SEMICOLON) {
+                    throw new ParserException("end of command", currentToken());
+                }
             }
         }
     }
@@ -534,6 +539,12 @@ public class Parser {
             expectAndConsume(TokenType.KEYWORD_column);
             Column newColumn = parseColumnDisallowingMostConstraints(table);
             return new ModifyColumn(table, newColumn);
+        }
+        else if (consumeNonReservedWordIfMatches("change")) {
+            expectAndConsume(TokenType.KEYWORD_column);
+            String oldName = consumeIdentifier();
+            Column newColumn = parseColumnDisallowingMostConstraints(table);
+            return new ChangeColumn(table, oldName, newColumn);
         }
         else {
             throw new ParserException("alter table action", currentToken());

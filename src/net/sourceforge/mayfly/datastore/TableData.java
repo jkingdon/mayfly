@@ -24,15 +24,15 @@ public class TableData {
     private final Columns columns;
     private final Rows rows;
     public final Constraints constraints;
-    public final ImmutableList /* <Index> */ indexes;
+    public final Indexes indexes;
 
     public TableData(Columns columns, Constraints constraints,
         ImmutableList indexes) {
-        this(columns, constraints, new Rows(), indexes);
+        this(columns, constraints, new Rows(), new Indexes(indexes));
     }
     
     TableData(Columns columns, Constraints constraints, Rows rows,
-        ImmutableList indexes) {
+        Indexes indexes) {
         this.constraints = constraints;
         if (constraints == null) {
             throw new NullPointerException("constraints is required");
@@ -353,6 +353,17 @@ public class TableData {
             constraints,
             rows,
             indexes
+        );
+    }
+
+    public TableData renameColumn(String oldName, String newName) {
+        Column oldColumn = columns.columnFromName(oldName);
+        Column newColumn = oldColumn.withName(newName);
+        return new TableData(
+            columns.replace(oldName, newColumn),
+            constraints.renameColumn(oldName, newName),
+            rows.renameColumn(oldName, newName),
+            indexes.renameColumn(oldName, newName)
         );
     }
 

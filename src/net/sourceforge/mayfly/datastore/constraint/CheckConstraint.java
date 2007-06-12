@@ -40,6 +40,10 @@ public class CheckConstraint extends Constraint {
     public boolean checkDropColumn(TableReference table, String column) {
         throw new UnimplementedException();
     }
+    
+    public Constraint renameColumn(String oldName, String newName) {
+        throw new UnimplementedException();
+    }
 
     public void checkExistingRows(DataStore store, TableReference table) {
         throw new UnimplementedException();
