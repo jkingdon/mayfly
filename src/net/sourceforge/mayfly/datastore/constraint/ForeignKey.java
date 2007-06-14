@@ -211,12 +211,7 @@ public class ForeignKey extends Constraint {
     public boolean checkDropReferencerColumn(TableReference table, String column) {
         checkWeAreInTheRightPlace(table.schema(), table.tableName());
         if (column.equalsIgnoreCase(referencerColumn)) {
-            // I think we just need to return false to make this
-            // work.  Need to write that test.
-            throw new MayflyException(
-                "mayfly does not currently allow dropping a " +
-                "column with a foreign key (table " +
-                referencerTable + ", column " + referencerColumn + ")");
+            return false;
         }
         return true;
     }

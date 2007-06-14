@@ -179,10 +179,9 @@ public class EndToEndTests extends SqlTestCase {
     
     /*
       It might be interesting to see what other databases do.
-      But for now I'm just wanting to make sure that Mayfly's
-      data structures don't end up in an inconsistent state.
+      But for now we just worry about ourselves.
     */
-    public void testForeignKey() throws Exception {
+    public void testDropColumnWithForeignKey() throws Exception {
         execute("create table currency(" +
             "id integer primary key, name varchar(255))");
         execute("create table balance(" +
@@ -190,15 +189,40 @@ public class EndToEndTests extends SqlTestCase {
             "currency integer, " +
             "foreign key(currency) references currency(id)" +
             ")");
-        expectExecuteFailure("alter table currency drop column id", 
+        String dropId = "alter table currency drop column id";
+        expectExecuteFailure(dropId, 
             "the column id is referenced by a foreign key in table balance, column currency");
-        expectExecuteFailure("alter table balance drop column currency", 
-            "mayfly does not currently allow dropping a column with a foreign key " +
-            "(table balance, column currency)");
-        execute("alter table currency drop column name");
-        execute("alter table balance drop column amount");
+        execute("alter table balance drop column currency");
+        execute(dropId);
+        ((MayflyDialect)dialect).checkDump(
+            "CREATE TABLE balance(\n" +
+            "  amount DECIMAL(10,3)\n" +
+            ");\n\n" +
+            "CREATE TABLE currency(\n" +
+            "  name VARCHAR(255)\n" +
+            ");\n\n");
     }
-    
+
+    public void testDropColumnFromTableWithForeignKey() throws Exception {
+        execute("create table currency(" +
+            "id integer primary key)");
+        execute("create table balance(" +
+            "amount decimal(10,3), " +
+            "currency integer, " +
+            "foreign key(currency) references currency(id)" +
+            ")");
+        execute("alter table balance drop column amount");
+        ((MayflyDialect)dialect).checkDump(
+            "CREATE TABLE currency(\n" +
+            "  id INTEGER,\n" +
+            "  PRIMARY KEY(id)\n" +
+            ");\n\n" +
+            "CREATE TABLE balance(\n" +
+            "  currency INTEGER,\n" +
+            "  FOREIGN KEY(currency) REFERENCES currency(id)\n" +
+            ");\n\n");
+    }
+
     public void testTransactionLevel() throws Exception {
         // TODO: What does "NONE" mean?  Check JDBC documentation.
         assertEquals(

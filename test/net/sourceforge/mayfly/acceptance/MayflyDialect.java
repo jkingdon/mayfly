@@ -5,6 +5,7 @@ import junit.framework.AssertionFailedError;
 
 import net.sourceforge.mayfly.Database;
 import net.sourceforge.mayfly.MayflySqlException;
+import net.sourceforge.mayfly.dump.SqlDumper;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -24,6 +25,11 @@ public class MayflyDialect extends Dialect {
 
     public void assertTableCount(int expected) {
         Assert.assertEquals(expected, database.tables().size());
+    }
+    
+    public void checkDump(String expected) {
+        String dump = new SqlDumper().dump(database.dataStore());
+        Assert.assertEquals(expected, dump);
     }
     
     public void shutdown(Connection connection) {
