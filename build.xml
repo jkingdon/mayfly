@@ -22,7 +22,8 @@
 
     <target name="compile">
         <mkdir dir="build/classes"/>
-        <javac srcdir="src" destdir="build/classes" debug="on" target="1.4">
+        <javac srcdir="src" destdir="build/classes" debug="on" 
+        	target="1.4" source="1.4" deprecation="on">
             <classpath refid="classpath"/>
         </javac>
     </target>
@@ -54,7 +55,8 @@
 
     <target name="compile-tests" depends="compile">
         <mkdir dir="build/test-classes"/>
-        <javac srcdir="test" destdir="build/test-classes">
+        <javac srcdir="test" destdir="build/test-classes"
+        	deprecation="on">
             <classpath refid="test.classpath"/>
         </javac>
     </target>

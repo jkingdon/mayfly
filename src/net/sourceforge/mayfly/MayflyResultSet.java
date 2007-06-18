@@ -177,10 +177,16 @@ public final class MayflyResultSet extends ResultSetStub {
     private static final String SUGGEST_GET_CHARACTER_STREAM = 
         "We suggest getCharacterStream instead";
 
+    /**
+     * @deprecated
+     */
     public InputStream getUnicodeStream(int columnIndex) throws SQLException {
         throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
     }
     
+    /**
+     * @deprecated
+     */
     public InputStream getUnicodeStream(String columnName) throws SQLException {
         throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
     }

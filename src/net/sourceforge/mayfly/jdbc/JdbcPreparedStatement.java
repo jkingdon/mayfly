@@ -190,6 +190,9 @@ public class JdbcPreparedStatement implements PreparedStatement {
         throw new UnimplementedException("We recommend setCharacterStream instead");
     }
 
+    /**
+     * @deprecated
+     */
     public void setUnicodeStream(int parameterIndex, InputStream value, int length)
             throws SQLException {
         throw new UnimplementedException("We recommend setCharacterStream instead");

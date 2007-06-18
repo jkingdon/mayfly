@@ -64,6 +64,9 @@ class ResultSetStub implements ResultSet {
         throw new UnimplementedException();
     }
 
+    /**
+     * @deprecated
+     */
     public BigDecimal getBigDecimal(int columnIndex, int scale)
             throws SQLException {
         throw new UnimplementedException();
@@ -89,6 +92,9 @@ class ResultSetStub implements ResultSet {
         throw new UnimplementedException();
     }
 
+    /**
+     * @deprecated
+     */
     public InputStream getUnicodeStream(int columnIndex)
             throws SQLException {
         throw new UnimplementedException();
@@ -130,6 +136,9 @@ class ResultSetStub implements ResultSet {
         throw new UnimplementedException();
     }
 
+    /**
+     * @deprecated
+     */
     public BigDecimal getBigDecimal(String columnName, int scale)
             throws SQLException {
         throw new UnimplementedException();
@@ -156,6 +165,9 @@ class ResultSetStub implements ResultSet {
         throw new UnimplementedException();
     }
 
+    /**
+     * @deprecated
+     */
     public InputStream getUnicodeStream(String columnName)
             throws SQLException {
         throw new UnimplementedException();
