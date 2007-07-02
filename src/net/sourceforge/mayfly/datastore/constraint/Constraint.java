@@ -72,6 +72,11 @@ public abstract class Constraint {
      */
     abstract public boolean checkDropColumn(TableReference table, String column);
 
+    public boolean refersTo(String column) {
+        // only does something for foreign keys, currently.
+        return false;
+    }
+
     public void checkDropTargetColumn(TableReference table, String column) {
         // only does something for foreign key.
     }

@@ -210,10 +210,14 @@ public class ForeignKey extends Constraint {
      */
     public boolean checkDropReferencerColumn(TableReference table, String column) {
         checkWeAreInTheRightPlace(table.schema(), table.tableName());
-        if (column.equalsIgnoreCase(referencerColumn)) {
+        if (refersTo(column)) {
             return false;
         }
         return true;
+    }
+
+    public boolean refersTo(String column) {
+        return column.equalsIgnoreCase(referencerColumn);
     }
 
     public void checkDropTargetColumn(TableReference table, String column) {

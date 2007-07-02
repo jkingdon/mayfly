@@ -123,6 +123,12 @@ public class Constraints {
         List newConstraints = new ArrayList();
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
+            
+            if (constraint.refersTo(oldName)) {
+                throw new MayflyException("cannot rename column " + oldName + 
+                    " because a constraint refers to it");
+            }
+
             Constraint newConstraint = 
                 constraint.renameColumn(oldName, newName);
             newConstraints.add(newConstraint);
