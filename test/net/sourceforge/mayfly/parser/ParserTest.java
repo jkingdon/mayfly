@@ -406,6 +406,26 @@ public class ParserTest extends TestCase {
         assertEquals(74, expression.location.endColumn);
     }
     
+    public void testParameterOutsidePreparedStatement() throws Exception {
+        Parser realParse = new Parser("limit ? offset ?");
+        try {
+            realParse.parseLimit();
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals(
+                "Attempt to specify '?' outside a prepared statement", 
+                e.getMessage());
+        }
+    }
+    
+    public void testParameterInPreparedStatement() throws Exception {
+        Parser syntaxCheck = new Parser(
+            new Lexer("limit ? offset ?").tokens(),
+            true);
+        syntaxCheck.parseLimit();
+    }
+    
     private void checkExpression(Class expectedClass, 
         int expectedStartColumn, int expectedEndColumn, String input) {
 

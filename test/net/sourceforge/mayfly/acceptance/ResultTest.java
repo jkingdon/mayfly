@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -329,6 +330,27 @@ public class ResultTest extends SqlTestCase {
         assertResultList(new String[] {"1"}, query(sql));
         assertResultList(new String[] {"1", "2"}, query("select a from foo order by a limit 2"));
         assertResultList(new String[] {"1", "2"}, query("select a from foo order by a limit 3"));
+    }
+    
+    public void testLimitOffsetAndParameters() throws Exception {
+        if (!dialect.haveLimit()) {
+            return;
+        }
+        
+        execute("create table foo(x integer)");
+        execute("insert into foo(x) values(5)");
+        execute("insert into foo(x) values(7)");
+        execute("insert into foo(x) values(9)");
+        execute("insert into foo(x) values(4)");
+        
+        PreparedStatement query =
+            connection.prepareStatement(
+                "select x from foo order by x limit ? offset ?");
+        query.setInt(1, 2);
+        query.setInt(2, 1);
+        assertResultSet(
+            new String[] { " 5 ", " 7 " },
+            query.executeQuery());
     }
     
 

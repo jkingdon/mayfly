@@ -1215,14 +1215,9 @@ public class Parser {
         else if (currentTokenType() == TokenType.QUOTED_STRING) {
             return parseQuotedString();
         }
-        else if (consumeIfMatches(TokenType.PARAMETER)) {
-            if (allowParameters) {
-                // We are just doing a syntax check.
-                return new NonBooleanParserExpression(new IntegerLiteral(0));
-            }
-            else {
-                throw new MayflyException("Attempt to specify '?' outside a prepared statement");
-            }
+        else if (currentTokenType() == TokenType.PARAMETER) {
+            return new NonBooleanParserExpression(
+                new IntegerLiteral(parameterDummy()));
         }
         else if (consumeIfMatches(TokenType.KEYWORD_null)) {
             throw new FoundNullLiteral(start);
@@ -1287,6 +1282,21 @@ public class Parser {
             /* Do we use the word expression for both boolean and
                non-boolean? */
             throw new ParserException("expression", currentToken());
+        }
+    }
+
+    private int parameterDummy() {
+        if (allowParameters) {
+            expectAndConsume(TokenType.PARAMETER);
+
+            /* We are just checking the syntax, so this value won't
+               be used anywhere */
+            return 0;
+        }
+        else {
+            throw new MayflyException(
+                "Attempt to specify '?' outside a prepared statement",
+                currentToken().location);
         }
     }
 
@@ -1633,13 +1643,13 @@ public class Parser {
         }
     }
 
-    private Limit parseLimit() {
+    Limit parseLimit() {
         if (currentTokenType() == TokenType.KEYWORD_limit) {
             expectAndConsume(TokenType.KEYWORD_limit);
-            int count = consumeInteger();
+            int count = consumeIntegerOrParameter();
             
             if (consumeNonReservedWordIfMatches("offset")) {
-                int offset = consumeInteger();
+                int offset = consumeIntegerOrParameter();
                 return new Limit(count, offset);
             }
             
@@ -1647,6 +1657,18 @@ public class Parser {
         }
         else {
             return Limit.NONE;
+        }
+    }
+
+    private int consumeIntegerOrParameter() {
+        if (currentTokenType() == TokenType.NUMBER) {
+            return consumeInteger();
+        }
+        else if (currentTokenType() == TokenType.PARAMETER) {
+            return parameterDummy();
+        }
+        else {
+            throw new ParserException("number", currentToken());
         }
     }
 
