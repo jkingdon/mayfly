@@ -23,7 +23,7 @@
     <target name="compile">
         <mkdir dir="build/classes"/>
         <javac srcdir="src" destdir="build/classes" debug="on" 
-        	target="1.4" source="1.4" deprecation="on">
+            target="1.4" source="1.4" deprecation="on">
             <classpath refid="classpath"/>
         </javac>
     </target>
@@ -32,7 +32,7 @@
         we generate the actual documentation with doxygen.  javadoc/gjdoc provide very little help
         for things like @internal, so going with doxygen seems nicer than writing
         a bunch of custom doclets. -->
-	<!-- TODO: Somehow get ${version} into the generated documentation -->
+    <!-- TODO: Somehow get ${version} into the generated documentation -->
     <target name="doc" description="regenerate documentation from source">
         <mkdir dir="build/doc"/>
         <exec executable="doxygen">
@@ -56,19 +56,12 @@
     <target name="compile-tests" depends="compile">
         <mkdir dir="build/test-classes"/>
         <javac srcdir="test" destdir="build/test-classes"
-        	deprecation="on">
+            deprecation="on">
             <classpath refid="test.classpath"/>
         </javac>
     </target>
 
     <target name="test" depends="compile-tests" description="run unit tests">
-        <!-- Don't see an easy way to find the tests in this case
-        <java classname="junit.textui.TestRunner"
-            classpathref="runtest.classpath"
-            fork="yes" failonerror="yes">
-            <arg value="net.sourceforge.mayfly.SqlTest"/>
-        </java>
-        -->
         <junit fork="yes" haltonfailure="true" haltonerror="true">
             <classpath refid="runtest.classpath"/>
             <formatter usefile="false" type="brief"/>
@@ -81,21 +74,37 @@
 
     </target>
 
+    <!-- Profile our tests with JIP ( http://jiprof.sourceforge.net/ ). -->
+    <target name="profile-test" depends="compile-tests" 
+        description="Profile tests">
+        <junit fork="yes" haltonfailure="true" haltonerror="true">
+            <classpath refid="runtest.classpath"/>
+            <jvmarg value="-javaagent:test/lib/jiprof-1.0.7.jar"/> 
+            <jvmarg value="-Dprofile.properties=profile.properties"/>
+            <formatter usefile="false" type="brief"/>
+            <batchtest>
+                <fileset dir="test">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
     <target name="jar" depends="compile,test"
-    	description="Build the Mayfly jar">
-    	<!-- TODO: Should put ${version} into the META-INF/MANIFEST.MF file
-    	     like Hibernate does. -->
+        description="Build the Mayfly jar">
+        <!-- TODO: Should put ${version} into the META-INF/MANIFEST.MF file
+             like Hibernate does. -->
         <jar jarfile="build/mayfly-${version}.jar">
             <fileset dir="build/classes"/>
         </jar>
     </target>
 
     <target name="dist" depends="clean,jar,doc" 
-    	description="Build .zip file for distribution">
+        description="Build .zip file for distribution">
         <zip destfile="build/mayfly-${version}-src-ide.zip">
             <fileset dir="src">
-            	<include name="net/**" />
-        	</fileset>
+                <include name="net/**" />
+            </fileset>
         </zip>
         <zip destfile="build/mayfly-${version}.zip">
             <fileset dir="build">
