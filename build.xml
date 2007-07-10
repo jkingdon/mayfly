@@ -74,7 +74,7 @@
 
     </target>
 
-    <!-- Profile our tests with JIP ( http://jiprof.sourceforge.net/ ). -->
+    <!-- Profile a test with JIP ( http://jiprof.sourceforge.net/ ). -->
     <target name="profile-test" depends="compile-tests" 
         description="Profile tests">
         <junit fork="yes" haltonfailure="true" haltonerror="true">
@@ -84,7 +84,7 @@
             <formatter usefile="false" type="brief"/>
             <batchtest>
                 <fileset dir="test">
-                    <include name="**/*Test.java"/>
+                    <include name="**/PerformanceTest.java"/>
                 </fileset>
             </batchtest>
         </junit>

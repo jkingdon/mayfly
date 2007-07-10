@@ -125,7 +125,22 @@ import java.util.List;
  */
 public class Parser {
 
+    private static final ResultRow PSEUDO_ROW_FOR_VALUE_CONSTRUCTOR = 
+        new ResultRow() {
+            public SingleColumn findColumn(
+                String tableOrAlias, String columnName,
+                Location location) {
+                throw new MayflyException(
+                    "values clause may not refer to column: " 
+                    + Column.displayName(tableOrAlias, columnName),
+                    location
+                );
+            }
+        };
+
     private List tokens;
+    private Token currentToken;
+
     private final boolean allowParameters;
     
     private final TimeSource timeSource;
@@ -163,6 +178,7 @@ public class Parser {
     public Parser(List tokens, boolean allowParameters, 
         TimeSource timeSource, Options options) {
         this.tokens = tokens;
+        this.currentToken = tokens.isEmpty() ? null : (Token) tokens.get(0);
         this.allowParameters = allowParameters;
         this.timeSource = timeSource;
         this.options = options;
@@ -179,9 +195,9 @@ public class Parser {
             }
             else {
                 commands.add(parseCommand());
-                if (currentTokenType() != TokenType.END_OF_FILE
-                    && currentTokenType() != TokenType.SEMICOLON) {
-                    throw new ParserException("end of command", currentToken());
+                if (currentToken.type != TokenType.END_OF_FILE
+                    && currentToken.type != TokenType.SEMICOLON) {
+                    throw new ParserException("end of command", currentToken);
                 }
             }
         }
@@ -194,13 +210,13 @@ public class Parser {
     }
 
     private Command parseCommand() {
-        if (currentTokenType() == TokenType.KEYWORD_select) {
+        if (currentToken.type == TokenType.KEYWORD_select) {
             return parseSelect();
         }
         else if (consumeNonReservedWordIfMatches("call")) {
             return parseCall();
         }
-        else if (currentTokenType() == TokenType.KEYWORD_drop) {
+        else if (currentToken.type == TokenType.KEYWORD_drop) {
             return parseDrop();
         }
         else if (consumeIfMatches(TokenType.KEYWORD_create)) {
@@ -219,27 +235,27 @@ public class Parser {
             }
             else {
                 throw new ParserException("create command",
-                    currentToken());
+                    currentToken);
             }
         }
         else if (consumeIfMatches(TokenType.KEYWORD_alter)) {
             expectAndConsume(TokenType.KEYWORD_table);
             return parseAlterTable();
         }
-        else if (currentTokenType() == TokenType.KEYWORD_set) {
+        else if (currentToken.type == TokenType.KEYWORD_set) {
             return parseSetSchema();
         }
-        else if (currentTokenType() == TokenType.KEYWORD_insert) {
+        else if (currentToken.type == TokenType.KEYWORD_insert) {
             return parseInsert();
         }
-        else if (currentTokenType() == TokenType.KEYWORD_update) {
+        else if (currentToken.type == TokenType.KEYWORD_update) {
             return parseUpdate();
         }
-        else if (currentTokenType() == TokenType.KEYWORD_delete) {
+        else if (currentToken.type == TokenType.KEYWORD_delete) {
             return parseDelete();
         }
         else {
-            throw new ParserException("command", currentToken());
+            throw new ParserException("command", currentToken);
         }
     }
 
@@ -266,7 +282,7 @@ public class Parser {
     }
 
     private Command parseInsert() {
-        Location start = currentToken().location;
+        Location start = currentToken.location;
 
         expectAndConsume(TokenType.KEYWORD_insert);
         expectAndConsume(TokenType.KEYWORD_into);
@@ -274,7 +290,7 @@ public class Parser {
         
         if (consumeIfMatches(TokenType.KEYWORD_set)) {
             List names = new ArrayList();
-            ValueList values = new ValueList(currentToken().location);
+            ValueList values = new ValueList(currentToken.location);
             do {
                 names.add(consumeIdentifier());
                 expectAndConsume(TokenType.EQUAL);
@@ -324,11 +340,11 @@ public class Parser {
     }
 
     private ImmutableList parseColumnNamesForInsert() {
-        if (currentTokenType() == TokenType.OPEN_PAREN) {
+        if (currentToken.type == TokenType.OPEN_PAREN) {
             expectAndConsume(TokenType.OPEN_PAREN);
             
             List columnNames = new ArrayList();
-            if (currentTokenType() != TokenType.CLOSE_PAREN) {
+            if (currentToken.type != TokenType.CLOSE_PAREN) {
                 do {
                     columnNames.add(consumeIdentifier());
                 } while (consumeIfMatches(TokenType.COMMA));
@@ -376,7 +392,7 @@ public class Parser {
         ValueList values = new ValueList(start);
         expectAndConsume(TokenType.OPEN_PAREN);
 
-        if (currentTokenType() != TokenType.CLOSE_PAREN) {
+        if (currentToken.type != TokenType.CLOSE_PAREN) {
             do {
                 values = values.with(parseAndEvaluate());
             } while (consumeIfMatches(TokenType.COMMA));
@@ -392,24 +408,14 @@ public class Parser {
             return new Value(null, Location.UNKNOWN);
         }
         else {
-            Cell cell = expression.evaluate(new ResultRow() {
-                public SingleColumn findColumn(
-                    String tableOrAlias, String columnName,
-                    Location location) {
-                    throw new MayflyException(
-                        "values clause may not refer to column: " 
-                        + Column.displayName(tableOrAlias, columnName),
-                        location
-                    );
-                }
-            }
-            );
+            Cell cell = expression.evaluate(
+                PSEUDO_ROW_FOR_VALUE_CONSTRUCTOR);
             return new Value(cell, expression.location);
         }
     }
 
     Expression parseExpressionOrNull() {
-        Location start = currentToken().location;
+        Location start = currentToken.location;
 
         if (consumeIfMatches(TokenType.KEYWORD_null)) {
             return new NullExpression(start);
@@ -518,7 +524,7 @@ public class Parser {
             }
             else {
                 throw new ParserException(
-                    "alter table drop action", currentToken());
+                    "alter table drop action", currentToken);
             }
         }
         else if (consumeIfMatches(TokenType.KEYWORD_add)) {
@@ -532,7 +538,7 @@ public class Parser {
             }
             else {
                 throw new ParserException(
-                    "alter table add action", currentToken());
+                    "alter table add action", currentToken);
             }
         }
         else if (consumeNonReservedWordIfMatches("modify")) {
@@ -547,7 +553,7 @@ public class Parser {
             return new ChangeColumn(table, oldName, newColumn);
         }
         else {
-            throw new ParserException("alter table action", currentToken());
+            throw new ParserException("alter table action", currentToken);
         }
     }
 
@@ -585,7 +591,7 @@ public class Parser {
     }
 
     void parseTableElement(CreateTable table) {
-        if (currentTokenType() == TokenType.IDENTIFIER) {
+        if (currentToken.type == TokenType.IDENTIFIER) {
             table.addColumn(parseColumnDefinition(table));
         }
         else if (lookingAtConstraint()) {
@@ -593,7 +599,7 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_index)) {
             String name;
-            if (currentTokenType() == TokenType.IDENTIFIER) {
+            if (currentToken.type == TokenType.IDENTIFIER) {
                 name = consumeIdentifier();
             }
             else {
@@ -605,16 +611,16 @@ public class Parser {
         else {
             throw new ParserException(
                 "column or table constraint",
-                currentToken());
+                currentToken);
         }
     }
 
     private boolean lookingAtConstraint() {
-        return currentTokenType() == TokenType.KEYWORD_primary
-            || currentTokenType() == TokenType.KEYWORD_unique
-            || currentTokenType() == TokenType.KEYWORD_foreign
-            || currentTokenType() == TokenType.KEYWORD_constraint
-            || currentTokenType() == TokenType.KEYWORD_check;
+        return currentToken.type == TokenType.KEYWORD_primary
+            || currentToken.type == TokenType.KEYWORD_unique
+            || currentToken.type == TokenType.KEYWORD_foreign
+            || currentToken.type == TokenType.KEYWORD_constraint
+            || currentToken.type == TokenType.KEYWORD_check;
     }
 
     private UnresolvedConstraint parseConstraint() {
@@ -635,7 +641,7 @@ public class Parser {
             return new UnresolvedUniqueConstraint(
                 parseColumnNames(), constraintName);
         }
-        else if (currentTokenType() == TokenType.KEYWORD_foreign) {
+        else if (currentToken.type == TokenType.KEYWORD_foreign) {
             return parseForeignKeyConstraint(constraintName);
         }
         else if (consumeIfMatches(TokenType.KEYWORD_check)) {
@@ -646,12 +652,12 @@ public class Parser {
         }
         else {
             throw new MayflyInternalException(
-                "expected constraint but got " + currentToken().describe());
+                "expected constraint but got " + currentToken.describe());
         }
     }
 
     private UnresolvedForeignKey parseForeignKeyConstraint(String constraintName) {
-        Location start = currentToken().location;
+        Location start = currentToken.location;
 
         expectAndConsume(TokenType.KEYWORD_foreign);
         expectAndConsume(TokenType.KEYWORD_key);
@@ -694,7 +700,7 @@ public class Parser {
             else {
                 throw new ParserException(
                     "UPDATE or DELETE",
-                    currentToken());
+                    currentToken);
             }
         }
         return actions;
@@ -728,13 +734,13 @@ public class Parser {
             }
             else {
                 throw new ParserException("expected ON DELETE action " +
-                    " but got SET " + currentToken().describe(),
-                    currentToken().location);
+                    " but got SET " + currentToken.describe(),
+                    currentToken.location);
             }
         }
         else {
             throw new ParserException("ON DELETE action",
-                currentToken());
+                currentToken);
         }
     }
 
@@ -748,8 +754,8 @@ public class Parser {
         
         Expression onUpdateValue = parseOnUpdateValue(name);
 
-        if (currentTokenType() == TokenType.IDENTIFIER) {
-            String text = currentToken().getText();
+        if (currentToken.type == TokenType.IDENTIFIER) {
+            String text = currentToken.getText();
             if (text.equalsIgnoreCase("auto_increment")) {
                 consumeIdentifier();
                 isAutoIncrement = true;
@@ -806,10 +812,10 @@ public class Parser {
     }
 
     Expression parseDefaultValue(String columnName) {
-        Location start = currentToken().location;
+        Location start = currentToken.location;
 
-        if (currentTokenType() == TokenType.NUMBER || 
-            currentTokenType() == TokenType.PERIOD) {
+        if (currentToken.type == TokenType.NUMBER || 
+            currentToken.type == TokenType.PERIOD) {
             return parseNumber(start).asNonBoolean();
         }
         else if (consumeIfMatches(TokenType.PLUS)) {
@@ -818,7 +824,7 @@ public class Parser {
         else if (consumeIfMatches(TokenType.MINUS)) {
             return parseNegativeNumber(start).asNonBoolean();
         }
-        else if (currentTokenType() == TokenType.QUOTED_STRING) {
+        else if (currentToken.type == TokenType.QUOTED_STRING) {
             return parseQuotedString().asNonBoolean();
         }
         else if (consumeIfMatches(TokenType.KEYWORD_null)) {
@@ -830,7 +836,7 @@ public class Parser {
         else {
             throw new ParserException(
                 "default value for column " + columnName,
-                currentToken());
+                currentToken);
         }
     }
 
@@ -883,7 +889,7 @@ public class Parser {
             expectAndConsume(TokenType.CLOSE_PAREN);
             type = new DecimalDataType(precision, scale);
         }
-        else if (currentTokenType() == TokenType.IDENTIFIER) {
+        else if (currentToken.type == TokenType.IDENTIFIER) {
             // These shouldn't be reserved if they are not in the
             // SQL standard, seems like.
             Token token = expectAndConsume(TokenType.IDENTIFIER);
@@ -928,7 +934,7 @@ public class Parser {
             }
         }
         else {
-            throw new ParserException("data type", currentToken());
+            throw new ParserException("data type", currentToken);
         }
         return new ParsedDataType(isAutoIncrement, type);
     }
@@ -945,7 +951,7 @@ public class Parser {
     }
 
     Select parseSelect() {
-        Location start = currentToken().location;
+        Location start = currentToken.location;
         
         expectAndConsume(TokenType.KEYWORD_select);
         
@@ -1006,7 +1012,7 @@ public class Parser {
     }
 
     public WhatElement parseWhatElement() {
-        if (currentTokenType() == TokenType.IDENTIFIER
+        if (currentToken.type == TokenType.IDENTIFIER
             && ((Token) tokens.get(1)).type == TokenType.PERIOD
             && ((Token) tokens.get(2)).type == TokenType.ASTERISK) {
 
@@ -1026,8 +1032,8 @@ public class Parser {
 
     public ParserExpression parseExpression() {
         ParserExpression left = parseFactor();
-        while (currentTokenType() == TokenType.MINUS
-            || currentTokenType() == TokenType.PLUS
+        while (currentToken.type == TokenType.MINUS
+            || currentToken.type == TokenType.PLUS
             ) {
             Token token = consume();
             if (token.type == TokenType.MINUS) {
@@ -1045,9 +1051,9 @@ public class Parser {
 
     private ParserExpression parseFactor() {
         ParserExpression left = parsePrimary();
-        while (currentTokenType() == TokenType.CONCATENATE
-            || currentTokenType() == TokenType.DIVIDE
-            || currentTokenType() == TokenType.ASTERISK
+        while (currentToken.type == TokenType.CONCATENATE
+            || currentToken.type == TokenType.DIVIDE
+            || currentToken.type == TokenType.ASTERISK
             ) {
             Token token = consume();
             if (token.type == TokenType.CONCATENATE) {
@@ -1079,7 +1085,7 @@ public class Parser {
     public ParserExpression parseCondition() {
         ParserExpression expression = parseBooleanTerm();
         
-        while (currentTokenType() == TokenType.KEYWORD_or) {
+        while (currentToken.type == TokenType.KEYWORD_or) {
             expectAndConsume(TokenType.KEYWORD_or);
             Condition right = parseBooleanTerm().asBoolean();
             expression = new BooleanParserExpression(new Or(expression.asBoolean(), right));
@@ -1091,7 +1097,7 @@ public class Parser {
     private ParserExpression parseBooleanTerm() {
         ParserExpression expression = parseBooleanFactor();
         
-        while (currentTokenType() == TokenType.KEYWORD_and) {
+        while (currentToken.type == TokenType.KEYWORD_and) {
             expectAndConsume(TokenType.KEYWORD_and);
             Condition right = parseBooleanFactor().asBoolean();
             expression = new BooleanParserExpression(new And(expression.asBoolean(), right));
@@ -1148,7 +1154,7 @@ public class Parser {
         else if (consumeIfMatches(TokenType.KEYWORD_not)) {
             return new BooleanParserExpression(new Not(parseIn(left.asNonBoolean())));
         }
-        else if (currentTokenType() == TokenType.KEYWORD_in) {
+        else if (currentToken.type == TokenType.KEYWORD_in) {
             return new BooleanParserExpression(parseIn(left.asNonBoolean()));
         }
         else if (consumeIfMatches(TokenType.KEYWORD_is)) {
@@ -1172,7 +1178,7 @@ public class Parser {
 
         expectAndConsume(TokenType.KEYWORD_in);
         expectAndConsume(TokenType.OPEN_PAREN);
-        if (currentTokenType() == TokenType.KEYWORD_select) {
+        if (currentToken.type == TokenType.KEYWORD_select) {
             Select subselect = parseSelect();
             result = new SubselectedIn(left, subselect);
         }
@@ -1194,13 +1200,13 @@ public class Parser {
 
     public ParserExpression parsePrimary() {
         AggregateArgumentParser argumentParser = new AggregateArgumentParser();
-        Location start = currentToken().location;
+        Location start = currentToken.location;
 
-        if (currentTokenType() == TokenType.IDENTIFIER) {
+        if (currentToken.type == TokenType.IDENTIFIER) {
             return new NonBooleanParserExpression(parseColumnReference());
         }
-        else if (currentTokenType() == TokenType.NUMBER || 
-            currentTokenType() == TokenType.PERIOD) {
+        else if (currentToken.type == TokenType.NUMBER || 
+            currentToken.type == TokenType.PERIOD) {
             return parseNumber(start);
         }
         else if (consumeIfMatches(TokenType.PLUS)) {
@@ -1209,20 +1215,20 @@ public class Parser {
         else if (consumeIfMatches(TokenType.MINUS)) {
             return parseNegativeNumber(start);
         }
-        else if (currentTokenType() == TokenType.KEYWORD_case) {
+        else if (currentToken.type == TokenType.KEYWORD_case) {
             return parseCase();
         }
-        else if (currentTokenType() == TokenType.QUOTED_STRING) {
+        else if (currentToken.type == TokenType.QUOTED_STRING) {
             return parseQuotedString();
         }
-        else if (currentTokenType() == TokenType.PARAMETER) {
+        else if (currentToken.type == TokenType.PARAMETER) {
             return new NonBooleanParserExpression(
                 new IntegerLiteral(parameterDummy()));
         }
         else if (consumeIfMatches(TokenType.KEYWORD_null)) {
             throw new FoundNullLiteral(start);
         }
-        else if (currentTokenType() == TokenType.BINARY) {
+        else if (currentToken.type == TokenType.BINARY) {
             Token token = expectAndConsume(TokenType.BINARY);
             return new NonBooleanParserExpression(
                 new CellExpression(new BinaryCell(token.getBytes()), start));
@@ -1263,7 +1269,7 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.OPEN_PAREN)) {
             ParserExpression expression;
-            if (currentTokenType() == TokenType.KEYWORD_select) {
+            if (currentToken.type == TokenType.KEYWORD_select) {
                 expression = parseScalarSubselect();
             }
             else {
@@ -1281,7 +1287,7 @@ public class Parser {
                think of precedence).  */
             /* Do we use the word expression for both boolean and
                non-boolean? */
-            throw new ParserException("expression", currentToken());
+            throw new ParserException("expression", currentToken);
         }
     }
 
@@ -1296,7 +1302,7 @@ public class Parser {
         else {
             throw new MayflyException(
                 "Attempt to specify '?' outside a prepared statement",
-                currentToken().location);
+                currentToken.location);
         }
     }
 
@@ -1306,7 +1312,7 @@ public class Parser {
     }
 
     private ParserExpression parseCase() {
-        Location start = currentToken().location;
+        Location start = currentToken.location;
 
         SearchedCase result = new SearchedCase();
         expectAndConsume(TokenType.KEYWORD_case);
@@ -1320,7 +1326,7 @@ public class Parser {
             
             result = result.withCase(condition, thenValue);
         }
-        while (currentTokenType() == TokenType.KEYWORD_when);
+        while (currentToken.type == TokenType.KEYWORD_when);
         
         if (consumeIfMatches(TokenType.KEYWORD_else)) {
             result = result.withElse(parseExpression().asNonBoolean());
@@ -1380,9 +1386,9 @@ public class Parser {
 
         Token number = expectAndConsume(TokenType.NUMBER);
         String firstInteger = number.getText();
-        if (currentTokenType() == TokenType.PERIOD) {
+        if (currentToken.type == TokenType.PERIOD) {
             Token period = expectAndConsume(TokenType.PERIOD);
-            if (currentTokenType() == TokenType.NUMBER) {
+            if (currentToken.type == TokenType.NUMBER) {
                 Token secondNumber = expectAndConsume(TokenType.NUMBER);
                 String secondInteger = secondNumber.getText();
                 return new DecimalLiteral(
@@ -1409,7 +1415,7 @@ public class Parser {
         Location location;
 
         boolean parse(TokenType aggregateTokenType, boolean allowAsterisk) {
-            if (currentTokenType() == aggregateTokenType) {
+            if (currentToken().type == aggregateTokenType) {
                 Token function = expectAndConsume(aggregateTokenType);
                 functionName = function.getText();
                 expectAndConsume(TokenType.OPEN_PAREN);
@@ -1511,13 +1517,13 @@ public class Parser {
 
         FromElement left = parseFromTable();
         while (true) {
-            if (currentTokenType() == TokenType.KEYWORD_cross) {
+            if (currentToken.type == TokenType.KEYWORD_cross) {
                 expectAndConsume(TokenType.KEYWORD_cross);
                 expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
                 left = new InnerJoin(left, right, Condition.TRUE);
             }
-            else if (currentTokenType() == TokenType.KEYWORD_inner) {
+            else if (currentToken.type == TokenType.KEYWORD_inner) {
                 expectAndConsume(TokenType.KEYWORD_inner);
                 expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
@@ -1525,9 +1531,9 @@ public class Parser {
                 Condition condition = parseWhere();
                 left = new InnerJoin(left, right, condition);
             }
-            else if (currentTokenType() == TokenType.KEYWORD_left) {
+            else if (currentToken.type == TokenType.KEYWORD_left) {
                 expectAndConsume(TokenType.KEYWORD_left);
-                if (currentTokenType() == TokenType.KEYWORD_outer) {
+                if (currentToken.type == TokenType.KEYWORD_outer) {
                     expectAndConsume(TokenType.KEYWORD_outer);
                 }
                 expectAndConsume(TokenType.KEYWORD_join);
@@ -1545,14 +1551,14 @@ public class Parser {
     public FromTable parseFromTable() {
         String firstIdentifier = consumeIdentifier();
         String table;
-        if (currentTokenType() == TokenType.PERIOD) {
+        if (currentToken.type == TokenType.PERIOD) {
             expectAndConsume(TokenType.PERIOD);
             table = consumeIdentifier();
         } else {
             table = firstIdentifier;
         }
 
-        if (currentTokenType() == TokenType.IDENTIFIER) {
+        if (currentToken.type == TokenType.IDENTIFIER) {
             String alias = consumeIdentifier();
             return new FromTable(table, alias);
         } else {
@@ -1590,10 +1596,10 @@ public class Parser {
             return groupBy;
         }
         else {
-            if (currentTokenType() == TokenType.KEYWORD_having) {
+            if (currentToken.type == TokenType.KEYWORD_having) {
                 throw new ParserException(
                     "can't specify HAVING without GROUP BY",
-                    currentToken().location);
+                    currentToken.location);
             }
             return new NoGroupBy();
         }
@@ -1619,7 +1625,7 @@ public class Parser {
     }
 
     private OrderItem parseOrderItem() {
-        if (currentTokenType() == TokenType.NUMBER) {
+        if (currentToken.type == TokenType.NUMBER) {
             int reference = consumeInteger();
             boolean ascending = parseAscending();
             return new ReferenceOrderItem(reference, ascending);
@@ -1644,7 +1650,7 @@ public class Parser {
     }
 
     Limit parseLimit() {
-        if (currentTokenType() == TokenType.KEYWORD_limit) {
+        if (currentToken.type == TokenType.KEYWORD_limit) {
             expectAndConsume(TokenType.KEYWORD_limit);
             int count = consumeIntegerOrParameter();
             
@@ -1661,25 +1667,17 @@ public class Parser {
     }
 
     private int consumeIntegerOrParameter() {
-        if (currentTokenType() == TokenType.NUMBER) {
+        if (currentToken.type == TokenType.NUMBER) {
             return consumeInteger();
         }
-        else if (currentTokenType() == TokenType.PARAMETER) {
+        else if (currentToken.type == TokenType.PARAMETER) {
             return parameterDummy();
         }
         else {
-            throw new ParserException("number", currentToken());
+            throw new ParserException("number", currentToken);
         }
     }
 
-    TokenType currentTokenType() {
-        return currentToken().type;
-    }
-
-    private Token currentToken() {
-        return (Token) tokens.get(0);
-    }
-    
     public String remainingTokens() {
         StringBuilder result = new StringBuilder();
         boolean first = true;
@@ -1756,7 +1754,7 @@ public class Parser {
     }
 
     boolean consumeIfMatches(TokenType type) {
-        if (currentTokenType() == type) {
+        if (currentToken.type == type) {
             expectAndConsume(type);
             return true;
         }
@@ -1764,11 +1762,11 @@ public class Parser {
     }
     
     private boolean consumeNonReservedWordIfMatches(String word) {
-        if (currentTokenType() != TokenType.IDENTIFIER) {
+        if (currentToken.type != TokenType.IDENTIFIER) {
             return false;
         }
 
-        String currentText = currentToken().getText();
+        String currentText = currentToken.getText();
         if (word.equalsIgnoreCase(currentText)) {
             expectAndConsume(TokenType.IDENTIFIER);
             return true;
@@ -1779,12 +1777,12 @@ public class Parser {
 
     private void expectNonReservedWord(String word) {
         if (!consumeNonReservedWordIfMatches(word)) {
-            throw new ParserException(word, currentToken());
+            throw new ParserException(word, currentToken);
         }
     }
 
     Token expectAndConsume(TokenType expectedType) {
-        Token token = currentToken();
+        Token token = currentToken;
         if (token.type != expectedType) {
             throw new ParserException(
                 describeExpectation(expectedType),
@@ -1803,7 +1801,13 @@ public class Parser {
      * instead where feasible.
      */
     private Token consume() {
-        return (Token) tokens.remove(0);
+        Token consumedToken = (Token) tokens.remove(0);
+        this.currentToken = tokens.isEmpty() ? null : (Token) tokens.get(0);
+        return consumedToken;
+    }
+    
+    Token currentToken() {
+        return currentToken;
     }
 
     private String describeExpectation(TokenType expectedType) {

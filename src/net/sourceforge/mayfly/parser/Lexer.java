@@ -97,25 +97,27 @@ public class Lexer {
         tokens = new ArrayList();
         current = nextCharacter();
         markTokenStart();
+        characterLoop:
         while (true) {
-            if (current == '.') {
+            switch (current) {
+            case '.':
                 current = nextCharacter();
                 addToken(tokens, TokenType.PERIOD, ".");
-            }
-            else if (current == ';') {
+                break;
+            case ';':
                 endOfCommand();
                 current = nextCharacter();
                 addToken(tokens, TokenType.SEMICOLON, ";");
-            }
-            else if (current == ',') {
+                break;
+            case ',':
                 current = nextCharacter();
                 addToken(tokens, TokenType.COMMA, ",");
-            }
-            else if (current == '+') {
+                break;
+            case '+':
                 current = nextCharacter();
                 addToken(tokens, TokenType.PLUS, "+");
-            }
-            else if (current == '-') {
+                break;
+            case '-':
                 current = nextCharacter();
                 if (current == '-') {
                     while (true) {
@@ -134,8 +136,8 @@ public class Lexer {
                 else {
                     addToken(tokens, TokenType.MINUS, "-");
                 }
-            }
-            else if (current == '/') {
+                break;
+            case '/':
                 current = nextCharacter();
                 if (current == '*') {
                     boolean gotStar = false;
@@ -161,24 +163,24 @@ public class Lexer {
                 else {
                     addToken(tokens, TokenType.DIVIDE, "/");
                 }
-            }
-            else if (current == '*') {
+                break;
+            case '*':
                 current = nextCharacter();
                 addToken(tokens, TokenType.ASTERISK, "*");
-            }
-            else if (current == '(') {
+                break;
+            case '(':
                 current = nextCharacter();
                 addToken(tokens, TokenType.OPEN_PAREN, "(");
-            }
-            else if (current == ')') {
+                break;
+            case ')':
                 current = nextCharacter();
                 addToken(tokens, TokenType.CLOSE_PAREN, ")");
-            }
-            else if (current == '?') {
+                break;
+            case '?':
                 current = nextCharacter();
                 addToken(tokens, TokenType.PARAMETER, "?");
-            }
-            else if (current == '<') {
+                break;
+            case '<':
                 current = nextCharacter();
                 if (current == '>') {
                     current = nextCharacter();
@@ -191,8 +193,8 @@ public class Lexer {
                 else {
                     addToken(tokens, TokenType.LESS, "<");
                 }
-            }
-            else if (current == '>') {
+                break;
+            case '>':
                 current = nextCharacter();
                 if (current == '=') {
                     current = nextCharacter();
@@ -201,12 +203,12 @@ public class Lexer {
                 else {
                     addToken(tokens, TokenType.GREATER, ">");
                 }
-            }
-            else if (current == '=') {
+                break;
+            case '=':
                 current = nextCharacter();
                 addToken(tokens, TokenType.EQUAL, "=");
-            }
-            else if (current == '!') {
+                break;
+            case '!':
                 current = nextCharacter();
                 if (current == '=') {
                     current = nextCharacter();
@@ -215,8 +217,8 @@ public class Lexer {
                 else {
                     throw new MayflyException("expected '=' but got " + describeCharacter(current));
                 }
-            }
-            else if (current == '|') {
+                break;
+            case '|':
                 current = nextCharacter();
                 if (current == '|') {
                     current = nextCharacter();
@@ -225,19 +227,80 @@ public class Lexer {
                 else {
                     throw new MayflyException("expected '|' but got " + describeCharacter(current));
                 }
-            }
-            else if (isIdentifierStart(current)) {
+                break;
+            case 'a':
+            case 'b':
+            case 'c':
+            case 'd':
+            case 'e':
+            case 'f':
+            case 'g':
+            case 'h':
+            case 'i':
+            case 'j':
+            case 'k':
+            case 'l':
+            case 'm':
+            case 'n':
+            case 'o':
+            case 'p':
+            case 'q':
+            case 'r':
+            case 's':
+            case 't':
+            case 'u':
+            case 'v':
+            case 'w':
+            case 'x':
+            case 'y':
+            case 'z':
+            case 'A':
+            case 'B':
+            case 'C':
+            case 'D':
+            case 'E':
+            case 'F':
+            case 'G':
+            case 'H':
+            case 'I':
+            case 'J':
+            case 'K':
+            case 'L':
+            case 'M':
+            case 'N':
+            case 'O':
+            case 'P':
+            case 'Q':
+            case 'R':
+            case 'S':
+            case 'T':
+            case 'U':
+            case 'V':
+            case 'W':
+            case 'X':
+            case 'Y':
+            case 'Z':
                 lexIdentifierOrHex();
-            }
-            else if (current >= '0' && current <= '9') {
+                break;
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9': {
                 StringBuilder text = new StringBuilder();
                 while (current >= '0' && current <= '9') {
                     text.append((char)current);
                     current = nextCharacter();
                 }
                 addToken(tokens, TokenType.NUMBER, text.toString());
+                break;
             }
-            else if (current == '\"') {
+            case '\"': {
                 StringBuilder text = new StringBuilder();
                 current = nextCharacter();
                 while (current != '\"') {
@@ -249,18 +312,20 @@ public class Lexer {
                 }
                 current = nextCharacter();
                 addToken(tokens, TokenType.IDENTIFIER, text.toString());
-            }
-            else if (current == ' ' || current == '\t' || current == '\n' || 
-                current == '\r') {
-                current = nextCharacter();
-                markTokenStart();
-            }
-            else if (current == -1) {
-                addEndOfFile(tokens);
-                endOfCommand();
                 break;
             }
-            else if (current == '\'') {
+            case ' ':
+            case '\t': 
+            case '\n':
+            case '\r':
+                current = nextCharacter();
+                markTokenStart();
+                break;
+            case -1:
+                addEndOfFile(tokens);
+                endOfCommand();
+                break characterLoop;
+            case '\'': {
                 StringBuilder text = new StringBuilder();
                 text.append("'");
                 current = nextCharacter();
@@ -285,8 +350,9 @@ public class Lexer {
                 }
                 text.append("'");
                 addToken(tokens, TokenType.QUOTED_STRING, text.toString());
+                break;
             }
-            else {
+            default:
                 throw new MayflyException("unexpected character " + describeCharacter(current));
             }
         }
@@ -305,7 +371,14 @@ public class Lexer {
             }
         }
 
-        while (isIdentifierCharacter(current)) {
+        /**
+         * Inlined call to {@link #isIdentifierCharacter(char)}
+         * based on profiler data.
+         */
+        while (((current >= 'a' && current <= 'z') || 
+            (current >= 'A' && current <= 'Z')) || 
+            (current >= '0' && current <= '9') ||
+            current == '_') {
             textBuilder.append((char)current);
             current = nextCharacter();
         }
@@ -386,15 +459,29 @@ public class Lexer {
     }
 
     /**
+     * @internal
      * Usage is to call nextCharacter() and then call this
      * method.  In other words, the character most recently
      * read by nextCharacter is <i>not</i> part of the token
      * we are adding here; the character before that is the
      * last character of the token.
+     * 
+     * This method is a performance bottleneck, which is why many
+     * of the functions which it calls have been inlined.
      */
     private void addToken(List tokens, TokenType tokenType, String text) {
-        TextToken newToken = new TextToken(tokenType, text, tokenLocation());
-        addToken(tokens, newToken);
+        TextToken newToken = new TextToken(
+            tokenType, text, 
+
+            new Location(tokenLine, tokenColumn, 
+                previousLine, previousColumn,
+                command)
+            
+        );
+
+        tokens.add(newToken);
+        tokenLine = previousLine;
+        tokenColumn = previousColumn;
     }
 
     private void addToken(List tokens, Token newToken) {

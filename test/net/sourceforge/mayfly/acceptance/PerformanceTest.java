@@ -26,8 +26,10 @@ public class PerformanceTest extends SqlTestCase {
     }
     
     public void xtestLotsOfRows() throws Exception {
-        // At the moment, I'm getting 510 ms for MySQL; 2500 ms for Mayfly.
-        // There must be some low-hanging fruit here...
+        // At the moment, I'm getting 360 ms for hypersonic;
+        // 111 s for MySQL (4.1.21 on Windows); 
+        // 953 ms for Mayfly.
+        // (try MySQL 5.x on Linux; I think it is faster).
         execute("create table foo(x integer, y integer, z integer, w varchar(50))");
         long start = System.currentTimeMillis();
         for (int i = 0; i < 10000; ++i) {
@@ -48,6 +50,30 @@ public class PerformanceTest extends SqlTestCase {
         for (int i = 0; i < 10000; ++i) {
             execute("insert into foo(x, y, w) values (" + 
                 i + ", " + (i + 100) + ", " + "'string " + i + "')");
+        }
+        long end = System.currentTimeMillis();
+        System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");
+    }
+    
+    public void xtestDozensOfColumns() throws Exception {
+        execute("create table foo(a integer, b integer, c integer, " +
+            "d integer, e integer, f integer, g integer, h integer," +
+            "i integer, j integer, k integer, l integer, m integer," +
+            "n integer, o integer, p integer, q integer, r integer," +
+            "s integer, t integer, u integer, v integer, w integer," +
+            "x integer, y integer, z integer," +
+            "alpha varchar(50), beta varchar(50), gamma varchar(50)," +
+            "delta varchar(50), epsilon varchar(50), zeta varchar(50), " +
+            "eta varchar(50), " +
+            "iota varchar(50), kappa varchar(50), lambda varchar(50), " +
+            "mu varchar(50), nu varchar(50), omicron varchar(50), " +
+            "pi varchar(50), rho varchar(50), sigma varchar(50), " +
+            "tau varchar(50), upsilon varchar(50), phi varchar(50), " +
+            "chi varchar(50), psi varchar(50), omega varchar(50) )");
+        long start = System.currentTimeMillis();
+        for (int i = 0; i < 10000; ++i) {
+            execute("insert into foo(x, y, w) values (" + 
+                i + ", " + i % 100 + ", " + "'string " + i + "')");
         }
         long end = System.currentTimeMillis();
         System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");
