@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
 
 public class TupleElement {
     private final String column;
@@ -21,6 +22,10 @@ public class TupleElement {
 
     public String columnName() {
         return column;
+    }
+    
+    public CaseInsensitiveString columnNameCase() {
+        return new CaseInsensitiveString(column);
     }
 
     boolean matchesName(String target) {

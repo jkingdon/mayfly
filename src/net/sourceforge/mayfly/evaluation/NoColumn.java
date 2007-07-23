@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.parser.Location;
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
 
 public class NoColumn extends MayflyException {
 
@@ -26,6 +27,10 @@ public class NoColumn extends MayflyException {
     private NoColumn(String message, Location location, boolean isDummy) {
         super(message, location);
         displayName = null;
+    }
+
+    public NoColumn(CaseInsensitiveString column) {
+        this(column.getString());
     }
 
     public static NoColumn dummyExceptionForSubselect(Location location) {

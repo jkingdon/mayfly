@@ -33,10 +33,11 @@ public class OrTest extends TestCase {
     }
 
     public void testEvaluate() throws Exception {
-        Row row = new Row(
+        Row row =
             new TupleBuilder()
                 .appendColumnCell("x", new StringCell("foo"))
-        );
+                .asRow()
+        ;
         Equal compareWithFoo = new Equal(new SingleColumn("x"), new QuotedString("'foo'"));
         Equal compareWithXxx = new Equal(new SingleColumn("x"), new QuotedString("'xxx'"));
         Not notNull = new Not(new IsNull(new SingleColumn("x")));

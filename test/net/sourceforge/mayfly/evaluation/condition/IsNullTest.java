@@ -19,17 +19,19 @@ public class IsNullTest extends TestCase {
     }
 
     public void testEvaluate() throws Exception {
-        Row nullRow = new Row(
+        Row nullRow =
             new TupleBuilder()
                 .appendColumnCell("colA", NullCell.INSTANCE)
-        );
+                .asRow()
+        ;
 
         assertTrue(new IsNull(new SingleColumn("colA")).evaluate(nullRow, "table1"));
 
-        Row nonNullRow = new Row(
+        Row nonNullRow =
             new TupleBuilder()
                 .appendColumnCell("colA", new StringCell("foo"))
-        );
+                .asRow()
+        ;
 
         assertFalse(new IsNull(new SingleColumn("colA")).evaluate(nonNullRow, "table1"));
     }

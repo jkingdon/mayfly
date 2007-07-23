@@ -3,12 +3,14 @@ package net.sourceforge.mayfly.util;
 public class CaseInsensitiveString {
     
     private final String delegate;
+    private final int hashCode;
     
     public CaseInsensitiveString(String contents) {
         this.delegate = contents;
         if (contents == null) {
             throw new NullPointerException();
         }
+        this.hashCode = delegate.toLowerCase().hashCode();
     }
 
     public String toString() {
@@ -28,7 +30,7 @@ public class CaseInsensitiveString {
     }
     
     public int hashCode() {
-        return delegate.toLowerCase().hashCode();
+        return hashCode;
     }
 
 }

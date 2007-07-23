@@ -1,21 +1,26 @@
 package net.sourceforge.mayfly.datastore;
 
 import junit.framework.TestCase;
+import junitx.framework.StringAssert;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.MayflyInternalException;
-import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.MayflyAssert;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 public class RowTest extends TestCase {
 
     public void testCell() throws Exception {
-        Row row = new Row(
+        Row row =
             new TupleBuilder()
                 .appendColumnCellContents("colA", "1")
                 .appendColumnCellContents("colB", "2")
                 .appendColumnCellContents("colC", "3")
-        );
+                .asRow();
 
         MayflyAssert.assertString("2", row.cell("colB"));
         MayflyAssert.assertString("2", row.cell("COLb"));
@@ -25,20 +30,6 @@ public class RowTest extends TestCase {
             fail();
         } catch (MayflyException e) {
             assertEquals("no column colD", e.getMessage());
-        }
-    }
-
-    public void testDuplicateColumnNames() throws Exception {
-        TupleElement one = new TupleElement("colA", new LongCell(5));
-        TupleElement two = new TupleElement("ColA", new LongCell(7));
-        ImmutableList list = ImmutableList.fromArray(
-            new TupleElement[] { one, two });
-        try {
-            new Row(list);
-            fail();
-        }
-        catch (MayflyInternalException e) {
-            assertEquals("duplicate column ColA", e.getMessage());
         }
     }
 
@@ -95,6 +86,41 @@ public class RowTest extends TestCase {
         }
     }
     
+    public void testRenameToConflict() throws Exception {
+        Row row = new TupleBuilder()
+            .appendColumnCellContents("a", 5)
+            .appendColumnCellContents("c", 7)
+            .asRow();
+
+        try {
+            row.renameColumn("C", "A");
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("duplicate column A", e.getMessage());
+        }
+    }
+    
+    public void testAdd() throws Exception {
+        Row row = new Row().addColumn(new Column("a"));
+        assertEquals(1, row.columnCount());
+        assertEquals(NullCell.INSTANCE, row.cell("A"));
+    }
+    
+    public void testAddDuplicate() throws Exception {
+        Row row = new TupleBuilder()
+            .appendColumnCell("a", new StringCell("hi"))
+            .asRow();
+        
+        try {
+            row.addColumn(new Column("A"));
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("duplicate column A", e.getMessage());
+        }
+    }
+    
     public void testToString() throws Exception {
         Row row = new TupleBuilder()
             .appendColumnCell("a", new StringCell("hi"))
@@ -102,9 +128,39 @@ public class RowTest extends TestCase {
             .appendColumnCell("c", NullCell.INSTANCE)
             .appendColumnCell("d", new BinaryCell((byte)7))
             .asRow();
+        String debug = row.toString();
+        StringAssert.assertStartsWith("Row(", debug);
+        StringAssert.assertContains("a=string 'hi'", debug);
+        StringAssert.assertContains("b=number 777", debug);
+        StringAssert.assertContains("c=null", debug);
+        StringAssert.assertContains("d=binary data", debug);
+        StringAssert.assertEndsWith(")", debug);
+    }
+    
+    public void testColumnNames() throws Exception {
+        Row row = new TupleBuilder()
+            .appendColumnCell("a", new StringCell("hi"))
+            .appendColumnCell("b", new LongCell(777))
+            .appendColumnCell("c", NullCell.INSTANCE)
+            .appendColumnCell("d", new BinaryCell((byte)7))
+            .asRow();
+        Iterator names = row.columnNames();
+        Set results = new HashSet();
+        results.add(names.next());
+        results.add(names.next());
+        results.add(names.next());
+        results.add(names.next());
+        assertFalse(names.hasNext());
+        
         assertEquals(
-            "Row(a=string 'hi', b=number 777, c=null, d=binary data)",
-            row.toString());
+            new HashSet(Arrays.asList(new CaseInsensitiveString[] {
+                new CaseInsensitiveString("d"),
+                new CaseInsensitiveString("c"),
+                new CaseInsensitiveString("b"),
+                new CaseInsensitiveString("a")
+            } )),
+            results
+        );
     }
     
 }

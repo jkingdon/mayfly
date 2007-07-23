@@ -13,10 +13,10 @@ import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
 public class EqualTest extends TestCase {
 
     public void testColumnAndQuotedString() throws Exception {
-        Row row = new Row(
+        Row row =
             new TupleBuilder()
                 .appendColumnCellContents("colA", "1")
-        );
+                .asRow();
 
         assertTrue(
             new Equal(new SingleColumn("colA"), new QuotedString("'1'"))
@@ -36,18 +36,19 @@ public class EqualTest extends TestCase {
             - we stick with the usual SQL semantics.
          */
         assertFalse(equal.evaluate(
-            new Row(new TupleBuilder()
+            new TupleBuilder()
                 .appendColumnCell("a", NullCell.INSTANCE)
                 .appendColumnCell("b", NullCell.INSTANCE)
-            ),
+                .asRow()
+            ,
             "table1"
         ));
 
         assertTrue(equal.evaluate(
-            new Row(new TupleBuilder()
+            new TupleBuilder()
                 .appendColumnCell("a", new LongCell(5))
                 .appendColumnCell("b", new LongCell(5))
-            ),
+                .asRow(),
             "table1"
         ));
     }

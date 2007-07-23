@@ -11,9 +11,10 @@ import net.sourceforge.mayfly.evaluation.Value;
 import net.sourceforge.mayfly.evaluation.expression.DefaultValue;
 import net.sourceforge.mayfly.evaluation.expression.SpecifiedDefaultValue;
 import net.sourceforge.mayfly.parser.Location;
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
 
 public class Column {
-    private final String columnName;
+    public final CaseInsensitiveString columnName;
     private final DefaultValue defaultValue;
     private final Expression onUpdateValue;
     private final boolean isAutoIncrement;
@@ -27,7 +28,8 @@ public class Column {
      */
     public final boolean isNotNull;
 
-    public Column(String name, DefaultValue defaultValue, 
+    public Column(CaseInsensitiveString name, 
+        DefaultValue defaultValue, 
         Expression onUpdateValue, 
         boolean isAutoIncrement,
         boolean isSequence,
@@ -45,6 +47,14 @@ public class Column {
         }
     }
 
+    public Column(String name, DefaultValue defaultValue, 
+        Expression onUpdateValue, 
+        boolean isAutoIncrement,
+        boolean isSequence,
+        DataType type, boolean isNotNull) {
+        this(new CaseInsensitiveString(name), defaultValue, onUpdateValue,
+            isAutoIncrement, isSequence, type, isNotNull);
+    }
     /**
      * Create a column with most of the fields defaulted.  I think this is
      * just called from tests; most code will want to look up an existing
@@ -56,7 +66,7 @@ public class Column {
     }
 
     public String columnName() {
-        return columnName;
+        return columnName.getString();
     }
 
     public boolean matches(String target) {
@@ -65,11 +75,11 @@ public class Column {
                 "column name " + target + " should not contain a period");
         }
 
-        return columnName.equalsIgnoreCase(target);
+        return columnName.getString().equalsIgnoreCase(target);
     }
 
     public String toString() {
-        return columnName;
+        return columnName();
     }
 
     public static String displayName(String tableOrAlias, String column) {

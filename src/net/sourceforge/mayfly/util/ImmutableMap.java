@@ -34,6 +34,14 @@ public class ImmutableMap implements Map {
         copy.put(key, value);
         return new ImmutableMap(copy, true);
     }
+    
+    public ImmutableMap add(Object key, Object value) {
+        Map copy = new LinkedHashMap(this);
+        if (copy.put(key, value) != null) {
+            throw new RuntimeException("key " + key + " already exists");
+        }
+        return new ImmutableMap(copy, true);
+    }
 
     public ImmutableMap without(Object key) {
         Map copy = new LinkedHashMap(this);

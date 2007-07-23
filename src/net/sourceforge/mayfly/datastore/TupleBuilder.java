@@ -1,19 +1,16 @@
 package net.sourceforge.mayfly.datastore;
 
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 
 public class TupleBuilder {
     
-    private L elements = new L();
-
-    public TupleBuilder append(TupleElement tuple) {
-        elements.append(tuple);
-        return this;
-    }
+//    private L elements = new L();
+    private TupleMapper mapper = new TupleMapper();
 
     public TupleBuilder append(Column column, Cell cell) {
-        return append(new TupleElement(column, cell));
+        return append(column.columnName, cell);
     }
     
     public TupleBuilder appendColumnCellContents(String columnName, String cellValue) {
@@ -24,16 +21,18 @@ public class TupleBuilder {
         return appendColumnCell(columnName, new LongCell(cellValue));
     }
 
-    public TupleBuilder appendColumnCell(String columnName, Cell cell) {
-        return append(new TupleElement(columnName, cell));
+    public TupleBuilder append(
+        CaseInsensitiveString columnName, Cell cell) {
+        mapper.add(columnName, cell);
+        return this;
     }
 
-    public ImmutableList asElements() {
-        return elements.asImmutable();
+    public TupleBuilder appendColumnCell(String columnName, Cell cell) {
+        return append(new CaseInsensitiveString(columnName), cell);
     }
-    
+
     public Row asRow() {
-        return new Row(elements.asImmutable());
+        return mapper.asRow();
     }
 
 }

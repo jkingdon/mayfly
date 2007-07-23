@@ -2,17 +2,17 @@ package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.evaluation.NoColumn;
-import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.parser.Location;
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.ImmutableMap;
 import net.sourceforge.mayfly.util.L;
-import net.sourceforge.mayfly.util.M;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 public class Columns {
     public static Columns fromColumnNames(List columnNameStrings) {
@@ -31,28 +31,70 @@ public class Columns {
     }
 
 
-    private final ImmutableList columns;
+    final ImmutableList columnNames;
+    final ImmutableMap nameToColumn;
 
     public Columns(ImmutableList columns) {
-        this.columns = columns;
+        List names = new ArrayList();
+        Map map = new HashMap();
+        for (Iterator iter = columns.iterator(); iter.hasNext();) {
+            Column column = (Column) iter.next();
+            CaseInsensitiveString name = column.columnName;
+            names.add(name);
+            Object oldColumn = map.put(name, column);
+            if (oldColumn != null) {
+                throw new MayflyException("duplicate column " + name);
+            }
+        }
+        this.columnNames = new ImmutableList(names);
+        this.nameToColumn = new ImmutableMap(map);
     }
+    
+    private Columns(ImmutableList names, ImmutableMap map) {
+        this.columnNames = names;
+        this.nameToColumn = map;
+    }
+    
 
     public Iterator iterator() {
-        return columns.iterator();
+        return new Iterator() {
+
+            Iterator delegate = columnNames.iterator();
+
+            public boolean hasNext() {
+                return delegate.hasNext();
+            }
+
+            public Object next() {
+                CaseInsensitiveString name = (CaseInsensitiveString) 
+                    delegate.next();
+                return nameToColumn.get(name);
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+            
+        };
     }
 
     public ImmutableList asNames() {
         List names = new ArrayList();
-        for (int i = 0; i < columns.size(); ++i) {
-            Column column = (Column) columns.get(i);
-            names.add(column.columnName());
+        for (int i = 0; i < columnNames.size(); ++i) {
+            CaseInsensitiveString column = (CaseInsensitiveString) 
+                columnNames.get(i);
+            names.add(column.getString());
         }
         return new ImmutableList(names);
+    }
+    
+    public ImmutableList asCaseNames() {
+        return columnNames;
     }
 
 
     public Column column(int index) {
-        return (Column) columns.get(index);
+        return (Column) nameToColumn.get(columnNames.get(index));
     }
 
     public Column columnFromName(String columnName) {
@@ -60,18 +102,8 @@ public class Columns {
     }
 
     public Column columnFromName(String columnName, Location location) {
-        Column found = null;
-        for (Iterator iter = columns.iterator(); iter.hasNext(); ) {
-            Column column = (Column) iter.next();
-            if (column.matches(columnName)) {
-                if (found != null) {
-                    throw new MayflyException(
-                        "ambiguous column " + columnName, location);
-                } else {
-                    found = column;
-                }
-            }
-        }
+        Column found = (Column) 
+            nameToColumn.get(new CaseInsensitiveString(columnName));
         if (found == null) {
             throw new NoColumn(columnName, location);
         } else {
@@ -80,23 +112,7 @@ public class Columns {
     }
     
     public boolean hasColumn(String name) {
-        for (Iterator iter = columns.iterator(); iter.hasNext(); ) {
-            Column column = (Column) iter.next();
-            if (column.matches(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void checkForDuplicates() {
-        Set names = new HashSet();
-        for (Iterator iter = iterator(); iter.hasNext();) {
-            Column column = (Column) iter.next();
-            if (!names.add(column.columnName().toLowerCase())) {
-                throw new MayflyException("duplicate column " + column.columnName());
-            }
-        }
+        return nameToColumn.containsKey(new CaseInsensitiveString(name));
     }
 
     public Columns replace(Column replacement) {
@@ -127,29 +143,39 @@ public class Columns {
     }
 
     public Columns with(Column newColumn, Position position) {
+        CaseInsensitiveString newName = newColumn.columnName;
+
         boolean found = false;
         List result = new ArrayList();
         if (position.isFirst()) {
-            result.add(newColumn);
+            result.add(newName);
             found = true;
         }
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            Column existing = (Column) iter.next();
+        for (Iterator iter = columnNames.iterator(); iter.hasNext();) {
+            CaseInsensitiveString existing = (CaseInsensitiveString) 
+                iter.next();
             result.add(existing);
-            if (position.isAfter(existing.columnName())) {
-                result.add(newColumn);
+            if (position.isAfter(existing.getString())) {
+                result.add(newName);
                 found = true;
             }
         }
         if (position.isLast()) {
-            result.add(newColumn);
+            result.add(newName);
             found = true;
         }
         
         if (!found) {
             throw new NoColumn(position.afterWhat(), position.location());
         }
-        return new Columns(new ImmutableList(result));
+        
+        if (nameToColumn.containsKey(newName)) {
+            throw new MayflyException("duplicate column " + newName,
+                position.location());
+        }
+
+        return new Columns(new ImmutableList(result),
+            nameToColumn.with(newName, newColumn));
     }
 
     public Columns without(String target) {
@@ -176,31 +202,15 @@ public class Columns {
     }
 
     public int columnCount() {
-        return columns.size();
-    }
-
-    public M zipper(ValueList values) {
-        List keys = columns;
-        if (keys.size()!=values.size()) {
-            throw new RuntimeException("mapify only supports equal-sized key and value lists. \n" +
-                                       "there were (" + keys.size() + " keys and " + values.size() + " values)");
-        }
-
-        if (keys.size()!= new HashSet(keys).size()) {
-            throw new RuntimeException("mapify only supports unique keysets. \n" +
-                                       "keys: " + keys.toString());
-        }
-
-        M result = new M();
-        for (int i = 0; i < keys.size(); i++) {
-            result.put(keys.get(i), values.value(i));
-        }
-
-        return result;
+        return columnNames.size();
     }
 
     public String columnName(int index) {
         return column(index).columnName();
+    }
+
+    public CaseInsensitiveString columnCase(int index) {
+        return new CaseInsensitiveString(columnName(index));
     }
 
 }

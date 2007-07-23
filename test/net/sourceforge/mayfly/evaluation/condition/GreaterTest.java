@@ -20,11 +20,12 @@ public class GreaterTest extends TestCase {
     }
 
     public void testEval() throws Exception {
-        Row row = new Row(
+        Row row =
             new TupleBuilder()
                 .appendColumnCellContents("colA", 6)
                 .appendColumnCellContents("colB", 7)
-        );
+                .asRow()
+        ;
 
         assertFalse(
             new Greater(new IntegerLiteral(5), new SingleColumn("colA"))

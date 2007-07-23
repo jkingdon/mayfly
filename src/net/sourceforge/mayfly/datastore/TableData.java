@@ -11,9 +11,9 @@ import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.UpdateTable;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.parser.Location;
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
-import net.sourceforge.mayfly.util.M;
 import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.util.Iterator;
@@ -37,50 +37,51 @@ public class TableData {
         if (constraints == null) {
             throw new NullPointerException("constraints is required");
         }
-        columns.checkForDuplicates();
         this.columns = columns;
         this.rows = rows;
         this.indexes = indexes;
     }
 
     public TableData addRow(Checker checker, List columnNames, ValueList values) {
-        Columns specified = findColumns(columnNames);
-        specified.checkForDuplicates();
-        
-        return addRow(checker, specified, values);
-    }
-
-    public TableData addRow(Checker checker, ValueList values) {
-        return addRow(checker, columns, values);
-    }
-
-    private TableData addRow(Checker checker,
-        Columns columnsToInsert, ValueList values) {
-        if (columnsToInsert.columnCount() != values.size()) {
-            if (values.size() > columnsToInsert.columnCount()) {
+        if (columnNames.size() != values.size()) {
+            Columns columnsToInsert = findColumns(columnNames);
+            if (values.size() > columnNames.size()) {
                 throw makeException("Too many values.\n", columnsToInsert, values);
             } else {
                 throw makeException("Too few values.\n", columnsToInsert, values);
             }
         }
         
-        M specifiedColumnToValue = columnsToInsert.zipper(values);
+        TupleMapper tuple = new TupleMapper();
         Columns newColumns = columns;
-        
-        TupleBuilder tuple = new TupleBuilder();
-        Iterator iter = columns.iterator();
-        while (iter.hasNext()) {
-            Column column = (Column) iter.next();
-            newColumns = setColumn(
-                specifiedColumnToValue, newColumns, tuple, column, 
-                values.location, checker);
+        for (int i = 0; i < values.size(); ++i) {
+            String columnName = (String)columnNames.get(i);
+            Column column = columns.columnFromName(columnName);
+            newColumns =
+                addColumn(newColumns, tuple, column, checker, values.value(i));
         }
-        Row newRow = new Row(tuple);
+        
+        Value defaultMarker = new Value(null, values.location);
+        for (int i = 0; i < columns.columnCount(); ++i) {
+            Column column = columns.column(i);
+            CaseInsensitiveString name = column.columnName;
+            if (!tuple.hasColumn(name)) {
+                newColumns =
+                    addColumn(newColumns, tuple, column, checker, defaultMarker);
+            }
+        }
+
+        Row newRow = tuple.asRow();
+        
         constraints.check(rows, newRow, values.location);
         checker.checkInsert(constraints, newRow);
 
         return new TableData(
             newColumns, constraints, rows.with(newRow), indexes);
+    }
+
+    public TableData addRow(Checker checker, ValueList values) {
+        return addRow(checker, columns.asNames(), values);
     }
 
     private MayflyException makeException(String message, Columns columnsToInsert, ValueList values) {
@@ -89,22 +90,12 @@ public class TableData {
             values.location);
     }
 
-    private Columns setColumn(M specifiedColumnToValue, Columns newColumns, 
-        TupleBuilder tuple, Column column, Location location, Checker checker) {
-        boolean isDefault;
-        Cell cell;
-        if (specifiedColumnToValue.containsKey(column)) {
-            Value value = (Value) specifiedColumnToValue.get(column);
-            isDefault = value.value == null;
-            cell = column.coerce(
-                isDefault ? column.defaultValue() : value.value, 
-                value.location);
-        } else {
-            isDefault = true;
-            cell = column.coerce(column.defaultValue(), location);
-        }
-        
-        tuple.append(new TupleElement(column, cell));
+    private Columns addColumn(Columns newColumns, TupleMapper tuple, Column column, Checker checker, Value value) {
+        boolean isDefault = value.value == null;
+        Cell cell = column.coerce(
+            isDefault ? column.defaultValue() : value.value, 
+            value.location);
+        tuple.add(column.columnName, cell);
 
         Column newColumn = column.afterAutoIncrement(checker, cell, isDefault);
         if (newColumn != null) {
@@ -231,14 +222,12 @@ public class TableData {
         TupleBuilder tuple = new TupleBuilder();
         for (int i = 0; i < columns.columnCount(); ++i) {
             tuple.append(
-                new TupleElement(
-                    columns.column(i),
-                    NullCell.INSTANCE
-                )
+                columns.column(i),
+                NullCell.INSTANCE
             );
         }
 
-        return new Row(tuple);
+        return tuple.asRow();
     }
 
     public Column findColumn(String columnName) {

@@ -27,7 +27,6 @@ public class ColumnsTest extends TestCase {
         Columns columns = new Columns(new ImmutableList(Arrays.asList(
             new Column[] {
                 new Column("a"),
-                new Column("a"),
                 new Column("b"),
                 new Column("d")
             })));
@@ -42,13 +41,6 @@ public class ColumnsTest extends TestCase {
             assertEquals("no column c", e.getMessage());
         }
 
-        try {
-            columns.columnFromName("a");
-            fail();
-        } catch (MayflyException e) {
-            assertEquals("ambiguous column a", e.getMessage());
-        }
-        
         assertEquals("d", columns.columnFromName("d").columnName());
     }
     
@@ -56,8 +48,8 @@ public class ColumnsTest extends TestCase {
         Columns columns = new Columns(new ImmutableList(Arrays.asList(
             new Column[] {
                 new Column("a"),
-                new Column("a"),
                 new Column("b"),
+                new Column("c")
             })));
         Columns newColumns = columns.replace(
             new Column("b", DefaultValue.NOT_SPECIFIED, null, true, false,
@@ -66,6 +58,9 @@ public class ColumnsTest extends TestCase {
         
         assertFalse(columns.columnFromName("b").isSequenceOrAutoIncrement());
         assertTrue(newColumns.columnFromName("b").isSequenceOrAutoIncrement());
+        
+        assertEquals(Arrays.asList(new String[] { "a", "b", "c" }), 
+            newColumns.asNames());
     }
     
     public void testAddLast() throws Exception {
@@ -108,4 +103,21 @@ public class ColumnsTest extends TestCase {
         }
     }
 
+    public void testAddDuplicate() throws Exception {
+        Columns columns = new Columns(new ImmutableList(Arrays.asList(
+            new Column[] {
+                new Column("a"),
+                new Column("b"),
+                new Column("c")
+            })));
+        
+        try {
+            columns.with(new Column("b"));
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("duplicate column b", e.getMessage());
+        }
+    }
+    
 }

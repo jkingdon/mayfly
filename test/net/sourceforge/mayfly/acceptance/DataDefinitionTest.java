@@ -8,7 +8,8 @@ package net.sourceforge.mayfly.acceptance;
 public class DataDefinitionTest extends SqlTestCase {
 
     public void testDuplicateColumnName() throws Exception {
-        expectExecuteFailure("create table foo (Id integer, Id integer)", "duplicate column Id");
+        expectExecuteFailure("create table foo (Id integer, Id integer)", 
+            "duplicate column Id");
     }
     
     public void testTableAlreadyExists() throws Exception {

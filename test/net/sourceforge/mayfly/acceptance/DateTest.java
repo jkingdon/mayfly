@@ -231,16 +231,10 @@ public class DateTest extends SqlTestCase {
     }
 
     private void assertDate(long expected, long actual) {
-        // Need to figure out what is going on here.  It might be
-        // similar to hypersonic and TIMESTAMP.  Needs a closer
-        // look, but seems to have something to do with the
-        // local time zone.
-        if (dialect.datesAreOff()) {
-            assertDateBetween(expected - ONE_DAY, expected + ONE_DAY, actual);
-        }
-        else {
-            assertEquals(expected, actual);
-        }
+        assertDateBetween(
+            expected - dateFudge(), 
+            expected + dateFudge(), 
+            actual);
     }
 
     private void assertDateBetween(
@@ -248,7 +242,7 @@ public class DateTest extends SqlTestCase {
         assertTrue("Expected between " + startExpected + 
             " and " + endExpected + 
             " but was " + actual,
-            actual >= startExpected && actual < endExpected
+            actual >= startExpected && actual <= endExpected
         );
     }
     
@@ -263,13 +257,28 @@ public class DateTest extends SqlTestCase {
         ResultSet results = query("select x, y from foo");
         assertTrue(results.next());
         assertDateBetween(
-            aboutNow - HOW_MUCH_CURRENT_TIMESTAMP_MIGHT_BE_IN_THE_PAST, 
-            aboutNow + HOW_LONG_A_TEST_MIGHT_TAKE,
+            aboutNow 
+                - HOW_MUCH_CURRENT_TIMESTAMP_MIGHT_BE_IN_THE_PAST
+                - dateFudge(), 
+            aboutNow + HOW_LONG_A_TEST_MIGHT_TAKE + dateFudge(),
             results.getTimestamp("x").getTime());
         assertEquals(5, results.getInt("y"));
         assertFalse(results.next());
     }
     
+    private long dateFudge() {
+        // Need to figure out what is going on here.  It might be
+        // similar to hypersonic and TIMESTAMP.  Needs a closer
+        // look, but seems to have something to do with the
+        // local time zone.
+        if (dialect.datesAreOff()) {
+            return ONE_DAY;
+        }
+        else {
+            return 0L;
+        }
+    }
+
     public void testSetDateOrTimestamp() throws Exception {
         execute("create table foo(x date, y timestamp)");
         PreparedStatement statement = connection.prepareStatement(

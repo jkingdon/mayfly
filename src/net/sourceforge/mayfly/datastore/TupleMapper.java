@@ -1,19 +1,26 @@
 package net.sourceforge.mayfly.datastore;
 
-import net.sourceforge.mayfly.util.M;
+import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.util.CaseInsensitiveString;
+import net.sourceforge.mayfly.util.ImmutableMap;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 public class TupleMapper {
     
-    private M columnToCell;
+    private Map columnToCell;
+
+    public TupleMapper() {
+        columnToCell = new HashMap();
+    }
 
     public TupleMapper(Row initial) {
-        columnToCell = new M();
-        for (Iterator iter = initial.iterator(); iter.hasNext();) {
-            TupleElement element = (TupleElement) iter.next();
-            columnToCell.put(element.columnName(), element.cell());
+        this();
+        for (Iterator iter = initial.columnNames(); iter.hasNext();) {
+            CaseInsensitiveString name = (CaseInsensitiveString) iter.next();
+            columnToCell.put(name, initial.cell(name));
         }
     }
 
@@ -22,18 +29,30 @@ public class TupleMapper {
     }
 
     public void put(String columnName, Cell cell) {
-        columnToCell.put(columnName, cell);
+        put(new CaseInsensitiveString(columnName), cell);
+    }
+
+    private Cell put(CaseInsensitiveString column, Cell cell) {
+        return (Cell) columnToCell.put(column, cell);
+    }
+
+    public void add(String column, Cell cell) {
+        add(new CaseInsensitiveString(column), cell);
+    }
+
+    public void add(CaseInsensitiveString columnCase, Cell cell) {
+        if (put(columnCase, cell) != null) {
+            throw new MayflyException(
+                "duplicate column " + columnCase);
+        }
+    }
+
+    public boolean hasColumn(CaseInsensitiveString column) {
+        return columnToCell.containsKey(column);
     }
 
     public Row asRow() {
-        TupleBuilder builder = new TupleBuilder();
-        for (Iterator iter = columnToCell.entrySet().iterator(); iter.hasNext();) {
-            Map.Entry entry = (Map.Entry) iter.next();
-            String column = (String) entry.getKey();
-            Cell cell = (Cell) entry.getValue();
-            builder.appendColumnCell(column, cell);
-        }
-        return new Row(builder);
+        return new Row(new ImmutableMap(columnToCell));
     }
 
 }

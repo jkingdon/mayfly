@@ -6,7 +6,6 @@ import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
-import net.sourceforge.mayfly.datastore.TupleElement;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
@@ -22,6 +21,17 @@ import java.util.Set;
 /**
  * @internal
  * Mapping from Expression to Cell.
+ * 
+ * Unlike a {@link Row}, here we have an ordering.  In some contexts
+ * (for example, evaluating an expression), the order doesn't matter,
+ * and in fact might be constructed haphazardly.
+ * 
+ * However, when copying data which we'll return in a select, the
+ * order here needs to
+ * match the order of columns in a table (for "select foo.*"),
+ * and even has some user-visible meaning between tables (for "select *"),
+ * although in the latter case I'm not sure what the meaning
+ * needs to be.
  */
 public class ResultRow {
     
@@ -46,12 +56,11 @@ public class ResultRow {
     private static ImmutableList fromRow(Row row, String table,
         Options options) {
         List result = new ArrayList();
-        for (Iterator iter = row.iterator(); iter.hasNext();) {
-            TupleElement columnAndValue = (TupleElement) iter.next();
+        for (Iterator iter = row.columnNames(); iter.hasNext();) {
+            CaseInsensitiveString column = (CaseInsensitiveString) iter.next();
             result.add(new Element(
-                new SingleColumn(table, columnAndValue.columnName(),
-                    options), 
-                columnAndValue.cell()));
+                new SingleColumn(table, column.getString(), options), 
+                row.cell(column)));
         }
         return new ImmutableList(result);
     }
