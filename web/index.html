@@ -41,6 +41,8 @@
 
 <h2>News</h2>
 
+<p>17 Feb 2007: Version 0.3 released.  Adds ALTER TABLE, subselects, LIKE, the ability to dump the database as SQL, CASE, hex constants for BLOBs (x'hexdigits'), ALTER TABLE and more (see the NEWS file).</p>
+
 <p>25 Aug 2006: Version 0.2 released.  This adds schemas (and SET SCHEMA),
 GROUP BY, auto-increment columns, and primary and foreign keys.</p>
 
@@ -75,16 +77,15 @@ data) and restore from that point.</li>
 <a href="doc/html/classnet_1_1sourceforge_1_1mayfly_1_1Database.html" 
 >Database</a> class</li>
 
-<li>Any number of tables, columns, and rows (limited by available memory and
-to a certain extent by query speed).</li>
+<li>The ability to dump the database to SQL, including features designed to make this useful for unit testing (for example, diff two database dumps meaningfully)</li>
 
 <li>Inner and left joins.</li>
 
-<li>WHERE clauses with =, !=, &lt;, &gt;, AND, OR, NOT</li>
+<li>WHERE clauses, many subselects</li>
 
 <li>ORDER BY and GROUP BY</li>
 
-<li>Integer, decimal and string data types.  Auto-increment columns.</li>
+<li>Integer, decimal and string data types.  Auto-increment columns. ALTER TABLE.</li>
 
 <li>Primary and foreign keys.</li>
 </ul>
@@ -94,8 +95,10 @@ to a certain extent by query speed).</li>
 <p><a href="http://jkingdon2000.blogspot.com/" >Jim Kingdon 
 on Programming</a> (often about Mayfly)</p>
 
+<p><a href="http://jkingdon2000.blogspot.com/2007/04/mayfly-and-hibernate.html" >Mayfly and Hibernate</a></p>
+
 <p>See Martin Fowler's <a 
-href="http://martinfowler.com/bliki/InMemoryDatabase.html"
+href="http://martinfowler.com/bliki/InMemoryTestDatabase.html"
 >InMemoryDatabase</a>.</p>
 <!-- 
 We don't disagree with him about
