@@ -41,6 +41,18 @@ public class ImmutableList implements List {
         return new ImmutableList(copy, true);
     }
 
+    public ImmutableList with(int index, Object newElement) {
+        List copy = new ArrayList(this);
+        copy.add(index, newElement);
+        return new ImmutableList(copy, true);
+    }
+
+    public ImmutableList without(int index) {
+        List copy = new ArrayList(this);
+        copy.remove(index);
+        return new ImmutableList(copy, true);
+    }
+
     public ImmutableList withAll(List elementsToAdd) {
         List copy = new ArrayList(this);
         copy.addAll(elementsToAdd);

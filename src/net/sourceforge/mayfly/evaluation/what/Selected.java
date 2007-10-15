@@ -15,6 +15,15 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+   Selected is a list of expressions.  In the case of
+   SELECT a, b, foo.* FROM . . .
+   it is what we get after we expand the *'s, unlike
+   {@link What} which is before that expansion.
+   
+   It also has been resolved in the sense of
+   {@link Expression#resolve(ResultRow)}.
+ */
 public class Selected implements Iterable {
 
     private List expressions;

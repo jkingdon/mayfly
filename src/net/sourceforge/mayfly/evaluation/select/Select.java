@@ -21,7 +21,6 @@ import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.What;
-import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.util.Iterator;
@@ -30,15 +29,12 @@ import java.util.Set;
 
 public class Select extends Command {
 
-    /**
-     * Not immutable, because of {@link What#add(WhatElement)}
-     */
     private final What what;
 
     /**
-     * Not immutable, because of {@link From#add(FromElement)}
+     * Can't yet be final, because of {@link #optimize(Evaluator)}.
      */
-    private final From from;
+    private /*final*/ From from;
 
     public Condition where;
 
@@ -73,12 +69,14 @@ public class Select extends Command {
     }
 
     public MayflyResultSet select(Evaluator evaluator, Cell lastIdentity) {
-        optimize(evaluator);
-        ResultRow dummyRow = dummyRow(evaluator);
+        Evaluator aliasEvaluator = new AliasEvaluator(what, evaluator);
+
+        optimize(aliasEvaluator);
+        ResultRow dummyRow = dummyRow(aliasEvaluator);
         Selected selected = what.selected(dummyRow);
-        check(evaluator, selected, dummyRow);
-        ResultRows rows = 
-            query(evaluator, selected);
+
+        check(aliasEvaluator, selected, dummyRow);
+        ResultRows rows = query(aliasEvaluator, selected);
         return new MayflyResultSet(selected, rows);
     }
 
@@ -184,9 +182,7 @@ public class Select extends Command {
                 moveWhereToOn(first, second, evaluator);
             InnerJoin explicitJoin = new InnerJoin(first, second, on);
 
-            from.remove(0);
-            from.remove(0);
-            from.add(0, explicitJoin);
+            from = from.without(0).without(0).with(0, explicitJoin);
         }
     }
 
@@ -218,8 +214,7 @@ public class Select extends Command {
     private void moveToResult(FromElement first, FromElement second, 
         Evaluator evaluator, 
         final MoveResult moveResult, Condition toAnalyze) {
-        if (canMove(toAnalyze, first, second, 
-            evaluator)) {
+        if (canMove(toAnalyze, first, second, evaluator)) {
             moveResult.toBeMoved = makeAnd(toAnalyze, moveResult.toBeMoved);
         }
         else if (toAnalyze instanceof And) {

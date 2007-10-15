@@ -1,25 +1,21 @@
 package net.sourceforge.mayfly.evaluation.what;
 
+import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
-/**
- * @internal
- * Not yet immutable, because of {@link #add(WhatElement)}
- */
 public class What {
 
-    private List elements;
+    private final ImmutableList elements;
 
-    public What() {
-        this(new ArrayList());
+    public What(WhatElement... elements) {
+        this(ImmutableList.fromArray(elements));
     }
 
-    public What(List elements) {
+    public What(ImmutableList elements) {
         this.elements = elements;
     }
 
@@ -27,9 +23,8 @@ public class What {
         return elements.iterator();
     }
 
-    public What add(WhatElement element) {
-        elements.add(element);
-        return this;
+    public What with(WhatElement newElement) {
+        return new What(elements.with(newElement));
     }
 
     public Selected selected(ResultRow dummyRow) {
@@ -39,6 +34,17 @@ public class What {
             result.addAll(element.selected(dummyRow));
         }
         return new Selected(result);
+    }
+
+    public Expression lookupAlias(String name) {
+        for (Iterator iter = elements.iterator(); iter.hasNext();) {
+            WhatElement element = (WhatElement) iter.next();
+            Expression result = element.lookupAlias(name);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 
     public int size() {

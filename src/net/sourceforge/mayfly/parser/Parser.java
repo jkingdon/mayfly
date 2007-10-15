@@ -112,7 +112,6 @@ import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -999,13 +998,13 @@ public class Parser {
 
     public What parseWhat() {
         if (consumeIfMatches(TokenType.ASTERISK)) {
-            return new What(Collections.singletonList(new All()));
+            return new What(new All());
         }
 
         What what = new What();
         
         do {
-            what.add(parseWhatElement());
+            what = what.with(parseWhatElement());
         } while (consumeIfMatches(TokenType.COMMA));
         
         return what;
@@ -1503,7 +1502,7 @@ public class Parser {
     public From parseFromItems() {
         From from = new From();
         do {
-            from.add(parseFromItem());
+            from = from.with(parseFromItem());
         } while (consumeIfMatches(TokenType.COMMA));
         return from;
     }

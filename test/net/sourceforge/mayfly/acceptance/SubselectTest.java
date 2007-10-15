@@ -54,6 +54,8 @@ public class SubselectTest extends SqlTestCase {
     }
     
     public void testReferToRowInEnclosingQuery() throws Exception {
+        assertTrue(connection.getMetaData().supportsCorrelatedSubqueries());
+
         execute("create table countries(" +
             "region varchar(255), name varchar(255), population integer)");
         execute("insert into countries values('Americas', 'USA', 300)");

@@ -296,9 +296,10 @@ public class MySqlDialect extends Dialect {
         return true;
     }
     
-    public boolean allowTimestampInDateColumn() {
-        return true;
-    }
+    // seems to be false for 5.0.45 (MysqlDataTruncation), true for 5.0.27
+//    public boolean allowTimestampInDateColumn() {
+//        return true;
+//    }
 
     public boolean dataTypesAreEnforced() {
         return false;

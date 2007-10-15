@@ -21,7 +21,7 @@ public class IsNullTest extends TestCase {
     public void testEvaluate() throws Exception {
         Row nullRow =
             new TupleBuilder()
-                .appendColumnCell("colA", NullCell.INSTANCE)
+                .append("colA", NullCell.INSTANCE)
                 .asRow()
         ;
 
@@ -29,7 +29,7 @@ public class IsNullTest extends TestCase {
 
         Row nonNullRow =
             new TupleBuilder()
-                .appendColumnCell("colA", new StringCell("foo"))
+                .append("colA", new StringCell("foo"))
                 .asRow()
         ;
 

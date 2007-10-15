@@ -26,9 +26,9 @@ public class ConditionTest extends TestCase {
         Condition where = new Parser("name='steve'").parseWhere();
 
         Row row1 = new TupleBuilder()
-            .appendColumnCellContents("name", "steve").asRow();
+            .append("name", "steve").asRow();
         Row row2 = new TupleBuilder()
-            .appendColumnCellContents("name", "bob").asRow();
+            .append("name", "bob").asRow();
 
         assertTrue(where.evaluate(row1, "table1"));
         assertFalse(where.evaluate(row2, "table1"));
@@ -36,9 +36,9 @@ public class ConditionTest extends TestCase {
     
     public void testNull() throws Exception {
         Condition where = new Equal(new SingleColumn("a"), new IntegerLiteral(5));
-        Row fiveRow = new TupleBuilder().appendColumnCellContents("a", 5).asRow();
+        Row fiveRow = new TupleBuilder().append("a", 5).asRow();
         Row nullRow = new TupleBuilder()
-            .appendColumnCell("a", NullCell.INSTANCE).asRow();
+            .append("a", NullCell.INSTANCE).asRow();
         
         assertTrue(where.evaluate(fiveRow, "table1"));
         assertFalse(where.evaluate(nullRow, "table1"));

@@ -24,7 +24,7 @@ public class NotTest extends TestCase {
     public void testEvaluate() throws Exception {
         Row row =
             new TupleBuilder()
-                .appendColumnCell("x", new StringCell("foo"))
+                .append("x", new StringCell("foo"))
                 .asRow()
         ;
         Equal compareWithFoo = new Equal(new SingleColumn("x"), new QuotedString("'foo'"));

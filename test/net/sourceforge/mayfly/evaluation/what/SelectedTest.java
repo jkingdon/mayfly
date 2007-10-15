@@ -38,5 +38,5 @@ public class SelectedTest extends TestCase {
         
         MayflyAssert.assertLong(18, row.cell(0));
     }
-
+    
 }

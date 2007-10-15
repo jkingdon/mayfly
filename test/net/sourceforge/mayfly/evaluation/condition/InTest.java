@@ -32,7 +32,7 @@ public class InTest extends TestCase {
 	}
 
     private Row row(long aValue) {
-        return new TupleBuilder().appendColumnCellContents("a", aValue).asRow();
+        return new TupleBuilder().append("a", aValue).asRow();
     }
 
 }

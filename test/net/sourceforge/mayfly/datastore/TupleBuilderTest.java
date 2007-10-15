@@ -8,7 +8,7 @@ public class TupleBuilderTest extends TestCase {
     
     public void testBasics() throws Exception {
         Row builtRow = new TupleBuilder()
-            .appendColumnCellContents("a", "val")
+            .append("a", "val")
             .asRow();
         assertEquals(1, builtRow.columnCount());
         MayflyAssert.assertString("val", builtRow.cell("a"));

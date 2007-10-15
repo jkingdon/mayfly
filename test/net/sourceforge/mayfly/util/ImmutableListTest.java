@@ -51,4 +51,21 @@ public class ImmutableListTest extends TestCase {
         assertEquals(expected, actual);
     }
     
+    public void testWithout() throws Exception {
+        ImmutableList list = new ImmutableList().with("a").with("b").with("c");
+        ImmutableList result = list.without(1);
+        assertEquals(2, result.size());
+        assertEquals("a", result.get(0));
+        assertEquals("c", result.get(1));
+    }
+    
+    public void testWithAtIndex() throws Exception {
+        ImmutableList list = new ImmutableList().with("a").with("c");
+        ImmutableList result = list.with(1, "b");
+        assertEquals(3, result.size());
+        assertEquals("a", result.get(0));
+        assertEquals("b", result.get(1));
+        assertEquals("c", result.get(2));
+    }
+    
 }

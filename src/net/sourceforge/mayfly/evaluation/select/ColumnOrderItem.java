@@ -2,6 +2,7 @@ package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
@@ -20,7 +21,7 @@ public class ColumnOrderItem extends OrderItem {
         return compare(first, second, column);
     }
 
-    public static int compare(ResultRow first, ResultRow second, SingleColumn column) {
+    public static int compare(ResultRow first, ResultRow second, Expression column) {
         Cell cell1 = column.evaluate(first);
         Cell cell2 = column.evaluate(second);
         return cell1.compareTo(cell2, column.location);

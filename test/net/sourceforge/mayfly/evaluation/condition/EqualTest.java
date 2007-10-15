@@ -15,7 +15,7 @@ public class EqualTest extends TestCase {
     public void testColumnAndQuotedString() throws Exception {
         Row row =
             new TupleBuilder()
-                .appendColumnCellContents("colA", "1")
+                .append("colA", "1")
                 .asRow();
 
         assertTrue(
@@ -37,8 +37,8 @@ public class EqualTest extends TestCase {
          */
         assertFalse(equal.evaluate(
             new TupleBuilder()
-                .appendColumnCell("a", NullCell.INSTANCE)
-                .appendColumnCell("b", NullCell.INSTANCE)
+                .append("a", NullCell.INSTANCE)
+                .append("b", NullCell.INSTANCE)
                 .asRow()
             ,
             "table1"
@@ -46,8 +46,8 @@ public class EqualTest extends TestCase {
 
         assertTrue(equal.evaluate(
             new TupleBuilder()
-                .appendColumnCell("a", new LongCell(5))
-                .appendColumnCell("b", new LongCell(5))
+                .append("a", new LongCell(5))
+                .append("b", new LongCell(5))
                 .asRow(),
             "table1"
         ));

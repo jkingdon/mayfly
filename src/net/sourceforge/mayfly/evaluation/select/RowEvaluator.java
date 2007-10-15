@@ -33,5 +33,10 @@ public class RowEvaluator extends Evaluator {
             return nestedEvaluator.lookup(this.row, tableOrAlias, columnName, location);
         }
     }
+    
+    /* TODO: the fact that we don't override table and options
+       (by delegating),
+       might mean we aren't correctly handling case-sensitive table names
+     */
 
 }

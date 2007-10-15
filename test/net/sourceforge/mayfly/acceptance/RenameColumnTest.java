@@ -20,7 +20,7 @@ public class RenameColumnTest extends SqlTestCase {
     }
     
     /**
-     * Here we ape the MySQL behavior.
+     * Here we ape the MySQL (5.0.27, I think) behavior.
      * 
      * It would, I suppose, make more sense to just rename the column
      * both in the foreign key and the table itself.  But if we

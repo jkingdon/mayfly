@@ -17,9 +17,9 @@ public class RowTest extends TestCase {
     public void testCell() throws Exception {
         Row row =
             new TupleBuilder()
-                .appendColumnCellContents("colA", "1")
-                .appendColumnCellContents("colB", "2")
-                .appendColumnCellContents("colC", "3")
+                .append("colA", "1")
+                .append("colB", "2")
+                .append("colC", "3")
                 .asRow();
 
         MayflyAssert.assertString("2", row.cell("colB"));
@@ -35,8 +35,8 @@ public class RowTest extends TestCase {
 
     public void testDropColumn() throws Exception {
         Row row = new TupleBuilder()
-            .appendColumnCellContents("a", 7)
-            .appendColumnCellContents("b", 9)
+            .append("a", 7)
+            .append("b", 9)
             .asRow();
         
         Row newRow = row.dropColumn("B");
@@ -47,7 +47,7 @@ public class RowTest extends TestCase {
     
     public void testDropColumnNonexistent() throws Exception {
         Row row = new TupleBuilder()
-            .appendColumnCellContents("a", 7)
+            .append("a", 7)
             .asRow();
         
         try {
@@ -61,8 +61,8 @@ public class RowTest extends TestCase {
     
     public void testRenameColumn() throws Exception {
         Row row = new TupleBuilder()
-            .appendColumnCellContents("a", 5)
-            .appendColumnCellContents("c", 7)
+            .append("a", 5)
+            .append("c", 7)
             .asRow();
         
         Row newRow = row.renameColumn("C", "b");
@@ -74,7 +74,7 @@ public class RowTest extends TestCase {
     
     public void testRenameColumnNonexistent() throws Exception {
         Row row = new TupleBuilder()
-            .appendColumnCellContents("a", 7)
+            .append("a", 7)
             .asRow();
         
         try {
@@ -88,8 +88,8 @@ public class RowTest extends TestCase {
     
     public void testRenameToConflict() throws Exception {
         Row row = new TupleBuilder()
-            .appendColumnCellContents("a", 5)
-            .appendColumnCellContents("c", 7)
+            .append("a", 5)
+            .append("c", 7)
             .asRow();
 
         try {
@@ -109,7 +109,7 @@ public class RowTest extends TestCase {
     
     public void testAddDuplicate() throws Exception {
         Row row = new TupleBuilder()
-            .appendColumnCell("a", new StringCell("hi"))
+            .append("a", new StringCell("hi"))
             .asRow();
         
         try {
@@ -123,10 +123,10 @@ public class RowTest extends TestCase {
     
     public void testToString() throws Exception {
         Row row = new TupleBuilder()
-            .appendColumnCell("a", new StringCell("hi"))
-            .appendColumnCell("b", new LongCell(777))
-            .appendColumnCell("c", NullCell.INSTANCE)
-            .appendColumnCell("d", new BinaryCell((byte)7))
+            .append("a", new StringCell("hi"))
+            .append("b", new LongCell(777))
+            .append("c", NullCell.INSTANCE)
+            .append("d", new BinaryCell((byte)7))
             .asRow();
         String debug = row.toString();
         StringAssert.assertStartsWith("Row(", debug);
@@ -139,10 +139,10 @@ public class RowTest extends TestCase {
     
     public void testColumnNames() throws Exception {
         Row row = new TupleBuilder()
-            .appendColumnCell("a", new StringCell("hi"))
-            .appendColumnCell("b", new LongCell(777))
-            .appendColumnCell("c", NullCell.INSTANCE)
-            .appendColumnCell("d", new BinaryCell((byte)7))
+            .append("a", new StringCell("hi"))
+            .append("b", new LongCell(777))
+            .append("c", NullCell.INSTANCE)
+            .append("d", new BinaryCell((byte)7))
             .asRow();
         Iterator names = row.columnNames();
         Set results = new HashSet();

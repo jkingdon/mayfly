@@ -106,5 +106,5 @@ public class MetaDataTest extends SqlTestCase {
             dialect.productName(), 
             connection.getMetaData().getDatabaseProductName());
     }
-
+    
 }

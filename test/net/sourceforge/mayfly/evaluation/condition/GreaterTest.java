@@ -22,8 +22,8 @@ public class GreaterTest extends TestCase {
     public void testEval() throws Exception {
         Row row =
             new TupleBuilder()
-                .appendColumnCellContents("colA", 6)
-                .appendColumnCellContents("colB", 7)
+                .append("colA", 6)
+                .append("colB", 7)
                 .asRow()
         ;
 

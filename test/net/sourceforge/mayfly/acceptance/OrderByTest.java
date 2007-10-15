@@ -64,29 +64,29 @@ public class OrderByTest extends SqlTestCase {
         execute("insert into foo(a, b) values (2, 70)");
 
         String expression = "select a from foo order by a + b";
-        // So here's the evil part: an integer is not an expression, it is a special case
-        String reference = "select a from foo order by 1, b";
-        String referenceDescending = "select a from foo order by 1 desc, b";
-        // But this one is an expression
+
+        /* So here's the evil part: an integer is not an expression, it is a 
+           reference (special case) */
+        assertResultList(new String[] { "2", "3", "4", "5", "8" }, 
+            query("select a from foo order by 1, b"));
+        assertResultList(new String[] { "8", "5", "4", "3", "2" }, 
+            query("select a from foo order by 1 desc, b"));
+        assertResultList(new String[] { "35", "48", "53", "64", "72" }, 
+            query("select a + b from foo order by 1, b"));
+
+        // But "1 + 0" is an expression, not a reference
         String constantExpression = "select a from foo order by 1 + 0, b";
-
-        // This one isn't quite so strange; maybe this is worth supporting
-        String referenceToExpression = "select a + b from foo order by 1, b";
-
-        assertResultList(new String[] { "2", "3", "4", "5", "8" }, query(reference));
-        assertResultList(new String[] { "8", "5", "4", "3", "2" }, query(referenceDescending));
         if (dialect.canOrderByExpression(false)) {
+            // Derby returns false, although it actually supports the feature.
+//            assertTrue(connection.getMetaData().supportsExpressionsInOrderBy());
             assertResultList(new String[] { "5", "8", "3", "4", "2" }, query(expression));
             // Evil!  We can at the very least give an error on a constant expression, I hope
             assertResultList(new String[] { "5", "8", "3", "4", "2" }, query(constantExpression));
-
-            assertResultList(new String[] { "35", "48", "53", "64", "72" }, query(referenceToExpression));
         }
         else {
+            assertFalse(connection.getMetaData().supportsExpressionsInOrderBy());
             expectQueryFailure(expression, "expected end of file but got '+'");
             expectQueryFailure(constantExpression, "expected end of file but got '+'");
-            
-            expectQueryFailure(referenceToExpression, "ORDER BY 1 refers to an expression not a column");
         }
     }
     
@@ -120,6 +120,8 @@ public class OrderByTest extends SqlTestCase {
             "ORDER BY 0 must be in range 1 to 1");
 
         // Does negative mean something?
+        // In hypersonic, I got 2,4,3,8,5 (reverse order of insertion, apparently).
+        // In Derby, an ArrayOutOfBoundsException
         //        expectQueryFailure("select a from foo order by -1", "ORDER BY -1 must be in range 1 to 1");
         //expectQueryFailure("select a from foo order by -1", "expected identifier but got '-'");
 
@@ -151,7 +153,7 @@ public class OrderByTest extends SqlTestCase {
             // thus cause the ORDER BY to refer to something different.
             assertResultList(new String[] { "2", "3", "4", "5", "8" }, query(orderByB));
             expectQueryFailure(orderBySecondA, "ORDER BY 3 must be in range 1 to 2");
-            expectQueryFailure(orderBySecondA2, "ORDER BY 2 refers to an expression not a column");
+            expectQueryFailure(orderBySecondA2, "ORDER BY 2 refers to foo.* not an expression");
         }
         else {
             assertResultList(new String[] { "5", "8", "3", "4", "2" }, query(orderByB));
@@ -160,6 +162,24 @@ public class OrderByTest extends SqlTestCase {
         }
     }
     
+    public void testOrderByWithSelectAll() throws Exception {
+        execute("create table foo (a integer, b integer)");
+        execute("insert into foo(a, b) values (5, 30)");
+        execute("insert into foo(a, b) values (8, 40)");
+        execute("insert into foo(a, b) values (3, 50)");
+        execute("insert into foo(a, b) values (4, 60)");
+        execute("insert into foo(a, b) values (2, 70)");
+        
+        String orderByOne = "select * from foo order by 1";
+
+        if (dialect.expectMayflyBehavior()) {
+            expectQueryFailure(orderByOne, "ORDER BY 1 refers to * not an expression");
+        }
+        else {
+            assertResultList(new String[] { "2", "3", "4", "5", "8" }, query(orderByOne));
+        }
+    }
+
     public void testOrderByWithTableAlias() throws Exception {
         execute("create table places (id integer, parent integer, name varchar(255))");
         execute("insert into places(id, parent, name) values(10, 1, 'B')");

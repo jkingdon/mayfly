@@ -43,7 +43,7 @@ public class ForeignKeyTest extends TestCase {
 
     private static Row singleColumnRow(String columnName, LongCell cell) {
         return new TupleBuilder()
-            .appendColumnCell(columnName, cell).asRow();
+            .append(columnName, cell).asRow();
     }
 
     public void testCheckDelete() throws Exception {

@@ -1,10 +1,9 @@
 package net.sourceforge.mayfly.evaluation.from;
 
 import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.util.ImmutableList;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * @internal
@@ -12,11 +11,13 @@ import java.util.List;
  */
 public class From {
 
-    private final List fromElements;
+    private final ImmutableList fromElements;
 
-    public From() { this.fromElements = new ArrayList(); }
+    public From(FromElement... elements) { 
+        this.fromElements = ImmutableList.fromArray(elements);
+    }
 
-    public From(List fromElements) {
+    public From(ImmutableList fromElements) {
         this.fromElements = fromElements;
     }
 
@@ -24,17 +25,16 @@ public class From {
         return fromElements.iterator();
     }
 
-    public From add(FromElement fromElement) {
-        fromElements.add(fromElement);
-        return this;
+    public From with(FromElement fromElement) {
+        return new From(fromElements.with(fromElement));
     }
 
-    public void remove(int index) {
-        fromElements.remove(index);
+    public From without(int index) {
+        return new From(fromElements.without(index));
     }
 
-    public void add(int index, FromElement element) {
-        fromElements.add(index, element);
+    public From with(int index, FromElement element) {
+        return new From(fromElements.with(index, element));
     }
 
     public FromElement soleElement() {

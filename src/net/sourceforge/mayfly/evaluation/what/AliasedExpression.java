@@ -10,7 +10,7 @@ import net.sourceforge.mayfly.evaluation.select.Evaluator;
  * @internal
  * expression AS alias
  * 
- * (as in, for example, SELECT a + b AS TOTAL FROM foo).
+ * (as in, for example, SELECT a + b AS total FROM foo).
  */
 public class AliasedExpression extends Expression {
 
@@ -33,10 +33,6 @@ public class AliasedExpression extends Expression {
     public String firstColumn() {
         return expression.firstColumn();
     }
-
-//    public Selected selected(Row dummyRow) {
-//        throw new UnimplementedException();
-//    }
 
     public Cell aggregate(ResultRows rows) {
         return expression.aggregate(rows);
@@ -63,6 +59,11 @@ public class AliasedExpression extends Expression {
     
     public boolean matches(String columnName) {
         return alias.equalsIgnoreCase(columnName);
+    }
+    
+    @Override
+    public Expression lookupAlias(String name) {
+        return matches(name) ? expression : null;
     }
 
 }

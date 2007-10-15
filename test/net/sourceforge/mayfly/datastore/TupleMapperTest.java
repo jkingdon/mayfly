@@ -10,8 +10,8 @@ public class TupleMapperTest extends TestCase {
     public void testBasics() throws Exception {
         Row initial = 
             new TupleBuilder()
-                .appendColumnCell("a", new LongCell(5))
-                .appendColumnCell("c", new LongCell(5))
+                .append("a", new LongCell(5))
+                .append("c", new LongCell(5))
                 .asRow();
         TupleMapper mapper = new TupleMapper(initial);
         mapper.put(new Column("a"), new StringCell("hi"));

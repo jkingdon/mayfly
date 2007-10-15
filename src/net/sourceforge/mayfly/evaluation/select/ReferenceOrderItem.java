@@ -1,8 +1,9 @@
 package net.sourceforge.mayfly.evaluation.select;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
+import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
-import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
 
@@ -26,13 +27,14 @@ public class ReferenceOrderItem extends OrderItem {
         }
 
         WhatElement whatElement = what.element(zeroBasedColumn);
-        if (whatElement instanceof SingleColumn) {
-            return ColumnOrderItem.compare(first, second, (SingleColumn) whatElement);
+        if (whatElement instanceof Expression) {
+            return ColumnOrderItem.compare(first, second, (Expression) whatElement);
         }
         else {
-            throw new MayflyException(
+            throw new MayflyInternalException(
                 "ORDER BY " + reference + 
-                " refers to an expression not a column");
+                " refers to " + whatElement.displayName() + 
+                " not an expression");
         }
     }
 

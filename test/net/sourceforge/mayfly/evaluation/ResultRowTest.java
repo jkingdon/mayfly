@@ -183,7 +183,7 @@ public class ResultRowTest extends TestCase {
     public void testOptions() throws Exception {
         Options options = new Options(true);
         Row row = new TupleBuilder()
-            .appendColumnCell("x", new LongCell(7))
+            .append("x", new LongCell(7))
             .asRow();
         ResultRow resultRow = new ResultRow(row, "foo", options);
         assertEquals(1, resultRow.size());

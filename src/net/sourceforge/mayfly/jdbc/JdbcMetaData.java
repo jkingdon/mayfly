@@ -464,7 +464,7 @@ public class JdbcMetaData implements DatabaseMetaData {
     }
 
     public boolean supportsCorrelatedSubqueries() throws SQLException {
-        return false;
+        return true;
     }
 
     public boolean supportsDataDefinitionAndDataManipulationTransactions() throws SQLException {

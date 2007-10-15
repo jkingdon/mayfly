@@ -38,4 +38,8 @@ public class MySql4Dialect extends MySqlDialect {
         return !isAggregate;
     }
 
+    public boolean allowTimestampInDateColumn() {
+        return true;
+    }
+
 }

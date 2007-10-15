@@ -2,6 +2,8 @@ package net.sourceforge.mayfly;
 
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.acceptance.MayflyDialect;
+
 public class TableNamesCaseSensitiveTest extends TestCase {
 
     private Database database;
@@ -39,6 +41,23 @@ public class TableNamesCaseSensitiveTest extends TestCase {
         expectQueryFailure("select * from FOO cross join bar", 
             "attempt to refer to table foo as FOO " +
             "(with case sensitive table names enabled)");
+    }
+
+    public void testSubselect() throws Exception {
+        if (!new MayflyDialect().wishThisWereTrue()) {
+            return;
+        }
+
+        database.execute("create table Foo(x integer)");
+        expectQueryFailure("select x from Foo where x = (select x from FOO)", 
+            "attempt to refer to table Foo as FOO " +
+            "(with case sensitive table names enabled)");
+        expectQueryFailure("select x from FOO where x = (select x from Foo)", 
+            "attempt to refer to table Foo as FOO " +
+            "(with case sensitive table names enabled)");
+        
+        // TODO: add a subselect to the following (two cases, like above)
+        expectQueryFailure("select x from Foo where FOO.x = 5", "no column FOO.x");
     }
 
     public void testDelete() throws Exception {

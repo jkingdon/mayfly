@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.what;
 
+import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 
 /**
@@ -20,6 +21,10 @@ abstract public class WhatElement {
 
     abstract public String displayName();
     
+    public Expression lookupAlias(String name) {
+        return null;
+    }
+
     public String debugName() {
         return displayName();
     }

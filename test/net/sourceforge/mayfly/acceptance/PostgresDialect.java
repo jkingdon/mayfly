@@ -91,11 +91,12 @@ public class PostgresDialect extends Dialect {
 //        return true;
 //    }
     
-    public boolean aggregateAsteriskIsForCountOnly() {
-        // I didn't really look into just what postgres
-        // does for this case.
-        return false;
-    }
+    // Seems to be false for postgres 8.1.4, true for 8.2.5
+//    public boolean aggregateAsteriskIsForCountOnly() {
+//        // I didn't really look into just what postgres
+//        // does for this case.
+//        return false;
+//    }
     
     /*
      * As of Postgres 8.1.8, this is true.

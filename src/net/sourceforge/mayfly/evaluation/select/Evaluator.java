@@ -10,9 +10,25 @@ import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.parser.Location;
 
 /**
- * @internal
- * This class has the information needed to evaluate a subselect.
+   @internal
+   This class is responsible for looking up names and also keeping a hold
+   of the store and current schema (I guess because the two tasks seemed
+   to need the same information).
+   
+   Cases for evaluating a name are:
+   
+   - column name, directly
+   
+   - value from the outer query of a correlated subquery, for example
+   candidate.region in:
+   SELECT name FROM countries candidate
+     WHERE population >= 
+       (SELECT max(population) FROM countries other
+         WHERE other.region = candidate.region)
+
+   - column alias (total in select a + b as total).
  */
+
 public abstract class Evaluator {
     
     public static final Evaluator NO_SUBSELECT_NEEDED = 
