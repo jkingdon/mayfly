@@ -17,10 +17,12 @@ public class LastIdentity extends Command {
     private static final String UPDATE_MESSAGE = 
         "SELECT is only available with query, not update";
 
+    @Override
     public UpdateStore update(DataStore store, String currentSchema) {
         throw new MayflyException(UPDATE_MESSAGE);
     }
     
+    @Override
     public MayflyResultSet select(
         Evaluator evaluator, Cell lastIdentity) {
         Expression expression = new LastIdentityExpression();

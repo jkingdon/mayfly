@@ -10,6 +10,7 @@ public class InnerJoin extends Join {
         super(left, right, condition);
     }
 
+    @Override
     public ResultRows tableContents(Evaluator evaluator) {
         ResultRows unfiltered = 
             left.tableContents(evaluator)

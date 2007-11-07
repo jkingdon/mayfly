@@ -13,14 +13,17 @@ public class StringCell extends Cell {
         this.content = content;
     }
 
+    @Override
     public String asString() {
         return content;
     }
     
+    @Override
     public String displayName() {
         return "string " + asQuotedString();
     }
     
+    @Override
     public String asSql() {
         return asQuotedString();
     }
@@ -29,10 +32,12 @@ public class StringCell extends Cell {
         return "'" + StringEscapeUtils.escapeSql(content) + "'";
     }
 
+    @Override
     public Object asObject() {
         return content;
     }
 
+    @Override
     public int compareTo(Cell otherCell, Location location) {
         if (otherCell instanceof StringCell) {
             return sqlStringCompare(content, ((StringCell) otherCell).content);

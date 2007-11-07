@@ -19,6 +19,7 @@ public class SubselectedIn extends Condition {
         this.subselect = subselect;
     }
 
+    @Override
     public boolean evaluate(ResultRow row, Evaluator evaluator) {
         Cell leftCell = leftSide.evaluate(row, evaluator);
         MayflyResultSet rows = 
@@ -32,10 +33,12 @@ public class SubselectedIn extends Condition {
         return false;
     }
 
+    @Override
     public String firstAggregate() {
         return leftSide.firstAggregate();
     }
 
+    @Override
     public void check(ResultRow row) {
         leftSide.check(row);
         throw NoColumn.dummyExceptionForSubselect(subselect.location);

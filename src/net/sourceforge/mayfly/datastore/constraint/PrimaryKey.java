@@ -23,22 +23,26 @@ public class PrimaryKey extends NotNullOrUnique {
         super(columns, constraintName);
     }
 
+    @Override
     protected void checkForNull(String column, Cell proposedCell) {
         if (proposedCell instanceof NullCell) {
             throw new MayflyException("primary key " + column + " cannot be null");
         }
     }
 
+    @Override
     public Constraint renameColumn(String oldName, String newName) {
         return new PrimaryKey(
             names.renameColumn(oldName, newName), 
             constraintName);
     }
 
+    @Override
     protected String description() {
         return "primary key";
     }
     
+    @Override
     public void dump(Writer out) throws IOException {
         out.write("PRIMARY KEY(");
         names.dump(out);

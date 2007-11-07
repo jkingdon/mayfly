@@ -20,6 +20,7 @@ public class CreateIndex extends Command {
         this.unique = unique;
     }
 
+    @Override
     public UpdateStore update(DataStore store, String currentSchema) {
         DataStore withConstraint = addUniqueConstraint(store, currentSchema);
         DataStore newStore = addIndex(withConstraint, currentSchema);

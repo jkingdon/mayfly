@@ -31,6 +31,7 @@ public class CreateTable extends Command {
         return table;
     }
 
+    @Override
     public UpdateStore update(DataStore store, String schema) {
         Schema updatedSchema = update(store, schema, store.schema(schema));
         return new UpdateStore(store.replace(schema, updatedSchema), 0);

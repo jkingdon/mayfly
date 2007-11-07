@@ -27,14 +27,17 @@ public class QuotedString extends Literal {
         return withoutQuotes.replaceAll("''", "'");
     }
 
+    @Override
     public Cell valueAsCell() {
         return new StringCell(stringWithoutQuotes());
     }
     
+    @Override
     public String displayName() {
         return stringInQuotes;
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         if (other instanceof QuotedString) {
             QuotedString string = (QuotedString) other;
@@ -45,6 +48,7 @@ public class QuotedString extends Literal {
         }
     }
     
+    @Override
     public int hashCode() {
         final int PRIME = 31;
         int result = super.hashCode();
@@ -56,6 +60,7 @@ public class QuotedString extends Literal {
      * For tests which want to check the string but don't
      * want the test to have to contain the expected location.
      */
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;

@@ -21,24 +21,29 @@ public class CountAll extends Expression {
         this(functionName, Location.UNKNOWN);
     }
 
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         /** This is just for checking; aggregation happens in 
             {@link #aggregate(Rows)}. */
         return new LongCell(0);
     }
 
+    @Override
     public String firstAggregate() {
         return displayName();
     }
 
+    @Override
     public String displayName() {
         return functionName + "(*)";
     }
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         return new LongCell(rows.size());
     }
     
+    @Override
     public boolean sameExpression(Expression other) {
         return other instanceof CountAll;
     }

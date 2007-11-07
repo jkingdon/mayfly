@@ -126,6 +126,7 @@ public class Parser {
 
     private static final ResultRow PSEUDO_ROW_FOR_VALUE_CONSTRUCTOR = 
         new ResultRow() {
+            @Override
             public SingleColumn findColumn(
                 String tableOrAlias, String columnName,
                 Location location) {
@@ -1453,12 +1454,14 @@ public class Parser {
             this.expression = expression;
         }
 
+        @Override
         public Condition asBoolean() {
             throw new ParserException(
                 "expected boolean expression but got non-boolean expression",
                 expression.location);
         }
 
+        @Override
         public Expression asNonBoolean() {
             return expression;
         }
@@ -1473,10 +1476,12 @@ public class Parser {
             this.condition = expression;
         }
 
+        @Override
         public Condition asBoolean() {
             return condition;
         }
 
+        @Override
         public Expression asNonBoolean() {
             throw new ParserException(
                 "expected non-boolean expression but got boolean expression");

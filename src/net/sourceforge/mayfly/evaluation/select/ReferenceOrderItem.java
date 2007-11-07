@@ -16,6 +16,7 @@ public class ReferenceOrderItem extends OrderItem {
         this.reference = reference;
     }
 
+    @Override
     protected int compareAscending(
         What what, ResultRow first, ResultRow second) {
         int zeroBasedColumn = reference - 1;
@@ -38,6 +39,7 @@ public class ReferenceOrderItem extends OrderItem {
         }
     }
 
+    @Override
     public void check(ResultRow afterGroupByAndDistinct, ResultRow afterGroupBy, ResultRow afterJoins) {
     }
 

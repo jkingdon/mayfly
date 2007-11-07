@@ -23,6 +23,7 @@ public class RowNode extends Node {
      * Lexicographic order based on the rows (that is, compare the
      * first column, if equal then compare the second, and so on).
      */
+    @Override
     public int backupOrdering(Node other) {
         Row first = row;
         Row second = ((RowNode)other).row;

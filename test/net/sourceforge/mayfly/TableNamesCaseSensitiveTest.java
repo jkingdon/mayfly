@@ -8,6 +8,7 @@ public class TableNamesCaseSensitiveTest extends TestCase {
 
     private Database database;
 
+    @Override
     public void setUp() throws Exception {
         database = new Database();
         database.tableNamesCaseSensitive(true);

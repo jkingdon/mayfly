@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 public class TimestampDataType extends DataType {
 
+    @Override
     public Cell coerce(Value value, String columnName) {
         if (value.value instanceof StringCell) {
             return stringToDate(value.value.asString(), value.location);
@@ -74,6 +75,7 @@ public class TimestampDataType extends DataType {
         }
     }
     
+    @Override
     public String dumpName() {
         return "TIMESTAMP";
     }

@@ -15,6 +15,7 @@ public class AddConstraint extends Command {
         this.constraint = constraint;
     }
 
+    @Override
     public UpdateStore update(DataStore store, String currentSchema) {
         TableReference reference = table.resolve(store, currentSchema, null);
         Constraint resolved = 

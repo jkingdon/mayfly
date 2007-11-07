@@ -17,14 +17,17 @@ public class Maximum extends AggregateExpression {
         this(column, spellingOfMax, distinct, Location.UNKNOWN);
     }
     
+    @Override
     Cell aggregate(Collection values) {
         return aggregateMinMax(values);
     }
     
+    @Override
     boolean isBetter(Cell candidate, Cell bestSoFar) {
         return candidate.compareTo(bestSoFar, location) > 0;
     }
 
+    @Override
     public Expression resolve(ResultRow row) {
         return new Maximum(column.resolve(row), functionName, distinct, location);
     }

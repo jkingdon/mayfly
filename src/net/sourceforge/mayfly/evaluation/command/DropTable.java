@@ -17,6 +17,7 @@ public class DropTable extends Command {
         return table;
     }
 
+    @Override
     public UpdateStore update(DataStore store, String schema) {
         if (ifExists) {
             if (!store.hasTable(table, schema)) {

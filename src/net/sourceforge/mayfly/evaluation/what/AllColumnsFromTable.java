@@ -10,10 +10,12 @@ public class AllColumnsFromTable extends WhatElement {
         this.aliasOrTable = aliasOrTable;
     }
 
+    @Override
     public Selected selected(ResultRow dummyRow) {
         return new Selected(dummyRow.expressionsForTable(aliasOrTable));
     }
 
+    @Override
     public String displayName() {
         return aliasOrTable + ".*";
     }

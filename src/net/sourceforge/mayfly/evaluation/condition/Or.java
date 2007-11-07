@@ -13,15 +13,18 @@ public class Or extends Condition {
         this.rightSide = rightSide;
     }
 
+    @Override
     public boolean evaluate(ResultRow row, Evaluator evaluator) {
         return leftSide.evaluate(row, evaluator) || 
             rightSide.evaluate(row, evaluator);
     }
 
+    @Override
     public String firstAggregate() {
         return firstAggregate(leftSide, rightSide);
     }
     
+    @Override
     public void check(ResultRow row) {
         leftSide.check(row);
         rightSide.check(row);

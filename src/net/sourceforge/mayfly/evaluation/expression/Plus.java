@@ -11,10 +11,12 @@ public class Plus extends BinaryOperator {
         super(left, right);
     }
 
+    @Override
     protected Cell combine(Cell left, Cell right) {
         return new LongCell(left.asLong() + right.asLong());
     }
 
+    @Override
     public Expression resolve(ResultRow row) {
         return new Plus(left.resolve(row), right.resolve(row));
     }

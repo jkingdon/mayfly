@@ -19,10 +19,12 @@ public class DateCell extends Cell {
         this.localDate = localDate;
     }
 
+    @Override
     public java.sql.Date asDate(DateTimeZone zone) throws SQLException {
         return new java.sql.Date(asMillis(zone));
     }
     
+    @Override
     public java.sql.Timestamp asTimestamp(DateTimeZone zone) throws SQLException {
         return new java.sql.Timestamp(asMillis(zone));
     }
@@ -31,6 +33,7 @@ public class DateCell extends Cell {
         return localDate.toDateMidnight(zone).getMillis();
     }
 
+    @Override
     public int compareTo(Cell otherCell, Location location) {
         if (otherCell instanceof DateCell) {
             DateCell dateCell = (DateCell) otherCell;
@@ -49,14 +52,17 @@ public class DateCell extends Cell {
         }
     }
 
+    @Override
     public String displayName() {
         return "date " + asBriefString();
     }
     
+    @Override
     public String asBriefString() {
         return localDate.toString();
     }
     
+    @Override
     public String asSql() {
         return "'" + localDate.toString() + "'";
     }

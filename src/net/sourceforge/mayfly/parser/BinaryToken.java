@@ -11,10 +11,12 @@ public class BinaryToken extends Token {
         this.bytes = binaryValue;
     }
     
+    @Override
     public ImmutableByteArray getBytes() {
         return bytes;
     }
 
+    @Override
     public Token withCommand(String command) {
         return new BinaryToken(bytes, location.withCommand(command));
     }

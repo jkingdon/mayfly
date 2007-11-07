@@ -9,6 +9,7 @@ public class Equal extends RowExpression {
         super(leftSide, rightSide);
     }
 
+    @Override
     protected boolean compare(Cell leftSide, Cell rightSide) {
         return leftSide.sqlEquals(rightSide);
     }

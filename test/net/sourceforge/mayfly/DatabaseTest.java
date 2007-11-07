@@ -17,6 +17,7 @@ public class DatabaseTest extends TestCase {
 
     private Database database;
 
+    @Override
     public void setUp() throws Exception {
         database = new Database();
     }

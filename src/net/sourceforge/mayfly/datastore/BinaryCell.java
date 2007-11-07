@@ -26,30 +26,37 @@ public class BinaryCell extends Cell {
         this(new byte[] { singleByte });
     }
 
+    @Override
     public String asBriefString() {
         return "binary data";
     }
 
+    @Override
     public int compareTo(Cell otherCell, Location location) {
         throw new UnimplementedException(location);
     }
 
+    @Override
     public String displayName() {
         return "binary data";
     }
     
+    @Override
     public String asSql() {
         return data.asSql();
     }
     
+    @Override
     public InputStream asBinaryStream() throws SQLException {
         return data.asBinaryStream();
     }
     
+    @Override
     public Blob asBlob() throws MayflySqlException {
         return new JdbcBlob(data);
     }
     
+    @Override
     public byte[] asBytes() throws SQLException {
         return data.asBytes();
     }

@@ -11,6 +11,7 @@ public class TestTimeSource extends TimeSource {
 
     private long simulatedTime = 0;
 
+    @Override
     public long current() {
         return simulatedTime;
     }

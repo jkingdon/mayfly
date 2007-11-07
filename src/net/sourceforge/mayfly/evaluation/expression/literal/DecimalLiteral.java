@@ -24,10 +24,12 @@ public class DecimalLiteral extends Literal {
         this.value = value;
     }
 
+    @Override
     public Cell valueAsCell() {
         return new DecimalCell(value);
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         if (other instanceof DecimalLiteral) {
             DecimalLiteral decimal = (DecimalLiteral) other;
@@ -38,6 +40,7 @@ public class DecimalLiteral extends Literal {
         }
     }
 
+    @Override
     public String displayName() {
         return value.toString();
     }

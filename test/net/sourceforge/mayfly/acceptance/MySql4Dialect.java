@@ -10,34 +10,42 @@ package net.sourceforge.mayfly.acceptance;
  */
 public class MySql4Dialect extends MySqlDialect {
 
+    @Override
     public boolean onIsRestrictedToJoinsTables() {
         return false;
     }
     
+    @Override
     public boolean considerTablesMentionedAfterJoin() {
         return true;
     }
     
+    @Override
     public boolean notBindsMoreTightlyThanIn() {
         return true;
     }
     
+    @Override
     public boolean aggregateDistinctIsForCountOnly() {
         return true;
     }
     
+    @Override
     public boolean columnInHavingMustAlsoBeInSelect() {
         return true;
     }
     
+    @Override
     public boolean rightHandArgumentToJoinCanBeJoin(boolean withParentheses) {
         return true;
     }
     
+    @Override
     public boolean canOrderByExpression(boolean isAggregate) {
         return !isAggregate;
     }
 
+    @Override
     public boolean allowTimestampInDateColumn() {
         return true;
     }

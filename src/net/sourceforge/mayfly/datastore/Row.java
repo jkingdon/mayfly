@@ -42,6 +42,7 @@ public class Row {
         return cell(new CaseInsensitiveString(column));
     }
 
+    @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
 

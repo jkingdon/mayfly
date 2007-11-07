@@ -35,14 +35,17 @@ public class StoreEvaluator extends Evaluator {
         this(new DataStore(schema), DataStore.ANONYMOUS_SCHEMA_NAME);
     }
 
+    @Override
     public DataStore store() {
         return store;
     }
 
+    @Override
     public String currentSchema() {
         return currentSchema;
     }
     
+    @Override
     public TableData table(FromTable table) {
         UnresolvedTableReference unresolved = new UnresolvedTableReference(
             currentSchema, table.tableName, table.location, options);
@@ -50,6 +53,7 @@ public class StoreEvaluator extends Evaluator {
         return store().table(resolved);
     }
     
+    @Override
     public Options options() {
         return options;
     }

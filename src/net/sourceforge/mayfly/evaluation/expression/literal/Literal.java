@@ -13,10 +13,12 @@ public abstract class Literal extends Expression {
         super(location);
     }
 
+    @Override
     public final Cell evaluate(ResultRow row, Evaluator evaluator) {
         return valueAsCell();
     }
 
+    @Override
     public final Cell aggregate(ResultRows rows) {
         return valueAsCell();
     }

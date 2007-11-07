@@ -26,10 +26,12 @@ public class TextToken extends Token {
         this.text = text;
     }
 
+    @Override
     public String getText() {
         return text;
     }
 
+    @Override
     public Token withCommand(String command) {
         return new TextToken(type, text, location.withCommand(command));
     }

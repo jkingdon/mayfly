@@ -18,10 +18,12 @@ public class UnresolvedCheckConstraint extends UnresolvedConstraint {
         this.constraintName = constraintName;
     }
 
+    @Override
     public Constraint resolve(DataStore store, String schema, String table) {
         throw new UnimplementedException();
     }
 
+    @Override
     public Constraint resolve(DataStore store, String schema, String table,
         Columns columns) {
         return new CheckConstraint(condition, table, constraintName);

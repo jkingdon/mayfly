@@ -18,6 +18,7 @@ public class SqlDumperTest extends TestCase {
     
     private Database database;
 
+    @Override
     protected void setUp() throws Exception {
         database = new Database();
     }

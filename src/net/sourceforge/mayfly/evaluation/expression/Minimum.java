@@ -17,14 +17,17 @@ public class Minimum extends AggregateExpression {
         this(column, functionName, distinct, Location.UNKNOWN);
     }
     
+    @Override
     Cell aggregate(Collection values) {
         return aggregateMinMax(values);
     }
     
+    @Override
     boolean isBetter(Cell candidate, Cell bestSoFar) {
         return candidate.compareTo(bestSoFar, location) < 0;
     }
 
+    @Override
     public Expression resolve(ResultRow row) {
         return new Minimum(column.resolve(row), functionName, distinct, location);
     }

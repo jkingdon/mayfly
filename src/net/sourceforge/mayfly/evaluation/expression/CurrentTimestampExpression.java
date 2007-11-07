@@ -19,10 +19,12 @@ public class CurrentTimestampExpression extends Expression {
         this.timeSource = timeSource;
     }
 
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         return valueAsCell();
     }
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         return valueAsCell();
     }
@@ -32,14 +34,17 @@ public class CurrentTimestampExpression extends Expression {
         return new TimestampCell(new LocalDateTime(timeSource.current()));
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         return other instanceof CurrentTimestampExpression;
     }
 
+    @Override
     public String displayName() {
         return "current_timestamp";
     }
     
+    @Override
     public String asSql() {
         return "CURRENT_TIMESTAMP";
     }

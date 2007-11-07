@@ -13,10 +13,12 @@ import net.sourceforge.mayfly.evaluation.Value;
  */
 public class FakeDataType extends DataType {
 
+    @Override
     public Cell coerce(Value value, String columnName) {
         return value.value;
     }
     
+    @Override
     public String dumpName() {
         throw new UnimplementedException(
             "specify a real data type if you want to dump the type");

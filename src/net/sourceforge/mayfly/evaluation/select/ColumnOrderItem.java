@@ -17,6 +17,7 @@ public class ColumnOrderItem extends OrderItem {
         this.column = column;
     }
     
+    @Override
     protected int compareAscending(What what, ResultRow first, ResultRow second) {
         return compare(first, second, column);
     }
@@ -27,6 +28,7 @@ public class ColumnOrderItem extends OrderItem {
         return cell1.compareTo(cell2, column.location);
     }
     
+    @Override
     public void check(ResultRow afterGroupByAndDistinct, 
         ResultRow afterGroupBy, ResultRow afterJoins) {
         try {

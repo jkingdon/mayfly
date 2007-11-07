@@ -23,6 +23,7 @@ public class CheckConstraint extends Constraint {
         this.tableName = tableName;
     }
 
+    @Override
     public void check(Rows existingRows, Row proposedRow, Location location) {
         /* Our message needs to be more informative somehow.  Giving the
            constraint name of the constraint would be one step.  If there
@@ -37,18 +38,22 @@ public class CheckConstraint extends Constraint {
         }
     }
 
+    @Override
     public boolean checkDropColumn(TableReference table, String column) {
         throw new UnimplementedException();
     }
     
+    @Override
     public Constraint renameColumn(String oldName, String newName) {
         throw new UnimplementedException();
     }
 
+    @Override
     public void checkExistingRows(DataStore store, TableReference table) {
         throw new UnimplementedException();
     }
 
+    @Override
     public void dump(Writer out) throws IOException {
         throw new UnimplementedException();
     }

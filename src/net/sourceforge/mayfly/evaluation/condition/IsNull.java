@@ -14,15 +14,18 @@ public class IsNull extends Condition {
         this.expression = expression;
     }
 
+    @Override
     public boolean evaluate(ResultRow row, Evaluator evaluator) {
         Cell cell = expression.evaluate(row, evaluator);
         return cell instanceof NullCell;
     }
 
+    @Override
     public String firstAggregate() {
         return expression.firstAggregate();
     }
     
+    @Override
     public void check(ResultRow row) {
         expression.check(row);
     }

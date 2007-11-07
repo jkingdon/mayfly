@@ -53,6 +53,7 @@ public class TableReference {
         return result.toString();
     }
     
+    @Override
     public String toString() {
         return formatTableName(null, schema, table);
     }

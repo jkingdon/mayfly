@@ -10,6 +10,7 @@ public class EndOfFileToken extends Token {
         super(TokenType.END_OF_FILE, location);
     }
 
+    @Override
     public Token withCommand(String command) {
         return new EndOfFileToken(location.withCommand(command));
     }

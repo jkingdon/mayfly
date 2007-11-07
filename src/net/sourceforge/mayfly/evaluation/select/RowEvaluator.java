@@ -16,14 +16,17 @@ public class RowEvaluator extends Evaluator {
         this.nestedEvaluator = nestedEvaluator;
     }
 
+    @Override
     public String currentSchema() {
         return nestedEvaluator.currentSchema();
     }
 
+    @Override
     public DataStore store() {
         return nestedEvaluator.store();
     }
     
+    @Override
     public Cell lookup(ResultRow row, 
         String tableOrAlias, String columnName, Location location) {
         try {

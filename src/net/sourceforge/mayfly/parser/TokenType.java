@@ -125,6 +125,7 @@ public class TokenType {
         return description;
     }
     
+    @Override
     public String toString() {
         return description();
     }

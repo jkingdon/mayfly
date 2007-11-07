@@ -12,6 +12,7 @@ public class And extends Condition {
         this.rightSide = rightSide;
     }
 
+    @Override
     public boolean evaluate(ResultRow row, Evaluator evaluator) {
         /*
          * We currently implement this as a short-circuited evaluation.
@@ -29,10 +30,12 @@ public class And extends Condition {
             rightSide.evaluate(row, evaluator);
     }
 
+    @Override
     public String firstAggregate() {
         return firstAggregate(leftSide, rightSide);
     }
     
+    @Override
     public void check(ResultRow row) {
         leftSide.check(row);
         rightSide.check(row);

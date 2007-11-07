@@ -16,6 +16,7 @@ public class Delete extends Command {
         this.where = where;
     }
 
+    @Override
     public UpdateStore update(Evaluator evaluator) {
         where.rejectAggregates("DELETE");
         DataStore store = evaluator.store();
@@ -27,6 +28,7 @@ public class Delete extends Command {
             table.options);
     }
 
+    @Override
     public UpdateStore update(DataStore store, String currentSchema) {
         throw new MayflyInternalException("should call the other update");
     }

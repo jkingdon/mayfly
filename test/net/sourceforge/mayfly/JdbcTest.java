@@ -16,11 +16,13 @@ import java.sql.Statement;
 
 public class JdbcTest extends TestCase {
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         Class.forName("net.sourceforge.mayfly.JdbcDriver");
     }
     
+    @Override
     protected void tearDown() throws Exception {
         JdbcDriver.shutdown();
         super.tearDown();

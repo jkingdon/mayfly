@@ -26,12 +26,14 @@ public class UnresolvedUniqueConstraint extends UnresolvedConstraint {
             constraintName);
     }
     
+    @Override
     public Constraint resolve(DataStore store, String schema, String table) {
         // Not suitable for CREATE TABLE, because we are assuming
         // the columns are already in the store.
         return resolve(store.schema(schema).table(table).columns());
     }
     
+    @Override
     public Constraint resolve(
         DataStore store, String schema, String table, Columns columns) {
         return resolve(columns);

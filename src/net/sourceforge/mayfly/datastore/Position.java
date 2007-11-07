@@ -6,12 +6,14 @@ import net.sourceforge.mayfly.parser.Location;
 public class Position {
     
     public static final Position FIRST = new Position() {
+        @Override
         public boolean isFirst() {
             return true;
         }
     };
 
     public static final Position LAST = new Position() {
+        @Override
         public boolean isLast() {
             return true;
         }
@@ -24,14 +26,17 @@ public class Position {
     public static Position after(final String existingName, 
         final Location location) {
         return new Position() {
+            @Override
             public boolean isAfter(String candidate) {
                 return existingName.equalsIgnoreCase(candidate);
             }
             
+            @Override
             public String afterWhat() {
                 return existingName;
             }
             
+            @Override
             public Location location() {
                 return location;
             }

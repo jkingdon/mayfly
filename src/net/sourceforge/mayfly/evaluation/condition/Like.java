@@ -12,6 +12,7 @@ public class Like extends RowExpression {
         super(left, pattern);
     }
 
+    @Override
     protected boolean compare(Cell left, Cell right) {
         if (left instanceof NullCell || right instanceof NullCell) {
             return false;

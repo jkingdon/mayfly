@@ -73,6 +73,7 @@ public class ForeignKey extends Constraint {
         }
     }
 
+    @Override
     public void checkExistingRows(DataStore store, TableReference table) {
         checkWeAreInTheRightPlace(table.schema(), table.tableName());
         TableData tableData = store.schema(referencerSchema).table(referencerTable);
@@ -82,6 +83,7 @@ public class ForeignKey extends Constraint {
         }
     }
 
+    @Override
     public void checkInsert(DataStore store, String schema, String table, 
         Row proposedRow, Location location) {
 
@@ -118,6 +120,7 @@ public class ForeignKey extends Constraint {
      * or 0 if they can be inserted in either order (as
      * far as can be determined by just looking at those two).
      */
+    @Override
     public boolean mustInsertBefore(Row first, Row second) {
         if (first == second) {
             // A row which satisfies its own constraint is OK.
@@ -160,6 +163,7 @@ public class ForeignKey extends Constraint {
             location);
     }
 
+    @Override
     public DataStore checkDelete(DataStore store, String schema, String table, 
         Row rowToDelete, Row replacementRow) {
         if (tableIsMyTarget(schema, table)) {
@@ -189,6 +193,7 @@ public class ForeignKey extends Constraint {
         return store;
     }
 
+    @Override
     public void checkDropTable(DataStore store, String schema, String table) {
         if (tableIsMyTarget(schema, table) && !refersToSameTable()) {
             throw new MayflyException(
@@ -216,10 +221,12 @@ public class ForeignKey extends Constraint {
         return true;
     }
 
+    @Override
     public boolean refersTo(String column) {
         return column.equalsIgnoreCase(referencerColumn);
     }
 
+    @Override
     public void checkDropTargetColumn(TableReference table, String column) {
         if (tableIsMyTarget(table.schema(), table.tableName()) &&
             column.equalsIgnoreCase(targetColumn)) {
@@ -232,6 +239,7 @@ public class ForeignKey extends Constraint {
         }
     }
     
+    @Override
     public Constraint renameColumn(String oldName, String newName) {
         if (oldName.equalsIgnoreCase(referencerColumn)) {
             return new ForeignKey(
@@ -251,6 +259,7 @@ public class ForeignKey extends Constraint {
      * and
      * {@link #checkInsert(DataStore, String, String, Row, Location)}.
      */
+    @Override
     public void check(Rows existingRows, Row proposedRow, Location location) {
     }
 
@@ -259,10 +268,12 @@ public class ForeignKey extends Constraint {
      * For foreign key we currently check in
      * {@link #checkDropReferencerColumn(TableReference, String)}.
      */
+    @Override
     public boolean checkDropColumn(TableReference table, String column) {
         return checkDropReferencerColumn(table, column);
     }
     
+    @Override
     public boolean canBeTargetOfForeignKey(String targetColumn) {
         if (FOREIGN_KEY_CAN_POINT_TO_FOREIGN_KEY) {
             return targetColumn.equalsIgnoreCase(referencerColumn);
@@ -270,10 +281,12 @@ public class ForeignKey extends Constraint {
         return super.canBeTargetOfForeignKey(targetColumn);
     }
     
+    @Override
     public boolean refersTo(String table, Evaluator evaluator) {
         return targetTable.matches(DataStore.ANONYMOUS_SCHEMA_NAME, table);
     }
     
+    @Override
     public List referencedTables() {
         if (refersToSameTable()) {
             return Collections.EMPTY_LIST;
@@ -283,6 +296,7 @@ public class ForeignKey extends Constraint {
         }
     }
 
+    @Override
     public void dump(Writer out) throws IOException {
         out.write("FOREIGN KEY(");
         out.write(referencerColumn);

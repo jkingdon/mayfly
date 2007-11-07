@@ -20,6 +20,7 @@ import java.sql.SQLException;
  */
 public class PostgresDialect extends Dialect {
 
+    @Override
     public Connection openConnection() throws Exception {
         Class.forName("org.postgresql.Driver");
 
@@ -34,10 +35,12 @@ public class PostgresDialect extends Dialect {
         return openAdditionalConnection();
     }
 
+    @Override
     public Connection openAdditionalConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:postgresql:test", "mayflytest", "mayflytest");
     }
 
+    @Override
     public void shutdown(Connection connection) throws Exception {
         connection.close();
 
@@ -64,24 +67,29 @@ public class PostgresDialect extends Dialect {
         }
     }
     
+    @Override
     public boolean fromIsOptional() {
         return true;
     }
     
+    @Override
     public boolean canHaveLimitWithoutOrderBy() {
         // The postgres manual warns that the results may not be
         // meaningful, but postgres doesn't throw an error.
         return true;
     }
     
+    @Override
     public boolean isReservedWord(String word) {
         return "offset".equalsIgnoreCase(word);
     }
     
+    @Override
     public boolean canOrderByExpression(boolean isAggregate) {
         return true;
     }
     
+    @Override
     public boolean whereCanReferToColumnAlias() {
         return false;
     }
@@ -117,14 +125,17 @@ public class PostgresDialect extends Dialect {
 //        }
 //    }
     
+    @Override
     public boolean nullSortsLower() {
         return false;
     }
     
+    @Override
     public boolean detectsSyntaxErrorsInPrepareStatement() {
         return false;
     }
     
+    @Override
     public boolean backslashInAStringIsAnEscape() {
         /*
          * "our long-term plan to transition to SQL-standard 
@@ -135,10 +146,12 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    @Override
     public boolean trailingSpacesConsultedInComparisons() {
         return true;
     }
 
+    @Override
     public boolean schemasMissing() {
         // Haven't really looked too much at what postgres has
         // for schemas.  "create schema authorization mayflytest"
@@ -147,10 +160,12 @@ public class PostgresDialect extends Dialect {
         return true;
     }
     
+    @Override
     public boolean numberOfValuesMustMatchNumberOfColumns() {
         return false;
     }
     
+    @Override
     public boolean canInsertNoValues() {
         /* The hibernate dialect makes it look like
            the postgres syntax is "insert into foo default values"
@@ -159,26 +174,32 @@ public class PostgresDialect extends Dialect {
         return false;
     }
 
+    @Override
     public boolean disallowNullsInExpressions() {
         return false;
     }
     
+    @Override
     public boolean disallowNullOnRightHandSideOfIn() {
         return false;
     }
 
+    @Override
     public boolean haveTinyint() {
         return false;
     }
     
+    @Override
     public boolean expressionsAreTypeLong() {
         return false;
     }
     
+    @Override
     public String binaryTypeName() {
         return "bytea";
     }
     
+    @Override
     public boolean blobTypeWorks() {
         /* The error I'm getting is: Bad value for type int: \001\003\377\220
            I guess this is just a postgres bug (why would the type be "int"
@@ -187,54 +208,67 @@ public class PostgresDialect extends Dialect {
         return false;
     }
     
+    @Override
     public boolean canGetBytesOnNumber() {
         return true;
     }
     
+    @Override
     public boolean canMixStringAndInteger() {
         return true;
     }
     
+    @Override
     public boolean canSetStringOnDecimalColumn() {
         return false;
     }
     
+    @Override
     public boolean haveDropTableFooIfExists() {
         return false;
     }
 
+    @Override
     public boolean haveDropTableIfExistsFoo() {
         return false;
     }
     
+    @Override
     public boolean haveModifyColumn() {
         return false;
     }
     
+    @Override
     public boolean canDropLastColumn() {
         return true;
     }
     
+    @Override
     public boolean haveDropForeignKey() {
         return false;
     }
     
+    @Override
     public boolean defaultValueCanBeExpression() {
         return true;
     }
     
+    @Override
     public boolean allowDateInTimestampColumn() {
         return true;
     }
     
+    @Override
     public boolean allowTimestampInDateColumn() {
         return true;
     }
 
+    @Override
     public boolean haveSerial() {
         return true;
     }
     
+    @Override
     public String identityType() {
         return "serial primary key";
     }
@@ -243,10 +277,12 @@ public class PostgresDialect extends Dialect {
      * According to discussion on postgres mailing lists, they plan on
      * adding sql200x syntax only when they can give it sql200x semantics.
      */
+    @Override
     public boolean haveSql2003AutoIncrement() {
         return false;
     }
     
+    @Override
     public boolean allowHexForBinary() {
         /* Postgres does have the x'00' syntax but it just seems to be
            for BIT VARYING(x) which doesn't seem to behave quite like
@@ -255,6 +291,7 @@ public class PostgresDialect extends Dialect {
         return false;
     }
     
+    @Override
     public String lastIdentityValueQuery(String table, String column) {
         return new StringBuffer().append("select currval('")
             .append(table)
@@ -264,22 +301,27 @@ public class PostgresDialect extends Dialect {
             .toString();
     }
     
+    @Override
     public boolean autoCommitMustBeOffToCallRollback() {
         return false;
     }
     
+    @Override
     public boolean allowOrderByOnDelete() {
         return false;
     }
     
+    @Override
     public boolean metaDataProblemWithUppercaseTableName() {
         return true;
     }
     
+    @Override
     public String productName() {
         return "PostgreSQL";
     }
     
+    @Override
     public boolean deleteAllRowsIsSmartAboutForeignKeys() {
         return true;
     }

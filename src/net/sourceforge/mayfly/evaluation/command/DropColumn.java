@@ -13,6 +13,7 @@ public class DropColumn extends Command {
         this.column = column;
     }
 
+    @Override
     public UpdateStore update(DataStore store, String defaultSchema) {
         TableReference reference = table.resolve(store, defaultSchema, null);
         

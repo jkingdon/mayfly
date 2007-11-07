@@ -68,6 +68,7 @@ public class Select extends Command {
         return from;
     }
 
+    @Override
     public MayflyResultSet select(Evaluator evaluator, Cell lastIdentity) {
         Evaluator aliasEvaluator = new AliasEvaluator(what, evaluator);
 
@@ -149,6 +150,7 @@ public class Select extends Command {
         return distinctRows;
     }
 
+    @Override
     public UpdateStore update(DataStore store, String schema) {
         throw new MayflyException(
             "SELECT is only available with query, not update");

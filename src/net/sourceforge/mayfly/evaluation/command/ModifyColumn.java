@@ -14,6 +14,7 @@ public class ModifyColumn extends Command {
         this.newColumn = newColumn;
     }
 
+    @Override
     public UpdateStore update(DataStore store, String defaultSchema) {
         TableReference reference = table.resolve(store, defaultSchema, null);
         

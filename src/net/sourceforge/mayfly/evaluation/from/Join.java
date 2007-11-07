@@ -16,6 +16,7 @@ public abstract class Join extends FromElement {
         this.condition = condition;
     }
 
+    @Override
     public ResultRow dummyRow(Evaluator evaluator) {
         ResultRow dummyRow = 
             left.dummyRow(evaluator)

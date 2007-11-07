@@ -13,30 +13,37 @@ public class LongCell extends Cell {
         this.value = value;
     }
 
+    @Override
     public byte asByte() throws SQLException {
         return longToByte(value);
     }
 
+    @Override
     public short asShort() throws SQLException {
         return longToShort(value);
     }
 
+    @Override
     public int asInt() throws SQLException {
         return longToInt(value);
     }
 
+    @Override
     public long asLong() {
         return value;
     }
     
+    @Override
     public double asDouble() {
         return value;
     }
 
+    @Override
     public Object asObject() {
         return new Long(value);
     }
 
+    @Override
     public String asString() {
         return stringValue();
     }
@@ -45,14 +52,17 @@ public class LongCell extends Cell {
         return String.valueOf(value);
     }
     
+    @Override
     public String displayName() {
         return "number " + stringValue();
     }
     
+    @Override
     public String asSql() {
         return stringValue();
     }
 
+    @Override
     public int compareTo(Cell otherCell, Location location) {
         if (otherCell instanceof LongCell) {
             return new Long(value).compareTo(new Long(((LongCell) otherCell).value));

@@ -18,12 +18,14 @@ abstract public class BinaryOperator extends Expression {
         this.right = right;
     }
 
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         Cell leftCell = left.evaluate(row, evaluator);
         Cell rightCell = right.evaluate(row, evaluator);
         return combineCellsOrNulls(leftCell, rightCell);
     }
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         Cell leftCell = left.aggregate(rows);
         Cell rightCell = right.aggregate(rows);
@@ -42,6 +44,7 @@ abstract public class BinaryOperator extends Expression {
     
     abstract protected Cell combine(Cell left, Cell right);
     
+    @Override
     public String firstColumn() {
         String firstInLeft = left.firstColumn();
         if (firstInLeft != null) {
@@ -50,16 +53,19 @@ abstract public class BinaryOperator extends Expression {
         return right.firstColumn();
     }
 
+    @Override
     public String firstAggregate() {
         return Expression.firstAggregate(left, right);
     }
 
+    @Override
     public String displayName() {
         // Hard to get precedence and associativity right.
         // And we probably want to show the users's whitespace anyway(?).
         return "expression";
     }
     
+    @Override
     public boolean sameExpression(Expression other) {
         if (getClass().equals(other.getClass())) {
             BinaryOperator operator = (BinaryOperator) other;
@@ -70,8 +76,10 @@ abstract public class BinaryOperator extends Expression {
         }
     }
     
+    @Override
     public abstract Expression resolve(ResultRow row);
     
+    @Override
     public void check(ResultRow row) {
         left.check(row);
         right.check(row);

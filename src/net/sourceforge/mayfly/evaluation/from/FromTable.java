@@ -36,11 +36,13 @@ public class FromTable extends FromElement {
         }
     }
 
+    @Override
     public ResultRows tableContents(Evaluator evaluator) {
         TableData table = evaluator.table(this);
         return applyAlias(table.rows(), table.columns(), evaluator.options());
     }
 
+    @Override
     public ResultRow dummyRow(Evaluator evaluator) {
         TableData table = evaluator.table(this);
         return applyAlias(table.dummyRow(), table.columns(), 

@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.datastore.TableReference;
 
 public class NoAction extends Action {
 
+    @Override
     public DataStore handleDelete(Cell oldValue, DataStore store, 
         String referencerSchema, String referencerTable, String referencerColumn, 
         TableReference targetTable, String targetColumn) {
@@ -20,6 +21,7 @@ public class NoAction extends Action {
             " in " + targetTable.tableName());
     }
 
+    @Override
     public DataStore handleUpdate(Cell oldValue, Cell newValue, 
         DataStore store, 
         String referencerSchema, String referencerTable, String referencerColumn, 
@@ -29,6 +31,7 @@ public class NoAction extends Action {
             targetTable, targetColumn);
     }
     
+    @Override
     public void dump(Writer out) throws IOException {
         out.write("NO ACTION");
     }

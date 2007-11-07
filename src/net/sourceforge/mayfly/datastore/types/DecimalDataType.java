@@ -19,6 +19,7 @@ public class DecimalDataType extends DataType {
         this.scale = scale;
     }
     
+    @Override
     public String dumpName() {
         return
             TokenType.KEYWORD_decimal.description() +
@@ -29,6 +30,7 @@ public class DecimalDataType extends DataType {
             ")";
     }
     
+    @Override
     public Cell coerce(Value value, String columnName) {
         if (value.value instanceof DecimalCell) {
             DecimalCell decimal = (DecimalCell) value.value;

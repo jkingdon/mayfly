@@ -38,6 +38,7 @@ public abstract class AggregateExpression extends Expression {
 
       It also is called in evaluating a HAVING condition,
       although that part doesn't completely work yet. */
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         Cell cell = row.findValueOrNull(this);
         return cell == null ? NullCell.INSTANCE : cell;
@@ -47,14 +48,17 @@ public abstract class AggregateExpression extends Expression {
         return column.evaluate(row);
     }
     
+    @Override
     public String firstAggregate() {
         return displayName();
     }
 
+    @Override
     public String displayName() {
         return functionName + "(" + (distinct ? "distinct " : "") + column.displayName() + ")";
     }
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         Collection values = findValues(rows);
         return aggregate(values);
@@ -126,6 +130,7 @@ public abstract class AggregateExpression extends Expression {
         return values;
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         if (getClass().equals(other.getClass())) {
             AggregateExpression otherExpression = (AggregateExpression) other;

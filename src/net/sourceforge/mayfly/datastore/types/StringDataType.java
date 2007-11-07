@@ -12,10 +12,12 @@ public class StringDataType extends DataType {
         this.dumpName = dumpName;
     }
 
+    @Override
     public Cell coerce(Value value, String columnName) {
         return genericCoerce(value, columnName, "string", StringCell.class);
     }
     
+    @Override
     public String dumpName() {
         return dumpName;
     }

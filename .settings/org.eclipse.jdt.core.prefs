@@ -1,4 +1,4 @@
-#Fri Oct 12 16:22:42 GMT-04:00 2007
+#Wed Nov 07 09:22:40 GMT-05:00 2007
 org.eclipse.jdt.core.compiler.problem.unusedDeclaredThrownExceptionWhenOverriding=disabled
 org.eclipse.jdt.core.formatter.insert_space_after_at_in_annotation_type_declaration=do not insert
 org.eclipse.jdt.core.formatter.keep_empty_array_initializer_on_one_line=false
@@ -231,7 +231,7 @@ org.eclipse.jdt.core.compiler.problem.unusedLocal=warning
 org.eclipse.jdt.core.compiler.problem.unusedParameter=ignore
 org.eclipse.jdt.core.formatter.insert_space_before_comma_in_constructor_declaration_throws=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_postfix_operator=do not insert
-org.eclipse.jdt.core.compiler.problem.missingOverrideAnnotation=ignore
+org.eclipse.jdt.core.compiler.problem.missingOverrideAnnotation=error
 org.eclipse.jdt.core.formatter.brace_position_for_block_in_case=end_of_line
 org.eclipse.jdt.core.codeComplete.argumentPrefixes=
 org.eclipse.jdt.core.formatter.insert_space_after_colon_in_assert=insert

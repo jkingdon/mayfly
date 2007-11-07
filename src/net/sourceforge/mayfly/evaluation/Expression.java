@@ -21,6 +21,7 @@ abstract public class Expression extends WhatElement {
         this(Location.UNKNOWN);
     }
 
+    @Override
     public Selected selected(ResultRow dummyRow) {
         return new Selected(resolve(dummyRow));
     }

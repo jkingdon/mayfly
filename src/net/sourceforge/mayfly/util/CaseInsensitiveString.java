@@ -13,6 +13,7 @@ public class CaseInsensitiveString {
         this.hashCode = delegate.toLowerCase().hashCode();
     }
 
+    @Override
     public String toString() {
         return getString();
     }
@@ -21,6 +22,7 @@ public class CaseInsensitiveString {
         return delegate;
     }
     
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof CaseInsensitiveString)) {
             return false;
@@ -29,6 +31,7 @@ public class CaseInsensitiveString {
         return delegate.equalsIgnoreCase(((CaseInsensitiveString) obj).getString());
     }
     
+    @Override
     public int hashCode() {
         return hashCode;
     }

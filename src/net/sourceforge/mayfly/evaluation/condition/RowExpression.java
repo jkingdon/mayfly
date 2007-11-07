@@ -16,6 +16,7 @@ abstract public class RowExpression extends Condition {
         this.rightSide = rightSide;
     }
 
+    @Override
     public boolean evaluate(ResultRow row, Evaluator evaluator) {
         return compareCellsOrNulls(
             leftSide.evaluate(row, evaluator), 
@@ -34,10 +35,12 @@ abstract public class RowExpression extends Condition {
 
     abstract protected boolean compare(Cell leftSide, Cell rightSide);
 
+    @Override
     public String firstAggregate() {
         return Expression.firstAggregate(leftSide, rightSide);
     }
     
+    @Override
     public void check(ResultRow row) {
         leftSide.check(row);
         rightSide.check(row);

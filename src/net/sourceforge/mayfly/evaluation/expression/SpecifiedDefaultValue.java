@@ -23,18 +23,22 @@ public class SpecifiedDefaultValue extends DefaultValue {
         this.expression = expression;
     }
 
+    @Override
     public Cell cell() {
         return expression.evaluate((ResultRow)null);
     }
 
+    @Override
     public boolean isSpecified() {
         return true;
     }
 
+    @Override
     public boolean sqlEquals(Cell cell) {
         return cell().sqlEquals(cell);
     }
 
+    @Override
     public String asSql() {
         return expression.asSql();
     }

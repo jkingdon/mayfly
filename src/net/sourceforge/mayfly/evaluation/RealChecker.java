@@ -61,34 +61,42 @@ public class RealChecker extends Checker {
         this.options = options;
     }
 
+    @Override
     public void checkDelete(Row rowToDelete, Row replacementRow) {
         store = store.checkDelete(schema, table, rowToDelete, replacementRow);
     }
 
+    @Override
     public void checkInsert(Constraints constraints, Row proposedRow) {
         constraints.checkInsert(store, schema, table, proposedRow, location);
     }
 
+    @Override
     public void checkDropTable() {
         store.checkDropTable(schema, table);
     }
 
+    @Override
     public DataStore store() {
         return store;
     }
 
+    @Override
     public String schema() {
         return schema;
     }
 
+    @Override
     public void setIdentityValue(Cell cell) {
         this.newIdentityValue = cell;
     }
 
+    @Override
     public Cell newIdentityValue() {
         return newIdentityValue;
     }
     
+    @Override
     public boolean evaluate(Condition condition, Row row, String tableName) {
         return condition.evaluate(new ResultRow(row, tableName, options), 
             new StoreEvaluator(store, schema, options));

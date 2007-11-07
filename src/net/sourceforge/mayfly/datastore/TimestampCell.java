@@ -25,11 +25,13 @@ public class TimestampCell extends Cell {
         this.stamp = time;
     }
 
+    @Override
     public java.sql.Timestamp asTimestamp(DateTimeZone zone)
     throws SQLException {
         return new java.sql.Timestamp(stamp.toDateTime(zone).getMillis());
     }
 
+    @Override
     public int compareTo(Cell otherCell, Location location) {
         if (otherCell instanceof TimestampCell) {
             TimestampCell stampCell = (TimestampCell) otherCell;
@@ -41,14 +43,17 @@ public class TimestampCell extends Cell {
         throw cannotCompare(otherCell, location);
     }
 
+    @Override
     public String displayName() {
         return "timestamp " + asBriefString();
     }
     
+    @Override
     public String asBriefString() {
         return FORMATTER.print(stamp);
     }
     
+    @Override
     public String asSql() {
         return "'" + asBriefString() + "'";
     }

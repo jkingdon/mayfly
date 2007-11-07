@@ -21,6 +21,7 @@ public class Update extends Command {
         this.where = where;
     }
 
+    @Override
     public UpdateStore update(Evaluator evaluator) {
         where.rejectAggregates("UPDATE");
         check();
@@ -42,6 +43,7 @@ public class Update extends Command {
         }
     }
 
+    @Override
     public UpdateStore update(DataStore store, String currentSchema) {
         throw new MayflyInternalException("should call the other update");
     }

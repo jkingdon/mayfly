@@ -58,6 +58,7 @@ public abstract class Cell extends ValueObject {
             "attempt to read " + displayName() + " as a string");
     }
     
+    @Override
     public String toString() {
         return asBriefString();
     }

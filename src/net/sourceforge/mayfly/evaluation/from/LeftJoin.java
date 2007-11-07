@@ -14,6 +14,7 @@ public class LeftJoin extends Join {
         super(left, right, condition);
     }
 
+    @Override
     public ResultRows tableContents(Evaluator evaluator) {
         ResultRows leftRows = left.tableContents(evaluator);
         ResultRows rightRows = right.tableContents(evaluator);

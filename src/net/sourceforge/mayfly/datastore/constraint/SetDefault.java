@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.datastore.TableReference;
 
 public class SetDefault extends Action {
 
+    @Override
     public DataStore handleDelete(Cell oldValue, DataStore store, 
         String referencerSchema, String referencerTable, 
         String referencerColumn, 
@@ -18,6 +19,7 @@ public class SetDefault extends Action {
             store, referencerSchema, referencerTable, referencerColumn);
     }
 
+    @Override
     public DataStore handleUpdate(Cell oldValue, Cell newValue, 
         DataStore store, String referencerSchema, 
         String referencerTable, 
@@ -25,6 +27,7 @@ public class SetDefault extends Action {
         throw new UnimplementedException();
     }
     
+    @Override
     public void dump(Writer out) throws IOException {
         out.write("SET DEFAULT");
     }

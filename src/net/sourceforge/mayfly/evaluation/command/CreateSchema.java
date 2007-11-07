@@ -20,6 +20,7 @@ public class CreateSchema extends Command {
         createTableCommands.add(command);
     }
 
+    @Override
     public UpdateStore update(DataStore store, String currentSchema) {
         Schema schema = new Schema();
         for (Iterator iter = createTableCommands.iterator(); iter.hasNext();) {

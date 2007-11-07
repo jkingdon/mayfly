@@ -6,6 +6,7 @@ public class XmlWriterTest extends TestCase {
 
     private XmlWriter out;
 
+    @Override
     public void setUp() {
         out = new XmlWriter();
     }

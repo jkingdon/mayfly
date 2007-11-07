@@ -18,10 +18,12 @@ public class Sum extends AggregateExpression {
         this(column, functionName, distinct, Location.UNKNOWN);
     }
 
+    @Override
     Cell aggregate(Collection values) {
         return aggregateSumAverage(values, true);
     }
 
+    @Override
     public Expression resolve(ResultRow row) {
         return new Sum(column.resolve(row), functionName, distinct, location);
     }

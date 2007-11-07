@@ -18,10 +18,12 @@ public class ScalarSubselect extends Expression {
         this.select = select;
     }
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         throw new UnimplementedException();
     }
 
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         MayflyResultSet rows = subselect(row, evaluator, select);
         return rows.scalar(select.location);
@@ -33,10 +35,12 @@ public class ScalarSubselect extends Expression {
         return subselect.select(innerEvaluator, null);
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         throw new UnimplementedException();
     }
 
+    @Override
     public String displayName() {
         throw new UnimplementedException();
     }

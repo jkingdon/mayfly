@@ -15,6 +15,7 @@ import java.io.Writer;
 
 public class Cascade extends Action {
 
+    @Override
     public DataStore handleDelete(Cell oldValue, DataStore store, 
         String referencerSchema, String referencerTable, String referencerColumn, 
         TableReference targetTable, String targetColumn) {
@@ -25,6 +26,7 @@ public class Cascade extends Action {
         return update.store();
     }
 
+    @Override
     public DataStore handleUpdate(Cell oldValue, Cell newValue, 
         DataStore store, String referencerSchema, 
         String referencerTable, 
@@ -45,6 +47,7 @@ public class Cascade extends Action {
         throw new UnimplementedException();
     }
     
+    @Override
     public void dump(Writer out) throws IOException {
         out.write("CASCADE");
     }

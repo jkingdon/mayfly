@@ -47,10 +47,12 @@ public class SingleColumn extends Expression {
         this.options = options;
     }
 
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         return evaluator.lookup(row, tableOrAlias, columnName, location);
     }
 
+    @Override
     public Cell evaluate(ResultRow row) {
         Expression found = row.findColumn(tableOrAlias, columnName, location);
         return row.findValue(found);
@@ -60,23 +62,28 @@ public class SingleColumn extends Expression {
         return row.findColumn(tableOrAlias, columnName, location);
     }
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         throw new MayflyInternalException(
             "shouldn't combine aggregate and column expressions");
     }
 
+    @Override
     public String firstColumn() {
         return displayName();
     }
 
+    @Override
     public String displayName() {
         return Column.displayName(originalTableOrAlias, columnName);
     }
 
+    @Override
     public String debugName() {
         return Column.displayName(tableOrAlias, columnName);
     }
 
+    @Override
     public boolean matches(String target) {
         return matches(null, target);
     }
@@ -96,6 +103,7 @@ public class SingleColumn extends Expression {
         return options.tableNamesEqual(tableOrAlias, this.tableOrAlias);
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         if (other instanceof SingleColumn) {
             SingleColumn column = (SingleColumn) other;
@@ -116,6 +124,7 @@ public class SingleColumn extends Expression {
         }
     }
     
+    @Override
     public Expression resolve(ResultRow row) {
         if (tableOrAlias == null) {
             SingleColumn column = lookup(row);
@@ -130,6 +139,7 @@ public class SingleColumn extends Expression {
         }
     }
     
+    @Override
     public void check(ResultRow row) {
         lookup(row);
     }

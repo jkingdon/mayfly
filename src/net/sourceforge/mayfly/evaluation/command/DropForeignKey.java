@@ -13,6 +13,7 @@ public class DropForeignKey extends Command {
         this.constraintName = constraintName;
     }
 
+    @Override
     public UpdateStore update(DataStore store, String currentSchema) {
         TableReference reference = table.resolve(store, currentSchema, null);
         return new UpdateStore(

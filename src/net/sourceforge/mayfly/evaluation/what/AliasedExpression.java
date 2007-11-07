@@ -22,26 +22,32 @@ public class AliasedExpression extends Expression {
         this.expression = expression;
     }
 
+    @Override
     public String displayName() {
         return expression.displayName() + " AS " + alias;
     }
     
+    @Override
     public String firstAggregate() {
         return expression.firstAggregate();
     }
     
+    @Override
     public String firstColumn() {
         return expression.firstColumn();
     }
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         return expression.aggregate(rows);
     }
 
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         return expression.evaluate(row, evaluator);
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         if (!(other instanceof AliasedExpression)) {
             return false;
@@ -57,6 +63,7 @@ public class AliasedExpression extends Expression {
         return true;
     }
     
+    @Override
     public boolean matches(String columnName) {
         return alias.equalsIgnoreCase(columnName);
     }

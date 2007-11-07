@@ -71,6 +71,7 @@ public class ImmutableMap implements Map {
         return delegate.entrySet();
     }
 
+    @Override
     public boolean equals(Object o) {
         return delegate.equals(o);
     }
@@ -79,6 +80,7 @@ public class ImmutableMap implements Map {
         return delegate.get(key);
     }
 
+    @Override
     public int hashCode() {
         return delegate.hashCode();
     }
@@ -111,6 +113,7 @@ public class ImmutableMap implements Map {
         return delegate.values();
     }
 
+    @Override
     public String toString() {
         return delegate.toString();
     }

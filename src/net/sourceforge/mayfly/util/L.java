@@ -51,6 +51,7 @@ public class L implements List {
     }
 
 
+    @Override
     public int hashCode() {
         return delegate.hashCode();
     }
@@ -103,6 +104,7 @@ public class L implements List {
         return delegate.contains(o);
     }
 
+    @Override
     public boolean equals(Object o) {
         return delegate.equals(o);
     }
@@ -178,6 +180,7 @@ public class L implements List {
         return new L(Arrays.asList(ArrayUtils.toObject(objects)));
     }
 
+    @Override
     public String toString() {
         return delegate.toString();
     }

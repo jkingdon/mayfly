@@ -47,6 +47,7 @@ public class M implements Map {
     }
 
 
+    @Override
     public int hashCode() {
         return delegate.hashCode();
     }
@@ -71,6 +72,7 @@ public class M implements Map {
         return delegate.containsValue(value);
     }
 
+    @Override
     public boolean equals(Object o) {
         return delegate.equals(o);
     }
@@ -103,6 +105,7 @@ public class M implements Map {
         return delegate.put(key, value);
     }
 
+    @Override
     public String toString() {
         return delegate.toString();
     }

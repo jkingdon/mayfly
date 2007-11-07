@@ -44,10 +44,12 @@ public abstract class SqlTestCase extends TestCase {
     protected Connection connection;
     private Statement statement;
 
+    @Override
     public void setUp() throws Exception {
         connection = dialect.openConnection();
     }
 
+    @Override
     public void tearDown() throws Exception {
         dialect.shutdown(connection);
 

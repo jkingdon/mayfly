@@ -19,6 +19,7 @@ public class AddColumn extends Command {
         this.position = position;
     }
 
+    @Override
     public UpdateStore update(DataStore store, String defaultSchema) {
         TableReference reference = table.resolve(store, defaultSchema, null);
         

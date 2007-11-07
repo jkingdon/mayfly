@@ -10,6 +10,7 @@ public class TableNode extends Node {
         this.name = name;
     }
 
+    @Override
     public int backupOrdering(Node other) {
         TableNode tableNode = (TableNode) other;
         return name.toUpperCase().compareTo(tableNode.name.toUpperCase());

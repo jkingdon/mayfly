@@ -17,10 +17,12 @@ public class BinaryDataType extends DataType {
         this.size = size;
     }
 
+    @Override
     public Cell coerce(Value value, String columnName) {
         return genericCoerce(value, columnName, "binary", BinaryCell.class);
     }
     
+    @Override
     public String dumpName() {
         if (hasSize()) {
             return "BLOB(" + size() + ")";

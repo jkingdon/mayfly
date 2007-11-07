@@ -19,6 +19,7 @@ import java.sql.SQLException;
  */
 public class SmallSqlDialect extends Dialect {
 
+    @Override
     public Connection openConnection() throws Exception {
         Class.forName("smallsql.database.SSDriver");
         Connection bootstrapConnection = 
@@ -30,10 +31,12 @@ public class SmallSqlDialect extends Dialect {
         return openAdditionalConnection();
     }
 
+    @Override
     public Connection openAdditionalConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:smallsql:mayflytest");
     }
 
+    @Override
     public void shutdown(Connection connection) throws Exception {
         SqlTestCase.execute("DROP DATABASE mayflytest", connection);
         
@@ -50,46 +53,57 @@ public class SmallSqlDialect extends Dialect {
         }
 */    }
     
+    @Override
     public boolean detectsAmbiguousColumns() {
         return false;
     }
     
+    @Override
     public boolean allowDuplicateTableInQuery() {
         return true;
     }
     
+    @Override
     public boolean stringComparisonsAreCaseInsensitive() {
         return true;
     }
     
+    @Override
     public boolean notRequiresBoolean() {
         return false;
     }
     
+    @Override
     public boolean disallowNullOnRightHandSideOfIn() {
         return false;
     }
     
+    @Override
     public boolean disallowNullsInExpressions() {
         return false;
     }
     
+    @Override
     public boolean whereCanReferToColumnAlias() {
         return false;
     }
     
+    @Override
     public boolean haveModifyColumn() {
         return false;
     }
     
+    @Override
     public boolean haveUpdateDefault() {
         return false;
     }
     
+    @Override
     public boolean haveLimit() {
         return false;
     }
     
+    @Override
     public boolean schemasMissing() {
         return true;
     }

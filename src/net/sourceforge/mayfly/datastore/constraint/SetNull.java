@@ -12,6 +12,7 @@ import net.sourceforge.mayfly.parser.Location;
 
 public class SetNull extends Action {
 
+    @Override
     public DataStore handleDelete(Cell oldValue, DataStore store, 
         String referencerSchema, String referencerTable, 
         String referencerColumn, 
@@ -20,6 +21,7 @@ public class SetNull extends Action {
             store, referencerSchema, referencerTable, referencerColumn);
     }
 
+    @Override
     public DataStore handleUpdate(Cell oldValue, Cell newValue, 
         DataStore store, String referencerSchema, 
         String referencerTable, 
@@ -32,6 +34,7 @@ public class SetNull extends Action {
             targetTable, targetColumn);
     }
     
+    @Override
     public void dump(Writer out) throws IOException {
         out.write("SET NULL");
     }

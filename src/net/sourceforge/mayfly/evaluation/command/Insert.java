@@ -28,6 +28,7 @@ public class Insert extends Command {
         return table.tableName();
     }
 
+    @Override
     public UpdateStore update(DataStore store, String defaultSchema) {
         TableReference resolved = table.resolve(store, defaultSchema, null);
         Checker checker = new RealChecker(store, resolved, location, table.options);

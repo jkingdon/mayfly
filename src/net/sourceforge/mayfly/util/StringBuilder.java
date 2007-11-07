@@ -14,10 +14,12 @@ public class StringBuilder {
         delegate = new StringBuffer();
     }
 
+    @Override
     public boolean equals(Object obj) {
         return delegate.equals(obj);
     }
 
+    @Override
     public int hashCode() {
         return delegate.hashCode();
     }
@@ -193,6 +195,7 @@ public class StringBuilder {
         return delegate.substring(beginIndex, endIndex);
     }
 
+    @Override
     public String toString() {
         return delegate.toString();
     }

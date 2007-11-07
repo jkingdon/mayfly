@@ -20,11 +20,13 @@ public class IntegerDataType extends DataType {
         this.dumpName = dumpName;
     }
 
+    @Override
     public Cell coerce(Value value, String columnName) {
         return genericCoerce(value, columnName, dumpName.toLowerCase(), 
             LongCell.class);
     }
     
+    @Override
     public String dumpName() {
         return dumpName;
     }

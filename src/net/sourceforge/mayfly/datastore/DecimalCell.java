@@ -22,6 +22,7 @@ public class DecimalCell extends Cell {
         this(new BigDecimal(string));
     }
 
+    @Override
     public byte asByte() throws SQLException {
         try {
             return longToByte(asLong("a byte"));
@@ -31,6 +32,7 @@ public class DecimalCell extends Cell {
         }
     }
 
+    @Override
     public short asShort() throws SQLException {
         try {
             return longToShort(asLong("a short"));
@@ -40,6 +42,7 @@ public class DecimalCell extends Cell {
         }
     }
 
+    @Override
     public int asInt() throws SQLException {
         try {
             return longToInt(asLong("an int"));
@@ -49,6 +52,7 @@ public class DecimalCell extends Cell {
         }
     }
 
+    @Override
     public long asLong() {
         /**
          * Could call {@link BigDecimal#longValueExact()} if we wanted to
@@ -85,22 +89,27 @@ public class DecimalCell extends Cell {
             "Value " + value.toString() + " does not fit in " + intoWhat);
     }
 
+    @Override
     public Object asObject() {
         return value;
     }
     
+    @Override
     public String asSql() {
         return value.toString();
     }
     
+    @Override
     public BigDecimal asBigDecimal() {
         return value;
     }
 
+    @Override
     public double asDouble() {
         return value.doubleValue();
     }
 
+    @Override
     public int compareTo(Cell otherCell, Location location) {
         if (otherCell instanceof DecimalCell) {
             return compareDecimals(value, ((DecimalCell) otherCell).value);
@@ -117,6 +126,7 @@ public class DecimalCell extends Cell {
         return value2.compareTo(value3);
     }
 
+    @Override
     public String displayName() {
         return "decimal " + value.toString();
     }

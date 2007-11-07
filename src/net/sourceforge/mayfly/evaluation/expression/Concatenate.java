@@ -11,10 +11,12 @@ public class Concatenate extends BinaryOperator {
         super(left, right);
     }
 
+    @Override
     protected Cell combine(Cell leftCell, Cell rightCell) {
         return new StringCell(leftCell.asString() + rightCell.asString());
     }
     
+    @Override
     public Expression resolve(ResultRow row) {
         return new Concatenate(
             left.resolve(row), right.resolve(row));

@@ -11,10 +11,12 @@ public class Minus extends BinaryOperator {
         super(left, right);
     }
 
+    @Override
     protected Cell combine(Cell left, Cell right) {
         return new LongCell(left.asLong() - right.asLong());
     }
 
+    @Override
     public Expression resolve(ResultRow row) {
         return new Minus(left.resolve(row), right.resolve(row));
     }

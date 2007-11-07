@@ -19,10 +19,12 @@ public class Count extends AggregateExpression {
         this(column, functionName, distinct, Location.UNKNOWN);
     }
 
+    @Override
     Cell aggregate(Collection values) {
         return new LongCell(values.size());
     }
 
+    @Override
     public Expression resolve(ResultRow row) {
         return new Count(column.resolve(row), functionName, distinct, location);
     }

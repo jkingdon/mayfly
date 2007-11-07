@@ -12,14 +12,17 @@ public class Not extends Condition {
         this.operand = operand;
     }
 
+    @Override
     public boolean evaluate(ResultRow row, Evaluator evaluator) {
         return !operand.evaluate(row, evaluator);
     }
 
+    @Override
     public String firstAggregate() {
         return operand.firstAggregate();
     }
     
+    @Override
     public void check(ResultRow row) {
         operand.check(row);
     }

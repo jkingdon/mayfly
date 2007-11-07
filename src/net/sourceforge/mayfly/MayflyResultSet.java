@@ -32,6 +32,7 @@ public final class MayflyResultSet extends ResultSetStub {
         this.rows = rows;
     }
 
+    @Override
     public boolean next() {
         ++pos;
         if (pos >= rows.size()) {
@@ -41,30 +42,37 @@ public final class MayflyResultSet extends ResultSetStub {
         }
     }
 
+    @Override
     public byte getByte(String columnName) throws SQLException {
         return cellFromName(columnName).asByte();
     }
 
+    @Override
     public byte getByte(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asByte();
     }
 
+    @Override
     public short getShort(String columnName) throws SQLException {
         return cellFromName(columnName).asShort();
     }
 
+    @Override
     public short getShort(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asShort();
     }
 
+    @Override
     public int getInt(String columnName) throws SQLException {
         return cellFromName(columnName).asInt();
     }
 
+    @Override
     public int getInt(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asInt();
     }
 
+    @Override
     public long getLong(String columnName) throws SQLException {
         try {
             return cellFromName(columnName).asLong();
@@ -73,6 +81,7 @@ public final class MayflyResultSet extends ResultSetStub {
         }
     }
 
+    @Override
     public long getLong(int oneBasedColumn) throws SQLException {
         try {
             return cellFromIndex(oneBasedColumn).asLong();
@@ -81,10 +90,12 @@ public final class MayflyResultSet extends ResultSetStub {
         }
     }
 
+    @Override
     public BigDecimal getBigDecimal(String columnName) throws SQLException {
         return cellFromName(columnName).asBigDecimal();
     }
 
+    @Override
     public BigDecimal getBigDecimal(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asBigDecimal();
     }
@@ -95,20 +106,24 @@ public final class MayflyResultSet extends ResultSetStub {
 
     /** @internal
      * @deprecated */
+    @Override
     public BigDecimal getBigDecimal(String columnName, int scale) throws SQLException {
         throw new SQLException(SUGGEST_SET_SCALE);
     }
 
     /** @internal
      * @deprecated */
+    @Override
     public BigDecimal getBigDecimal(int oneBasedColumn, int scale) throws SQLException {
         throw new SQLException(SUGGEST_SET_SCALE);
     }
     
+    @Override
     public double getDouble(String columnName) throws SQLException {
         return cellFromName(columnName).asDouble();
     }
 
+    @Override
     public float getFloat(String columnName) throws SQLException {
         /* As float is an inexact type, I think that truncating is
            probably the right thing, rather than throwing an exception
@@ -116,14 +131,17 @@ public final class MayflyResultSet extends ResultSetStub {
         return (float) cellFromName(columnName).asDouble();
     }
 
+    @Override
     public double getDouble(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asDouble();
     }
 
+    @Override
     public float getFloat(int oneBasedColumn) throws SQLException {
         return (float) cellFromIndex(oneBasedColumn).asDouble();
     }
 
+    @Override
     public String getString(String columnName) throws SQLException {
         try {
             return cellFromName(columnName).asString();
@@ -133,6 +151,7 @@ public final class MayflyResultSet extends ResultSetStub {
         }
     }
 
+    @Override
     public String getString(int oneBasedColumn) throws SQLException {
         try {
             return cellFromIndex(oneBasedColumn).asString();
@@ -142,34 +161,42 @@ public final class MayflyResultSet extends ResultSetStub {
         }
     }
     
+    @Override
     public Reader getCharacterStream(String columnName) throws SQLException {
         return new StringReader(getString(columnName));
     }
     
+    @Override
     public Reader getCharacterStream(int columnIndex) throws SQLException {
         return new StringReader(getString(columnIndex));
     }
     
+    @Override
     public InputStream getBinaryStream(int columnIndex) throws SQLException {
         return cellFromIndex(columnIndex).asBinaryStream();
     }
     
+    @Override
     public InputStream getBinaryStream(String columnName) throws SQLException {
         return cellFromName(columnName).asBinaryStream();
     }
     
+    @Override
     public Blob getBlob(int columnIndex) throws SQLException {
         return cellFromIndex(columnIndex).asBlob();
     }
     
+    @Override
     public Blob getBlob(String columnName) throws SQLException {
         return cellFromName(columnName).asBlob();
     }
     
+    @Override
     public byte[] getBytes(int columnIndex) throws SQLException {
         return cellFromIndex(columnIndex).asBytes();
     }
     
+    @Override
     public byte[] getBytes(String columnName) throws SQLException {
         return cellFromName(columnName).asBytes();
     }
@@ -180,6 +207,7 @@ public final class MayflyResultSet extends ResultSetStub {
     /**
      * @deprecated
      */
+    @Override
     public InputStream getUnicodeStream(int columnIndex) throws SQLException {
         throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
     }
@@ -187,40 +215,49 @@ public final class MayflyResultSet extends ResultSetStub {
     /**
      * @deprecated
      */
+    @Override
     public InputStream getUnicodeStream(String columnName) throws SQLException {
         throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
     }
     
+    @Override
     public InputStream getAsciiStream(int columnIndex) throws SQLException {
         throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
     }
     
+    @Override
     public InputStream getAsciiStream(String columnName) throws SQLException {
         throw new UnimplementedException(SUGGEST_GET_CHARACTER_STREAM);
     }
     
+    @Override
     public java.sql.Date getDate(String columnName, Calendar calendar)
     throws SQLException {
         return cellFromName(columnName).asDate(timeZone(calendar));
     }
     
+    @Override
     public java.sql.Date getDate(String columnName) throws SQLException {
         return cellFromName(columnName).asDate(DateTimeZone.getDefault());
     }
 
+    @Override
     public java.sql.Date getDate(int oneBasedColumn, Calendar calendar)
     throws SQLException {
         return cellFromIndex(oneBasedColumn).asDate(timeZone(calendar));
     }
 
+    @Override
     public java.sql.Date getDate(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn).asDate(DateTimeZone.getDefault());
     }
     
+    @Override
     public Timestamp getTimestamp(String columnName) throws SQLException {
         return cellFromName(columnName).asTimestamp(DateTimeZone.getDefault());
     }
 
+    @Override
     public Timestamp getTimestamp(int oneBasedColumn) throws SQLException {
         return cellFromIndex(oneBasedColumn)
             .asTimestamp(DateTimeZone.getDefault());
@@ -230,6 +267,7 @@ public final class MayflyResultSet extends ResultSetStub {
         return DateTimeZone.forTimeZone(calendar.getTimeZone());
     }
 
+    @Override
     public Object getObject(String columnName) throws SQLException {
         try {
             return cellFromName(columnName).asObject();
@@ -238,6 +276,7 @@ public final class MayflyResultSet extends ResultSetStub {
         }
     }
 
+    @Override
     public Object getObject(int oneBasedColumn) throws SQLException {
         try {
             return cellFromIndex(oneBasedColumn).asObject();
@@ -246,6 +285,7 @@ public final class MayflyResultSet extends ResultSetStub {
         }
     }
     
+    @Override
     public boolean wasNull() throws SQLException {
         return wasNull;
     }
@@ -284,6 +324,7 @@ public final class MayflyResultSet extends ResultSetStub {
         return pos;
     }
 
+    @Override
     public void close() throws SQLException {
     }
 

@@ -14,18 +14,22 @@ public class NullExpression extends Expression {
         super(location);
     }
 
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         return NullCell.INSTANCE;
     }
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         return NullCell.INSTANCE;
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         return other instanceof NullExpression;
     }
 
+    @Override
     public String displayName() {
         return "null";
     }

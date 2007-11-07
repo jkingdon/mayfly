@@ -39,10 +39,12 @@ public class SearchedCase extends Expression {
         this.thenValues = thenValues;
     }
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         throw new UnimplementedException();
     }
 
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         for (int i = 0; i < conditions.size(); ++i) {
             Condition condition = (Condition) conditions.get(i);
@@ -54,10 +56,12 @@ public class SearchedCase extends Expression {
         return elseExpression.evaluate(row, evaluator);
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         throw new UnimplementedException();
     }
 
+    @Override
     public String displayName() {
         throw new UnimplementedException();
     }

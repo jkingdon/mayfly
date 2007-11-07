@@ -32,12 +32,14 @@ public class UnresolvedForeignKey extends UnresolvedConstraint {
         this.location = location;
     }
     
+    @Override
     public Constraint resolve(DataStore store, String schema, String table,
         Columns columns) {
         columns.columnFromName(referencingColumn, location);
         return resolve(store, schema, table);
     }
 
+    @Override
     public Constraint resolve(DataStore store, String schema, String table) {
         TableReference resolvedTargetTable = 
             targetTable.resolve(store, schema, table);

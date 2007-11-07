@@ -21,19 +21,23 @@ public class UniqueConstraint extends NotNullOrUnique {
         super(columns, constraintName);
     }
 
+    @Override
     protected void checkForNull(String column, Cell proposedCell) {
     }
 
+    @Override
     public Constraint renameColumn(String oldName, String newName) {
         return new UniqueConstraint(
             names.renameColumn(oldName, newName), 
             constraintName);
     }
 
+    @Override
     protected String description() {
         return "unique column";
     }
     
+    @Override
     public void dump(Writer out) throws IOException {
         out.write("UNIQUE(");
         names.dump(out);

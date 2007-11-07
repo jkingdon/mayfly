@@ -37,6 +37,7 @@ public abstract class NotNullOrUnique extends Constraint {
         }
     }
     
+    @Override
     public void checkExistingRows(DataStore store, TableReference table) {
         Rows allRows = store.table(table).rows();
         for (int i = 0; i < allRows.rowCount(); ++i) {
@@ -44,6 +45,7 @@ public abstract class NotNullOrUnique extends Constraint {
         }
     }
 
+    @Override
     public void check(Rows existingRows, Row proposedRow, Location location) {
         List proposedValues = collectProposedValues(proposedRow);
 
@@ -125,6 +127,7 @@ public abstract class NotNullOrUnique extends Constraint {
 
     protected abstract String description();
     
+    @Override
     public boolean checkDropColumn(TableReference table, String column) {
         if (names.hasColumn(column)) {
             if (names.size() > 1) {
@@ -137,6 +140,7 @@ public abstract class NotNullOrUnique extends Constraint {
         return true;
     }
     
+    @Override
     public boolean canBeTargetOfForeignKey(String targetColumn) {
         return names.size() == 1 && names.hasColumn(targetColumn);
     }

@@ -18,15 +18,18 @@ public class CellExpression extends Literal {
         this.value = value;
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
 //        return false;
         throw new UnimplementedException();
     }
 
+    @Override
     public String displayName() {
         return value.displayName();
     }
 
+    @Override
     public Cell valueAsCell() {
         return value;
     }

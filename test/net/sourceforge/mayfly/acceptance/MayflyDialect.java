@@ -14,15 +14,18 @@ public class MayflyDialect extends Dialect {
 
     private Database database;
 
+    @Override
     public Connection openConnection() throws Exception {
         database = new Database();
         return openAdditionalConnection();
     }
 
+    @Override
     public Connection openAdditionalConnection() throws SQLException {
         return database.openConnection();
     }
 
+    @Override
     public void assertTableCount(int expected) {
         Assert.assertEquals(expected, database.tables().size());
     }
@@ -32,13 +35,16 @@ public class MayflyDialect extends Dialect {
         Assert.assertEquals(expected, dump);
     }
     
+    @Override
     public void shutdown(Connection connection) {
     }
     
+    @Override
     public void assertMessage(String expectedMessage, SQLException exception) {
         Assert.assertEquals(expectedMessage, exception.getMessage());
     }
     
+    @Override
     public void assertMessage(String expectedMessage, SQLException exception, 
         int expectedStartLine, int expectedStartColumn, int expectedEndLine, int expectedEndColumn) {
         super.assertMessage(expectedMessage, exception, expectedStartLine,
@@ -68,10 +74,12 @@ public class MayflyDialect extends Dialect {
         }
     }
     
+    @Override
     public boolean expectMayflyBehavior() {
         return true;
     }
     
+    @Override
     public boolean isReservedWord(String word) {
         // Although some databases don't reserve IF, all that have IF EXISTS
         // in their DROP TABLE do.  The parsing of DROP TABLE seems pretty
@@ -88,6 +96,7 @@ public class MayflyDialect extends Dialect {
         ;
     }
         
+    @Override
     public boolean willReadUncommitted() {
         /** It isn't clear that there is any way to just
            dip our toes into this water.  It seems like
@@ -99,6 +108,7 @@ public class MayflyDialect extends Dialect {
         return !wishThisWereTrue();
     }
     
+    @Override
     public boolean haveTransactions() {
         /**
          * {@link net.sourceforge.mayfly.MayflyConnection#rollback()}
@@ -111,44 +121,54 @@ public class MayflyDialect extends Dialect {
      * @internal
      * Stuff to work on.
      */
+    @Override
     public boolean wishThisWereTrue() {
         return false;
     }
 
+    @Override
     public boolean haveSql2003AutoIncrement() {
         return true;
     }
     
+    @Override
     public boolean haveAutoUnderbarIncrement() {
         return true;
     }
     
+    @Override
     public boolean haveIdentity() {
         return true;
     }
 
+    @Override
     public boolean haveSerial() {
         return true;
     }
     
+    @Override
     public String autoIncrementType() {
         return "integer auto_increment";
     }
     
+    @Override
     public boolean haveOnUpdateValue() {
         return true;
     }
 
+    @Override
     public boolean trailingSpacesConsultedInComparisons() {
         // I guess we should go with the standard instead of hypersonic...
         // I don't know, are there any strong arguments one way or the other?
         return !wishThisWereTrue();
     }
     
+    @Override
     public boolean onUpdateSetNullAndCascadeMissing() {
         return !wishThisWereTrue();
     }
     
+    @Override
     public boolean foreignKeyJustNeedsIndex() {
         /* Here we adopt the most permissive rule of our
            tested databases.  That seems expedient in
@@ -174,6 +194,7 @@ public class MayflyDialect extends Dialect {
        for now, compatibility with other databases is
        winning out.
      */
+    @Override
     public boolean allowDateInTimestampColumn() {
         return true;
     }
@@ -185,10 +206,12 @@ public class MayflyDialect extends Dialect {
        for now, compatibility with other databases is
        winning out.
      */
+    @Override
     public boolean allowTimestampInDateColumn() {
         return true;
     }
     
+    @Override
     public boolean allowOrderByOnDelete() {
         /* I don't know how I'd implement ORDER BY on DELETE.
            It also doesn't seem very elegant.
@@ -196,6 +219,7 @@ public class MayflyDialect extends Dialect {
         return false;
     }
     
+    @Override
     public boolean canSumStrings(boolean rowsPresent) {
         if (rowsPresent) {
             return super.canSumStrings(rowsPresent);
@@ -208,30 +232,36 @@ public class MayflyDialect extends Dialect {
         }
     }
     
+    @Override
     public boolean createTableCanContainIndex() {
         // MySQL compatibility.
         return true;
     }
     
+    @Override
     public boolean canIndexPartOfColumn() {
         // MySQL compatibility.
         return true;
     }
     
+    @Override
     public boolean duplicateIndexNamesOk() {
         return !wishThisWereTrue();
     }
     
+    @Override
     public boolean haveAddColumnAfter() {
         return true;
     }
 
+    @Override
     public boolean haveInsertSetSyntax() {
         /* Only supported by MySQL as far as I know.  But it really
            is a better syntax, seems like... */
         return true;
     }
     
+    @Override
     public Class typeOfInteger() {
         /* Is it important to be compatible with other databases (which
            have Integer.class here)?  There's also a potential speed/space
@@ -241,6 +271,7 @@ public class MayflyDialect extends Dialect {
         return Long.class;
     }
     
+    @Override
     public String productName() {
         return "Mayfly";
     }

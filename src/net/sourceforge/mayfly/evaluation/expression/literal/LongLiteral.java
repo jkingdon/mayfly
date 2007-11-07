@@ -18,14 +18,17 @@ public class LongLiteral extends Literal {
         this.value = value;
     }
 
+    @Override
     public Cell valueAsCell() {
         return new LongCell(value);
     }
 
+    @Override
     public String displayName() {
         return Long.toString(value);
     }
     
+    @Override
     public boolean sameExpression(Expression other) {
         // Since the choice of IntegerLiteral versus LongLiteral
         // is based just on what range the value is in, saying

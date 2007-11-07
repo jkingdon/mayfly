@@ -10,6 +10,7 @@ import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public class LastIdentityExpression extends Expression {
 
+    @Override
     public Cell aggregate(ResultRows rows) {
         throw new MayflyInternalException(
             "no need to aggregate with identity()");
@@ -26,15 +27,18 @@ public class LastIdentityExpression extends Expression {
      * "call identity() + 7" or some such, but I don't even know
      * whether that makes any sense to worry about.
      */
+    @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
         throw new MayflyInternalException(
             "no need to evaluate with identity()");
     }
 
+    @Override
     public boolean sameExpression(Expression other) {
         return other instanceof LastIdentityExpression;
     }
 
+    @Override
     public String displayName() {
         return "identity()";
     }

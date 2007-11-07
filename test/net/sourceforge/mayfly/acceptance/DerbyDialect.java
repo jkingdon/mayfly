@@ -9,6 +9,7 @@ import java.sql.SQLException;
 
 public class DerbyDialect extends Dialect {
 
+    @Override
     public Connection openConnection() throws Exception {
         System.setProperty("derby.system.home", "derby");
         Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
@@ -29,10 +30,12 @@ public class DerbyDialect extends Dialect {
         }
     }
 
+    @Override
     public Connection openAdditionalConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:derby:test");
     }
 
+    @Override
     public void shutdown(Connection connection) throws Exception {
         connection.close();
         try {
@@ -41,38 +44,47 @@ public class DerbyDialect extends Dialect {
         }
     }
     
+    @Override
     public boolean crossJoinCanHaveOn() {
         return true;
     }
 
+    @Override
     public boolean crossJoinRequiresOn() {
         return true;
     }
     
+    @Override
     public boolean onIsRestrictedToJoinsTables() {
         return false;
     }
     
+    @Override
     boolean onCanMentionOutsideTable() {
         return false;
     }
     
+    @Override
     public boolean uniqueColumnMayBeNullable() {
         return false;
     }
     
+    @Override
     public boolean canSetObjectNull() {
         return false;
     }
     
+    @Override
     public boolean canCreateSchemaAndTablesInSameStatement() {
         return false;
     }
     
+    @Override
     public boolean authorizationAllowedInCreateSchema() {
         return false;
     }
     
+    @Override
     public boolean isReservedWord(String word) {
         return "first".equalsIgnoreCase(word)
             || "last".equalsIgnoreCase(word)
@@ -80,18 +92,22 @@ public class DerbyDialect extends Dialect {
         ;
     }
     
+    @Override
     public boolean quotedIdentifiersAreCaseSensitive() {
         return true;
     }
 
+    @Override
     public boolean haveSlashStarComments() {
         return false;
     }
 
+    @Override
     public boolean canConcatenateStringAndInteger() {
         return false;
     }
     
+    @Override
     public boolean caseExpressionPickyAboutTypes() {
         /* Not sure exactly what is going on here.  It might have
            to do with omitting ELSE from the case expression, but
@@ -99,31 +115,38 @@ public class DerbyDialect extends Dialect {
         return true;
     }
     
+    @Override
     public boolean canGroupByExpression() {
         // Seems to be allowed as of Derby 10.2.1.6
         return false;
     }
     
+    @Override
     public boolean canGroupByColumnAlias() {
         return false;
     }
     
+    @Override
     public boolean whereCanReferToColumnAlias() {
         return false;
     }
 
+    @Override
     public boolean canOrderByExpression(boolean isAggregate) {
         return true;
     }
 
+    @Override
     public boolean nullSortsLower() {
         return false;
     }    
 
+    @Override
     public boolean haveLimit() {
         return false;
     }
     
+    @Override
     public boolean willWaitForWriterToCommit() {
         /* If we are in a situation where another
            connection has written data but not committed,
@@ -133,10 +156,12 @@ public class DerbyDialect extends Dialect {
         return true;
     }
     
+    @Override
     public boolean autoCommitMustBeOffToCallRollback() {
         return false;
     }
     
+    @Override
     public void endTransaction(Connection connection) throws SQLException {
         /* setAutoCommit(true) would also suffice.
            How about commit() (don't think I've tried that one)?
@@ -144,10 +169,12 @@ public class DerbyDialect extends Dialect {
         connection.rollback();
     }
     
+    @Override
     public boolean haveTinyint() {
         return false;
     }
     
+    @Override
     public boolean expressionsAreTypeLong() {
         /* I suppose the question being what is maxint + maxint?
            (not that forcing to long solves this, with maxint * maxint * maxint
@@ -155,20 +182,24 @@ public class DerbyDialect extends Dialect {
         return false;
     }
 
+    @Override
     public boolean allowHexForBinary() {
         /* Derby has the x'00' syntax, but not for type BLOB.  I haven't
            checked what types it is allowed for. */
         return false;
     }
     
+    @Override
     public boolean haveTextType() {
         return false;
     }
 
+    @Override
     public boolean canInsertNoValues() {
         return false;
     }
     
+    @Override
     public boolean canSetStringOnDecimalColumn() {
         return true;
     }
@@ -179,26 +210,32 @@ public class DerbyDialect extends Dialect {
        {@link Dialect#allowDateInTimestampColumn()}, as the latter
        isn't losing any precision.  But that seems to be what Derby does.
      */
+    @Override
     public boolean allowTimestampInDateColumn() {
         return true;
     }
 
+    @Override
     public boolean haveDropTableFooIfExists() {
         return false;
     }
 
+    @Override
     public boolean haveDropTableIfExistsFoo() {
         return false;
     }
     
+    @Override
     public boolean notNullRequiresDefault() {
         return true;
     }
 
+    @Override
     public boolean haveDropColumn() {
         return false;
     }
     
+    @Override
     public boolean haveModifyColumn() {
         /* Derby 10.2.1.6 claims the ability to change the nullability
         of a column (or certain other changes).  For the nullability
@@ -207,15 +244,18 @@ public class DerbyDialect extends Dialect {
         return false;
     }
 
+    @Override
     public boolean haveSql2003AutoIncrement() {
         return true;
     }
     
+    @Override
     public String identityType() {
         return "INTEGER GENERATED BY DEFAULT " +
             "AS IDENTITY(START WITH 1) PRIMARY KEY";
     }
     
+    @Override
     public String lastIdentityValueQuery(String table, String column) {
         return "values identity_val_local()";
     }
@@ -226,6 +266,7 @@ public class DerbyDialect extends Dialect {
     // which appear to be the same as NO ACTION except how triggers are handled.
     // We don't test these currently.
 
+    @Override
     public boolean onDeleteSetDefaultMissing(boolean tableCreateTime) {
         /* Derby doesn't claim to have ON DELETE SET DEFAULT.
            But it doesn't complain when you create the table,
@@ -233,26 +274,32 @@ public class DerbyDialect extends Dialect {
         return !tableCreateTime;
     }
 
+    @Override
     public boolean onUpdateSetNullAndCascadeMissing() {
         return true;
     }
     
+    @Override
     public boolean allowOrderByOnDelete() {
         return false;
     }
 
+    @Override
     public boolean deleteAllRowsIsSmartAboutForeignKeys() {
         return true;
     }
     
+    @Override
     public boolean errorIfOrderByNotInSelectDistinct() {
         return false;
     }
 
+    @Override
     public boolean metaDataExpectsUppercase() {
         return true;
     }
     
+    @Override
     public String productName() {
         return "Apache Derby";
     }

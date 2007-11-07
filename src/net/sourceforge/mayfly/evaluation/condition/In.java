@@ -19,6 +19,7 @@ public class In extends Condition {
         this.expressions = new ImmutableList(expressions);
     }
 
+    @Override
     public boolean evaluate(ResultRow row, Evaluator evaluator) {
         Cell leftSideValue = leftSide.evaluate(row, evaluator);
 
@@ -32,6 +33,7 @@ public class In extends Condition {
         return false;
     }
 
+    @Override
     public String firstAggregate() {
         String firstInLeft = leftSide.firstAggregate();
         if (firstInLeft != null) {
@@ -49,6 +51,7 @@ public class In extends Condition {
         return null;
     }
     
+    @Override
     public void check(ResultRow row) {
         leftSide.check(row);
         for (int i = 0; i < expressions.size(); ++i) {

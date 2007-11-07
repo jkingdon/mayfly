@@ -8,11 +8,13 @@ public class StringNode extends Node {
         this.string = string;
     }
 
+    @Override
     public int backupOrdering(Node other) {
         StringNode stringNode = (StringNode) other;
         return string.compareTo(stringNode.string);
     }
 
+    @Override
     public String toString() {
         return string;
     }

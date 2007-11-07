@@ -23,6 +23,7 @@ public class UnresolvedPrimaryKey extends UnresolvedConstraint {
         this(ColumnNames.singleton(column), null);
     }
 
+    @Override
     public Constraint resolve(DataStore store, String schema, String table) {
         // Not suitable for CREATE TABLE, because we are assuming
         // the columns are already in the store.
@@ -34,6 +35,7 @@ public class UnresolvedPrimaryKey extends UnresolvedConstraint {
         return resolve(store, schema, table, existingTable.columns());
     }
     
+    @Override
     public Constraint resolve(
         DataStore store, String schema, String table, Columns tableColumns) {
         return new PrimaryKey(this.columns.resolve(tableColumns), constraintName);
