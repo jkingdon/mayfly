@@ -50,7 +50,6 @@ public class AddConstraintTest extends TestCase {
             ");\n" +
             "\n", 
             new SqlDumper().dump(database.dataStore()));
-
     }
 
 }

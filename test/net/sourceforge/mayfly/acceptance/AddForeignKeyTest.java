@@ -36,10 +36,25 @@ public class AddForeignKeyTest extends SqlTestCase {
             "foreign key (second_foo) references foo(id)");
     }
     
-    /* TODO: are there any more cases with orders?  Like where removing a key
-       leaves a gap (yes, I think this is a relevant case, perhaps currently 
-       buggy).
-       Does adding a key always add to the end? (I think so)
-       What does that do to numbering? */
+    public void testRemoveCreatesGap() throws Exception {
+        if (!dialect.haveDropForeignKey() || !dialect.nameForeignKeysWithIbfk()) {
+            return;
+        }
+
+        execute("create table foo(id integer primary key)" +
+            dialect.tableTypeForForeignKeys());
+        execute("create table bar(f1 integer, f2 integer, f3 integer)" +
+            dialect.tableTypeForForeignKeys());
+        
+        execute("alter table bar add foreign key(f1) references foo(id)");
+        execute("alter table bar add foreign key(f2) references foo(id)");
+        execute("alter table bar drop foreign key bar_ibfk_1");
+        execute("alter table bar add foreign key(f3) references foo(id)");
+        execute("alter table bar drop foreign key bar_ibfk_2");
+        execute("alter table bar drop foreign key bar_ibfk_3");
+        
+        // verify all foreign keys are gone
+        execute("insert into bar(f1, f2, f3) values(4, 5, 6)");
+    }
     
 }

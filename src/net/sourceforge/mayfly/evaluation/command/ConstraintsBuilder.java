@@ -16,18 +16,35 @@ public class ConstraintsBuilder {
 
     public static ConstraintsBuilder fromTable(
         DataStore store, TableReference table) {
-        String tableName = table.tableName();
-        String namePrefix = tableName + "_ibfk_";
+        return new ConstraintsBuilder(store, table.schema(), table.tableName(), 
+            findNextForeignKeyNumber(store, table));
+    }
+
+    static int findNextForeignKeyNumber(
+        DataStore store, TableReference table) {
+        String namePrefix = table.tableName() + "_ibfk_";
+        int prefixLength = namePrefix.length();
         int nextForeignKeyNumber = 1;
 
         TableData tableData = store.table(table);
         for (Constraint constraint : tableData.constraints) {
+            String name = constraint.constraintName;
             if (constraint instanceof ForeignKey
-                && constraint.constraintName.startsWith(namePrefix)) {
-                ++nextForeignKeyNumber;
+                && name.startsWith(namePrefix)) {
+                String remaining = name.substring(prefixLength);
+                int thisNumber;
+                try {
+                    thisNumber = Integer.parseInt(remaining);
+                }
+                catch (NumberFormatException e) {
+                    continue;
+                }
+                if (nextForeignKeyNumber <= thisNumber) {
+                    nextForeignKeyNumber = thisNumber + 1;
+                }
             }
         }
-        return new ConstraintsBuilder(store, table.schema(), tableName, nextForeignKeyNumber);
+        return nextForeignKeyNumber;
     }
 
     private List<Constraint> resolved = new ArrayList<Constraint>();
