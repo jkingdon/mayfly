@@ -181,6 +181,16 @@ but subject to change to improve compatibility or general usefulness).
 Foreign key actions for ON DELETE are NO ACTION, CASCADE, SET NULL, 
 and SET DEFAULT.  Foreign key actions for ON UPDATE are NO ACTION only.
 
+Foreign keys which are not given a name will be named according to
+the scheme <i>referringTable</i>_ibfk_<i>sequence</i>,
+where <i>sequence</i> is 1 for the first foreign key in this table, 2 for
+the second, and so on.  This can be kind of ugly in dumps (although not 
+as problematic as if the name were set in an unpredictable way, 
+such as based on times
+or database internal state), but seems to be the best way to make
+ALTER TABLE DROP FOREIGN KEY usable where a constraint name was not
+initially assigned.
+
 @subsection drop DROP TABLE
 
 <pre>

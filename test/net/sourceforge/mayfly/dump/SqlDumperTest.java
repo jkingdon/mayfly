@@ -265,7 +265,7 @@ public class SqlDumperTest extends TestCase {
         assertEquals(
             "CREATE TABLE refd(\n  a INTEGER,\n  PRIMARY KEY(a)\n);\n\n" +
             "CREATE TABLE refr(\n  d INTEGER,\n" +
-            "  FOREIGN KEY(d) REFERENCES refd(a) " +
+            "  CONSTRAINT refr_ibfk_1 FOREIGN KEY(d) REFERENCES refd(a) " +
             "ON DELETE SET NULL\n" +
             ");\n\n",
             dump()

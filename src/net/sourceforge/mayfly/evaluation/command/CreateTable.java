@@ -9,7 +9,6 @@ import net.sourceforge.mayfly.datastore.Index;
 import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.datastore.constraint.Constraints;
 import net.sourceforge.mayfly.util.ImmutableList;
-import net.sourceforge.mayfly.util.L;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,24 +44,24 @@ public class CreateTable extends Command {
 
     private Constraints makeTableConstraints(
         DataStore store, String schema) {
-        return new Constraints(resolveAll(store, schema, this.constraints));
+        return resolveAll(store, schema, this.constraints);
     }
 
-    private ImmutableList resolveAll(
+    private Constraints resolveAll(
         DataStore store, String schema, List unresolved) {
         checkMultiplePrimaryKeys(unresolved);
-        L result = new L();
+        ConstraintsBuilder result = new ConstraintsBuilder(
+            store, schema, table, columns);
         for (Iterator iter = unresolved.iterator(); iter.hasNext();) {
             UnresolvedConstraint constraint = 
                 (UnresolvedConstraint) iter.next();
-            // TODO: passing in store here is (I think)
+            // TODO: using store (via the constructor) here is (I think)
             // subtlely wrong.  In the case of
             // CREATE SCHEMA S1 CREATE TABLE FOO ... CREATE TABLE BAR ...
             // then store won't contain FOO.
-            result.add(constraint.resolve(
-                store, schema, table, this.columns));
+            result.add(constraint);
         }
-        return result.asImmutable();
+        return result.asConstraints();
     }
     
     private void checkMultiplePrimaryKeys(List unresolved) {

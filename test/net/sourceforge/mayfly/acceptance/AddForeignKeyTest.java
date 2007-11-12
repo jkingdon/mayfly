@@ -36,4 +36,10 @@ public class AddForeignKeyTest extends SqlTestCase {
             "foreign key (second_foo) references foo(id)");
     }
     
+    /* TODO: are there any more cases with orders?  Like where removing a key
+       leaves a gap (yes, I think this is a relevant case, perhaps currently 
+       buggy).
+       Does adding a key always add to the end? (I think so)
+       What does that do to numbering? */
+    
 }

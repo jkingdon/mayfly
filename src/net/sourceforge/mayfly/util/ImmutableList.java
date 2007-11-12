@@ -8,7 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class ImmutableList implements List {
+public class ImmutableList<T> implements List<T> {
 
     public static ImmutableList singleton(Object singleElement) {
         return new ImmutableList(Collections.singletonList(singleElement), true);
@@ -18,7 +18,7 @@ public class ImmutableList implements List {
         return new ImmutableList(Arrays.asList(elements));
     }
     
-    List delegate;
+    List<T> delegate;
 
     public ImmutableList() {
         delegate = Collections.EMPTY_LIST;
@@ -61,11 +61,11 @@ public class ImmutableList implements List {
 
 
     
-    public boolean add(Object o) {
+    public boolean add(T o) {
         return delegate.add(o);
     }
 
-    public void add(int index, Object o) {
+    public void add(int index, T o) {
         delegate.add(index, o);
     }
 
@@ -94,7 +94,7 @@ public class ImmutableList implements List {
         return delegate.equals(o);
     }
 
-    public Object get(int index) {
+    public T get(int index) {
         return delegate.get(index);
     }
 
@@ -131,7 +131,7 @@ public class ImmutableList implements List {
         return delegate.remove(o);
     }
 
-    public Object remove(int index) {
+    public T remove(int index) {
         return delegate.remove(index);
     }
 
@@ -143,7 +143,7 @@ public class ImmutableList implements List {
         return delegate.retainAll(c);
     }
 
-    public Object set(int index, Object o) {
+    public T set(int index, T o) {
         return delegate.set(index, o);
     }
 
@@ -151,18 +151,13 @@ public class ImmutableList implements List {
         return delegate.size();
     }
 
-    /**
-     * @internal
-     * @return an ImmutableList (declared as List to cater to Java 1.4
-     * override rules, but castable to ImmutableList)
-     */
-    public List subList(int fromIndex, int toIndex) {
+    public ImmutableList<T> subList(int fromIndex, int toIndex) {
         /* Here we rely on the fact that delegate is immutable.
            Although we don't actually copy the sublist, there is
            no way for it to change out from under the ImmutableList
            we are returning.
          */
-        return new ImmutableList(delegate.subList(fromIndex, toIndex), true);
+        return new ImmutableList<T>(delegate.subList(fromIndex, toIndex), true);
     }
 
     public Object[] toArray() {

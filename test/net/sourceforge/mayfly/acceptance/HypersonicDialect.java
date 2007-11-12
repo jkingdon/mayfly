@@ -262,6 +262,11 @@ public class HypersonicDialect extends Dialect {
     }
     
     @Override
+    public boolean canDropColumnWithForeignKey() {
+        return false;
+    }
+
+    @Override
     public boolean haveDropForeignKey() {
         return false;
     }

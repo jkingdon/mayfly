@@ -557,8 +557,16 @@ public abstract class Dialect {
     public boolean haveDropColumn() {
         return true;
     }
+    
+    public boolean canDropColumnWithForeignKey() {
+        return true;
+    }
 
     public boolean haveDropForeignKey() {
+        return true;
+    }
+    
+    public boolean nameForeignKeysWithIbfk() {
         return true;
     }
 

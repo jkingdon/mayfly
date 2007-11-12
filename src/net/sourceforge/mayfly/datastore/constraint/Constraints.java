@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class Constraints {
+public class Constraints implements Iterable<Constraint> {
 
-    private final ImmutableList constraints;
+    private final ImmutableList<Constraint> constraints;
 
     public Constraints() {
         this(new ImmutableList());
@@ -193,7 +193,7 @@ public class Constraints {
     }
     
     public Constraint constraint(int index) {
-        return (Constraint) constraints.get(index);
+        return constraints.get(index);
     }
 
     public boolean hasPrimaryKey() {
@@ -235,6 +235,10 @@ public class Constraints {
             }
         }
         return false;
+    }
+
+    public Iterator<Constraint> iterator() {
+        return constraints.iterator();
     }
 
 }

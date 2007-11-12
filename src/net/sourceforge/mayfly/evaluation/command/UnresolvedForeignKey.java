@@ -16,7 +16,7 @@ public class UnresolvedForeignKey extends UnresolvedConstraint {
     private final String targetColumn;
     private final Action onDelete;
     private final Action onUpdate;
-    private final String constraintName;
+    private String constraintName;
     private final Location location;
 
     public UnresolvedForeignKey(String referencingColumn, 
@@ -30,6 +30,17 @@ public class UnresolvedForeignKey extends UnresolvedConstraint {
         this.onUpdate = onUpdate;
         this.constraintName = constraintName;
         this.location = location;
+    }
+    
+    @Override
+    public Constraint resolve(ConstraintsBuilder builder) {
+        if (this.constraintName == null) {
+            this.constraintName = builder.assignForeignKeyName();
+        }
+        if (builder.columns != null) {
+            builder.columns.columnFromName(referencingColumn, location);
+        }
+        return resolve(builder.store, builder.schema, builder.table);
     }
     
     @Override

@@ -1,5 +1,14 @@
 Changes since 0.3:
 
+When adding a foreign key without giving it a name, Mayfly now assigns
+a name using the same scheme as MySQL: referringTable_ibfk_sequence,
+where the first foreign key in this table is sequence 1, the second is 2, 
+and so on.  This can be kind of ugly in dumps (although not as problematic
+as if the name were set in an unpredictable way, such as based on times
+or database internal state), but seems to be the best way to make
+ALTER TABLE DROP FOREIGN KEY usable where a constraint name was not
+initially assigned.
+
 Add MySQL syntax for CHANGE COLUMN (which is like MODIFY COLUMN but
 also allows renaming the column):
   ALTER TABLE table CHANGE COLUMN old-name column-definition

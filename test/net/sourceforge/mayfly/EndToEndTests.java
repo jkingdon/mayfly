@@ -219,7 +219,7 @@ public class EndToEndTests extends SqlTestCase {
             ");\n\n" +
             "CREATE TABLE balance(\n" +
             "  currency INTEGER,\n" +
-            "  FOREIGN KEY(currency) REFERENCES currency(id)\n" +
+            "  CONSTRAINT balance_ibfk_1 FOREIGN KEY(currency) REFERENCES currency(id)\n" +
             ");\n\n");
     }
 

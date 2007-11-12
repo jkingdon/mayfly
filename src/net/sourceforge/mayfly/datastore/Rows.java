@@ -32,7 +32,7 @@ public class Rows {
     }
     
     public Rows subList(int fromIndex, int toIndex) {
-        return new Rows((ImmutableList) rows.subList(fromIndex, toIndex));
+        return new Rows(rows.subList(fromIndex, toIndex));
     }
 
     public Rows with(Row newRow) {

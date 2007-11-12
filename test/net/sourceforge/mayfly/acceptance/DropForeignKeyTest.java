@@ -1,5 +1,8 @@
 package net.sourceforge.mayfly.acceptance;
 
+import java.sql.SQLException;
+
+
 
 public class DropForeignKeyTest extends SqlTestCase {
     
@@ -103,6 +106,97 @@ public class DropForeignKeyTest extends SqlTestCase {
         execute(insertCityWithoutColonialPower);
         expectExecuteFailure(insertCityWithoutCountry, 
             "foreign key violation: countries has no id 7");
+    }
+    
+    public void testDropUnnamedForeignKey() throws Exception {
+        /*
+         * A cleaner way, perhaps, would be if there were a syntax to
+         * drop the key based on which column it is from/to or something
+         * like that.  But existing practice (such as it is) seems to be
+         * that the database assigns a constraint name (kind of a problem
+         * for scripting this stuff, but at least mysql assigns the name
+         * in a predictable way, which doesn't depend on the contents of
+         * other tables, the time, database internal state, etc).
+         */
+        if (!dialect.haveDropForeignKey()) {
+            return;
+        }
+
+        execute("create table refd(id integer primary key)" + 
+            dialect.tableTypeForForeignKeys());
+        execute("create table refr(a integer, b integer, c integer," +
+            "foreign key(a) references refd(id)," +
+            "foreign key(b) references refd(id)" +
+            ")" + 
+            dialect.tableTypeForForeignKeys());
+
+        String dropForeignKeyB = "alter table refr drop foreign key refr_ibfk_2";
+        if (dialect.nameForeignKeysWithIbfk()) {
+            execute(dropForeignKeyB);
+
+            checkWeDeletedBConstraintNotA();
+        }
+        else {
+            /* Derby names them like "SQL071109113329810" which seems
+             * to be based on the time (2007-11-09T11:33:29.10 local time zone, 
+             * or some such).
+             */
+            /* postgres and hypersonic probably name them some other way,
+             * but they don't have drop foreign key, so we don't worry about it.
+             */
+            expectExecuteFailure(dropForeignKeyB, "no foreign key refr_ibfk_2");
+        }
+
+    }
+    
+    public void testForeignKeyNamesAndOrder() throws Exception {
+        if (!dialect.haveDropForeignKey() || 
+            !dialect.nameForeignKeysWithIbfk()) {
+            return;
+        }
+
+        execute("create table refd(id integer primary key)" + 
+            dialect.tableTypeForForeignKeys());
+        execute("create table refr(a integer, b integer, c integer," +
+            "foreign key(b) references refd(id)," +
+            "foreign key(a) references refd(id)" +
+            ")" + 
+            dialect.tableTypeForForeignKeys());
+
+        execute("alter table refr drop foreign key refr_ibfk_1");
+
+        checkWeDeletedBConstraintNotA();
+    }
+
+    public void testForeignKeyNamesWhereSomeKeysExplicitlyNamed() throws Exception {
+        if (!dialect.haveDropForeignKey() || 
+            !dialect.nameForeignKeysWithIbfk()) {
+            return;
+        }
+
+        execute("create table refd(id integer primary key)" + 
+            dialect.tableTypeForForeignKeys());
+        execute("create table refr(a integer, b integer, c integer," +
+            "constraint a_constraint foreign key(a) references refd(id)," +
+            "foreign key(b) references refd(id)" +
+            ")" + 
+            dialect.tableTypeForForeignKeys());
+
+        execute("alter table refr drop foreign key refr_ibfk_1");
+
+        checkWeDeletedBConstraintNotA();
+    }
+
+    private void checkWeDeletedBConstraintNotA() throws SQLException {
+        execute("insert into refd(id) values(5)");
+        execute("insert into refr(a,b,c) values(5,7,9)");
+        expectExecuteFailure("insert into refr(a,b,c) values(7,5,9)",
+            dialect.wishThisWereTrue() ?
+                /* The wording here is awkward, but it is useful to know
+                   which column, right? */
+                "foreign key violation: column a references non-present " +
+                    "value 7 in table refd, column id" :
+                "foreign key violation: refd has no id 7");
     }
     
 }

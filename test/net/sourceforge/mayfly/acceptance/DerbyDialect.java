@@ -236,6 +236,11 @@ public class DerbyDialect extends Dialect {
     }
     
     @Override
+    public boolean nameForeignKeysWithIbfk() {
+        return false;
+    }
+
+    @Override
     public boolean haveModifyColumn() {
         /* Derby 10.2.1.6 claims the ability to change the nullability
         of a column (or certain other changes).  For the nullability

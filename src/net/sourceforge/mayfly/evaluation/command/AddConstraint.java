@@ -18,8 +18,8 @@ public class AddConstraint extends Command {
     @Override
     public UpdateStore update(DataStore store, String currentSchema) {
         TableReference reference = table.resolve(store, currentSchema, null);
-        Constraint resolved = 
-            constraint.resolve(store, reference.schema(), reference.tableName());
+        ConstraintsBuilder builder = ConstraintsBuilder.fromTable(store, reference);
+        Constraint resolved = constraint.resolve(builder);
         resolved.checkExistingRows(store, reference);
         return new UpdateStore(
             store.addConstraint(reference, resolved), 

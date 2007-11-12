@@ -72,7 +72,27 @@ public class DropColumnTest extends SqlTestCase {
         execute("alter table foo drop column a");
     }
     
-    // foreign key references column
+    public void testForeignKeyFromDroppedColumn() throws Exception {
+        if (!dialect.haveDropColumn()) {
+            return;
+        }
+
+        execute("create table bar(id integer primary key)");
+        execute("create table foo(a integer, " +
+            "remaining_column integer,  " +
+            "foreign key(a) references bar(id) " +
+            ")");
+        String dropColumnWithForeignKey = "alter table foo drop column a";
+        if (dialect.canDropColumnWithForeignKey()) {
+            execute(dropColumnWithForeignKey);
+        }
+        else {
+            expectExecuteFailure(dropColumnWithForeignKey, 
+                "column is referenced by a foreign key constraint");
+        }
+    }
+    
+    // foreign key references column (i.e. ForeignKeyToDroppedColumn)
     // unique or primary key constraint 
     //   (multi-column) references column
     // CASCADE (means also drop foreign keys or views which reference the column)
