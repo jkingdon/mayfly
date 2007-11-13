@@ -309,4 +309,9 @@ public class DerbyDialect extends Dialect {
         return "Apache Derby";
     }
     
+    @Override
+    public boolean callJavaMethodAsStoredProcedure() {
+        return false;
+    }
+
 }

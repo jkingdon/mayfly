@@ -14,7 +14,6 @@ import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
-import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.util.Iterator;
 import java.util.List;

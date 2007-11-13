@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly.acceptance;
 
-import net.sourceforge.mayfly.util.StringBuilder;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -168,6 +166,10 @@ public abstract class Dialect {
 
     public boolean notBindsMoreTightlyThanIn() {
         return false;
+    }
+    
+    public boolean callJavaMethodAsStoredProcedure() {
+        return true;
     }
 
     public boolean orderByCountsAsWhat() {

@@ -10,7 +10,6 @@ import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.Rows;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.parser.Location;
-import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.util.ArrayList;
 import java.util.Iterator;

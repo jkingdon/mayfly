@@ -3,7 +3,6 @@ package net.sourceforge.mayfly.parser;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.util.ImmutableByteArray;
-import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -276,4 +276,9 @@ public class MayflyDialect extends Dialect {
         return "Mayfly";
     }
     
+    @Override
+    public boolean callJavaMethodAsStoredProcedure() {
+        return wishThisWereTrue();
+    }
+
 }

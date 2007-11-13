@@ -412,4 +412,9 @@ public class MySqlDialect extends Dialect {
         return "MySQL";
     }
 
+    @Override
+    public boolean callJavaMethodAsStoredProcedure() {
+        return false;
+    }
+
 }

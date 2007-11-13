@@ -326,4 +326,9 @@ public class PostgresDialect extends Dialect {
         return true;
     }
 
+    @Override
+    public boolean callJavaMethodAsStoredProcedure() {
+        return false;
+    }
+
 }

@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly.dump;
 
-import net.sourceforge.mayfly.util.StringBuilder;
-
 import java.util.Stack;
 
 public class XmlWriter {

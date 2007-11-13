@@ -108,7 +108,6 @@ import net.sourceforge.mayfly.evaluation.what.AllColumnsFromTable;
 import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.util.ImmutableList;
-import net.sourceforge.mayfly.util.StringBuilder;
 
 import java.io.Reader;
 import java.util.ArrayList;

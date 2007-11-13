@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly.acceptance;
 
-import net.sourceforge.mayfly.util.StringBuilder;
-
 import java.sql.ResultSet;
 
 public class PerformanceTest extends SqlTestCase {
