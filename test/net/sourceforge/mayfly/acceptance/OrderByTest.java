@@ -85,8 +85,10 @@ public class OrderByTest extends SqlTestCase {
         }
         else {
             assertFalse(connection.getMetaData().supportsExpressionsInOrderBy());
-            expectQueryFailure(expression, "expected end of file but got '+'");
-            expectQueryFailure(constantExpression, "expected end of file but got '+'");
+            expectQueryFailure(expression, 
+                "expected column reference in ORDER BY but got expression");
+            expectQueryFailure(constantExpression, 
+                "expected end of file but got '+'");
         }
     }
     

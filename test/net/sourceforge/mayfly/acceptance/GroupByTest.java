@@ -353,8 +353,10 @@ public class GroupByTest extends SqlTestCase {
         execute("insert into item(type, price) values('book', 1695)");
         execute("insert into item(type, price) values('pencil', 15)");
         
-        String orderByAggregate = "select type, avg(price) from item " +
-                "group by type order by avg(price)";
+        String orderByAggregate = 
+            "select type, avg(price) from item \n" +
+            "group by type \n" +
+            "order by avg(price)";
         if (dialect.canOrderByExpression(true)) {
             assertResultList(
                 new String[] { " 'pencil', 15 ", " 'book', 1595 " },
@@ -363,8 +365,8 @@ public class GroupByTest extends SqlTestCase {
         }
         else {
             expectQueryFailure(orderByAggregate, 
-                "expected identifier but got AVG",
-                1, 58, 1, 61);
+                "expected column reference in ORDER BY but got avg(price)",
+                3, 10, 3, 20);
         }
 
         String notAggregateOrGrouped = "select type, avg(price) from item " +

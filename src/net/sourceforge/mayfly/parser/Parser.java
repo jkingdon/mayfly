@@ -72,6 +72,7 @@ import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.CurrentTimestampExpression;
 import net.sourceforge.mayfly.evaluation.expression.DefaultValue;
 import net.sourceforge.mayfly.evaluation.expression.Divide;
+import net.sourceforge.mayfly.evaluation.expression.Function;
 import net.sourceforge.mayfly.evaluation.expression.Maximum;
 import net.sourceforge.mayfly.evaluation.expression.Minimum;
 import net.sourceforge.mayfly.evaluation.expression.Minus;
@@ -1182,19 +1183,19 @@ public class Parser {
             result = new SubselectedIn(left, subselect);
         }
         else {
-            List expressions = parseExpressionList();
+            ImmutableList<Expression> expressions = parseExpressionList();
             result = new In(left, expressions);
         }
         expectAndConsume(TokenType.CLOSE_PAREN);
         return result;
     }
 
-    private List parseExpressionList() {
-        List expressions = new ArrayList();
+    private ImmutableList<Expression> parseExpressionList() {
+        List<Expression> expressions = new ArrayList<Expression>();
         do {
-            expressions.add(parsePrimary().asNonBoolean());
+            expressions.add(parseExpression().asNonBoolean());
         } while (consumeIfMatches(TokenType.COMMA));
-        return expressions;
+        return new ImmutableList<Expression>(expressions);
     }
 
     public ParserExpression parsePrimary() {
@@ -1202,7 +1203,7 @@ public class Parser {
         Location start = currentToken.location;
 
         if (currentToken.type == TokenType.IDENTIFIER) {
-            return new NonBooleanParserExpression(parseColumnReference());
+            return new NonBooleanParserExpression(parsePrimaryIdentifier());
         }
         else if (currentToken.type == TokenType.NUMBER || 
             currentToken.type == TokenType.PERIOD) {
@@ -1488,7 +1489,7 @@ public class Parser {
 
     }
 
-    private SingleColumn parseColumnReference() {
+    private Expression parsePrimaryIdentifier() {
         Token firstIdentifier = expectAndConsume(TokenType.IDENTIFIER);
 
         if (consumeIfMatches(TokenType.PERIOD)) {
@@ -1497,9 +1498,29 @@ public class Parser {
                 firstIdentifier.location.combine(column.location),
                 options
             );
-        } else {
+        }
+        else if (consumeIfMatches(TokenType.OPEN_PAREN)) {
+            ImmutableList<Expression> arguments = parseExpressionList();
+            Token close = expectAndConsume(TokenType.CLOSE_PAREN);
+            return new Function(firstIdentifier.getText(), arguments,
+                firstIdentifier.location.combine(close.location),
+                options);
+        }
+        else {
             return new SingleColumn(firstIdentifier.getText(), 
                 firstIdentifier.location, options);
+        }
+    }
+
+    private SingleColumn parseColumnReference() {
+        Expression expression = parseExpression().asNonBoolean();
+        if (expression instanceof SingleColumn) {
+            return (SingleColumn) expression;
+        }
+        else {
+            throw new ParserException(
+                "expected column reference in ORDER BY but got " + expression.displayName(),
+                expression.location);
         }
     }
 
@@ -1627,7 +1648,7 @@ public class Parser {
         }
     }
 
-    private OrderItem parseOrderItem() {
+    OrderItem parseOrderItem() {
         if (currentToken.type == TokenType.NUMBER) {
             int reference = consumeInteger();
             boolean ascending = parseAscending();

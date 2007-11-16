@@ -14,7 +14,8 @@ public class StoredProcedureTest extends SqlTestCase {
                 query(query));
         }
         else {
-            expectQueryFailure(query, "expected FROM but got '('");
+            expectQueryFailure(query, 
+                "This feature is not yet implemented in Mayfly");
         }
     }
     
@@ -41,5 +42,11 @@ public class StoredProcedureTest extends SqlTestCase {
     }
     
     // overloaded method case - hypersonic uses the first one with that name.
+    // method exists but isn't static
+    // wrong number of arguments
+    // method exists but isn't public (? - this case might be too much trouble)
+    // types on arguments (int vs float vs string vs ?)
+    // types on return type
+    // in WHERE, not just in select
 
 }

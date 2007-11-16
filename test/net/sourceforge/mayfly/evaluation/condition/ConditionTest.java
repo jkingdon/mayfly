@@ -14,11 +14,8 @@ import net.sourceforge.mayfly.evaluation.expression.ScalarSubselect;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.select.Select;
-import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.parser.Parser;
-
-import java.util.ArrayList;
-import java.util.Arrays;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 public class ConditionTest extends TestCase {
     
@@ -50,12 +47,12 @@ public class ConditionTest extends TestCase {
         assertEquals("count(*)", new Equal(new CountAll("count"), new SingleColumn("y")).firstAggregate());
         assertEquals("count(*)", new IsNull(new CountAll("count")).firstAggregate());
 
-        assertEquals(null, new In(new SingleColumn("x"), new ArrayList()).firstAggregate());
-        assertEquals("count(*)", new In(new CountAll("count"), new ArrayList()).firstAggregate());
+        assertEquals(null, new In(new SingleColumn("x"), new ImmutableList()).firstAggregate());
+        assertEquals("count(*)", new In(new CountAll("count"), new ImmutableList()).firstAggregate());
         assertEquals("count(*)",
             new In(
                 new SingleColumn("x"), 
-                Arrays.asList(new WhatElement[] { new CountAll("count") })
+                ImmutableList.fromElements(new CountAll("count"))
             ).firstAggregate()
         );
 

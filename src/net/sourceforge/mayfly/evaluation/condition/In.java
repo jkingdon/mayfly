@@ -6,25 +6,21 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.util.ImmutableList;
 
-import java.util.Iterator;
-import java.util.List;
-
 public class In extends Condition {
 
     public final Expression leftSide;
-    public final ImmutableList expressions;
+    public final ImmutableList<Expression> expressions;
 
-    public In(Expression leftSide, List expressions) {
+    public In(Expression leftSide, ImmutableList<Expression> expressions) {
         this.leftSide = leftSide;
-        this.expressions = new ImmutableList(expressions);
+        this.expressions = expressions;
     }
 
     @Override
     public boolean evaluate(ResultRow row, Evaluator evaluator) {
         Cell leftSideValue = leftSide.evaluate(row, evaluator);
 
-        for (Iterator iter = expressions.iterator(); iter.hasNext();) {
-            Expression element = (Expression) iter.next();
+        for (Expression element : expressions) {
             Cell aRightSideValue = element.evaluate(row, evaluator);
             if (leftSideValue.sqlEquals(aRightSideValue)) {
                 return true;
@@ -40,8 +36,7 @@ public class In extends Condition {
             return firstInLeft;
         }
 
-        for (int i = 0; i < expressions.size(); ++i) {
-            Expression element = (Expression) expressions.get(i);
+        for (Expression element : expressions) {
             String first = element.firstAggregate();
             if (first != null) {
                 return first;
@@ -54,8 +49,7 @@ public class In extends Condition {
     @Override
     public void check(ResultRow row) {
         leftSide.check(row);
-        for (int i = 0; i < expressions.size(); ++i) {
-            Expression expression = (Expression) expressions.get(i);
+        for (Expression expression : expressions) {
             expression.check(row);
         }
     }

@@ -5,6 +5,7 @@ import junitx.framework.ObjectAssert;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
+import net.sourceforge.mayfly.acceptance.MayflyDialect;
 import net.sourceforge.mayfly.datastore.Column;
 import net.sourceforge.mayfly.datastore.constraint.Cascade;
 import net.sourceforge.mayfly.datastore.constraint.NoAction;
@@ -635,6 +636,40 @@ public class ParserTest extends TestCase {
         assertEquals(expected, decimal.value.doubleValue(), 0.0001);
     }
     
+    public void testExpressionInOrderBy() throws Exception {
+        try {
+            new Parser("x + y").parseOrderItem();
+            fail();
+        }
+        catch (ParserException e) {
+            /* Maybe this is no big deal as long as location is set?
+               A bit reluctant to get too worried without user experience.
+             */
+            if (new MayflyDialect().wishThisWereTrue()) {
+                assertEquals("expected column reference in ORDER BY but got x + y", 
+                    e.getMessage());
+            }
+            else {
+                assertEquals("expected column reference in ORDER BY but got expression", 
+                    e.getMessage());
+            }
+            assertEquals(1, e.startColumn());
+            assertEquals(6, e.endColumn());
+        }
+    }
+    
+    public void testFunctionInOrderBy() throws Exception {
+        try {
+            new Parser("x(y)").parseOrderItem();
+            fail();
+        }
+        catch (ParserException e) {
+            assertEquals("expected column reference in ORDER BY but got function call", 
+                e.getMessage());
+        }
+    }
+    
+
     public void testMultipleConstraints() throws Exception {
         // UNIQUE and PRIMARY KEY together don't make much sense.
         // The rule here is that constraints must be after DEFAULT

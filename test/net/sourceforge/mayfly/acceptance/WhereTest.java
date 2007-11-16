@@ -224,6 +224,11 @@ public class WhereTest extends SqlTestCase {
             new String[] { " 'equals b' " },
             query("select description from foo where a in (b, c)")
         );
+
+        assertResultSet(
+            new String[] { " 'equals nothing' " , " 'equals b' " },
+            query("select description from foo where a in (b, b - 1)")
+        );
     }
     
     public void testNullLiteralOnRightHandSideOfIn() throws Exception {
