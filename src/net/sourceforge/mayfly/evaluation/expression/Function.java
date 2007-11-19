@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
+import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
@@ -12,11 +13,45 @@ import net.sourceforge.mayfly.util.ImmutableList;
 
 public class Function extends Expression {
 
+    final String className;
+    final String methodName;
+    final Class classObject;
+
     public Function(String name, ImmutableList<Expression> arguments,
         Location location, Options options) {
         super(location);
-    }
+        int lastPeriod = name.lastIndexOf('.');
+        if (lastPeriod == -1) {
+            throw new MayflyException("function name " + name + 
+                " does not contain a period", location);
+        }
+        this.className = name.substring(0, lastPeriod);
+        this.methodName = name.substring(lastPeriod + 1);
 
+        try {
+            this.classObject = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            /* Is there any reason to supply e as the cause?
+             * Normally, I'm loath to potentially destroy information about
+             * what happened.  But is there any interesting information to
+             * destroy here?
+             */
+            throw new MayflyException(
+                "function name specifies Java class " + 
+                className + " which is not found", location);
+        }
+        
+//        try {
+//            classObject.getMethod(methodName, new Class[0]);
+//        }
+//        catch (NoSuchMethodException e) {
+//            throw new MayflyException(
+//                "function name specifies method " + methodName +
+//                " which is not found in " + classObject.getName(),
+//                location);
+//        }
+    }
+    
     @Override
     public Cell aggregate(ResultRows rows) {
         throw new UnimplementedException();

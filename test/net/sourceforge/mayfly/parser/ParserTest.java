@@ -660,7 +660,7 @@ public class ParserTest extends TestCase {
     
     public void testFunctionInOrderBy() throws Exception {
         try {
-            new Parser("x(y)").parseOrderItem();
+            new Parser("\"java.lang.Math.abs\"(y)").parseOrderItem();
             fail();
         }
         catch (ParserException e) {
