@@ -40,6 +40,7 @@ import net.sourceforge.mayfly.evaluation.command.CreateTable;
 import net.sourceforge.mayfly.evaluation.command.Delete;
 import net.sourceforge.mayfly.evaluation.command.DropColumn;
 import net.sourceforge.mayfly.evaluation.command.DropForeignKey;
+import net.sourceforge.mayfly.evaluation.command.DropIndex;
 import net.sourceforge.mayfly.evaluation.command.DropTable;
 import net.sourceforge.mayfly.evaluation.command.Insert;
 import net.sourceforge.mayfly.evaluation.command.LastIdentity;
@@ -216,8 +217,17 @@ public class Parser {
         else if (consumeNonReservedWordIfMatches("call")) {
             return parseCall();
         }
-        else if (currentToken.type == TokenType.KEYWORD_drop) {
-            return parseDrop();
+        else if (consumeIfMatches(TokenType.KEYWORD_drop)) {
+            if (consumeIfMatches(TokenType.KEYWORD_table)) {
+                return parseDropTable();
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_index)) {
+                return parseDropIndex();
+            }
+            else {
+                throw new ParserException("drop command",
+                    currentToken);
+            }
         }
         else if (consumeIfMatches(TokenType.KEYWORD_create)) {
             if (consumeIfMatches(TokenType.KEYWORD_schema)) {
@@ -434,10 +444,7 @@ public class Parser {
         }
     }
 
-    private Command parseDrop() {
-        expectAndConsume(TokenType.KEYWORD_drop);
-        expectAndConsume(TokenType.KEYWORD_table);
-        
+    private Command parseDropTable() {
         boolean ifExists = false;
         if (consumeIfMatches(TokenType.KEYWORD_if)) {
             expectAndConsume(TokenType.KEYWORD_exists);
@@ -449,6 +456,13 @@ public class Parser {
             ifExists = true;
         }
         return new DropTable(table, ifExists);
+    }
+    
+    private Command parseDropIndex() {
+        String indexName = consumeIdentifier();
+        expectAndConsume(TokenType.KEYWORD_on);
+        UnresolvedTableReference table = parseTableReference();
+        return new DropIndex(table, indexName);
     }
 
     private CreateSchema parseCreateSchema() {

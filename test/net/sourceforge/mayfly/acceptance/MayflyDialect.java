@@ -245,7 +245,11 @@ public class MayflyDialect extends Dialect {
     }
     
     @Override
-    public boolean duplicateIndexNamesOk() {
+    public boolean indexNamesArePerTable() {
+        /* Actually, we want this to be false but also accept the
+         * syntax DROP INDEX index_name ON table_name
+         * (which is just like DROP INDEX index_name but it complains
+         * if that index is from a different table). */
         return !wishThisWereTrue();
     }
     

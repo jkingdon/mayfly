@@ -761,7 +761,7 @@ public abstract class Dialect {
         return false;
     }
     
-    public boolean duplicateIndexNamesOk() {
+    public boolean indexNamesArePerTable() {
         return false;
     }
     

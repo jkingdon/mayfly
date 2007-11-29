@@ -24,7 +24,8 @@ public class IndexTest extends SqlTestCase {
     }
     
     /* TODO: Might want to insist that the index be on a NOT NULL
-       column the way that MySQL 5.1 does */
+       column the way that MySQL 5.1 does 
+       (apparently these tests just pass with MySQL 5.0). */
 
     public void testCreateIndexSyntax() throws Exception {
         execute("create table foo(a integer)");
@@ -62,7 +63,7 @@ public class IndexTest extends SqlTestCase {
         execute("create table bar(b integer)");
         execute("create index an_index_name on foo(f)");
         String duplicate = "create index an_index_name on bar(b)";
-        if (dialect.duplicateIndexNamesOk()) {
+        if (dialect.indexNamesArePerTable()) {
             execute(duplicate);
         }
         else {
@@ -81,5 +82,45 @@ public class IndexTest extends SqlTestCase {
             expectExecuteFailure(sql, "expected ')' but got '('");
         }
     }
+    
+    public void testDropIndex() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        execute("create index an_index on foo(a)");
+        String tryToCreateIndexWithSameName = "create index an_index on foo(b)";
+        expectExecuteFailure(tryToCreateIndexWithSameName, 
+            "duplicate index an_index");
+
+        String dropWithoutGivingTable = "drop index an_index";
+        if (dialect.indexNamesArePerTable()) {
+            expectExecuteFailure(dropWithoutGivingTable, 
+                "expected ON but got end of file");
+            execute("drop index an_index on foo");
+        }
+        else {
+            execute(dropWithoutGivingTable);
+        }
+
+        execute(tryToCreateIndexWithSameName);
+    }
+    
+    public void mysql_only_testAlterTableDropIndex() throws Exception {
+        // another syntax, as an alternative to the DROP INDEX one
+
+        execute("create table foo(a integer, b integer)");
+        execute("create index an_index on foo(a)");
+        String tryToCreateIndexWithSameName = "create index an_index on foo(b)";
+        expectExecuteFailure(tryToCreateIndexWithSameName, 
+            "duplicate index an_index");
+
+        execute("alter table foo drop index an_index");
+
+        execute(tryToCreateIndexWithSameName);
+    }
+    
+    /* Another case for duplicates is:
+        execute("create index an_index on foo(a)");
+        execute("create index an_index on foo(a)");
+       Derby seems to like that one, but hypersonic and postgres don't.
+     */
     
 }

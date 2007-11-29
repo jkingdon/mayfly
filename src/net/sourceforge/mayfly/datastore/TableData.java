@@ -398,6 +398,14 @@ public class TableData {
             indexes.with(index));
     }
 
+    public TableData dropIndex(String indexName) {
+        return new TableData(
+            columns,
+            constraints,
+            rows,
+            indexes.without(indexName));
+    }
+
     public boolean canBeTargetOfForeignKey(String targetColumn) {
         return constraints.canBeTargetOfForeignKey(targetColumn);
     }

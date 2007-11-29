@@ -393,7 +393,7 @@ public class MySqlDialect extends Dialect {
     }
     
     @Override
-    public boolean duplicateIndexNamesOk() {
+    public boolean indexNamesArePerTable() {
         return true;
     }
     

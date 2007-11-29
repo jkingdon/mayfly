@@ -228,4 +228,8 @@ public class Schema {
         return replaceTable(table, table(table).addIndex(index));
     }
 
+    public Schema dropIndex(String table, String indexName) {
+        return replaceTable(table, table(table).dropIndex(indexName));
+    }
+
 }

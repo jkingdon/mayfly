@@ -252,4 +252,12 @@ public class DataStore {
         );
     }
 
+    public DataStore dropIndex(TableReference table, String indexName) {
+        Schema existing = schema(table.schema());
+        return replace(
+            table.schema(), 
+            existing.dropIndex(table.tableName(), indexName)
+        );
+    }
+
 }

@@ -1,5 +1,9 @@
 Changes since 0.3:
 
+Add DROP INDEX. For now the syntax is a MySQL-specific one:
+    DROP INDEX index-name ON table
+although a future version of Mayfly might not require the "ON table".
+
 When adding a foreign key without giving it a name, Mayfly now assigns
 a name using the same scheme as MySQL: referringTable_ibfk_sequence,
 where the first foreign key in this table is sequence 1, the second is 2, 
