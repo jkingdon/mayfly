@@ -40,12 +40,13 @@ public abstract class NotNullOrUnique extends Constraint {
     public void checkExistingRows(DataStore store, TableReference table) {
         Rows allRows = store.table(table).rows();
         for (int i = 0; i < allRows.rowCount(); ++i) {
-            check(allRows.subList(0, i), allRows.row(i), Location.UNKNOWN);
+            check(allRows.subList(0, i), allRows.row(i), table, Location.UNKNOWN);
         }
     }
 
     @Override
-    public void check(Rows existingRows, Row proposedRow, Location location) {
+    public void check(Rows existingRows, Row proposedRow, 
+        TableReference table, Location location) {
         List proposedValues = collectProposedValues(proposedRow);
 
         for (Iterator iter = existingRows.iterator(); iter.hasNext();) {
@@ -53,7 +54,9 @@ public abstract class NotNullOrUnique extends Constraint {
             List valuesForRow = valuesForRow(row);
             if (sqlEquals(proposedValues, valuesForRow, location)) {
                 throw new MayflyException(
-                    constraintName() + " already has a value " + 
+                    constraintName(table) + ": duplicate value" +
+                    (valuesForRow.size() == 1 ? "" : "s") +
+                    " " + 
                     describeValues(valuesForRow));
             }
         }
@@ -96,10 +99,17 @@ public abstract class NotNullOrUnique extends Constraint {
         return message.toString();
     }
 
-    private String constraintName() {
+    private String constraintName(TableReference table) {
         StringBuilder message = new StringBuilder();
         message.append(description());
+        message.append(" in table ");
+        message.append(table.tableName());
+        message.append(", column");
+        if (names.size() != 1) {
+            message.append("s");
+        }
         message.append(" ");
+
         Iterator iter = names.iterator();
         String firstColumn = (String) iter.next();
         message.append(firstColumn);
@@ -132,7 +142,7 @@ public abstract class NotNullOrUnique extends Constraint {
             if (names.size() > 1) {
                 throw new MayflyException(
                     "attempt to drop column " + column + 
-                    " from multi-column " + constraintName());
+                    " from multi-column " + constraintName(table));
             }
             return false;
         }

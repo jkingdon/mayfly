@@ -74,7 +74,9 @@ public class TableDataTest extends TestCase {
         UpdateTable update = table.update(new NullChecker(), 
             Collections.singletonList(
                 new SetClause("a", new QuotedString("'2004-02-29'"))), 
-            Condition.TRUE, "table1");
+            Condition.TRUE, 
+            new TableReference("schema", "table1")
+        );
         assertEquals(1, update.rowsAffected());
         TableData newTable = update.table();
         Row newRow = newTable.row(0);

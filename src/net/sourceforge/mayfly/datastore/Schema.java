@@ -148,26 +148,31 @@ public class Schema {
         return tables.keySet();
     }
 
-    public Schema addRow(Checker checker, String table, List columnNames, ValueList values) {
-        return new Schema(tables.with(lookUpTable(table), 
-            table(table).addRow(checker, columnNames, values)));
+    public Schema addRow(Checker checker, TableReference table, 
+        List columnNames, ValueList values) {
+        return new Schema(tables.with(lookUpTable(table.tableName()), 
+            table(table.tableName()).addRow(checker, table, columnNames, values)));
     }
     
     public Schema addRow(String table, List columnNames, ValueList values) {
-        return addRow(new NullChecker(), table, columnNames, values);
+        return addRow(new NullChecker(), 
+            new TableReference(DataStore.ANONYMOUS_SCHEMA_NAME, table), 
+            columnNames, values);
     }
 
-    public Schema addRow(Checker checker, String table, ValueList values) {
+    public Schema addRow(Checker checker, TableReference table, ValueList values) {
         return new Schema(
             tables.with(
-                lookUpTable(table), 
-                table(table).addRow(checker, values)));
+                lookUpTable(table.tableName()), 
+                table(table.tableName()).addRow(checker, table, values)));
     }
 
-    public UpdateSchema update(Checker checker, String table, 
+    public UpdateSchema update(Checker checker, TableReference table, 
         List setClauses, Condition where) {
-        UpdateTable result = table(table).update(checker, setClauses, where, table);
-        return replaceTable(table, result);
+        UpdateTable result = 
+            table(table.tableName())
+                .update(checker, setClauses, where, table);
+        return replaceTable(table.tableName(), result);
     }
 
     public UpdateSchema delete(String table, Condition where, Checker checker) {

@@ -24,7 +24,8 @@ public class CheckConstraint extends Constraint {
     }
 
     @Override
-    public void check(Rows existingRows, Row proposedRow, Location location) {
+    public void check(Rows existingRows, Row proposedRow, 
+        TableReference table, Location location) {
         /* Our message needs to be more informative somehow.  Giving the
            constraint name of the constraint would be one step.  If there
            isn't one, then what?  The text of the expression (which we currently

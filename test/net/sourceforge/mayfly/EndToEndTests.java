@@ -173,7 +173,8 @@ public class EndToEndTests extends SqlTestCase {
         execute("create table foo(a integer, b integer, c integer, " +
             "primary key(a, c) )");
         expectExecuteFailure("alter table foo drop column a", 
-            "attempt to drop column a from multi-column primary key a,c");
+            "attempt to drop column a from multi-column " +
+            "primary key in table foo, columns a,c");
         execute("alter table foo drop column b");
     }
     

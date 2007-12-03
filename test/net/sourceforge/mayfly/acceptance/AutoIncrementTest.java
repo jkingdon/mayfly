@@ -172,7 +172,7 @@ public class AutoIncrementTest extends SqlTestCase {
         }
         else {
             expectExecuteFailure(insertAnotherOne, 
-                "primary key x already has a value 1");
+                "primary key in table foo, column x: duplicate value 1");
             
             String tryAgain = "insert into foo(y) values(77)";
             if (dialect.wishThisWereTrue()) {
@@ -185,7 +185,7 @@ public class AutoIncrementTest extends SqlTestCase {
             }
             else {
                 expectExecuteFailure(tryAgain, 
-                    "primary key x already has a value 1");
+                    "primary key in table foo, column x: duplicate value 1");
             }
         }
     }

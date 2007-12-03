@@ -61,10 +61,10 @@ public class Constraints implements Iterable<Constraint> {
      * Not-null is checked in 
      * {@link Column#coerce(net.sourceforge.mayfly.datastore.Cell, Location)}
      */
-    public void check(Rows rows, Row newRow, Location location) {
+    public void check(Rows rows, Row newRow, TableReference table, Location location) {
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint constraint = (Constraint) iter.next();
-            constraint.check(rows, newRow, location);
+            constraint.check(rows, newRow, table, location);
         }
     }
 

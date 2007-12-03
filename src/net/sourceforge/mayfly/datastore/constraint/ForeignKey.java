@@ -260,7 +260,8 @@ public class ForeignKey extends Constraint {
      * {@link #checkInsert(DataStore, String, String, Row, Location)}.
      */
     @Override
-    public void check(Rows existingRows, Row proposedRow, Location location) {
+    public void check(Rows existingRows, Row proposedRow, 
+        TableReference table, Location location) {
     }
 
     /**

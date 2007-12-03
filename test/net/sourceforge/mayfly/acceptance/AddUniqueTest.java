@@ -21,13 +21,13 @@ public class AddUniqueTest extends SqlTestCase {
            with one there; there are two there.  But is this really
            confusing or only inaccurate in a nit-picky way?
         */
-        expectExecuteFailure(add, "unique column id already has a value 5");
+        expectExecuteFailure(add, "unique constraint in table foo, column id: duplicate value 5");
         
         execute("delete from foo where x = 20");
         execute(add);
         
         expectExecuteFailure("insert into foo values(5, 30)", 
-            "unique column id already has a value 5");
+            "unique constraint in table foo, column id: duplicate value 5");
 
         if (dialect.uniqueColumnMayBeNullable()) {
             String secondNull = "insert into foo values(null, 50)";
@@ -36,7 +36,7 @@ public class AddUniqueTest extends SqlTestCase {
             }
             else {
                 expectExecuteFailure(secondNull, 
-                    "unique column id has duplicate value null");
+                    "unique constraint in table foo, column id: duplicate value null");
             }
         }
     }
@@ -67,7 +67,7 @@ public class AddUniqueTest extends SqlTestCase {
         execute("insert into foo values(5, 20)");
 
         String add = "alter table foo add primary key(id)";
-        expectExecuteFailure(add, "primary key id already has a value 5");
+        expectExecuteFailure(add, "primary key in table foo, column id: duplicate value 5");
         
         execute("update foo set id = null where x = 20");
         if (dialect.notNullImpliesDefaults()) {
@@ -80,7 +80,7 @@ public class AddUniqueTest extends SqlTestCase {
                     expected.getMessage());
             }
             expectExecuteFailure("insert into foo values(5, 30)", 
-                "primary key id already has a value 5");
+                "primary key in table foo, column id: duplicate value 5");
         }
         else {
             expectExecuteFailure(add, "primary key id cannot be null");
@@ -90,7 +90,7 @@ public class AddUniqueTest extends SqlTestCase {
                 execute(add);
                 
                 expectExecuteFailure("insert into foo values(5, 30)", 
-                    "primary key id already has a value 5");
+                    "primary key in table foo, column id: duplicate value 5");
             }
             else {
                 /* I'm not sure there is a way out other than copying

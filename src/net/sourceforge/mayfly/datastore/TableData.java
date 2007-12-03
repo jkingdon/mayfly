@@ -41,7 +41,8 @@ public class TableData {
         this.indexes = indexes;
     }
 
-    public TableData addRow(Checker checker, List columnNames, ValueList values) {
+    public TableData addRow(Checker checker, TableReference table,
+        List columnNames, ValueList values) {
         if (columnNames.size() != values.size()) {
             Columns columnsToInsert = findColumns(columnNames);
             if (values.size() > columnNames.size()) {
@@ -72,15 +73,15 @@ public class TableData {
 
         Row newRow = tuple.asRow();
         
-        constraints.check(rows, newRow, values.location);
+        constraints.check(rows, newRow, table, values.location);
         checker.checkInsert(constraints, newRow);
 
         return new TableData(
             newColumns, constraints, rows.with(newRow), indexes);
     }
 
-    public TableData addRow(Checker checker, ValueList values) {
-        return addRow(checker, columns.asNames(), values);
+    public TableData addRow(Checker checker, TableReference table, ValueList values) {
+        return addRow(checker, table, columns.asNames(), values);
     }
 
     private MayflyException makeException(String message, Columns columnsToInsert, ValueList values) {
@@ -105,17 +106,17 @@ public class TableData {
     }
 
     public UpdateTable update(Checker checker, List setClauses, 
-        Condition where, String tableName) {
-        checker.evaluate(where, dummyRow(), tableName);
+        Condition where, TableReference table) {
+        checker.evaluate(where, dummyRow(), table.tableName());
 
         Rows newRows = new Rows();
         int rowsAffected = 0;
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             Row row = (Row) iter.next();
             
-            if (checker.evaluate(where, row, tableName)) {
-                Row newRow = newRow(setClauses, row, tableName);
-                constraints.check(newRows, newRow, Location.UNKNOWN);
+            if (checker.evaluate(where, row, table.tableName())) {
+                Row newRow = newRow(setClauses, row, table.tableName());
+                constraints.check(newRows, newRow, table, Location.UNKNOWN);
                 checker.checkInsert(constraints, newRow);
                 checker.checkDelete(row, newRow);
 
@@ -123,7 +124,7 @@ public class TableData {
                 ++rowsAffected;
             }
             else {
-                constraints.check(newRows, row, Location.UNKNOWN);
+                constraints.check(newRows, row, table, Location.UNKNOWN);
                 newRows = newRows.with(row);
             }
 

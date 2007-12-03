@@ -43,12 +43,10 @@ public class Insert extends Command {
     private DataStore insertOneRow(DataStore store, TableReference resolved, 
         Checker checker) {
         if (columnNames == null) {
-            return store.addRow(resolved.schema(), resolved.tableName(), 
-                values, checker);
+            return store.addRow(resolved, values, checker);
         }
         else {
-            return store.addRow(resolved.schema(), resolved.tableName(), 
-                columnNames, values, checker);
+            return store.addRow(resolved, columnNames, values, checker);
         }
     }
 

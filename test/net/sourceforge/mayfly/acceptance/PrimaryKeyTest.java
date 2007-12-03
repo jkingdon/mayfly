@@ -6,13 +6,16 @@ public class PrimaryKeyTest extends SqlTestCase {
         execute("create table foo (x integer, primary key(x))");
         execute("insert into foo(x) values(5)");
         execute("insert into foo(x) values(7)");
-        expectExecuteFailure("insert into foo(x) values(5)", "primary key x already has a value 5");
+        expectExecuteFailure("insert into foo(x) values(5)", 
+            "primary key in table foo, column x: duplicate value 5");
     }
     
     public void testNull() throws Exception {
         execute("create table foo (x integer, y integer, primary key(x))");
         expectExecuteFailure("insert into foo(x,y) values(null,10)", 
-            "primary key x cannot be null");
+            dialect.wishThisWereTrue() ?
+                "primary key in table foo, column x: cannot be null" :
+                "primary key x cannot be null");
     }
     
     public void testManyColumns() throws Exception {
@@ -20,7 +23,8 @@ public class PrimaryKeyTest extends SqlTestCase {
         execute("insert into foo(x,y) values(5,10)");
         execute("insert into foo(x,y) values(5,11)");
         execute("insert into foo(x,y) values(7,10)");
-        expectExecuteFailure("insert into foo(x,y) values(5,10)", "primary key x,y already has a value 5,10");
+        expectExecuteFailure("insert into foo(x,y) values(5,10)", 
+            "primary key in table foo, columns x,y: duplicate values 5,10");
     }
     
     public void testForwardReference() throws Exception {
@@ -28,7 +32,8 @@ public class PrimaryKeyTest extends SqlTestCase {
         if (dialect.constraintCanHaveForwardReference()) {
             execute(sql);
             execute("insert into foo(x) values(5)");
-            expectExecuteFailure("insert into foo(x) values(5)", "primary key x already has a value 5");
+            expectExecuteFailure("insert into foo(x) values(5)", 
+                "primary key in table foo, column x: duplicate value 5");
         }
         else {
             expectExecuteFailure(sql, "no column x");
@@ -43,14 +48,16 @@ public class PrimaryKeyTest extends SqlTestCase {
         execute("create table foo (x integer, primary key(x))");
         execute("insert into foo(x) values(5)");
         execute("insert into foo(x) values(7)");
-        expectExecuteFailure("update foo set x = 5 where x = 7", "primary key x already has a value 5");
+        expectExecuteFailure("update foo set x = 5 where x = 7", 
+            "primary key in table foo, column x: duplicate value 5");
     }
     
     public void testAsPartOfDeclaration() throws Exception {
         execute("create table foo (x integer primary key)");
         execute("insert into foo(x) values(5)");
         execute("insert into foo(x) values(7)");
-        expectExecuteFailure("insert into foo(x) values(5)", "primary key x already has a value 5");
+        expectExecuteFailure("insert into foo(x) values(5)", 
+            "primary key in table foo, column x: duplicate value 5");
     }
     
     public void testTwoPrimaryKeys() throws Exception {
@@ -66,16 +73,20 @@ public class PrimaryKeyTest extends SqlTestCase {
             ")");
         
         execute("insert into foo(x) values(5)");
-        // TODO: message should mention my_primary_key
         expectExecuteFailure("insert into foo(x) values(5)", 
-            "primary key x already has a value 5");
+            dialect.wishThisWereTrue() ?
+                "primary key my_primary_key (table foo, column x): duplicate value 5" :
+                "primary key in table foo, column x: duplicate value 5");
     }
     
     public void testNotNull() throws Exception {
         // Not a primary key, but related enough to put in the same test file
         execute("create table foo (x integer not null)");
         expectExecuteFailure("insert into foo(x) values(null)",
-            "column x cannot be null", 1, 27, 1, 31);
+            dialect.wishThisWereTrue() ?
+                "violation of not-null constraint: table foo, column x" :
+                "column x cannot be null", 
+            1, 27, 1, 31);
     }
     
 }

@@ -34,7 +34,7 @@ public class UniqueConstraint extends NotNullOrUnique {
 
     @Override
     protected String description() {
-        return "unique column";
+        return "unique constraint";
     }
     
     @Override

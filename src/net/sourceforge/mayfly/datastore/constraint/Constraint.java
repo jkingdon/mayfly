@@ -53,7 +53,8 @@ public abstract class Constraint {
         DataStore store, TableReference table);
 
     abstract public void check(
-        Rows existingRows, Row proposedRow, Location location);
+        Rows existingRows, Row proposedRow, 
+        TableReference table, Location location);
 
     public void checkInsert(DataStore store, String schema, String table, 
         Row proposedRow, Location location) {

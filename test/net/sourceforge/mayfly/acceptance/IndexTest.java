@@ -45,7 +45,7 @@ public class IndexTest extends SqlTestCase {
         // Also acts as a constraint
         execute("insert into foo(a, b) values(4, 'one')");
         expectExecuteFailure("insert into foo(a, b) values(4, 'two')", 
-            "unique column a already has a value 4");
+            "unique constraint in table foo, column a: duplicate value 4");
     }
     
     public void testUniqueAndExistingRows() throws Exception {
@@ -54,7 +54,7 @@ public class IndexTest extends SqlTestCase {
         execute("insert into foo(a, b) values(4, 'two')");
         expectExecuteFailure(
             "create unique index an_index_name on foo(a)",
-            "unique column a already has a value 4");
+            "unique constraint in table foo, column a: duplicate value 4");
         execute("create index an_index_name on foo(a)");
     }
     

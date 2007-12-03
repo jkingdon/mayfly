@@ -7,7 +7,8 @@ public class UniqueColumnTest extends SqlTestCase {
         execute("create table foo (x integer not null, unique(x))");
         execute("insert into foo(x) values(5)");
         execute("insert into foo(x) values(7)");
-        expectExecuteFailure("insert into foo(x) values(5)", "unique column x already has a value 5");
+        expectExecuteFailure("insert into foo(x) values(5)", 
+            "unique constraint in table foo, column x: duplicate value 5");
     }
 
     public void testNull() throws Exception {
@@ -38,16 +39,18 @@ public class UniqueColumnTest extends SqlTestCase {
         execute("insert into foo(x,y) values(5,10)");
         execute("insert into foo(x,y) values(5,11)");
         execute("insert into foo(x,y) values(7,10)");
-        // terminology problem: it isn't one column
-        expectExecuteFailure("insert into foo(x,y) values(5,10)", "unique column x,y already has a value 5,10");
+        expectExecuteFailure("insert into foo(x,y) values(5,10)", 
+            "unique constraint in table foo, columns x,y: duplicate values 5,10");
     }
     
     public void testUpdate() throws Exception {
         execute("create table foo (x integer not null, unique(x))");
         execute("insert into foo(x) values(5)");
         execute("insert into foo(x) values(7)");
-        expectExecuteFailure("update foo set x = 5 where x = 7", "unique column x already has a value 5");
-        expectExecuteFailure("update foo set x = 7 where x = 5", "unique column x already has a value 7");
+        expectExecuteFailure("update foo set x = 5 where x = 7", 
+            "unique constraint in table foo, column x: duplicate value 5");
+        expectExecuteFailure("update foo set x = 7 where x = 5", 
+            "unique constraint in table foo, column x: duplicate value 7");
         execute("update foo set x = 7 where x = 7");
     }
 
@@ -57,7 +60,8 @@ public class UniqueColumnTest extends SqlTestCase {
             execute(partOfColumnDeclaration);
             execute("insert into foo(x) values(5)");
             execute("insert into foo(x) values(7)");
-            expectExecuteFailure("insert into foo(x) values(5)", "unique column x already has a value 5");
+            expectExecuteFailure("insert into foo(x) values(5)", 
+                "unique constraint in table foo, column x: duplicate value 5");
         }
         else {
             expectExecuteFailure(partOfColumnDeclaration, "unexpected token UNIQUE");
@@ -78,9 +82,9 @@ public class UniqueColumnTest extends SqlTestCase {
         expectExecuteFailure("insert into three(x, y, z) values (null, 11, 101)", 
             "primary key x cannot be null");
         expectExecuteFailure("insert into three(x, y, z) values (2, 10, 102)", 
-            "unique column y already has a value 10");
+            "unique constraint in table three, column y: duplicate value 10");
         expectExecuteFailure("insert into three(x, y, z) values (3, 13, 100)", 
-            "unique column z already has a value 100");
+            "unique constraint in table three, column z: duplicate value 100");
     }
     
     public void testDuplicateConstraintName() throws Exception {

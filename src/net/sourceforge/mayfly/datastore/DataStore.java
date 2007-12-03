@@ -113,14 +113,17 @@ public class DataStore {
         return schema(schema).tables();
     }
 
-    public DataStore addRow(String schema, String table, 
+    public DataStore addRow(TableReference table, 
         List columnNames, ValueList values, Checker checker) {
-        return replace(schema,
-            schema(schema).addRow(checker, table, columnNames, values));
+        return replace(table.schema(),
+            schema(table.schema())
+                .addRow(checker, table, columnNames, values));
     }
 
-    public DataStore addRow(String schema, String table, ValueList values, Checker checker) {
-        return replace(schema, schema(schema).addRow(checker, table, values));
+    public DataStore addRow(TableReference table, ValueList values, Checker checker) {
+        return replace(table.schema(), 
+            schema(table.schema())
+                .addRow(checker, table, values));
     }
 
     public Set schemas() {
@@ -136,10 +139,12 @@ public class DataStore {
 
     public UpdateStore update(String schema, String table, 
         List setClauses, Condition where, Options options) {
+        TableReference tableReference = new TableReference(schema, table);
+
         Checker checker = new RealChecker(this, schema, table, 
             Location.UNKNOWN, options);
         UpdateSchema result = 
-            schema(schema).update(checker, table, setClauses, where);
+            schema(schema).update(checker, tableReference, setClauses, where);
         return replaceSchema(schema, result);
     }
 
