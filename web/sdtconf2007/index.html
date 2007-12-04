@@ -1,0 +1,71 @@
+<html>
+<head>
+<title>Mayfly talk at Simple Design &amp; Testing, 2007</title>
+</head>
+<body>
+<p>Here are the notes I (Jim Kingdon) prepared for the Mayfly session at <a href="http://sdtconf.com" 
+>Simple Design &amp; Testing</a> in 2007.  Because this is a very informal conference,
+these notes are only an approximate match to what we really talked about.</p>
+
+<ol>
+
+<li>
+What is mayfly?
+
+<ul>
+<li>
+In-memory database written in Java (have tried it with java,
+    would like to play with groovy, jruby, jython, etc)
+</li>
+</ul>
+
+</li>
+
+<li>
+What SQL syntax does it support?
+
+<ul>
+<li>
+Borrow syntax/semantics from other databases (the most widely supported
+    one(s), usually, or the best).  Especially where there is
+    no common syntax which works on other databases, support more
+    than one.
+    </li>
+    
+<li>Aim to be compatible with production database (most well-developed 
+    with MySQL currently but open to contributions)
+    </li>
+</ul>
+
+</li>
+
+<li>    
+Why Yet Another SQL Implementation?
+
+<ul>
+<li>
+Generally faster than postgres, mysql, etc (at least, on the mayfly tests)
+</li>
+  
+<li>Roughly as fast as hypersonic (faster on some things, slower on others,
+    aim to make mayfly faster)</li>
+    
+<li>Good error messages (see <a href="ErrorMessageTest.java" >ErrorMessageTest</a>)</li>
+<li>Dumps which you can diff (see <a href="DumperTest.java" >DumperTest</a>)</li>
+<li>Snapshot/restore (see <a href="IsolationTest.java" >IsolationTest</a> for how to isolate tests with this)</li>
+</ul>
+</li>
+
+<li>Does it talk to Hibernate, etc?
+
+<ul>
+<li>
+Haven't tried the "etc", but see <a href="../hibernate-demo" >hibernate-demo</a>.
+</li>
+</ul>
+</li>
+
+</ol>
+</body>
+</html>
+
