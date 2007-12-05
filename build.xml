@@ -23,7 +23,7 @@
     <target name="compile">
         <mkdir dir="build/classes"/>
         <javac srcdir="src" destdir="build/classes" debug="on" 
-            target="1.4" source="1.4" deprecation="on">
+            deprecation="on">
             <classpath refid="classpath"/>
         </javac>
     </target>
