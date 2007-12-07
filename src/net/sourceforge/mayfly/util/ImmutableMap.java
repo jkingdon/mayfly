@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class ImmutableMap implements Map {
+public class ImmutableMap<K, V> implements Map<K, V> {
 
-    Map delegate;
+    Map<K, V> delegate;
 
     public ImmutableMap() {
         delegate = Collections.EMPTY_MAP;
@@ -18,7 +18,7 @@ public class ImmutableMap implements Map {
         delegate = Collections.unmodifiableMap(new LinkedHashMap(map));
     }
 
-    public ImmutableMap(Object key, Object value) {
+    public ImmutableMap(K key, V value) {
         delegate = Collections.singletonMap(key, value);
     }
 
@@ -29,13 +29,13 @@ public class ImmutableMap implements Map {
         delegate = Collections.unmodifiableMap(alreadyCopied);
     }
 
-    public ImmutableMap with(Object key, Object value) {
+    public ImmutableMap with(K key, V value) {
         Map copy = new LinkedHashMap(this);
         copy.put(key, value);
         return new ImmutableMap(copy, true);
     }
     
-    public ImmutableMap add(Object key, Object value) {
+    public ImmutableMap add(K key, V value) {
         Map copy = new LinkedHashMap(this);
         if (copy.put(key, value) != null) {
             throw new RuntimeException("key " + key + " already exists");
@@ -43,7 +43,7 @@ public class ImmutableMap implements Map {
         return new ImmutableMap(copy, true);
     }
 
-    public ImmutableMap without(Object key) {
+    public ImmutableMap without(K key) {
         Map copy = new LinkedHashMap(this);
         if (copy.remove(key) == null) {
             throw new NoSuchKeyException(key.toString());
@@ -76,7 +76,7 @@ public class ImmutableMap implements Map {
         return delegate.equals(o);
     }
 
-    public Object get(Object key) {
+    public V get(Object key) {
         return delegate.get(key);
     }
 
@@ -93,7 +93,7 @@ public class ImmutableMap implements Map {
         return delegate.keySet();
     }
 
-    public Object put(Object key, Object value) {
+    public V put(K key, V value) {
         throw new UnsupportedOperationException("Attempt to mutate immutable map");
     }
 
@@ -101,7 +101,7 @@ public class ImmutableMap implements Map {
         throw new UnsupportedOperationException("Attempt to mutate immutable map");
     }
 
-    public Object remove(Object key) {
+    public V remove(Object key) {
         throw new UnsupportedOperationException("Attempt to mutate immutable map");
     }
 

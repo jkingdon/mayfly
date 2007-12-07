@@ -171,6 +171,10 @@ public abstract class Dialect {
     public boolean callJavaMethodAsStoredProcedure() {
         return true;
     }
+    
+    public boolean complainAboutDubiousStoredProcedure() {
+        return true;
+    }
 
     public boolean orderByCountsAsWhat() {
         return false;

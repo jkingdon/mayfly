@@ -68,6 +68,11 @@ public class HypersonicDialect extends Dialect {
     public boolean trailingSpacesConsultedInComparisons() {
         return true;
     }
+    
+    @Override
+    public boolean complainAboutDubiousStoredProcedure() {
+        return false;
+    }
 
     @Override
     public boolean orderByCountsAsWhat() {
