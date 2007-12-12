@@ -299,6 +299,7 @@ An <var>expression</var> is:
   <var>expression</var> * <var>expression</var> |
   <var>expression</var> / <var>expression</var> |
   <var>expression</var> || <var>expression</var> |
+  CONCAT(<var>expression</var>, ...) |
   ( <var>expression</var> ) |
   ( <var>subselect</var> ) |
   MAX ( [ ALL | DISTINCT ] <var>expression</var> ) |

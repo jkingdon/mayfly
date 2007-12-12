@@ -26,7 +26,8 @@ public class FunctionTest extends TestCase {
             fail();
         }
         catch (MayflyException e) {
-            assertEquals("function name abs does not contain a period",
+//            assertEquals("function name abs does not contain a period",
+            assertEquals("no function abs",
                 e.getMessage());
             assertLocation(5, 6, 7, 8, e.location());
         }

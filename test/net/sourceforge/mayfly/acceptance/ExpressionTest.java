@@ -36,7 +36,7 @@ public class ExpressionTest extends SqlTestCase {
         assertResultSet(new String[] { " 'X' " }, query("select * from dual"));
     }
     
-    public void testConcat() throws Exception {
+    public void testConcatenateVerticalBars() throws Exception {
         execute("create table names (first_name varchar(255), last_name varchar(255))");
         execute("insert into names(first_name, last_name) values ('John', 'Jones')");
         ResultSet results;
@@ -64,6 +64,23 @@ public class ExpressionTest extends SqlTestCase {
         } else {
             expectQueryFailure(sql, "cannot convert integer to string");
         }
+    }
+    
+    public void testConcatBuiltIn() throws Exception {
+        execute("create table names (first_name varchar(255), last_name varchar(255))");
+        execute("insert into names(first_name, last_name) values ('John', 'Jones')");
+        String query = "select concat(first_name, ' ', last_name) from names";
+        if (dialect.haveConcatBuiltIn()) {
+            assertResultSet(new String[] { "'John Jones'" }, query(query));
+        } else {
+            expectQueryFailure(query, "no function concat");
+        }
+    }
+    
+    public void testNoSuchBuiltIn() throws Exception {
+        execute("create table foo(x integer)");
+        expectExecuteFailure("insert into foo(x) values(ZETA_FUNCTION(5))",
+            "no function ZETA_FUNCTION");
     }
 
     public void testPlus() throws Exception {

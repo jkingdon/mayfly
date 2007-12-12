@@ -198,6 +198,10 @@ public abstract class Dialect {
         return true;
     }
     
+    public boolean haveConcatBuiltIn() {
+        return false;
+    }
+    
     public boolean caseExpressionPickyAboutTypes() {
         return false;
     }

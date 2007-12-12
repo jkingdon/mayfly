@@ -81,6 +81,11 @@ public class MySqlDialect extends Dialect {
     }
     
     @Override
+    public boolean haveConcatBuiltIn() {
+        return true;
+    }
+    
+    @Override
     public boolean tableNamesMightBeCaseSensitive() {
         // Whether table names are case sensitive in MySQL depends on whether
         // file names are.

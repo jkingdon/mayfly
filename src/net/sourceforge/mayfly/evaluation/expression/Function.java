@@ -22,8 +22,11 @@ public class Function extends Expression {
         super(location);
         int lastPeriod = name.lastIndexOf('.');
         if (lastPeriod == -1) {
-            throw new MayflyException("function name " + name + 
-                " does not contain a period", location);
+            /* The more likely reason is not that a period was intended,
+               but that a built-in or aliased function is misspelled. */
+            throw new MayflyException("no function " + name, location);
+//            throw new MayflyException("function name " + name + 
+//                " does not contain a period", location);
         }
         this.className = name.substring(0, lastPeriod);
         this.methodName = name.substring(lastPeriod + 1);
