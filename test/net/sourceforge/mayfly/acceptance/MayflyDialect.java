@@ -288,18 +288,7 @@ public class MayflyDialect extends Dialect {
     @Override
     public boolean haveConcatBuiltIn() {
         // No real downside
-        
-        /* To add to documentation:
-         
-The SQL standard syntax for string concatenation is 
-<var>expression</var> || <var>expression</var>.  If you want compatibility
-with MySQL, you can either tell MySQL to accept the || syntax 
-(set sql_mode='PIPES_AS_CONCAT' or set sql_mode='ANSI'), or you can use
-the CONCAT(<var>expression</var>, ...) syntax, which is also provided
-by Mayfly.
-
-         */
-        return wishThisWereTrue();
+        return true;
     }
     
 }

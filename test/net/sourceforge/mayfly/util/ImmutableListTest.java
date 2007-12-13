@@ -68,4 +68,13 @@ public class ImmutableListTest extends TestCase {
         assertEquals("c", result.get(2));
     }
     
+    public void testLastConvenienceMethods() throws Exception {
+        ImmutableList list = new ImmutableList().with("a").with("b").with("c");
+        assertEquals("c", list.last());
+        ImmutableList result = list.allButLast();
+        assertEquals(2, result.size());
+        assertEquals("a", result.get(0));
+        assertEquals("b", result.get(1));
+    }
+    
 }

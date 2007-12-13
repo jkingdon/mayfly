@@ -1,5 +1,8 @@
 Changes since 0.3:
 
+Now support CONCAT(expression, ...) syntax for MySQL compatibility in
+addition to the SQL standard expression || expression.
+
 Add DROP INDEX. For now the syntax is a MySQL-specific one:
     DROP INDEX index-name ON table
 although a future version of Mayfly might not require the "ON table".

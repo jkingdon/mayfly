@@ -71,7 +71,13 @@ public class ExpressionTest extends SqlTestCase {
         execute("insert into names(first_name, last_name) values ('John', 'Jones')");
         String query = "select concat(first_name, ' ', last_name) from names";
         if (dialect.haveConcatBuiltIn()) {
-            assertResultSet(new String[] { "'John Jones'" }, query(query));
+            assertResultSet(new String[] { " 'John Jones' " }, query(query));
+            
+            // Corner cases: one argument, or zero.
+            assertResultSet(new String[] { " 'John' " }, 
+                query("select concat(first_name) from names"));
+            expectQueryFailure("select concat() from names", 
+                "expected expression but got ')'");
         } else {
             expectQueryFailure(query, "no function concat");
         }

@@ -317,6 +317,13 @@ A <var>subselect</var> is just a SELECT statement.
 
 There is also some support for GROUP BY and HAVING.
 
+The SQL standard syntax for string concatenation is 
+<var>expression</var> || <var>expression</var>.  If you want compatibility
+with MySQL, you can either tell MySQL to accept the || syntax 
+(set sql_mode='PIPES_AS_CONCAT' or set sql_mode='ANSI'), or you can use
+the CONCAT(<var>expression</var>, ...) syntax, which is also provided
+by Mayfly.
+
 @subsection select UPDATE
 
 UPDATE <var>table</var> {SET <var>column</var> = <var>expression</var> }, ...

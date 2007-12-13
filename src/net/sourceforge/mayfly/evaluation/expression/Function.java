@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.evaluation.expression;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.Cell;
@@ -12,6 +13,36 @@ import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
 
 public class Function extends Expression {
+
+    public static Expression create(
+        String name, ImmutableList<Expression> arguments, 
+        Location location, Options options) {
+        if (name.equalsIgnoreCase("concat")) {
+            return concat(arguments, location, options);
+        }
+        else {
+            return new Function(name, arguments, location, options);
+        }
+    }
+
+    private static Expression concat(ImmutableList<Expression> arguments, 
+        Location location, Options options) {
+        if (arguments.isEmpty()) {
+            throw new MayflyInternalException(
+                "parser should require at least one argument");
+        }
+        else if (arguments.size() == 1) {
+            return arguments.get(0);
+        }
+        else {
+            /* Not sure associativity matters, but we turn concat(a, b, c)
+               into (a || b) || c not a || (b || c) */
+            Expression last = arguments.last();
+            Expression allButLast = concat(
+                arguments.allButLast(), location, options);
+            return new Concatenate(allButLast, last);
+        }
+    }
 
     final String className;
     final String methodName;

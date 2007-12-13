@@ -1516,7 +1516,7 @@ public class Parser {
         else if (consumeIfMatches(TokenType.OPEN_PAREN)) {
             ImmutableList<Expression> arguments = parseExpressionList();
             Token close = expectAndConsume(TokenType.CLOSE_PAREN);
-            return new Function(firstIdentifier.getText(), arguments,
+            return Function.create(firstIdentifier.getText(), arguments,
                 firstIdentifier.location.combine(close.location),
                 options);
         }

@@ -63,6 +63,14 @@ public class ImmutableList<T> implements List<T> {
         return new ImmutableList(copy, true);
     }
 
+    public T last() {
+        return get(size() - 1);
+    }
+
+    public ImmutableList<T> allButLast() {
+        return subList(0, size() - 1);
+    }
+
 
     
     public boolean add(T o) {
