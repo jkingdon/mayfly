@@ -107,6 +107,11 @@ public class MySqlDialect extends Dialect {
            one gets dropped? */
         return true;
     }
+    
+    @Override
+    public boolean haveDropConstraint() {
+        return false;
+    }
 
     @Override
     public boolean crossJoinCanHaveOn() {

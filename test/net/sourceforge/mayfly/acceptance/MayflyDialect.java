@@ -254,6 +254,11 @@ public class MayflyDialect extends Dialect {
     }
     
     @Override
+    public boolean haveDropConstraint() {
+        return wishThisWereTrue();
+    }
+    
+    @Override
     public boolean haveAddColumnAfter() {
         return true;
     }

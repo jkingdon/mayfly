@@ -576,6 +576,10 @@ public abstract class Dialect {
         return true;
     }
     
+    public boolean haveDropConstraint() {
+        return true;
+    }
+    
     public boolean nameForeignKeysWithIbfk() {
         return true;
     }
