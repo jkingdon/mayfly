@@ -382,6 +382,15 @@ public class TableData {
         );
     }
 
+    public TableData dropConstraint(String constraintName) {
+        return new TableData(
+            columns,
+            constraints.dropConstraint(constraintName),
+            rows,
+            indexes
+        );
+    }
+
     public TableData addConstraint(Constraint key) {
         return new TableData(
             columns,

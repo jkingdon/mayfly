@@ -39,6 +39,7 @@ import net.sourceforge.mayfly.evaluation.command.CreateSchema;
 import net.sourceforge.mayfly.evaluation.command.CreateTable;
 import net.sourceforge.mayfly.evaluation.command.Delete;
 import net.sourceforge.mayfly.evaluation.command.DropColumn;
+import net.sourceforge.mayfly.evaluation.command.DropConstraint;
 import net.sourceforge.mayfly.evaluation.command.DropForeignKey;
 import net.sourceforge.mayfly.evaluation.command.DropIndex;
 import net.sourceforge.mayfly.evaluation.command.DropTable;
@@ -535,6 +536,10 @@ public class Parser {
                 expectAndConsume(TokenType.KEYWORD_key);
                 String constraintName = consumeIdentifier();
                 return new DropForeignKey(table, constraintName);
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_constraint)) {
+                String constraintName = consumeIdentifier();
+                return new DropConstraint(table, constraintName);
             }
             else {
                 throw new ParserException(

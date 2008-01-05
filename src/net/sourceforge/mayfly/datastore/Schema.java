@@ -225,6 +225,10 @@ public class Schema {
         return replaceTable(table, table(table).dropForeignKey(constraintName));
     }
 
+    public Schema dropConstraint(String table, String constraintName) {
+        return replaceTable(table, table(table).dropConstraint(constraintName));
+    }
+
     public Schema addConstraint(String table, Constraint constraint) {
         return replaceTable(table, table(table).addConstraint(constraint));
     }

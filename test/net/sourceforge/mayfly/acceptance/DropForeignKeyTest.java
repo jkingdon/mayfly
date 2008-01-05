@@ -32,6 +32,32 @@ public class DropForeignKeyTest extends SqlTestCase {
         }
     }
     
+    public void testDropConstraintCommand() throws Exception {
+        execute("create table countries (id integer primary key, " +
+            "name varchar(255))" +
+            dialect.tableTypeForForeignKeys());
+        execute("create table cities (name varchar(255), country integer, " +
+            "constraint city_country " +
+            "foreign key (country) references countries(id)" +
+            ")" +
+            dialect.tableTypeForForeignKeys());
+
+        String countrylessCity = "insert into cities values ('Monaco', 99)";
+        expectExecuteFailure(countrylessCity,
+            "foreign key violation: countries has no id 99");
+        
+        String dropConstraint = 
+            "alter table cities drop constraint city_country";
+        if (dialect.haveDropConstraint()) {
+            execute(dropConstraint);
+            execute(countrylessCity);
+        }
+        else {
+            expectExecuteFailure(dropConstraint, 
+                "expected alter table drop action but got CONSTRAINT");
+        }
+    }
+    
     // alter table cities drop constraint city_country restrict
     // (or CASCADE).
     

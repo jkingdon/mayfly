@@ -235,6 +235,14 @@ public class DataStore {
         );
     }
 
+    public DataStore dropConstraint(TableReference table, String constraintName) {
+        Schema existing = schema(table.schema());
+        return replace(
+            table.schema(), 
+            existing.dropConstraint(table.tableName(), constraintName)
+        );
+    }
+
     public DataStore addConstraint(TableReference table, Constraint constraint) {
         Schema existing = schema(table.schema());
         return replace(

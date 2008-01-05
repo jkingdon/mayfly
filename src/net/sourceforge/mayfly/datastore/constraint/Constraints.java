@@ -140,10 +140,30 @@ public class Constraints implements Iterable<Constraint> {
         return new Constraints(
             constraintsWithout(constraintName, ForeignKey.class));
     }
+    
+    public Constraints dropConstraint(String constraintName) {
+        return new Constraints(constraintsWithout(constraintName));
+    }
+
+    private ImmutableList constraintsWithout(String constraintName) {
+        List keys = new ArrayList();
+        findConstraint(constraintName, keys);
+        return new ImmutableList(keys);
+    }
 
     private ImmutableList constraintsWithout(String constraintName, Class constraintType) {
-        Constraint found = null;
         List keys = new ArrayList();
+        Constraint found = findConstraint(constraintName, keys);
+        if (found.getClass() != constraintType) {
+            throw new MayflyException(
+                "constraint " + constraintName + 
+                " is not a " + describe(constraintType));
+        }
+        return new ImmutableList(keys);
+    }
+
+    private Constraint findConstraint(String constraintName, List keys) {
+        Constraint found = null;
         for (Iterator iter = constraints.iterator(); iter.hasNext();) {
             Constraint key = (Constraint) iter.next();
             if (!key.nameMatches(constraintName)) {
@@ -156,12 +176,7 @@ public class Constraints implements Iterable<Constraint> {
         if (found == null) {
             throw new MayflyException("no constraint " + constraintName);
         }
-        if (found.getClass() != constraintType) {
-            throw new MayflyException(
-                "constraint " + constraintName + 
-                " is not a " + describe(constraintType));
-        }
-        return new ImmutableList(keys);
+        return found;
     }
 
     private String describe(Class constraintType) {
