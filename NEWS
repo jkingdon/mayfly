@@ -1,5 +1,9 @@
 Changes since 0.3:
 
+Add ALTER TABLE table DROP CONSTRAINT constraint-name
+  (in addition to ALTER TABLE table DROP FOREIGN KEY constraint-name
+  which has been there longer).
+
 Now support CONCAT(expression, ...) syntax for MySQL compatibility in
 addition to the SQL standard expression || expression.
 

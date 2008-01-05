@@ -105,6 +105,7 @@ ALTER TABLE <var>table-name</var> MODIFY COLUMN <var>column-definition</var>
 ALTER TABLE <var>table-name</var> 
   CHANGE COLUMN <var>old-name</var> <var>column-definition</var>
 ALTER TABLE <var>table-name</var> DROP FOREIGN KEY <var>constraint-name</var>
+ALTER TABLE <var>table-name</var> DROP CONSTRAINT <var>constraint-name</var>
 ALTER TABLE <var>table-name</var> ADD <var>constraint</var>
 </pre>
 
