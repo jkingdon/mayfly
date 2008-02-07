@@ -248,6 +248,13 @@ So don't use it if you want portability.  But the potential added readibility
 gained by putting the column name next to the corresponding expression may
 justify it.
 
+<pre>
+INSERT INTO <var>table</var> [ ( <var>column-name</var>, ... ) ] <var>select-statement</var>
+</pre>
+
+Used, for example, for copying data from an old table  to a rearranged table.  
+The number of columns selected in the SELECT must match the number being inserted.
+
 @subsection select SELECT
 
 <pre>

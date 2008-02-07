@@ -1,5 +1,10 @@
 Changes since 0.3:
 
+Add 
+  INSERT INTO table(columns...) select-statement
+syntax (used, for example, for copying data from an old table 
+to a rearranged table).
+
 Add ALTER TABLE table DROP CONSTRAINT constraint-name
   (in addition to ALTER TABLE table DROP FOREIGN KEY constraint-name
   which has been there longer).
