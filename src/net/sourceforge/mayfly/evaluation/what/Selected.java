@@ -11,7 +11,7 @@ import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.util.Iterable;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,8 +32,8 @@ public class Selected implements Iterable {
         this(new ArrayList());
     }
 
-    public Selected(Expression singleExpression) {
-        this(Collections.singletonList(singleExpression));
+    public Selected(Expression... expressions) {
+        this(new ArrayList(Arrays.asList(expressions)));
     }
 
     public Selected(List expressions) {

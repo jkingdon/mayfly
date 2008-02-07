@@ -29,8 +29,7 @@ public class Update extends Command {
         DataStore store = evaluator.store();
         String currentSchema = evaluator.currentSchema();
 
-        TableReference resolved = 
-            table.resolve(store, currentSchema, null);
+        TableReference resolved = table.resolve(evaluator);
         return store.update(
             table.schema(currentSchema), resolved.tableName(), setClauses, where,
             table.options);

@@ -34,19 +34,19 @@ public class Insert extends Command {
         Checker checker = new RealChecker(store, resolved, location, table.options);
 
         return new UpdateStore(
-            insertOneRow(store, resolved, checker),
+            addOneRow(store, resolved, columnNames, values, checker),
             1,
             checker.newIdentityValue()
         );
     }
 
-    private DataStore insertOneRow(DataStore store, TableReference resolved, 
-        Checker checker) {
+    public static DataStore addOneRow(DataStore store, TableReference table, 
+        ImmutableList columnNames, ValueList values, Checker checker) {
         if (columnNames == null) {
-            return store.addRow(resolved, values, checker);
+            return store.addRow(table, values, checker);
         }
         else {
-            return store.addRow(resolved, columnNames, values, checker);
+            return store.addRow(table, columnNames, values, checker);
         }
     }
 

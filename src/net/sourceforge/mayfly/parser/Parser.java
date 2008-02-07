@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.parser;
 
+import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_values;
+
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.Options;
@@ -48,6 +50,7 @@ import net.sourceforge.mayfly.evaluation.command.LastIdentity;
 import net.sourceforge.mayfly.evaluation.command.ModifyColumn;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
+import net.sourceforge.mayfly.evaluation.command.SubselectedInsert;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedCheckConstraint;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedConstraint;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedForeignKey;
@@ -313,9 +316,18 @@ public class Parser {
 
         ImmutableList columnNames = parseColumnNamesForInsert();
         
-        ValueList values = parseValueConstructor();
-
-        return new Insert(table, columnNames, values, start.combine(values.location));
+        if (currentToken.type == TokenType.KEYWORD_select) {
+            Select subselect = parseSelect();
+            return new SubselectedInsert(table, columnNames, subselect);
+        }
+        else if (currentToken.type == KEYWORD_values) {
+            ValueList values = parseValueConstructor();
+    
+            return new Insert(table, columnNames, values, start.combine(values.location));
+        }
+        else {
+            throw new ParserException("VALUES or SELECT", currentToken);
+        }
     }
 
     private Command parseUpdate() {
@@ -1658,7 +1670,7 @@ public class Parser {
             
             OrderBy orderBy = new OrderBy();
             do {
-                orderBy.add(parseOrderItem());
+                orderBy = orderBy.with(parseOrderItem());
             } while (consumeIfMatches(TokenType.COMMA));
             return orderBy;
         }

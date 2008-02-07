@@ -3,6 +3,10 @@ package net.sourceforge.mayfly.acceptance;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * @internal
+ * See {@link ValueTest} for insert cases involving subselects
+ */
 public class ValueTest extends SqlTestCase {
 
     public void testNull() throws Exception {

@@ -26,7 +26,7 @@ public class StatementTest extends SqlTestCase {
                 connection.prepareStatement(sql);
                 fail();
             } catch (SQLException e) {
-                assertMessage("expected VALUES but got place", e);
+                assertMessage("expected VALUES or SELECT but got place", e);
             }
         }
         else {

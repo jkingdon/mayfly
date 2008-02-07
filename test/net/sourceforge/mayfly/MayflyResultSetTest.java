@@ -9,11 +9,15 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.Maximum;
+import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.Selected;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class MayflyResultSetTest extends TestCase {
     
@@ -94,6 +98,25 @@ public class MayflyResultSetTest extends TestCase {
                 expectedMessage, 
                 e.getMessage());
         }
+    }
+    
+    public void testValues() throws Exception {
+        SingleColumn a = new SingleColumn("a");
+        SingleColumn b = new SingleColumn("b");
+        MayflyResultSet results =
+            new MayflyResultSet(
+                new Selected(a, new Plus(a, b)),
+                new ResultRows(
+                    new ResultRow()
+                        .with(a, new LongCell(44))
+                        .with(b, new LongCell(55))
+                    )
+            );
+        results.next();
+        ValueList values = results.asValues(new Location(4, 5, 6, 7));
+        assertEquals(2, values.size());
+        MayflyAssert.assertLong(44, values.cell(0));
+        MayflyAssert.assertLong(99, values.cell(1));
     }
 
 }

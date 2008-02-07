@@ -8,7 +8,7 @@ public class OrderByTest extends TestCase {
 
     public void testIsEmpty() throws Exception {
         assertTrue(new OrderBy().isEmpty());
-        assertFalse(new OrderBy().add(new SingleColumn("a")).isEmpty());
+        assertFalse(new OrderBy().with(new SingleColumn("a")).isEmpty());
     }
 
 }

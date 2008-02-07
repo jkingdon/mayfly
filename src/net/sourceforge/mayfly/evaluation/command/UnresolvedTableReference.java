@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation.command;
 import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 /** 
@@ -58,6 +59,10 @@ public class UnresolvedTableReference {
 
     public String schema(String defaultSchema) {
         return schema == null ? defaultSchema : schema;
+    }
+    
+    public TableReference resolve(Evaluator evaluator) {
+        return resolve(evaluator.store(), evaluator.currentSchema(), null);
     }
     
     public TableReference resolve(DataStore store, String defaultSchema,

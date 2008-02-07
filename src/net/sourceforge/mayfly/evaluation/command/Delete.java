@@ -20,9 +20,8 @@ public class Delete extends Command {
     public UpdateStore update(Evaluator evaluator) {
         where.rejectAggregates("DELETE");
         DataStore store = evaluator.store();
-        String currentSchema = evaluator.currentSchema();
         TableReference resolved = 
-            table.resolve(store, currentSchema, null);
+            table.resolve(evaluator);
         return store.delete(
             resolved.schema(), resolved.tableName(), where,
             table.options);

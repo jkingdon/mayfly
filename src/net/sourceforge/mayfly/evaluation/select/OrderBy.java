@@ -14,15 +14,22 @@ import java.util.List;
 
 public class OrderBy {
 
-    List elements = new ArrayList();
-
-    public OrderBy add(SingleColumn column) {
-        return add(new ColumnOrderItem(column, true));
+    final ImmutableList elements;
+    
+    public OrderBy() {
+        this(new ImmutableList());
     }
 
-    public OrderBy add(OrderItem item) {
-        elements.add(item);
-        return this;
+    public OrderBy(ImmutableList elements) {
+        this.elements = elements;
+    }
+
+    public OrderBy with(SingleColumn column) {
+        return with(new ColumnOrderItem(column, true));
+    }
+
+    public OrderBy with(OrderItem item) {
+        return new OrderBy(new ImmutableList(elements).with(item));
     }
 
     public Iterator iterator() {

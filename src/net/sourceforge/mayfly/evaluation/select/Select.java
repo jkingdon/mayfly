@@ -45,7 +45,6 @@ public class Select extends Command {
 
     private final boolean distinct;
 
-    /** Not immutable */
     private final OrderBy orderBy;
 
     private final Limit limit;

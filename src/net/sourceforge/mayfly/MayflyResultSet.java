@@ -4,6 +4,8 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.Value;
+import net.sourceforge.mayfly.evaluation.ValueList;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.parser.Location;
 
@@ -351,6 +353,10 @@ public final class MayflyResultSet extends ResultSetStub {
         return rows.row(0).cell(0);
     }
     
+    /**
+     * @internal
+     * Return the single cell from the current row.
+     */
     public Cell singleColumn(Location location) {
         checkOneColumn(location);
         
@@ -364,6 +370,23 @@ public final class MayflyResultSet extends ResultSetStub {
                 " expressions in a subselect", 
                 location);
         }
+    }
+
+    /**
+     * @internal
+     * Return the values from the current row.
+     */
+    public ValueList asValues(Location location) {
+        ResultRow row = currentRow();
+
+        ValueList values = new ValueList(location);
+        for (int zeroBasedColumn = 0; 
+            zeroBasedColumn < selected.size(); 
+            ++zeroBasedColumn) {
+            Cell cell = selected.evaluate(zeroBasedColumn + 1, row);
+            values = values.with(new Value(cell, location));
+        }
+        return values;
     }
 
 }
