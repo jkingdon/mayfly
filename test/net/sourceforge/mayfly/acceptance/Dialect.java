@@ -397,6 +397,10 @@ public abstract class Dialect {
         return true;
     }
     
+    public boolean canJoinInUpdate() {
+        return false;
+    }
+    
     public boolean errorIfAggregateInWhere() {
         return true;
     }

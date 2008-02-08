@@ -156,5 +156,43 @@ public class UpdateTest extends SqlTestCase {
             execute(aggregateInWhere);
         }
     }
+    
+    public void testJoin() throws Exception {
+        execute("create table foo(a integer, aa varchar(255))");
+        execute("create table bar(b integer, bb varchar(255))");
+        execute("insert into foo(a, aa) values(5, 'five')");
+        execute("insert into foo(a, aa) values(6, 'six')");
+        execute("insert into bar(b, bb) values(5, 'cinco')");
+        
+        String joinedUpdate = 
+            "update foo, bar set aa = 'one more than four' " +
+                "where a = b and bb = 'cinco'";
+        if (dialect.canJoinInUpdate()) {
+            execute(joinedUpdate);
+            assertResultSet(
+                new String[] { " 5, 'one more than four' ", " 6, 'six' "},
+                query("select a, aa from foo"));
+        }
+        else {
+            expectExecuteFailure(joinedUpdate, "expected SET but got ','");
+        }
+    }
+
+    /*
+     * Same problem as a join, different solution
+     */
+    public void testSubselect() throws Exception {
+        execute("create table foo(a integer, aa varchar(255))");
+        execute("create table bar(b integer, bb varchar(255))");
+        execute("insert into foo(a, aa) values(5, 'five')");
+        execute("insert into foo(a, aa) values(6, 'six')");
+        execute("insert into bar(b, bb) values(5, 'cinco')");
+        
+        execute("update foo set aa = 'one more than four' " +
+            "where a = (select b from bar where bb = 'cinco')");
+        assertResultSet(
+            new String[] { " 5, 'one more than four' ", " 6, 'six' "},
+            query("select a, aa from foo"));
+    }
 
 }

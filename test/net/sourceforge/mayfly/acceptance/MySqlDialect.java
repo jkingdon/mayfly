@@ -316,6 +316,11 @@ public class MySqlDialect extends Dialect {
         // ON UPDATE only applies to ON UPDATE CURRENT_TIMESTAMP.
         return false;
     }
+
+    @Override
+    public boolean canJoinInUpdate() {
+        return true;
+    }
     
     @Override
     public boolean haveAutoUnderbarIncrement() {
