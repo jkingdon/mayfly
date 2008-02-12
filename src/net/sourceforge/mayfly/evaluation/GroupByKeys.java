@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.evaluation;
 
+import net.sourceforge.mayfly.datastore.Cell;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -7,7 +9,7 @@ import java.util.List;
 
 public class GroupByKeys {
 
-    private List items = new ArrayList();
+    private List<GroupItem> items = new ArrayList<GroupItem>();
 
     public void add(GroupItem key) {
         items.add(key);
@@ -23,12 +25,11 @@ public class GroupByKeys {
     }
 
     public GroupByCells evaluate(ResultRow row) {
-        GroupByCells keyCells = new GroupByCells();
-        for (Iterator iter = items.iterator(); iter.hasNext();) {
-            GroupItem item = (GroupItem) iter.next();
+        List<Cell> keyCells = new ArrayList<Cell>();
+        for (GroupItem item : items) {
             keyCells.add(item.expression().evaluate(row));
         }
-        return keyCells;
+        return new GroupByCells(keyCells);
     }
 
     public int keyCount() {
@@ -57,7 +58,7 @@ public class GroupByKeys {
     }
 
     public GroupItem get(int index) {
-        return (GroupItem) items.get(index);
+        return items.get(index);
     }
 
 }

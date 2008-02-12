@@ -98,12 +98,12 @@ public class Selected implements Iterable {
     }
 
     public GroupByCells evaluateAll(ResultRow row) {
-        GroupByCells result = new GroupByCells();
+        List<Cell> result = new ArrayList<Cell>();
         for (Iterator iter = expressions.iterator(); iter.hasNext();) {
             Expression expression = (Expression) iter.next();
             result.add(expression.evaluate(row));
         }
-        return result;
+        return new GroupByCells(result);
     }
 
     public ResultRow toRow(GroupByCells cells) {

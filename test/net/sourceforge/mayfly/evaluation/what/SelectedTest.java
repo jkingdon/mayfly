@@ -26,8 +26,7 @@ public class SelectedTest extends TestCase {
     public void testToRow() throws Exception {
         Selected selected = new Selected(
             new Plus(new SingleColumn("x"), new SingleColumn("y")));
-        GroupByCells cells = new GroupByCells();
-        cells.add(new LongCell(18));
+        GroupByCells cells = new GroupByCells(new LongCell(18));
         
         ResultRow row = selected.toRow(cells);
         assertEquals(1, row.size());

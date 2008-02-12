@@ -23,7 +23,7 @@
     <target name="compile">
         <mkdir dir="build/classes"/>
         <javac srcdir="src" destdir="build/classes" debug="on" 
-            deprecation="on">
+            source="1.5" target="1.5" deprecation="on">
             <classpath refid="classpath"/>
         </javac>
     </target>
@@ -56,7 +56,7 @@
     <target name="compile-tests" depends="compile">
         <mkdir dir="build/test-classes"/>
         <javac srcdir="test" destdir="build/test-classes"
-            deprecation="on">
+            deprecation="on" source="1.5" target="1.5">
             <classpath refid="test.classpath"/>
         </javac>
     </target>
@@ -76,7 +76,7 @@
 
     <!-- Profile a test with JIP ( http://jiprof.sourceforge.net/ ). -->
     <target name="profile-test" depends="compile-tests" 
-        description="Profile tests">
+        description="Profile tests - may require manual editing of PerformanceTest.java">
         <junit fork="yes" haltonfailure="true" haltonerror="true">
             <classpath refid="runtest.classpath"/>
             <jvmarg value="-javaagent:test/lib/jiprof-1.0.7.jar"/> 
@@ -89,6 +89,46 @@
             </batchtest>
         </junit>
     </target>
+	
+	<!-- A work in progress.  In particular, I think we need to figure out
+		how to instrument mayfly without instrumenting all the jars (or, I
+		suppose, the tests).  Or maybe that isn't the right fix.  But the
+		point is that linking is sometimes prohibitively slow (to the point
+		that it didn't finish on my machine despite causing much swapping). -->
+    <target name="gprof-link" depends="compile-tests">
+        <exec executable="gcj">
+            <arg value="-pg" />
+            <arg value="-g" />
+            <arg value="--main=net.sourceforge.mayfly.acceptance.PerformanceTest" />
+
+        	<arg value="-I" />
+            <arg value="build/classes" />
+           	<arg value="-I" />
+        	<arg value="build/test-classes" />
+
+        	<!-- There's probably a way to just refer to the path 
+        	     runtest.classpath which is the intent, but until I figure out
+        	     the ant magic for that... -->
+            <!--<arg value="- -classpath=src/lib/commons-collections-3.1.jar:src/lib/commons-lang-2.1.jar:src/lib/joda-time-1.3.jar:test/lib/junit.jar:build/classes:build/test-classes" />-->
+
+        	<arg value="-o" />
+        	<arg value="build/profiled-executable" />
+            <arg value="build/test-classes/net/sourceforge/mayfly/acceptance/PerformanceTest.class" />
+
+        	<!--
+        	<arg value="src/lib/commons-collections-3.1.jar" />
+            <arg value="src/lib/commons-lang-2.1.jar" />
+            <arg value="src/lib/joda-time-1.3.jar" />
+            -->
+            <arg value="test/lib/junit.jar" />
+        </exec>
+    </target>
+    
+	<target name="gprof" depends="gprof-link"
+	    description="Run PerformanceTest#main and generate a gprof profile">
+        <exec executable="build/profiled-executable"></exec>
+        <exec executable="gprof"></exec>
+	</target>
 
     <target name="jar" depends="compile,test"
         description="Build the Mayfly jar">

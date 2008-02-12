@@ -133,6 +133,21 @@ public abstract class Cell extends ValueObject {
     public boolean sqlEquals(Cell otherCell, Location location) {
         return compareTo(otherCell, location) == 0;
     }
+    
+    /**
+     * @internal
+     * The kind of equality here is the kind we want for GROUP BY or
+     * DISTINCT, in which all nulls are equal.  That is, it is different
+     * from {@link #sqlEquals(Cell)}, in which null != null.
+     */
+    public final boolean distinctEquals(Cell otherCell) {
+        /* (Need to think more about the difference between these
+         * two implementations and whether equals is the clean
+         * way to do things or not)
+         */
+//        return compareTo(otherCell, Location.UNKNOWN) == 0;
+        return equals(otherCell);
+    }
 
     abstract public String displayName();
 

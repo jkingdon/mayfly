@@ -185,5 +185,11 @@ public class PerformanceTest extends SqlTestCase {
 //        long end = System.currentTimeMillis();
 //        System.out.println("Elapsed time = " + (end - start) / 1000.0 + " s");
     }
+    
+    public static void main(String[] args) throws Exception {
+        PerformanceTest test = new PerformanceTest();
+        test.setUp();
+        test.xtestDozensOfColumns();
+    }
 
 }
