@@ -15,11 +15,11 @@ public class ResultRowsTest extends TestCase {
             .with(new ResultRow().with(new SingleColumn("x"), new LongCell(7)))
             .with(new ResultRow().with(new SingleColumn("x"), new LongCell(9)))
             ;
-        assertEquals(2, rows.size());
+        assertEquals(2, rows.rowCount());
         
         ResultRows someRows = rows.select(
             new Equal(new IntegerLiteral(9), new SingleColumn("x")));
-        assertEquals(1, someRows.size());
+        assertEquals(1, someRows.rowCount());
     }
 
     public void testJoin() throws Exception {
@@ -34,7 +34,7 @@ public class ResultRowsTest extends TestCase {
         
         ResultRows joined = left.join(right);
 
-        assertEquals(4, joined.size());
+        assertEquals(4, joined.rowCount());
         assertRow(7, 10, joined.row(0));
         assertRow(7, 20, joined.row(1));
         assertRow(9, 10, joined.row(2));

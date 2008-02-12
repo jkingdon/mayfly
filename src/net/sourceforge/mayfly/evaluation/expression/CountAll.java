@@ -40,7 +40,7 @@ public class CountAll extends Expression {
 
     @Override
     public Cell aggregate(ResultRows rows) {
-        return new LongCell(rows.size());
+        return new LongCell(rows.rowCount());
     }
     
     @Override

@@ -44,7 +44,7 @@ public class SelectTest extends TestCase {
             );
 
         ResultRows rows = query(evaluator, "select * from foo, bar");
-        assertEquals(6, rows.size());
+        assertEquals(6, rows.rowCount());
         assertRow("foo", "colA", "1a", "foo", "colB", "1b", "bar", "colX", "1a", "bar", "colY", "1b", rows.row(0));
         assertRow("foo", "colA", "1a", "foo", "colB", "1b", "bar", "colX", "2a", "bar", "colY", "2b", rows.row(1));
         assertRow("foo", "colA", "1a", "foo", "colB", "1b", "bar", "colX", "3a", "bar", "colY", "3b", rows.row(2));
@@ -113,7 +113,7 @@ public class SelectTest extends TestCase {
             );
 
         ResultRows rows = query(evaluator, "select * from foo where colB = 'xx'");
-        assertEquals(2, rows.size());
+        assertEquals(2, rows.rowCount());
         assertRow("foo", "colA", "2a", "foo", "colB", "xx", rows.row(0));
         assertRow("foo", "colA", "3a", "foo", "colB", "xx", rows.row(1));
     }

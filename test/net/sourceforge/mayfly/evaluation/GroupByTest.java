@@ -41,7 +41,7 @@ public class GroupByTest extends TestCase {
         ResultRows sevenRows = 
             grouped.getRows(new GroupByCells(new LongCell(7)));
 
-        assertEquals(2, sevenRows.size());
+        assertEquals(2, sevenRows.rowCount());
         expectRow(7, 50, sevenRows.row(0));
         expectRow(7, 51, sevenRows.row(1));
 

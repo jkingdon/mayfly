@@ -34,7 +34,7 @@ import java.util.Set;
  */
 public class ResultRow {
     
-    private final ImmutableList elements;
+    private final ImmutableList<Element> elements;
 
     public ResultRow(Row row, String table) {
         this(row, table, new Options());
@@ -52,7 +52,7 @@ public class ResultRow {
         this.elements = elements;
     }
 
-    private static ImmutableList fromRow(Row row, String table,
+    private static ImmutableList<Element> fromRow(Row row, String table,
         Options options) {
         List result = new ArrayList();
         for (Iterator iter = row.columnNames(); iter.hasNext();) {
@@ -69,7 +69,7 @@ public class ResultRow {
     }
 
     public Element element(int index) {
-        return (Element) elements.get(index);
+        return elements.get(index);
     }
     
     public Cell cell(int index) {
@@ -91,8 +91,7 @@ public class ResultRow {
     public SingleColumn findColumn(String tableOrAlias, String columnName,
         Location location) {
         SingleColumn found = null;
-        for (Iterator iter = elements.iterator(); iter.hasNext();) {
-            Element element = (Element) iter.next();
+        for (Element element : elements) {
             if (element.expression instanceof SingleColumn) {
                 SingleColumn candidate = (SingleColumn) element.expression;
                 if (candidate.matches(tableOrAlias, columnName)) {
@@ -161,8 +160,7 @@ public class ResultRow {
     public String debugString() {
         StringBuilder out = new StringBuilder();
         out.append("Result Row:\n");
-        for (int i = 0; i < elements.size(); ++i) {
-            Element element = (Element) elements.get(i);
+        for (Element element : elements) {
             out.append("  ");
             out.append(element.expression.displayName());
             out.append(" = ");
@@ -171,7 +169,7 @@ public class ResultRow {
         }
         return out.toString();
     }
-
+    
     public static class Element {
         public final Expression expression;
         public final Cell value;
@@ -241,8 +239,7 @@ public class ResultRow {
 
     public ImmutableList expressionsForTable(String aliasOrTable) {
         List found = new ArrayList();
-        for (int i = 0; i < elements.size(); ++i) {
-            Element element = (Element) elements.get(i);
+        for (Element element : elements) {
             if (element.expression instanceof SingleColumn) {
                 SingleColumn column = (SingleColumn) element.expression;
                 if (column.matchesAliasOrTable(aliasOrTable)) {

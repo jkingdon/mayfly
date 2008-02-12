@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly;
 
+import static net.sourceforge.mayfly.util.MayflyAssert.assertLong;
+
 import junit.framework.TestCase;
 import junitx.framework.ObjectAssert;
 
@@ -17,7 +19,6 @@ import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.ImmutableList;
-import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class MayflyResultSetTest extends TestCase {
     
@@ -78,7 +79,12 @@ public class MayflyResultSetTest extends TestCase {
     }
 
     public void testSuccess() throws Exception {
-        Maximum maximum = new Maximum(new SingleColumn("a"), "max", false);
+        /* Specifying the table name here is so that resolve won't expect
+           the result row also to contain a column a, so it can resolve
+           the max(a) into max(foo.a).  I think (hope) that this just has
+           consequences for test setup, and that the real code will
+           pass in a resolved expression to the MayflyResultSet.  */
+        Maximum maximum = new Maximum(new SingleColumn("foo", "a"), "max", false);
         MayflyResultSet results =
             new MayflyResultSet(
                 new Selected(maximum),
@@ -115,8 +121,25 @@ public class MayflyResultSetTest extends TestCase {
         results.next();
         ValueList values = results.asValues(new Location(4, 5, 6, 7));
         assertEquals(2, values.size());
-        MayflyAssert.assertLong(44, values.cell(0));
-        MayflyAssert.assertLong(99, values.cell(1));
+        assertLong(44, values.cell(0));
+        assertLong(99, values.cell(1));
+    }
+    
+    public void testPickCorrectColumnBasedOnSelected() throws Exception {
+        SingleColumn a = new SingleColumn("a");
+        SingleColumn b = new SingleColumn("b");
+        MayflyResultSet results =
+            new MayflyResultSet(
+                new Selected(b),
+                new ResultRows(
+                    new ResultRow()
+                        .with(a, new LongCell(44))
+                        .with(b, new LongCell(55))
+                    )
+            );
+        assertLong(55, results.scalar());
+        results.next();
+        assertLong(55, results.singleColumn(Location.UNKNOWN));
     }
 
 }

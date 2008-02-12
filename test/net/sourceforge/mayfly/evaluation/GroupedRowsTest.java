@@ -38,7 +38,7 @@ public class GroupedRowsTest extends TestCase {
         ResultRows rows = groupedRows.ungroup(
             new Selected(new SingleColumn("player"))
         );
-        assertEquals(2, rows.size());
+        assertEquals(2, rows.rowCount());
 
         ResultRow row0 = rows.row(0);
         assertEquals(1, row0.size());
@@ -89,7 +89,7 @@ public class GroupedRowsTest extends TestCase {
             }))
         );
         
-        assertEquals(3, rows.size());
+        assertEquals(3, rows.rowCount());
         ResultRow row0 = rows.row(0);
         ResultRow row1 = rows.row(1);
         ResultRow row2 = rows.row(2);

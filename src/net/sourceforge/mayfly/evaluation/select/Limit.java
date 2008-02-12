@@ -19,14 +19,14 @@ public class Limit {
     }
 
     public ResultRows limit(ResultRows rows) {
-        if (offset == 0 && count >= rows.size()) {
+        if (offset == 0 && count >= rows.rowCount()) {
             return rows;
         }
         
-        if (offset > rows.size()) {
+        if (offset > rows.rowCount()) {
             return new ResultRows();
         }
-        int end = Math.min(offset + count, rows.size());
+        int end = Math.min(offset + count, rows.rowCount());
         return new ResultRows(new ImmutableList(rows.asList().subList(offset, end)));
     }
 

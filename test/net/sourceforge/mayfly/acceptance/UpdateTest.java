@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.acceptance;
 
+
 public class UpdateTest extends SqlTestCase {
     
     public void testNoRows() throws Exception {
@@ -193,6 +194,29 @@ public class UpdateTest extends SqlTestCase {
         assertResultSet(
             new String[] { " 5, 'one more than four' ", " 6, 'six' "},
             query("select a, aa from foo"));
+    }
+
+    /*
+     * Buggy in Mayfly as of 2008-02-12.
+     */
+    public void testSubselectWithConfusableValues() throws Exception {
+        execute("create table first_table(first_id integer, first_value varchar(80))");
+        execute("insert into first_table(first_id, first_value) values(5, 'original')");
+        execute("insert into first_table(first_id, first_value) values(3, 'bystander')");
+        execute("create table second_table(second_id integer, reference_to_first_id integer)");
+        execute("insert into second_table(second_id, reference_to_first_id) values(3, 5)");
+
+        assertResultSet(new String [] { " 5 " }, 
+            query("select reference_to_first_id from second_table where second_id = 3"));
+        execute("update first_table set first_value = 'updated' where first_id in" +
+            " (select reference_to_first_id from second_table where second_id = 3)");
+        assertResultSet(new String[] { " 5, 'updated' ", " 3, 'bystander' " }, 
+            query("select first_id, first_value from first_table"));
+
+        execute("update first_table set first_value = 'again' where first_id =" +
+            " (select reference_to_first_id from second_table where second_id = 3)");
+        assertResultSet(new String[] { " 5, 'again' ", " 3, 'bystander' " }, 
+            query("select first_id, first_value from first_table"));
     }
 
 }

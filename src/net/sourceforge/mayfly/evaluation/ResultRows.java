@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class ResultRows {
 
-    private final ImmutableList rows;
+    private final ImmutableList<ResultRow> rows;
 
     public ResultRows(ResultRow singleRow) {
         this(ImmutableList.singleton(singleRow));
@@ -28,19 +28,19 @@ public class ResultRows {
         this(new ImmutableList());
     }
     
-    public ResultRows(ImmutableList rows) {
+    public ResultRows(ImmutableList<ResultRow> rows) {
         this.rows = rows;
     }
 
-    public int size() {
+    public int rowCount() {
         return rows.size();
     }
 
     public ResultRow row(int index) {
-        return (ResultRow) rows.get(index);
+        return rows.get(index);
     }
     
-    public Iterator iterator() {
+    public Iterator<ResultRow> iterator() {
         return rows.iterator();
     }
 
@@ -80,10 +80,19 @@ public class ResultRows {
     }
     
     public ResultRow singleRow() {
-        if (size() != 1) {
-            throw new MayflyInternalException("expected one row, got " + size());
+        if (rowCount() != 1) {
+            throw new MayflyInternalException("expected one row, got " + rowCount());
         }
         return row(0);
+    }
+
+    public String debugString() {
+        StringBuilder out = new StringBuilder();
+        out.append("row count = " + rowCount() + "\n");
+        for (ResultRow row : rows) {
+            out.append(row.debugString());
+        }
+        return out.toString();
     }
 
 }

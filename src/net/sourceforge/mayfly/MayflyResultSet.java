@@ -37,7 +37,7 @@ public final class MayflyResultSet extends ResultSetStub {
     @Override
     public boolean next() {
         ++pos;
-        if (pos >= rows.size()) {
+        if (pos >= rows.rowCount()) {
             return false;
         } else {
             return true;
@@ -320,7 +320,7 @@ public final class MayflyResultSet extends ResultSetStub {
         if (pos < 0) {
             throw new MayflyException("no current result row");
         }
-        if (pos >= rows.size()) {
+        if (pos >= rows.rowCount()) {
             throw new MayflyException("already read last result row");
         }
         return pos;
@@ -341,16 +341,16 @@ public final class MayflyResultSet extends ResultSetStub {
     public Cell scalar(Location location) {
         checkOneColumn(location);
         
-        if (rows.size() == 0) {
+        if (rows.rowCount() == 0) {
             return NullCell.INSTANCE;
         }
-        else if (rows.size() != 1) {
+        else if (rows.rowCount() != 1) {
             throw new MayflyException(
-                "subselect expects one row but got " + rows.size(),
+                "subselect expects one row but got " + rows.rowCount(),
                 location);
         }
         
-        return rows.row(0).cell(0);
+        return selected.evaluate(1, rows.row(0));
     }
     
     /**
@@ -360,7 +360,7 @@ public final class MayflyResultSet extends ResultSetStub {
     public Cell singleColumn(Location location) {
         checkOneColumn(location);
         
-        return currentRow().cell(0);
+        return selected.evaluate(1, currentRow());
     }
 
     private void checkOneColumn(Location location) {
@@ -387,6 +387,10 @@ public final class MayflyResultSet extends ResultSetStub {
             values = values.with(new Value(cell, location));
         }
         return values;
+    }
+
+    public String debugString() {
+        return rows.debugString();
     }
 
 }
