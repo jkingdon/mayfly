@@ -264,7 +264,7 @@ public class PostgresDialect extends Dialect {
     }
 
     @Override
-    public boolean haveSerial() {
+    public boolean haveSequencySerial() {
         return true;
     }
     

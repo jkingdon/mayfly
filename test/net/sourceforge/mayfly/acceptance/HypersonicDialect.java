@@ -304,7 +304,7 @@ public class HypersonicDialect extends Dialect {
     }
     
     @Override
-    public boolean autoIncrementIsRelativeToLastValue() {
+    public boolean sql2003RelativeToLastValue() {
         return true;
     }
     

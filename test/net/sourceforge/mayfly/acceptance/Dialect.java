@@ -636,7 +636,20 @@ public abstract class Dialect {
         return false;
     }
 
-    public boolean haveSerial() {
+    /**
+     * @internal
+     * Is there a type SERIAL which behaves like a sequence?
+     */
+    public boolean haveSequencySerial() {
+        return false;
+    }
+    
+    /**
+     * @internal
+     * Is there a type SERIAL which behaves like an auto-increment
+     * (relative to last value)?
+     */
+    public boolean haveAutoIncrementSerial() {
         return false;
     }
 
@@ -651,10 +664,12 @@ public abstract class Dialect {
     /**
      * @internal
      * Return the preferred (or one that will work) way to specify
-     * an identity column, including the type.
+     * an identity column, including the type.  Only for contexts
+     * where either an auto-increment-style or a sequence-style
+     * column will do.
      * 
      * Generally should also declare it a primary key, even if your
-     * database allows auto-increment columsn which are not primary keys.
+     * database allows auto-increment columns which are not primary keys.
      */
     public String identityType() {
         return "identity primary key";
@@ -662,9 +677,9 @@ public abstract class Dialect {
     
     /**
      * @internal
-     * Return a to specify an auto-increment column,
-     * that is one for which {@link #autoIncrementIsRelativeToLastValue()}
-     * would be true, or null if there is no such type.
+     * Return a type to specify an auto-increment column, that is one
+     * where values are assigned relative to existing data in the
+     * column, or null if there is no such type.
      */
     public String autoIncrementType() {
         return null;
@@ -674,11 +689,7 @@ public abstract class Dialect {
         return "call identity()"; //hypersonic
     }
 
-    public boolean autoIncrementIsRelativeToLastValue() {
-        // Not sure what the arguments on either side of
-        // this one are.  (If not relative to the last
-        // inserted value, it is a sequence, which is
-        // independent of what was explicitly inserted).
+    public boolean sql2003RelativeToLastValue() {
         return false;
     }
 

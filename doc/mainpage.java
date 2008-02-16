@@ -191,9 +191,11 @@ by other insert statements into the table).</li>
 It is based on the existing values (that is, inserting another value
 into the table will change the value to be inserted).</li>
 </ul>
+
 Also, IDENTITY or SERIAL as datatypes indicate an incrementing column
-(currently auto-increment rather than identity and INTEGER for the type, 
-but subject to change to improve compatibility or general usefulness).
+(for compatibility with Hypersonic and Postgres, respectively,
+IDENTITY is an auto-increment column and SERIAL is a sequence-style column.
+The type in both cases is INTEGER).
 
 Foreign key actions for ON DELETE are NO ACTION, CASCADE, SET NULL, 
 and SET DEFAULT.  Foreign key actions for ON UPDATE are NO ACTION only.

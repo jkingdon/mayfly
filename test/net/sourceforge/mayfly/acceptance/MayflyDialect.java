@@ -142,7 +142,7 @@ public class MayflyDialect extends Dialect {
     }
 
     @Override
-    public boolean haveSerial() {
+    public boolean haveSequencySerial() {
         return true;
     }
     

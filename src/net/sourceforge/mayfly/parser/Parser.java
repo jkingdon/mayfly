@@ -778,8 +778,8 @@ public class Parser {
     Column parseColumnDefinition(CreateTable table) {
         String name = consumeIdentifier();
         ParsedDataType parsed = parseDataType();
-        boolean isAutoIncrement = false;
-        boolean isSequence = parsed.isAutoIncrement;
+        boolean isAutoIncrement = parsed.isAutoIncrement;
+        boolean isSequence = parsed.isSequence;
 
         DefaultValue defaultValue = parseDefaultClause(name);
         
@@ -894,6 +894,7 @@ public class Parser {
 
     ParsedDataType parseDataType() {
         boolean isAutoIncrement = false;
+        boolean isSequence = false;
         DataType type;
         if (consumeIfMatches(TokenType.KEYWORD_integer)
             || consumeIfMatches(TokenType.KEYWORD_int)) {
@@ -955,9 +956,12 @@ public class Parser {
                 // Reserved word in SQL92; maybe we should too...
                 type = new TimestampDataType();
             }
-            else if (currentText.equalsIgnoreCase("identity")
-                || currentText.equalsIgnoreCase("serial")) {
+            else if (currentText.equalsIgnoreCase("identity")) {
                 isAutoIncrement = true;
+                type = new IntegerDataType("INTEGER");
+            }
+            else if (currentText.equalsIgnoreCase("serial")) {
+                isSequence = true;
                 type = new IntegerDataType("INTEGER");
             }
             else {
@@ -967,15 +971,18 @@ public class Parser {
         else {
             throw new ParserException("data type", currentToken);
         }
-        return new ParsedDataType(isAutoIncrement, type);
+        return new ParsedDataType(isAutoIncrement, isSequence, type);
     }
     
     class ParsedDataType {
-        boolean isAutoIncrement;
-        DataType type;
+        final boolean isAutoIncrement;
+        final boolean isSequence;
+        final DataType type;
 
-        public ParsedDataType(boolean isAutoIncrement, DataType type) {
+        public ParsedDataType(boolean isAutoIncrement, boolean isSequence, 
+            DataType type) {
             this.isAutoIncrement = isAutoIncrement;
+            this.isSequence = isSequence;
             this.type = type;
         }
         

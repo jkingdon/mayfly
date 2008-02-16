@@ -1,5 +1,10 @@
 Changes since 0.3:
 
+For better compatibility with Hypersonic, the data type IDENTITY
+now indicates an auto-increment column (that is, newly inserted
+values are chosen relative to what is already in the table,
+rather than as a sequence which isn't affected by table contents).
+
 Add 
   INSERT INTO table(columns...) select-statement
 syntax (used, for example, for copying data from an old table 

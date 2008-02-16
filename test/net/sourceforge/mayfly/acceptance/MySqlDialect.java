@@ -328,12 +328,7 @@ public class MySqlDialect extends Dialect {
     }
     
     @Override
-    public boolean haveSerial() {
-        return true;
-    }
-    
-    @Override
-    public boolean autoIncrementIsRelativeToLastValue() {
+    public boolean haveAutoIncrementSerial() {
         return true;
     }
     
