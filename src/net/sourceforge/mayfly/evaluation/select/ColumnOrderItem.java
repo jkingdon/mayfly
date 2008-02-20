@@ -18,8 +18,11 @@ public class ColumnOrderItem extends OrderItem {
     }
     
     @Override
-    protected int compareAscending(What what, ResultRow first, ResultRow second) {
-        return compare(first, second, column);
+    protected int compareAscending(What what, Evaluator evaluator,
+        ResultRow first, ResultRow second) {
+        Cell cell1 = column.evaluate(first, evaluator);
+        Cell cell2 = column.evaluate(second, evaluator);
+        return cell1.compareTo(cell2, column.location);
     }
 
     public static int compare(ResultRow first, ResultRow second, Expression column) {
@@ -30,9 +33,10 @@ public class ColumnOrderItem extends OrderItem {
     
     @Override
     public void check(ResultRow afterGroupByAndDistinct, 
-        ResultRow afterGroupBy, ResultRow afterJoins) {
+        ResultRow afterGroupBy, ResultRow afterJoins,
+        Evaluator evaluator) {
         try {
-            column.evaluate(afterGroupByAndDistinct);
+            column.evaluate(afterGroupByAndDistinct, evaluator);
         }
         catch (NoColumn doesNotSurviveDistinct) {
             /* We're going to throw some exception, we just need to figure

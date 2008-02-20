@@ -18,7 +18,7 @@ public class ReferenceOrderItem extends OrderItem {
 
     @Override
     protected int compareAscending(
-        What what, ResultRow first, ResultRow second) {
+        What what, Evaluator evaluator, ResultRow first, ResultRow second) {
         int zeroBasedColumn = reference - 1;
 
         int size = what.size();
@@ -40,7 +40,8 @@ public class ReferenceOrderItem extends OrderItem {
     }
 
     @Override
-    public void check(ResultRow afterGroupByAndDistinct, ResultRow afterGroupBy, ResultRow afterJoins) {
+    public void check(ResultRow afterGroupByAndDistinct, ResultRow afterGroupBy, 
+        ResultRow afterJoins, Evaluator evaluator) {
     }
 
 }

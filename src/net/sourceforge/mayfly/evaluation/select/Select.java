@@ -93,7 +93,8 @@ public class Select extends Command {
         ResultRows afterDistinct = 
             distinct(selected, new ResultRows(groupedDummyRow));
 
-        orderBy.check(afterDistinct.singleRow(), groupedDummyRow, dummyRow);
+        orderBy.check(afterDistinct.singleRow(), groupedDummyRow, 
+            dummyRow, evaluator);
         
         if (orderBy.isEmpty() && limit.isSpecified()) {
             throw new MayflyException("Must specify ORDER BY with LIMIT");
@@ -116,7 +117,7 @@ public class Select extends Command {
 
         ResultRows afterDistinct = distinct(selected, afterGrouping);
 
-        ResultRows sorted = orderBy.sort(afterDistinct, what);
+        ResultRows sorted = orderBy.sort(afterDistinct, what, evaluator);
         return limit.limit(sorted);
     }
 

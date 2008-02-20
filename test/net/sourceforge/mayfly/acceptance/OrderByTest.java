@@ -63,8 +63,6 @@ public class OrderByTest extends SqlTestCase {
         execute("insert into foo(a, b) values (4, 60)");
         execute("insert into foo(a, b) values (2, 70)");
 
-        String expression = "select a from foo order by a + b";
-
         /* So here's the evil part: an integer is not an expression, it is a 
            reference (special case) */
         assertResultList(new String[] { "2", "3", "4", "5", "8" }, 
@@ -72,8 +70,9 @@ public class OrderByTest extends SqlTestCase {
         assertResultList(new String[] { "8", "5", "4", "3", "2" }, 
             query("select a from foo order by 1 desc, b"));
         assertResultList(new String[] { "35", "48", "53", "64", "72" }, 
-            query("select a + b from foo order by 1, b"));
+            query("select a + b from foo order by 1 asc, b desc"));
 
+        String expression = "select a from foo order by a + b";
         // But "1 + 0" is an expression, not a reference
         String constantExpression = "select a from foo order by 1 + 0, b";
         if (dialect.canOrderByExpression(false)) {
@@ -98,14 +97,8 @@ public class OrderByTest extends SqlTestCase {
         execute("insert into foo(a, b) values (8, 40)");
         execute("insert into foo(a, b) values (3, 50)");
 
-        String sql = "select a + b as total from foo order by total";
-
-        if (dialect.canOrderByExpression(false) && dialect.haveColumnAlias()) {
-            assertResultList(new String[] { "35", "48", "53", }, query(sql));
-        }
-        else {
-            expectQueryFailure(sql, "no column total");
-        }
+        assertResultList(new String[] { "35", "48", "53", }, 
+            query("select a + b as total from foo order by total"));
     }
     
     public void testOrderByNumericReference() throws Exception {
@@ -248,6 +241,11 @@ public class OrderByTest extends SqlTestCase {
         else {
             query(orderByWhenSelectingAggregate);
         }
+    }
+    
+    public void testCompletelyUnheardOfName() throws Exception {
+        execute("create table foo(a integer)");
+        expectQueryFailure("select a as b from foo order by c", "no column c");
     }
 
     // TODO: order by a   -- where a is in several columns, only one of which survives after the joins

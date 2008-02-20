@@ -14,13 +14,13 @@ import java.util.List;
 
 public class OrderBy {
 
-    final ImmutableList elements;
+    final ImmutableList<OrderItem> elements;
     
     public OrderBy() {
-        this(new ImmutableList());
+        this(new ImmutableList<OrderItem>());
     }
 
-    public OrderBy(ImmutableList elements) {
+    public OrderBy(ImmutableList<OrderItem> elements) {
         this.elements = elements;
     }
 
@@ -29,14 +29,15 @@ public class OrderBy {
     }
 
     public OrderBy with(OrderItem item) {
-        return new OrderBy(new ImmutableList(elements).with(item));
+        return new OrderBy(elements.with(item));
     }
 
-    public Iterator iterator() {
+    public Iterator<OrderItem> iterator() {
         return elements.iterator();
     }
 
-    public ResultRows sort(ResultRows rows, final What what) {
+    public ResultRows sort(ResultRows rows, 
+        final What what, final Evaluator evaluator) {
         if (isEmpty()) {
             return rows;
         }
@@ -49,7 +50,7 @@ public class OrderBy {
                 ResultRow second = (ResultRow) o2;
                 for (Iterator iter = elements.iterator(); iter.hasNext();) {
                     OrderItem item = (OrderItem) iter.next();
-                    int comparison = item.compareRows(what, first, second);
+                    int comparison = item.compareRows(what, evaluator, first, second);
                     if (comparison != 0) {
                         return comparison;
                     }
@@ -62,10 +63,10 @@ public class OrderBy {
     }
 
     public void check(ResultRow afterGroupByAndDistinct, 
-        ResultRow afterGroupBy, ResultRow afterJoins) {
-        for (Iterator iter = elements.iterator(); iter.hasNext();) {
-            OrderItem item = (OrderItem) iter.next();
-            item.check(afterGroupByAndDistinct, afterGroupBy, afterJoins);
+        ResultRow afterGroupBy, ResultRow afterJoins, Evaluator evaluator) {
+        for (OrderItem item : elements) {
+            item.check(afterGroupByAndDistinct, afterGroupBy, 
+                afterJoins, evaluator);
         }
     }
 

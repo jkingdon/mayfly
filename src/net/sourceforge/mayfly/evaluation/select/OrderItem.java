@@ -11,14 +11,14 @@ abstract public class OrderItem {
         this.ascending = ascending;
     }
 
-    public int compareRows(What what, ResultRow first, ResultRow second) {
-        int comparison = compareAscending(what, first, second);
+    public int compareRows(What what, Evaluator evaluator, ResultRow first, ResultRow second) {
+        int comparison = compareAscending(what, evaluator, first, second);
         return ascending ? comparison : - comparison;
     }
 
-    abstract protected int compareAscending(What what, ResultRow first, ResultRow second);
+    abstract protected int compareAscending(What what, Evaluator evaluator, ResultRow first, ResultRow second);
 
     abstract public void check(ResultRow afterGroupByAndDistinct, 
-        ResultRow afterGroupBy, ResultRow afterJoins);
+        ResultRow afterGroupBy, ResultRow afterJoins, Evaluator evaluator);
 
 }

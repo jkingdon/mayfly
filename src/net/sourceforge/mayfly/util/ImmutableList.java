@@ -39,16 +39,16 @@ public class ImmutableList<T> implements List<T> {
         delegate = Collections.unmodifiableList(alreadyCopied);
     }
 
-    public ImmutableList with(Object newElement) {
-        List copy = new ArrayList(this);
+    public ImmutableList with(T newElement) {
+        List<T> copy = new ArrayList<T>(this);
         copy.add(newElement);
-        return new ImmutableList(copy, true);
+        return new ImmutableList<T>(copy, true);
     }
 
-    public ImmutableList with(int index, Object newElement) {
-        List copy = new ArrayList(this);
+    public ImmutableList with(int index, T newElement) {
+        List<T> copy = new ArrayList<T>(this);
         copy.add(index, newElement);
-        return new ImmutableList(copy, true);
+        return new ImmutableList<T>(copy, true);
     }
 
     public ImmutableList without(int index) {
