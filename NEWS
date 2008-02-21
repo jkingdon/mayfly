@@ -1,5 +1,9 @@
 Changes since 0.3:
 
+For MySQL compatibility, accept engine and character set in CREATE TABLE
+and ALTER TABLE (the former had existed in Mayfly for a while
+but had not been documented; the latter is new).
+
 For better compatibility with Hypersonic, the data type IDENTITY
 now indicates an auto-increment column (that is, newly inserted
 values are chosen relative to what is already in the table,

@@ -36,6 +36,10 @@ public class RenameColumnTest extends SqlTestCase {
             "  constraint fu_constraint " +
             "  foreign key(fu_id) references foo(id))");
         String rename = "alter table bar change column fu_id foo_id integer";
+
+        /* I'm not seeing an exception in MySQL 5.0.45 here.
+           Haven't investigated in detail, though.
+         */
         expectExecuteFailure(
             rename, 
             "cannot rename column fu_id because a constraint refers to it");

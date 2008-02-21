@@ -1,6 +1,12 @@
 package net.sourceforge.mayfly.parser;
 
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_values;
+import static net.sourceforge.mayfly.parser.TokenType.EQUAL;
+import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_column;
+import static net.sourceforge.mayfly.parser.TokenType.IDENTIFIER;
+import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_character;
+import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_set;
+import static net.sourceforge.mayfly.parser.TokenType.CLOSE_PAREN;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
@@ -58,6 +64,7 @@ import net.sourceforge.mayfly.evaluation.command.UnresolvedPrimaryKey;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedUniqueConstraint;
 import net.sourceforge.mayfly.evaluation.command.Update;
+import net.sourceforge.mayfly.evaluation.command.NoopCommand;
 import net.sourceforge.mayfly.evaluation.condition.And;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.condition.Equal;
@@ -256,7 +263,7 @@ public class Parser {
             expectAndConsume(TokenType.KEYWORD_table);
             return parseAlterTable();
         }
-        else if (currentToken.type == TokenType.KEYWORD_set) {
+        else if (currentToken.type == KEYWORD_set) {
             return parseSetSchema();
         }
         else if (currentToken.type == TokenType.KEYWORD_insert) {
@@ -285,12 +292,12 @@ public class Parser {
     private Command parseCall() {
         expectNonReservedWord("identity");
         expectAndConsume(TokenType.OPEN_PAREN);
-        expectAndConsume(TokenType.CLOSE_PAREN);
+        expectAndConsume(CLOSE_PAREN);
         return new LastIdentity();
     }
 
     private Command parseSetSchema() {
-        expectAndConsume(TokenType.KEYWORD_set);
+        expectAndConsume(KEYWORD_set);
         expectAndConsume(TokenType.KEYWORD_schema);
         return new SetSchema(consumeIdentifier());
     }
@@ -302,12 +309,12 @@ public class Parser {
         expectAndConsume(TokenType.KEYWORD_into);
         UnresolvedTableReference table = parseTableReference();
         
-        if (consumeIfMatches(TokenType.KEYWORD_set)) {
+        if (consumeIfMatches(KEYWORD_set)) {
             List names = new ArrayList();
             ValueList values = new ValueList(currentToken.location);
             do {
                 names.add(consumeIdentifier());
-                expectAndConsume(TokenType.EQUAL);
+                expectAndConsume(EQUAL);
                 values = values.with(parseAndEvaluate());
             } while (consumeIfMatches(TokenType.COMMA));
             return new Insert(table, new ImmutableList(names), values, 
@@ -333,7 +340,7 @@ public class Parser {
     private Command parseUpdate() {
         expectAndConsume(TokenType.KEYWORD_update);
         UnresolvedTableReference table = parseTableReference();
-        expectAndConsume(TokenType.KEYWORD_set);
+        expectAndConsume(KEYWORD_set);
         List setClauses = parseSetClauseList();
         Condition where = parseOptionalWhere();
         return new Update(table, setClauses, where);
@@ -357,7 +364,7 @@ public class Parser {
 
     private SetClause parseSetClause() {
         String column = consumeIdentifier();
-        expectAndConsume(TokenType.EQUAL);
+        expectAndConsume(EQUAL);
         Expression value = parseExpressionOrNull();
         return new SetClause(column, value);
     }
@@ -367,13 +374,13 @@ public class Parser {
             expectAndConsume(TokenType.OPEN_PAREN);
             
             List columnNames = new ArrayList();
-            if (currentToken.type != TokenType.CLOSE_PAREN) {
+            if (currentToken.type != CLOSE_PAREN) {
                 do {
                     columnNames.add(consumeIdentifier());
                 } while (consumeIfMatches(TokenType.COMMA));
             }
             
-            expectAndConsume(TokenType.CLOSE_PAREN);
+            expectAndConsume(CLOSE_PAREN);
             return new ImmutableList(columnNames);
         }
         else {
@@ -389,11 +396,11 @@ public class Parser {
             columnNames.add(consumeIdentifier());
             if (consumeIfMatches(TokenType.OPEN_PAREN)) {
                 expectAndConsume(TokenType.NUMBER);
-                expectAndConsume(TokenType.CLOSE_PAREN);
+                expectAndConsume(CLOSE_PAREN);
             }
         } while (consumeIfMatches(TokenType.COMMA));
 
-        expectAndConsume(TokenType.CLOSE_PAREN);
+        expectAndConsume(CLOSE_PAREN);
         return new ColumnNames(new ImmutableList(columnNames));
     }
     
@@ -405,7 +412,7 @@ public class Parser {
             columnNames.add(consumeIdentifier());
         } while (consumeIfMatches(TokenType.COMMA));
 
-        expectAndConsume(TokenType.CLOSE_PAREN);
+        expectAndConsume(CLOSE_PAREN);
         return new ColumnNames(new ImmutableList(columnNames));
     }
     
@@ -415,12 +422,12 @@ public class Parser {
         ValueList values = new ValueList(start);
         expectAndConsume(TokenType.OPEN_PAREN);
 
-        if (currentToken.type != TokenType.CLOSE_PAREN) {
+        if (currentToken.type != CLOSE_PAREN) {
             do {
                 values = values.with(parseAndEvaluate());
             } while (consumeIfMatches(TokenType.COMMA));
         }
-        Location end = expectAndConsume(TokenType.CLOSE_PAREN).location;
+        Location end = expectAndConsume(CLOSE_PAREN).location;
         return values.with(end);
     }
 
@@ -505,7 +512,7 @@ public class Parser {
             parseTableElement(table);
         } while (consumeIfMatches(TokenType.COMMA));
 
-        expectAndConsume(TokenType.CLOSE_PAREN);
+        expectAndConsume(CLOSE_PAREN);
         
         parseTableTypeIfPresent();
         parseCharacterSetIfPresent();
@@ -515,8 +522,8 @@ public class Parser {
 
     private void parseTableTypeIfPresent() {
         if (consumeNonReservedWordIfMatches("engine")) {
-            expectAndConsume(TokenType.EQUAL);
-            Token token = expectAndConsume(TokenType.IDENTIFIER);
+            expectAndConsume(EQUAL);
+            Token token = expectAndConsume(IDENTIFIER);
             String tableType = token.getText();
             if ("innodb".equalsIgnoreCase(tableType)
                 || "myisam".equalsIgnoreCase(tableType)) {
@@ -530,8 +537,8 @@ public class Parser {
     }
 
     private void parseCharacterSetIfPresent() {
-        if (consumeIfMatches(TokenType.KEYWORD_character)) {
-            expectAndConsume(TokenType.KEYWORD_set);
+        if (consumeIfMatches(KEYWORD_character)) {
+            expectAndConsume(KEYWORD_set);
             consumeIdentifier();
         }
     }
@@ -540,7 +547,7 @@ public class Parser {
         UnresolvedTableReference table = parseTableReference();
         if (consumeIfMatches(TokenType.KEYWORD_drop)) {
             // optional according to SQL92 but does anyone omit it?
-            if (consumeIfMatches(TokenType.KEYWORD_column)) {
+            if (consumeIfMatches(KEYWORD_column)) {
                 String column = consumeIdentifier();
                 return new DropColumn(table, column);
             }
@@ -560,7 +567,7 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_add)) {
             // optional according to SQL92 but does anyone omit it?
-            if (consumeIfMatches(TokenType.KEYWORD_column)) {
+            if (consumeIfMatches(KEYWORD_column)) {
                 return parseAddColumn(table);
             }
             else if (lookingAtConstraint()) {
@@ -573,15 +580,23 @@ public class Parser {
             }
         }
         else if (consumeNonReservedWordIfMatches("modify")) {
-            expectAndConsume(TokenType.KEYWORD_column);
+            expectAndConsume(KEYWORD_column);
             Column newColumn = parseColumnDisallowingMostConstraints(table);
             return new ModifyColumn(table, newColumn);
         }
         else if (consumeNonReservedWordIfMatches("change")) {
-            expectAndConsume(TokenType.KEYWORD_column);
+            expectAndConsume(KEYWORD_column);
             String oldName = consumeIdentifier();
             Column newColumn = parseColumnDisallowingMostConstraints(table);
             return new ChangeColumn(table, oldName, newColumn);
+        }
+        else if (matchesNonReservedWord("engine")) {
+            parseTableTypeIfPresent();
+            return new NoopCommand();
+        }
+        else if (currentToken.type == KEYWORD_character) {
+            parseCharacterSetIfPresent();
+            return new NoopCommand();
         }
         else {
             throw new ParserException("alter table action", currentToken);
@@ -592,7 +607,7 @@ public class Parser {
         Position position = Position.LAST;
         Column newColumn = parseColumnDisallowingMostConstraints(table);
         if (consumeNonReservedWordIfMatches("after")) {
-            Token column = expectAndConsume(TokenType.IDENTIFIER);
+            Token column = expectAndConsume(IDENTIFIER);
             position = Position.after(column.getText(), column.location);
         }
         else if (consumeNonReservedWordIfMatches("first")) {
@@ -622,7 +637,7 @@ public class Parser {
     }
 
     void parseTableElement(CreateTable table) {
-        if (currentToken.type == TokenType.IDENTIFIER) {
+        if (currentToken.type == IDENTIFIER) {
             table.addColumn(parseColumnDefinition(table));
         }
         else if (lookingAtConstraint()) {
@@ -630,7 +645,7 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.KEYWORD_index)) {
             String name;
-            if (currentToken.type == TokenType.IDENTIFIER) {
+            if (currentToken.type == IDENTIFIER) {
                 name = consumeIdentifier();
             }
             else {
@@ -678,7 +693,7 @@ public class Parser {
         else if (consumeIfMatches(TokenType.KEYWORD_check)) {
             expectAndConsume(TokenType.OPEN_PAREN);
             Condition condition = parseCondition().asBoolean();
-            expectAndConsume(TokenType.CLOSE_PAREN);
+            expectAndConsume(CLOSE_PAREN);
             return new UnresolvedCheckConstraint(condition, constraintName);
         }
         else {
@@ -694,13 +709,13 @@ public class Parser {
         expectAndConsume(TokenType.KEYWORD_key);
         expectAndConsume(TokenType.OPEN_PAREN);
         String referencingColumn = consumeIdentifier();
-        expectAndConsume(TokenType.CLOSE_PAREN);
+        expectAndConsume(CLOSE_PAREN);
 
         expectAndConsume(TokenType.KEYWORD_references);
         UnresolvedTableReference targetTable = parseTableReference();
         expectAndConsume(TokenType.OPEN_PAREN);
         String targetColumn = consumeIdentifier();
-        Token end = expectAndConsume(TokenType.CLOSE_PAREN);
+        Token end = expectAndConsume(CLOSE_PAREN);
         
         Actions actions = parseActions();
         return new UnresolvedForeignKey(
@@ -756,7 +771,7 @@ public class Parser {
         else if (consumeNonReservedWordIfMatches("cascade")) {
             return new Cascade();
         }
-        else if (consumeIfMatches(TokenType.KEYWORD_set)) {
+        else if (consumeIfMatches(KEYWORD_set)) {
             if (consumeIfMatches(TokenType.KEYWORD_null)) {
                 return new SetNull();
             }
@@ -785,7 +800,7 @@ public class Parser {
         
         Expression onUpdateValue = parseOnUpdateValue(name);
 
-        if (currentToken.type == TokenType.IDENTIFIER) {
+        if (currentToken.type == IDENTIFIER) {
             String text = currentToken.getText();
             if (text.equalsIgnoreCase("auto_increment")) {
                 consumeIdentifier();
@@ -802,7 +817,7 @@ public class Parser {
                     expectAndConsume(TokenType.KEYWORD_with);
                     defaultValue = 
                         new SpecifiedDefaultValue(parseDefaultValue(name));
-                    expectAndConsume(TokenType.CLOSE_PAREN);
+                    expectAndConsume(CLOSE_PAREN);
                 }
                 isSequence = true;
             }
@@ -906,7 +921,7 @@ public class Parser {
         else if (consumeIfMatches(TokenType.KEYWORD_varchar)) {
             expectAndConsume(TokenType.OPEN_PAREN);
             long size = consumeLong();
-            expectAndConsume(TokenType.CLOSE_PAREN);
+            expectAndConsume(CLOSE_PAREN);
             type = new StringDataType(
                 TokenType.KEYWORD_varchar.description() +
                 "(" +
@@ -918,13 +933,13 @@ public class Parser {
             int precision = consumeInteger();
             expectAndConsume(TokenType.COMMA);
             int scale = consumeInteger();
-            expectAndConsume(TokenType.CLOSE_PAREN);
+            expectAndConsume(CLOSE_PAREN);
             type = new DecimalDataType(precision, scale);
         }
-        else if (currentToken.type == TokenType.IDENTIFIER) {
+        else if (currentToken.type == IDENTIFIER) {
             // These shouldn't be reserved if they are not in the
             // SQL standard, seems like.
-            Token token = expectAndConsume(TokenType.IDENTIFIER);
+            Token token = expectAndConsume(IDENTIFIER);
             String currentText = token.getText();
             if (currentText.equalsIgnoreCase("tinyint")) {
                 type = new IntegerDataType("TINYINT");
@@ -939,7 +954,7 @@ public class Parser {
                 if (consumeIfMatches(TokenType.OPEN_PAREN)) {
                     long size = consumeLong();
                     //expectAndConsume(TokenType.NUMBER);
-                    expectAndConsume(TokenType.CLOSE_PAREN);
+                    expectAndConsume(CLOSE_PAREN);
                     type = new BinaryDataType(size);
                 }
                 else {
@@ -1050,7 +1065,7 @@ public class Parser {
     }
 
     public WhatElement parseWhatElement() {
-        if (currentToken.type == TokenType.IDENTIFIER
+        if (currentToken.type == IDENTIFIER
             && ((Token) tokens.get(1)).type == TokenType.PERIOD
             && ((Token) tokens.get(2)).type == TokenType.ASTERISK) {
 
@@ -1155,7 +1170,7 @@ public class Parser {
         }
 
         ParserExpression left = parseExpression();
-        if (consumeIfMatches(TokenType.EQUAL)) {
+        if (consumeIfMatches(EQUAL)) {
             Expression right = parsePrimary().asNonBoolean();
             return new BooleanParserExpression(new Equal(left.asNonBoolean(), right));
         }
@@ -1224,7 +1239,7 @@ public class Parser {
             ImmutableList<Expression> expressions = parseExpressionList();
             result = new In(left, expressions);
         }
-        expectAndConsume(TokenType.CLOSE_PAREN);
+        expectAndConsume(CLOSE_PAREN);
         return result;
     }
 
@@ -1240,7 +1255,7 @@ public class Parser {
         AggregateArgumentParser argumentParser = new AggregateArgumentParser();
         Location start = currentToken.location;
 
-        if (currentToken.type == TokenType.IDENTIFIER) {
+        if (currentToken.type == IDENTIFIER) {
             return new NonBooleanParserExpression(parsePrimaryIdentifier());
         }
         else if (currentToken.type == TokenType.NUMBER || 
@@ -1313,7 +1328,7 @@ public class Parser {
             else {
                 expression = parseCondition();
             }
-            expectAndConsume(TokenType.CLOSE_PAREN);
+            expectAndConsume(CLOSE_PAREN);
             return expression;
         }
         else {
@@ -1467,7 +1482,7 @@ public class Parser {
                     }
                     expression = parseExpression().asNonBoolean();
                 }
-                Token end = expectAndConsume(TokenType.CLOSE_PAREN);
+                Token end = expectAndConsume(CLOSE_PAREN);
 
                 location = function.location.combine(end.location);
                 return true;
@@ -1528,10 +1543,10 @@ public class Parser {
     }
 
     private Expression parsePrimaryIdentifier() {
-        Token firstIdentifier = expectAndConsume(TokenType.IDENTIFIER);
+        Token firstIdentifier = expectAndConsume(IDENTIFIER);
 
         if (consumeIfMatches(TokenType.PERIOD)) {
-            Token column = expectAndConsume(TokenType.IDENTIFIER);
+            Token column = expectAndConsume(IDENTIFIER);
             return new SingleColumn(firstIdentifier.getText(), column.getText(),
                 firstIdentifier.location.combine(column.location),
                 options
@@ -1539,7 +1554,7 @@ public class Parser {
         }
         else if (consumeIfMatches(TokenType.OPEN_PAREN)) {
             ImmutableList<Expression> arguments = parseExpressionList();
-            Token close = expectAndConsume(TokenType.CLOSE_PAREN);
+            Token close = expectAndConsume(CLOSE_PAREN);
             return Function.create(firstIdentifier.getText(), arguments,
                 firstIdentifier.location.combine(close.location),
                 options);
@@ -1573,7 +1588,7 @@ public class Parser {
     private FromElement parseFromItem() {
         if (consumeIfMatches(TokenType.OPEN_PAREN)) {
             FromElement fromElement = parseFromItem();
-            expectAndConsume(TokenType.CLOSE_PAREN);
+            expectAndConsume(CLOSE_PAREN);
             return fromElement;
         }
 
@@ -1620,7 +1635,7 @@ public class Parser {
             table = firstIdentifier;
         }
 
-        if (currentToken.type == TokenType.IDENTIFIER) {
+        if (currentToken.type == IDENTIFIER) {
             String alias = consumeIdentifier();
             return new FromTable(table, alias);
         } else {
@@ -1629,9 +1644,9 @@ public class Parser {
     }
     
     public UnresolvedTableReference parseTableReference() {
-        Token first = expectAndConsume(TokenType.IDENTIFIER);
+        Token first = expectAndConsume(IDENTIFIER);
         if (consumeIfMatches(TokenType.PERIOD)) {
-            Token table = expectAndConsume(TokenType.IDENTIFIER);
+            Token table = expectAndConsume(IDENTIFIER);
             return new UnresolvedTableReference(
                 first.getText(), table.getText(), 
                 first.location.combine(table.location),
@@ -1760,12 +1775,12 @@ public class Parser {
     }
 
     private String consumeIdentifier() {
-        Token token = expectAndConsume(TokenType.IDENTIFIER);
+        Token token = expectAndConsume(IDENTIFIER);
         return token.getText();
     }
 
     private void expectIdentifier(String expectedIdentifier) {
-        Token token = expectAndConsume(TokenType.IDENTIFIER);
+        Token token = expectAndConsume(IDENTIFIER);
         String text = token.getText();
         if (!text.equalsIgnoreCase(expectedIdentifier)) {
             throw new ParserException(expectedIdentifier, token);
@@ -1824,16 +1839,29 @@ public class Parser {
     }
     
     private boolean consumeNonReservedWordIfMatches(String word) {
-        if (currentToken.type != TokenType.IDENTIFIER) {
+        if (currentToken.type != IDENTIFIER) {
             return false;
         }
 
         String currentText = currentToken.getText();
         if (word.equalsIgnoreCase(currentText)) {
-            expectAndConsume(TokenType.IDENTIFIER);
+            expectAndConsume(IDENTIFIER);
             return true;
         }
         
+        return false;
+    }
+
+    private boolean matchesNonReservedWord(String word) {
+        if (currentToken.type != IDENTIFIER) {
+            return false;
+        }
+
+        String currentText = currentToken.getText();
+        if (word.equalsIgnoreCase(currentText)) {
+            return true;
+        }
+
         return false;
     }
 

@@ -70,6 +70,15 @@ public class EndToEndTests extends SqlTestCase {
         expectExecuteFailure("create table cities (id integer) engine=DataSinkHole", 
             "unrecognized table type DataSinkHole");
     }
+
+    public void testAlterEngine() throws Exception {
+        execute("create table foo(x integer)");
+        execute("alter table foo engine=innodb");
+        ((MayflyDialect)dialect).checkDump(
+            "CREATE TABLE foo(\n" +
+            "  x INTEGER\n" +
+            ");\n\n");
+    }
     
     public void testCharacterSet() throws Exception {
         /* Mayfly can store any unicode string.  So it seems
@@ -82,9 +91,28 @@ public class EndToEndTests extends SqlTestCase {
         execute("create table baz (id integer) character set klingonEncoding1");
     }
 
+    public void testAlterCharacterSet() throws Exception {
+        execute("create table foo(x integer)");
+        execute("alter table foo character set utf8");
+        ((MayflyDialect)dialect).checkDump(
+            "CREATE TABLE foo(\n" +
+            "  x INTEGER\n" +
+            ");\n\n");
+    }
+
+    public void testCollation() throws Exception {
+        /* Collation is a real-life feature which we would like to support.
+           I'm a bit reluctant to just ignore the collation (and mis-collate strings).
+           I guess the status quo mis-collates (it uses Java string operations, which
+           I guess is binary unicode order although I don't know about surrogate pairs).
+           So perhaps ignoring a specified collation would be no worse, I don't know. */
+        expectExecuteFailure("create table foo(x integer) character set utf8 collation utf8_unicode_ci",
+            "expected end of file but got collation");
+    }
+
     /**
      * @internal
-     * In {@link DataTypeTest#testCharacterStream()} we test
+     * In {@link net.sourceforge.mayfly.acceptance.StringTest#testCharacterStream()} we test
      * setting parameters with a length, and results via
      * an index.  So here we test setting parameters without
      * a length (which should work, as described there),

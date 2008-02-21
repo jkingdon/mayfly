@@ -107,12 +107,17 @@ ALTER TABLE <var>table-name</var>
 ALTER TABLE <var>table-name</var> DROP FOREIGN KEY <var>constraint-name</var>
 ALTER TABLE <var>table-name</var> DROP CONSTRAINT <var>constraint-name</var>
 ALTER TABLE <var>table-name</var> ADD <var>constraint</var>
+ALTER TABLE <var>table-name</var> ENGINE = <var>engine</var>
+ALTER TABLE <var>table-name</var> CHARACTER SET <var>character-set</var>
 </pre>
 
 where <var>column-definition</var> is as in CREATE TABLE (a column
 name and data type, roughly), and <var>constraint</var> is as in
 CREATE TABLE (that is, starts with CONSTRAINT, UNIQUE, PRIMARY KEY,
 or FOREIGN KEY).
+
+See CREATE TABLE for more on engine and character set (which are no-ops,
+for MySQL compatibility).
 
 @subsection createindex CREATE INDEX
 
@@ -168,6 +173,8 @@ CREATE TABLE <var>table-name</var> (
       ]
   }, ...
 )
+[ ENGINE = <var>engine</var> ]
+[ CHARACTER SET <var>character-set</var> ]
 </pre>
 
 For the most part, the data type is enforced fairly strictly.  Mayfly
@@ -209,6 +216,19 @@ such as based on times
 or database internal state), but seems to be the best way to make
 ALTER TABLE DROP FOREIGN KEY usable where a constraint name was not
 initially assigned.
+
+The engine may be specified as innodb or myisam (case-insensitive) and is
+for MySQL compatibility.  A future version of mayfly may choose to do
+something with the engine (for example, turning off foreign keys, or
+warning about an attempt to use them, for myisam), but currently it is
+ignored.
+
+The character set is for MySQL compatibility and is currently ignored
+(mayfly always is capable of storing general unicode characters).
+A future version of mayfly may change this, for example, to warn about
+storing data which is not compatible with the character set, or try to
+emulate MySQL in terms of being able to test code which converts a
+database from one character set to another.
 
 @subsection drop DROP TABLE
 

@@ -649,7 +649,7 @@ public class DataTypeTest extends SqlTestCase {
         byte[] data = new byte[] { 0x1, 0x3, (byte)0xff, (byte)0x90 };
         /**
             Requiring the correct length here probably wouldn't be
-            as big a deal as in the {@link #testCharacterStream}
+            as big a deal as in the {@link StringTest#testCharacterStream}
             case, although I guess there are cases (e.g. reading
             from a network stream) in which it could be inconvenient.
         */
@@ -683,7 +683,7 @@ public class DataTypeTest extends SqlTestCase {
         byte[] data = new byte[] { 0x1, 0x3, (byte)0xff, (byte)0x90 };
         /**
             Requiring the correct length here probably wouldn't be
-            as big a deal as in the {@link #testCharacterStream}
+            as big a deal as in the {@link StringTest#testCharacterStream}
             case, although I guess there are cases (e.g. reading
             from a network stream) in which it could be inconvenient.
         */
