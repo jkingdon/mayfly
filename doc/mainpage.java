@@ -96,29 +96,6 @@ description of the semantics and syntax.
 Text from -- to a newline, or between 
 <tt>/*</tt> and <tt>*</tt><tt>/</tt>, is a comment. 
 
-@subsection alter ALTER TABLE
-
-<pre>
-ALTER TABLE <var>table-name</var> DROP COLUMN <var>column-name</var>
-ALTER TABLE <var>table-name</var> ADD COLUMN <var>column-definition</var>
-ALTER TABLE <var>table-name</var> MODIFY COLUMN <var>column-definition</var>
-ALTER TABLE <var>table-name</var> 
-  CHANGE COLUMN <var>old-name</var> <var>column-definition</var>
-ALTER TABLE <var>table-name</var> DROP FOREIGN KEY <var>constraint-name</var>
-ALTER TABLE <var>table-name</var> DROP CONSTRAINT <var>constraint-name</var>
-ALTER TABLE <var>table-name</var> ADD <var>constraint</var>
-ALTER TABLE <var>table-name</var> ENGINE = <var>engine</var>
-ALTER TABLE <var>table-name</var> CHARACTER SET <var>character-set</var>
-</pre>
-
-where <var>column-definition</var> is as in CREATE TABLE (a column
-name and data type, roughly), and <var>constraint</var> is as in
-CREATE TABLE (that is, starts with CONSTRAINT, UNIQUE, PRIMARY KEY,
-or FOREIGN KEY).
-
-See CREATE TABLE for more on engine and character set (which are no-ops,
-for MySQL compatibility).
-
 @subsection createindex CREATE INDEX
 
 <pre>
@@ -243,6 +220,29 @@ Without IF EXISTS, there must be a table by that name.
 With the IF EXISTS (in either position), if there is no
 table by that name, the command does nothing, without
 an error.
+
+@subsection alter ALTER TABLE
+
+<pre>
+ALTER TABLE <var>table-name</var> DROP COLUMN <var>column-name</var>
+ALTER TABLE <var>table-name</var> ADD COLUMN <var>column-definition</var>
+ALTER TABLE <var>table-name</var> MODIFY COLUMN <var>column-definition</var>
+ALTER TABLE <var>table-name</var>
+  CHANGE COLUMN <var>old-name</var> <var>column-definition</var>
+ALTER TABLE <var>table-name</var> DROP FOREIGN KEY <var>constraint-name</var>
+ALTER TABLE <var>table-name</var> DROP CONSTRAINT <var>constraint-name</var>
+ALTER TABLE <var>table-name</var> ADD <var>constraint</var>
+ALTER TABLE <var>table-name</var> ENGINE = <var>engine</var>
+ALTER TABLE <var>table-name</var> CHARACTER SET <var>character-set</var>
+</pre>
+
+where <var>column-definition</var> is as in CREATE TABLE (a column
+name and data type, roughly), and <var>constraint</var> is as in
+CREATE TABLE (that is, starts with CONSTRAINT, UNIQUE, PRIMARY KEY,
+or FOREIGN KEY).
+
+See CREATE TABLE for more on engine and character set (which are no-ops,
+for MySQL compatibility).
 
 @subsection insert INSERT
 
@@ -374,10 +374,10 @@ but is not there now.
 The syntax of the schema commands is:
 
 <pre>
-CREATE SCHEMA name [AUTHORIZATION DBA] 
+CREATE SCHEMA <var>name</var> [AUTHORIZATION DBA]
   [ { <var>create-table-command</var> } ... ]
 
-SET SCHEMA name
+SET SCHEMA <var>name</var>
 </pre>
 
 @section transactions Transactions and Threads
@@ -385,8 +385,8 @@ SET SCHEMA name
 It is not yet safe to share a database between several threads.
 
 Furthermore, even those aspects of transactions which are
-visible from within a single thread (for example, rollback),
-and not yet implemented.
+visible from within a single thread (for example, rollback)
+are not yet implemented.
 
 @section optimize Query Optimization
 
@@ -434,3 +434,11 @@ by Judith S. Bowman, Sandra L. Emerson, and Marcy Darnovsky (third edition is fr
 One good SQL reference/tutorial web site is <a href="http://www.sqlzoo.net/" >SQLzoo</a>.
 
 */
+
+// ALTER SCHEMA <var>name</var> CHARACTER SET <var>character-set</var>
+/*The character set is ignored (see discussion of character set
+under CREATE TABLE above).
+
+*/
+
+// NEWS: Also add ALTER SCHEMA schema CHARACTER SET character-set

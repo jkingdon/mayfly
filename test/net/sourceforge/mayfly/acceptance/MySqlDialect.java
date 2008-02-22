@@ -91,7 +91,11 @@ public class MySqlDialect extends Dialect {
         // file names are.
         return true;
     }
-    
+
+    public boolean haveEngine() {
+        return true;
+    }
+
     @Override
     public boolean constraintNamesMightBeCaseSensitive() {
         // I didn't find this one in the MySQL 5.1 documentation under foreign

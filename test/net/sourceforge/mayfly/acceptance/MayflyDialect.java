@@ -95,7 +95,11 @@ public class MayflyDialect extends Dialect {
             || word.equalsIgnoreCase("index")
         ;
     }
-        
+
+    public boolean haveEngine() {
+        return true;
+    }
+
     @Override
     public boolean willReadUncommitted() {
         /** It isn't clear that there is any way to just

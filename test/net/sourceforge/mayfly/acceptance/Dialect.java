@@ -39,6 +39,10 @@ public abstract class Dialect {
         assertMessage(expectedMessage, exception);
     }
 
+    public void checkDump(String expected) {
+        // As with messages, dump formats probably differ too much to test cross-database.
+    }
+
     private void printException(SQLException exception) {
         exception.printStackTrace(System.out);
         System.out.print("SQL state was: " + exception.getSQLState() + "\n");
@@ -207,6 +211,17 @@ public abstract class Dialect {
     }
 
     public boolean maySpecifyTableDotColumnToJdbc() {
+        return false;
+    }
+
+    /**
+     * @internal
+     * Does the database have engines and character sets?
+     * (would be easy enough to separate those two things
+     * if there are any databases which have one and not
+     * the other).
+     */
+    public boolean haveEngine() {
         return false;
     }
 

@@ -59,57 +59,6 @@ public class EndToEndTests extends SqlTestCase {
             "This command is only available with update, not query");
     }
     
-    public void testTableEngine() throws Exception {
-        /* MySQL compatibility.  In the future perhaps the engine will
-           do something like give an error if you specify myisam
-           and try to use features it doesn't support, like
-           transactions or foreign keys.  For now the engine is a noop.  */
-        execute("create table countries (id integer) engine=innodb");
-        execute("create table mixedcase (id integer) engine = InnoDB");
-        execute("create table cities (id integer) engine=myisam");
-        expectExecuteFailure("create table cities (id integer) engine=DataSinkHole", 
-            "unrecognized table type DataSinkHole");
-    }
-
-    public void testAlterEngine() throws Exception {
-        execute("create table foo(x integer)");
-        execute("alter table foo engine=innodb");
-        ((MayflyDialect)dialect).checkDump(
-            "CREATE TABLE foo(\n" +
-            "  x INTEGER\n" +
-            ");\n\n");
-    }
-    
-    public void testCharacterSet() throws Exception {
-        /* Mayfly can store any unicode string.  So it seems
-         * best to ignore the character set, I guess.  I suppose
-         * if it is being set to ISO8859-15, for example, we
-         * could complain about other characters being inserted.
-         * But I'm not sure how useful that would be.  */
-        execute("create table foo (id integer) engine=InnoDB character set utf8");
-        execute("create table bar (id integer) character set utf8");
-        execute("create table baz (id integer) character set klingonEncoding1");
-    }
-
-    public void testAlterCharacterSet() throws Exception {
-        execute("create table foo(x integer)");
-        execute("alter table foo character set utf8");
-        ((MayflyDialect)dialect).checkDump(
-            "CREATE TABLE foo(\n" +
-            "  x INTEGER\n" +
-            ");\n\n");
-    }
-
-    public void testCollation() throws Exception {
-        /* Collation is a real-life feature which we would like to support.
-           I'm a bit reluctant to just ignore the collation (and mis-collate strings).
-           I guess the status quo mis-collates (it uses Java string operations, which
-           I guess is binary unicode order although I don't know about surrogate pairs).
-           So perhaps ignoring a specified collation would be no worse, I don't know. */
-        expectExecuteFailure("create table foo(x integer) character set utf8 collation utf8_unicode_ci",
-            "expected end of file but got collation");
-    }
-
     /**
      * @internal
      * In {@link net.sourceforge.mayfly.acceptance.StringTest#testCharacterStream()} we test
