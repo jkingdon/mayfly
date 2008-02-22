@@ -92,6 +92,7 @@ public class MySqlDialect extends Dialect {
         return true;
     }
 
+    @Override
     public boolean haveEngine() {
         return true;
     }

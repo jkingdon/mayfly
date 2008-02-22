@@ -789,6 +789,16 @@ public class ParserTest extends TestCase {
         }
     }
     
+    public void testAlterError() throws Exception {
+        try {
+            new Parser("alter your mommma").parseCommand();
+            fail();
+        }
+        catch (ParserException e) {
+            assertEquals("expected alter command but got your", e.getMessage());
+        }
+    }
+    
     public void testDataType() throws Exception {
         try {
             new Parser("  foobar").parseDataType();

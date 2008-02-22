@@ -83,5 +83,20 @@ public class TableOptionTest extends SqlTestCase {
         expectExecuteFailure("create table foo(x integer) character set utf8 collation utf8_unicode_ci",
             "expected end of file but got collation");
     }
+    
+    public void testAlterSchema() throws Exception {
+        if (dialect.schemasMissing()) {
+            return;
+        }
+        
+        execute(dialect.createEmptySchemaCommand("mars"));
+        String sql = "alter schema mars character set utf8";
+        if (dialect.haveEngine()) {
+            execute(sql);
+        }
+        else {
+            expectExecuteFailure(sql, "expected end of file but got character");
+        }
+    }
 
 }

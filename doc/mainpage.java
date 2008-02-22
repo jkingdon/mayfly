@@ -378,7 +378,12 @@ CREATE SCHEMA <var>name</var> [AUTHORIZATION DBA]
   [ { <var>create-table-command</var> } ... ]
 
 SET SCHEMA <var>name</var>
+
+ALTER SCHEMA <var>name</var> CHARACTER SET <var>character-set</var>
 </pre>
+
+The character set is ignored (see discussion of character set
+under CREATE TABLE above).
 
 @section transactions Transactions and Threads
 
@@ -434,11 +439,3 @@ by Judith S. Bowman, Sandra L. Emerson, and Marcy Darnovsky (third edition is fr
 One good SQL reference/tutorial web site is <a href="http://www.sqlzoo.net/" >SQLzoo</a>.
 
 */
-
-// ALTER SCHEMA <var>name</var> CHARACTER SET <var>character-set</var>
-/*The character set is ignored (see discussion of character set
-under CREATE TABLE above).
-
-*/
-
-// NEWS: Also add ALTER SCHEMA schema CHARACTER SET character-set

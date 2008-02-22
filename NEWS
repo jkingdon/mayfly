@@ -1,8 +1,9 @@
 Changes since 0.3:
 
 For MySQL compatibility, accept engine and character set in CREATE TABLE
-and ALTER TABLE (the former had existed in Mayfly for a while
-but had not been documented; the latter is new).
+and ALTER TABLE (the CREATE TABLE form had existed in Mayfly for a while
+but had not been documented; the ALTER TABLE form is new).
+Also add ALTER SCHEMA schema CHARACTER SET character-set.
 
 For better compatibility with Hypersonic, the data type IDENTITY
 now indicates an auto-increment column (that is, newly inserted

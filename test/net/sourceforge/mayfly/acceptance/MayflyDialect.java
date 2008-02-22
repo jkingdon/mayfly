@@ -30,6 +30,7 @@ public class MayflyDialect extends Dialect {
         Assert.assertEquals(expected, database.tables().size());
     }
     
+    @Override
     public void checkDump(String expected) {
         String dump = new SqlDumper().dump(database.dataStore());
         Assert.assertEquals(expected, dump);
@@ -96,6 +97,7 @@ public class MayflyDialect extends Dialect {
         ;
     }
 
+    @Override
     public boolean haveEngine() {
         return true;
     }

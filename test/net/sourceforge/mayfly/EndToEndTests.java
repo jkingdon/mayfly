@@ -3,7 +3,6 @@ package net.sourceforge.mayfly;
 import junitx.framework.ArrayAssert;
 import junitx.framework.StringAssert;
 
-import net.sourceforge.mayfly.acceptance.DataTypeTest;
 import net.sourceforge.mayfly.acceptance.MayflyDialect;
 import net.sourceforge.mayfly.acceptance.SqlTestCase;
 

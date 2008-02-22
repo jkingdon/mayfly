@@ -221,7 +221,7 @@ public class Parser {
         return command;
     }
 
-    private Command parseCommand() {
+    Command parseCommand() {
         if (currentToken.type == TokenType.KEYWORD_select) {
             return parseSelect();
         }
@@ -260,8 +260,15 @@ public class Parser {
             }
         }
         else if (consumeIfMatches(TokenType.KEYWORD_alter)) {
-            expectAndConsume(TokenType.KEYWORD_table);
-            return parseAlterTable();
+            if (consumeIfMatches(TokenType.KEYWORD_table)) {
+                return parseAlterTable();
+            }
+            else if (consumeIfMatches(TokenType.KEYWORD_schema)) {
+                return parseAlterSchema();
+            }
+            else {
+                throw new ParserException("alter command", currentToken);
+            }
         }
         else if (currentToken.type == KEYWORD_set) {
             return parseSetSchema();
@@ -501,6 +508,14 @@ public class Parser {
             schema.add(createTable);
         }
         return schema;
+    }
+    
+    private Command parseAlterSchema() {
+        consumeIdentifier();
+        expectAndConsume(TokenType.KEYWORD_character);
+        expectAndConsume(TokenType.KEYWORD_set);
+        consumeIdentifier();
+        return new NoopCommand();
     }
 
     private CreateTable parseCreateTable() {
