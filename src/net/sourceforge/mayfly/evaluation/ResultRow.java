@@ -7,6 +7,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -125,9 +126,8 @@ public class ResultRow {
     }
 
     public Cell findValueOrNull(Expression target) {
-        Expression resolved = target.resolve(this);
-        for (Iterator iter = elements.iterator(); iter.hasNext();) {
-            Element element = (Element) iter.next();
+        Expression resolved = target.resolve(this, Evaluator.NO_SUBSELECT_NEEDED);
+        for (Element element : elements) {
             if (resolved.matches(element.expression)) {
                 return element.value;
             }

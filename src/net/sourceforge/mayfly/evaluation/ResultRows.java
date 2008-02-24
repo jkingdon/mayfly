@@ -16,7 +16,7 @@ import java.util.List;
  * various things other than just a cell in
  * each column.
  */
-public class ResultRows {
+public class ResultRows implements Iterable<ResultRow> {
 
     private final ImmutableList<ResultRow> rows;
 

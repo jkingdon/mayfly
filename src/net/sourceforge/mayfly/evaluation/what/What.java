@@ -7,9 +7,9 @@ import net.sourceforge.mayfly.util.L;
 
 import java.util.Iterator;
 
-public class What {
+public class What implements Iterable<WhatElement> {
 
-    private final ImmutableList elements;
+    private final ImmutableList<WhatElement> elements;
 
     public What(WhatElement... elements) {
         this(ImmutableList.fromArray(elements));
@@ -19,7 +19,7 @@ public class What {
         this.elements = elements;
     }
 
-    public Iterator iterator() {
+    public Iterator<WhatElement> iterator() {
         return elements.iterator();
     }
 
@@ -29,17 +29,25 @@ public class What {
 
     public Selected selected(ResultRow dummyRow) {
         L result = new L();
-        for (Iterator iter = elements.iterator(); iter.hasNext();) {
-            WhatElement element = (WhatElement) iter.next();
+        for (WhatElement element : elements) {
             result.addAll(element.selected(dummyRow));
         }
-        return new Selected(result);
+        return new Selected(new ImmutableList(result));
     }
 
     public Expression lookupAlias(String name) {
-        for (Iterator iter = elements.iterator(); iter.hasNext();) {
-            WhatElement element = (WhatElement) iter.next();
+        for (WhatElement element : elements) {
             Expression result = element.lookupAlias(name);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    public Expression lookupName(String name) {
+        for (WhatElement element : elements) {
+            Expression result = element.lookupName(name);
             if (result != null) {
                 return result;
             }
@@ -52,7 +60,7 @@ public class What {
     }
 
     public WhatElement element(int zeroBasedColumn) {
-        return (WhatElement) elements.get(zeroBasedColumn);
+        return elements.get(zeroBasedColumn);
     }
 
 }

@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.expression.Concatenate;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.QuotedString;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class GroupByKeysTest extends TestCase {
@@ -14,7 +15,7 @@ public class GroupByKeysTest extends TestCase {
         GroupByKeys keys = new GroupByKeys();
         keys.add(new GroupItem(new Concatenate(new SingleColumn("a"), new QuotedString("'abc'"))));
         ResultRow row = new ResultRow().withColumn("foo", "a", NullCell.INSTANCE);
-        keys.resolve(row);
+        keys.resolve(row, Evaluator.NO_SUBSELECT_NEEDED);
         
         assertEquals(1, keys.size());
         Expression expression = keys.get(0).expression();

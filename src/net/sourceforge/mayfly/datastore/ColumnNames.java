@@ -23,11 +23,10 @@ public class ColumnNames {
     
     public static ColumnNames fromColumns(Columns columns) {
         List names = new ArrayList();
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            Column column = (Column) iter.next();
+        for (Column column : columns) {
             names.add(column.columnName());
         }
-        return new ColumnNames(new ImmutableList(names));
+        return new ColumnNames(new ImmutableList<Column>(names));
     }
 
     public static ColumnNames singleton(String column) {

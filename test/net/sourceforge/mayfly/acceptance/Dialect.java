@@ -768,11 +768,11 @@ public abstract class Dialect {
     }
     
     public boolean whereCanReferToColumnAlias() {
-        return haveColumnAlias();
+        return true;
     }
     
     public boolean canGroupByColumnAlias() {
-        return haveColumnAlias();
+        return true;
     }
 
     public boolean allowOrderByOnDelete() {

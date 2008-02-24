@@ -14,7 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class Columns {
+public class Columns implements Iterable<Column> {
     public static Columns fromColumnNames(List columnNameStrings) {
         L columnList = new L();
         for (Iterator iter = columnNameStrings.iterator(); iter.hasNext();) {

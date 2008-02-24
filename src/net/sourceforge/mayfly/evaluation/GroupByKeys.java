@@ -1,10 +1,10 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Cell;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 public class GroupByKeys {
@@ -17,17 +17,16 @@ public class GroupByKeys {
 
     List expressions() {
         List columns = new ArrayList();
-        for (Iterator iter = items.iterator(); iter.hasNext();) {
-            GroupItem item = (GroupItem) iter.next();
+        for (GroupItem item : items) {
             columns.add(item.expression());
         }
         return Collections.unmodifiableList(columns);
     }
 
-    public GroupByCells evaluate(ResultRow row) {
+    public GroupByCells evaluate(ResultRow row, Evaluator evaluator) {
         List<Cell> keyCells = new ArrayList<Cell>();
         for (GroupItem item : items) {
-            keyCells.add(item.expression().evaluate(row));
+            keyCells.add(item.expression().evaluate(row, evaluator));
         }
         return new GroupByCells(keyCells);
     }
@@ -37,8 +36,7 @@ public class GroupByKeys {
     }
 
     public boolean containsExpresion(Expression target) {
-        for (Iterator iter = items.iterator(); iter.hasNext();) {
-            GroupItem item = (GroupItem) iter.next();
+        for (GroupItem item : items) {
             if (target.sameExpression(item.expression())) {
                 return true;
             }
@@ -46,10 +44,9 @@ public class GroupByKeys {
         return false;
     }
 
-    public void resolve(ResultRow row) {
-        for (Iterator iter = items.iterator(); iter.hasNext();) {
-            GroupItem item = (GroupItem) iter.next();
-            item.resolve(row);
+    public void resolve(ResultRow row, Evaluator evaluator) {
+        for (GroupItem item : items) {
+            item.resolve(row, evaluator);
         }
     }
 

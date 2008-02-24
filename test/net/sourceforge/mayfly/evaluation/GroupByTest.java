@@ -1,5 +1,7 @@
 package net.sourceforge.mayfly.evaluation;
 
+import static net.sourceforge.mayfly.evaluation.select.Evaluator.NO_SUBSELECT_NEEDED;
+
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.LongCell;
@@ -30,7 +32,7 @@ public class GroupByTest extends TestCase {
                 )
         );
         
-        GroupedRows grouped = groupBy.makeGroupedRows(rows);
+        GroupedRows grouped = groupBy.makeGroupedRows(rows, NO_SUBSELECT_NEEDED);
         assertEquals(2, grouped.groupCount());
 
         Iterator iterator = grouped.iteratorForFirstKeys();
@@ -79,7 +81,7 @@ public class GroupByTest extends TestCase {
                 )
         );
         
-        GroupedRows grouped = groupBy.makeGroupedRows(rows);
+        GroupedRows grouped = groupBy.makeGroupedRows(rows, NO_SUBSELECT_NEEDED);
         assertEquals(3, grouped.groupCount());
 
         Iterator iterator = grouped.iteratorForFirstKeys();

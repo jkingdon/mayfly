@@ -50,6 +50,11 @@ public class AliasEvaluator extends Evaluator {
     }
     
     @Override
+    public Expression lookupName(String columnName) {
+        return what.lookupName(columnName);
+    }
+    
+    @Override
     public TableData table(FromTable table) {
         return delegate.table(table);
     }

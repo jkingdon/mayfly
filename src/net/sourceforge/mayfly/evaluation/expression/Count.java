@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.util.Collection;
@@ -25,8 +26,8 @@ public class Count extends AggregateExpression {
     }
 
     @Override
-    public Expression resolve(ResultRow row) {
-        return new Count(column.resolve(row), functionName, distinct, location);
+    public Expression resolve(ResultRow row, Evaluator evaluator) {
+        return new Count(column.resolve(row, evaluator), functionName, distinct, location);
     }
 
 }

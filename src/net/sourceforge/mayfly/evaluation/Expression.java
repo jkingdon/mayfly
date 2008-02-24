@@ -23,7 +23,7 @@ abstract public class Expression extends WhatElement {
 
     @Override
     public Selected selected(ResultRow dummyRow) {
-        return new Selected(resolve(dummyRow));
+        return new Selected(resolve(dummyRow, Evaluator.NO_SUBSELECT_NEEDED));
     }
 
     public String firstColumn() {
@@ -56,6 +56,10 @@ abstract public class Expression extends WhatElement {
     abstract public boolean sameExpression(Expression other);
 
     public Expression resolve(ResultRow row) {
+        return resolve(row, Evaluator.NO_SUBSELECT_NEEDED);
+    }
+    
+    public Expression resolve(ResultRow row, Evaluator evaluator) {
         return this;
     }
     

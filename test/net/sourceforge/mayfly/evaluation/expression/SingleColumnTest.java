@@ -7,6 +7,9 @@ import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.select.AliasEvaluator;
+import net.sourceforge.mayfly.evaluation.what.AliasedExpression;
+import net.sourceforge.mayfly.evaluation.what.What;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.MayflyAssert;
@@ -48,12 +51,27 @@ public class SingleColumnTest extends TestCase {
     
     public void testResolve() throws Exception {
         ResultRow row = new ResultRow().withColumn("foo", "x", new LongCell(7));
-        SingleColumn resolved = (SingleColumn) 
-            new SingleColumn("x", new Location(5, 20, 7, 24), new Options())
-            .resolve(row);
+        SingleColumn unresolved = new SingleColumn(
+            "x", new Location(5, 20, 7, 24), new Options());
+
+        SingleColumn resolved = (SingleColumn) unresolved.resolve(row);
         assertEquals("foo", resolved.tableOrAlias());
         assertEquals("x", resolved.columnName());
         assertEquals(20, resolved.location.startColumn);
+    }
+    
+    public void testResolveWithColumnAlias() throws Exception {
+        ResultRow row = new ResultRow().withColumn("foo", "x", new LongCell(7));
+        SingleColumn unresolved = new SingleColumn(
+            "adjusted", new Location(5, 20, 7, 24), new Options());
+        unresolved.resolve(
+            row, 
+            new AliasEvaluator(new What(
+                new AliasedExpression("adjusted", 
+                    new Plus(new SingleColumn("x"), new IntegerLiteral(5))
+                )
+            ))
+        );
     }
     
     public void testCaseSensitiveSameExression() throws Exception {

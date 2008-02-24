@@ -5,10 +5,6 @@ import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.Iterator;
 
-/**
- * @internal
- * Not yet immutable, because of {@link #add(FromElement)}
- */
 public class From {
 
     private final ImmutableList fromElements;

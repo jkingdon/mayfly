@@ -3,9 +3,8 @@ package net.sourceforge.mayfly.evaluation;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.evaluation.what.Selected;
-
-import java.util.Iterator;
 
 public class GroupBy implements Aggregator {
     
@@ -20,24 +19,23 @@ public class GroupBy implements Aggregator {
         this.having = having;
     }
     
-    public GroupedRows makeGroupedRows(ResultRows resultRows) {
+    public GroupedRows makeGroupedRows(ResultRows resultRows, Evaluator evaluator) {
         GroupedRows grouped = new GroupedRows();
-        for (Iterator iter = resultRows.iterator(); iter.hasNext();) {
-            ResultRow row = (ResultRow) iter.next();
-            grouped.add(keys, row);
+        for (ResultRow row : resultRows) {
+            grouped.add(keys, row, evaluator);
         }
         return grouped;
     }
 
-    public ResultRows group(ResultRows rows, Selected selected) {
-        ResultRows resultOfGrouping = makeGroupedRows(rows).ungroup(selected);
+    public ResultRows group(ResultRows rows, Evaluator evaluator, Selected selected) {
+        ResultRows resultOfGrouping = makeGroupedRows(rows, evaluator).ungroup(selected);
         return resultOfGrouping.select(having);
     }
     
-    public ResultRow check(ResultRow afterJoins, Selected selected) {
-        keys.resolve(afterJoins);
+    public ResultRow check(ResultRow afterJoins, Evaluator evaluator, Selected selected) {
+        keys.resolve(afterJoins, evaluator);
 
-        GroupedRows grouped = makeGroupedRows(new ResultRows(afterJoins));
+        GroupedRows grouped = makeGroupedRows(new ResultRows(afterJoins), evaluator);
         ResultRows resultOfGrouping = grouped.ungroup(selected);
 
         ResultRow afterGroupBy = resultOfGrouping.singleRow();

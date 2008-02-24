@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation.expression;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 import java.util.Collection;
@@ -24,8 +25,8 @@ public class Average extends AggregateExpression {
     }
     
     @Override
-    public Expression resolve(ResultRow row) {
-        return new Average(column.resolve(row), 
+    public Expression resolve(ResultRow row, Evaluator evaluator) {
+        return new Average(column.resolve(row, evaluator), 
             functionName, distinct, location);
     }
 

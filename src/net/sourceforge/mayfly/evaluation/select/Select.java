@@ -88,7 +88,7 @@ public class Select extends Command {
         
         where.evaluate(dummyRow, evaluator);
         where.rejectAggregates("WHERE");
-        ResultRow groupedDummyRow = groupBy.check(dummyRow, selected);
+        ResultRow groupedDummyRow = groupBy.check(dummyRow, evaluator, selected);
 
         ResultRows afterDistinct = 
             distinct(selected, new ResultRows(groupedDummyRow));
@@ -113,7 +113,7 @@ public class Select extends Command {
 
         ResultRows afterWhere = joinedRows.select(where, evaluator);
         
-        ResultRows afterGrouping = groupBy.group(afterWhere, selected);
+        ResultRows afterGrouping = groupBy.group(afterWhere, evaluator, selected);
 
         ResultRows afterDistinct = distinct(selected, afterGrouping);
 

@@ -8,10 +8,11 @@ import net.sourceforge.mayfly.evaluation.GroupByCells;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
+import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.Iterable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,21 +23,21 @@ import java.util.List;
    {@link What} which is before that expansion.
    
    It also has been resolved in the sense of
-   {@link Expression#resolve(ResultRow)}.
+   {@link Expression#resolve(ResultRow, Evaluator)}.
  */
 public class Selected implements Iterable {
 
-    private List expressions;
+    private final ImmutableList<Expression> expressions;
 
     public Selected() {
-        this(new ArrayList());
+        this(new ImmutableList<Expression>());
     }
 
     public Selected(Expression... expressions) {
-        this(new ArrayList(Arrays.asList(expressions)));
+        this(ImmutableList.fromArray(expressions));
     }
 
-    public Selected(List expressions) {
+    public Selected(ImmutableList<Expression> expressions) {
         this.expressions = expressions;
     }
 
@@ -44,24 +45,18 @@ public class Selected implements Iterable {
         return expressions.iterator();
     }
 
-    public Selected add(Expression expression) {
-        expressions.add(expression);
-        return this;
-    }
-
     public Cell evaluate(int oneBasedColumn, ResultRow row) {
         int zeroBasedColumn = oneBasedColumn - 1;
         if (zeroBasedColumn < 0 || zeroBasedColumn >= expressions.size()) {
             throw new MayflyException("no column " + oneBasedColumn);
         }
-        Expression element = (Expression) expressions.get(zeroBasedColumn);
+        Expression element = expressions.get(zeroBasedColumn);
         return row.findOrEvaluate(element);
     }
 
     public Cell evaluate(String columnName, ResultRow row) {
         Cell found = null;
-        for (int i = 0; i < expressions.size(); ++i) {
-            Expression expression = (Expression) expressions.get(i);
+        for (Expression expression : expressions) {
             if (expression.matches(columnName)) {
                 if (found != null) {
                     throw new MayflyException("ambiguous column " + columnName);
@@ -82,8 +77,7 @@ public class Selected implements Iterable {
 
     public ResultRows aggregate(ResultRows rows) {
         ResultRow result = new ResultRow();
-        for (int i = 0; i < expressions.size(); ++i) {
-            Expression expression = (Expression) expressions.get(i);
+        for (Expression expression : expressions) {
             result = result.with(expression, expression.aggregate(rows));
         }
         return new ResultRows(result);
@@ -94,7 +88,7 @@ public class Selected implements Iterable {
     }
 
     public Expression element(int index) {
-        return (Expression) expressions.get(index);
+        return expressions.get(index);
     }
 
     public GroupByCells evaluateAll(ResultRow row) {
@@ -116,7 +110,7 @@ public class Selected implements Iterable {
         ResultRow result = new ResultRow();
         for (int i = 0; i < cells.size(); ++i) {
             Cell cell = cells.get(i);
-            result = result.with((Expression) expressions.get(i), cell);
+            result = result.with(expressions.get(i), cell);
         }
         return result;
     }

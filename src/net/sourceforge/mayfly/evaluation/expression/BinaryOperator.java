@@ -77,7 +77,7 @@ abstract public class BinaryOperator extends Expression {
     }
     
     @Override
-    public abstract Expression resolve(ResultRow row);
+    public abstract Expression resolve(ResultRow row, Evaluator evaluator);
     
     @Override
     public void check(ResultRow row) {

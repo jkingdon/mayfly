@@ -24,6 +24,10 @@ abstract public class WhatElement {
     public Expression lookupAlias(String name) {
         return null;
     }
+    
+    public Expression lookupName(String name) {
+        return null;
+    }
 
     public String debugName() {
         return displayName();

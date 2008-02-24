@@ -1,13 +1,14 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
 import java.util.Iterator;
 
 public class NoGroupBy implements Aggregator {
 
-    public ResultRows group(ResultRows rows, Selected selected) {
+    public ResultRows group(ResultRows rows, Evaluator evaluator, Selected selected) {
         if (isAggregate(selected)) {
             return selected.aggregate(rows);
         }
@@ -35,7 +36,7 @@ public class NoGroupBy implements Aggregator {
         return firstAggregate != null;
     }
 
-    public ResultRow check(ResultRow dummyRow, Selected selected) {
+    public ResultRow check(ResultRow dummyRow, Evaluator evaluator, Selected selected) {
         if (isAggregate(selected)) {
             return new ResultRow();
         }

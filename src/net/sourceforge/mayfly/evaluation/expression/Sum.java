@@ -5,6 +5,7 @@ import java.util.Collection;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 public class Sum extends AggregateExpression {
@@ -24,8 +25,8 @@ public class Sum extends AggregateExpression {
     }
 
     @Override
-    public Expression resolve(ResultRow row) {
-        return new Sum(column.resolve(row), functionName, distinct, location);
+    public Expression resolve(ResultRow row, Evaluator evaluator) {
+        return new Sum(column.resolve(row, evaluator), functionName, distinct, location);
     }
 
 }

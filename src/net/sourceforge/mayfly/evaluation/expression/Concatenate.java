@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.StringCell;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public class Concatenate extends BinaryOperator {
 
@@ -17,9 +18,9 @@ public class Concatenate extends BinaryOperator {
     }
     
     @Override
-    public Expression resolve(ResultRow row) {
+    public Expression resolve(ResultRow row, Evaluator evaluator) {
         return new Concatenate(
-            left.resolve(row), right.resolve(row));
+            left.resolve(row, evaluator), right.resolve(row, evaluator));
     }
 
 }

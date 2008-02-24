@@ -51,5 +51,9 @@ public abstract class Evaluator {
     public Options options() {
         return new Options();
     }
+
+    public Expression lookupName(String columnName) {
+        return null;
+    }
     
 }

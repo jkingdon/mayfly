@@ -125,8 +125,12 @@ public class SingleColumn extends Expression {
     }
     
     @Override
-    public Expression resolve(ResultRow row) {
+    public Expression resolve(ResultRow row, Evaluator evaluator) {
         if (tableOrAlias == null) {
+            Expression lookedUp = evaluator.lookupName(columnName);
+            if (lookedUp != null) {
+                return lookedUp;
+            }
             SingleColumn column = lookup(row);
 //            if (column.tableOrAlias() == null) {
 //                throw new NullPointerException();

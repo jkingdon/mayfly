@@ -2,11 +2,12 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public class GroupItem {
 
     /**
-     * Not yet immutable, because of {@link #resolve(ResultRow)}.
+     * Not yet immutable, because of {@link #resolve(ResultRow, Evaluator)}.
      */
     private Expression expression;
 
@@ -28,8 +29,8 @@ public class GroupItem {
         return expression;
     }
 
-    public void resolve(ResultRow row) {
-        expression = expression.resolve(row);
+    public void resolve(ResultRow row, Evaluator evaluator) {
+        expression = expression.resolve(row, evaluator);
     }
 
 }

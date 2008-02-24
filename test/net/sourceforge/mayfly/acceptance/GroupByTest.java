@@ -12,11 +12,14 @@ public class GroupByTest extends SqlTestCase {
         assertResultList(new String[] { " 'Dickens' " }, query("select author from books group by author"));
         assertResultList(new String[] { " 'Dickens' ", " 'Dickens' " }, query("select author from books"));
 
-        if (!dialect.canGroupByColumnAlias()) {
-            return;
+        String groupByColumnAlias = "select author as dude from books group by dude";
+        if (dialect.canGroupByColumnAlias()) {
+            assertResultList(new String[] { " 'Dickens' " }, 
+                query(groupByColumnAlias));
         }
-        assertResultList(new String[] { " 'Dickens' " }, 
-            query("select author as dude from books group by dude"));
+        else {
+            expectQueryFailure(groupByColumnAlias, "no column dude");
+        }
     }
     
     public void testGroupByExpression() throws Exception {
@@ -43,12 +46,16 @@ public class GroupByTest extends SqlTestCase {
                 query(needsSmartExpressionComparator));
         }
 
-        if (!dialect.canGroupByColumnAlias()) {
-            return;
+        String groupByColumnAlias = 
+            "select birthdate + age as deathdate " +
+            "from people group by deathdate";
+        if (dialect.canGroupByColumnAlias()) {
+            assertResultList(new String[] { " 1747 " }, 
+                query(groupByColumnAlias));
         }
-        assertResultList(new String[] { " 1747 " }, 
-            query("select birthdate + age as deathdate " +
-                "from people group by deathdate"));
+        else {
+            expectQueryFailure(groupByColumnAlias, "no column deathdate");
+        }
     }
 
     public void testGroupByExpressionError() throws Exception {

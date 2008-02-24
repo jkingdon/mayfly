@@ -9,8 +9,7 @@ import net.sourceforge.mayfly.evaluation.expression.Average;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
-
-import java.util.Arrays;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 public class GroupedRowsTest extends TestCase {
     
@@ -82,7 +81,7 @@ public class GroupedRowsTest extends TestCase {
         
         Average averageExpression = new Average(new SingleColumn("score"), "avg", false);
         ResultRows rows = groupedRows.ungroup(
-            new Selected(Arrays.asList(new WhatElement[] {
+            new Selected(ImmutableList.fromArray(new WhatElement[] {
                 new SingleColumn("player"),
                 new SingleColumn("year"),
                 averageExpression

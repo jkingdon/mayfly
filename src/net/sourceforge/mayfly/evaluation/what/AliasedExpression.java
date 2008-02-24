@@ -73,4 +73,9 @@ public class AliasedExpression extends Expression {
         return matches(name) ? expression : null;
     }
 
+    @Override
+    public Expression lookupName(String name) {
+        return matches(name) ? this : null;
+    }
+
 }
