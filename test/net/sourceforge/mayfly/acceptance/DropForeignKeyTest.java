@@ -220,8 +220,8 @@ public class DropForeignKeyTest extends SqlTestCase {
             dialect.wishThisWereTrue() ?
                 /* The wording here is awkward, but it is useful to know
                    which column, right? */
-                "foreign key violation: column a references non-present " +
-                    "value 7 in table refd, column id" :
+                "foreign key violation: attempt in table refr, column a " +
+                    "to reference non-present value 7 in table refd, column id" :
                 "foreign key violation: refd has no id 7");
     }
     

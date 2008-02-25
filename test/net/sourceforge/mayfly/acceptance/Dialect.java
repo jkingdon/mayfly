@@ -757,16 +757,6 @@ public abstract class Dialect {
         return false;
     }
 
-    /**
-     * @internal
-     * Slightly misnamed; it applies to the column alias cases
-     * which Mayfly can't handle.  Things like {@link ResultTest#testAs()}
-     * just use select a AS b unconditionally.
-     */
-    public boolean haveColumnAlias() {
-        return wishThisWereTrue();
-    }
-    
     public boolean whereCanReferToColumnAlias() {
         return true;
     }
