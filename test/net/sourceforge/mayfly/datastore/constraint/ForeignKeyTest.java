@@ -37,7 +37,9 @@ public class ForeignKeyTest extends TestCase {
             fail();
         }
         catch (MayflyException e) {
-            assertEquals("foreign key violation: bar has no id 55", e.getMessage());
+            assertEquals("foreign key violation: attempt in table foo, column bar_id " +
+                "to reference non-present value 55 in table bar, column id", 
+                e.getMessage());
         }
     }
 

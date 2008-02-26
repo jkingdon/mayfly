@@ -136,7 +136,8 @@ public class EndToEndTests extends SqlTestCase {
         prefer not to use constraint names).  */
         expectExecuteFailure(
             "  insert into cities(name, country) values ('Dhaka', 3)  ",
-            "foreign key violation: countries has no id 3",
+            "foreign key violation: attempt in table cities, column country " +
+            "to reference non-present value 3 in table countries, column id",
             1, 3/*54*/, 1, 56/*55*/);
     }
 

@@ -156,10 +156,12 @@ public class ForeignKey extends Constraint {
 
     private void throwInsertException(String schema, Cell value, Location location) {
         String targetTableName = targetTable.displayName(schema);
-        throw new MayflyException("foreign key violation: " + targetTableName + 
-            " has no " +
-            targetColumn +
-            " " + value.asBriefString(),
+        throw new MayflyException("foreign key violation: attempt in table " + 
+            referencerDisplayName(schema) + ", column " + referencerColumn +
+            " to reference non-present value " + value.asBriefString() +
+            " in table " + targetTableName + 
+            ", column " +
+            targetColumn,
             location);
     }
 
@@ -199,10 +201,14 @@ public class ForeignKey extends Constraint {
             throw new MayflyException(
                 "cannot drop " + table +
                 " because a foreign key in table " + 
-                TableReference.formatTableName(schema, referencerSchema, referencerTable) +
+                referencerDisplayName(schema) +
                 " refers to it"
             );
         }
+    }
+
+    private String referencerDisplayName(String schema) {
+        return TableReference.formatTableName(schema, referencerSchema, referencerTable);
     }
 
     private boolean tableIsMyTarget(String schema, String table) {

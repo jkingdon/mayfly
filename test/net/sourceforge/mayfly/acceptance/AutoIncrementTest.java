@@ -177,7 +177,8 @@ public class AutoIncrementTest extends SqlTestCase {
         String tryAgain = "insert into foo(y) values(77)";
         if (dialect.wishThisWereTrue()) {
             execute(tryAgain);
-            assertResultSet(new String[] { 
+            assertResultSet(
+                new String[] { 
                     " 1, 5 ",
                     " 2, 77 "
                 }, 

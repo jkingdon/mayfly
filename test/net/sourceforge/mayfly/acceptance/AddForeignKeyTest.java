@@ -12,13 +12,21 @@ public class AddForeignKeyTest extends SqlTestCase {
         execute("insert into foo values(5)");
 
         String add = "alter table bar add foreign key (foo_id) references foo(id)";
-        expectExecuteFailure(add, "foreign key violation: foo has no id 6");
+        expectExecuteFailure(add, 
+            dialect.wishThisWereTrue() ?
+                "attempt to add foreign key from table bar, column foo_id " +
+                "where existing value 6 references non-present value " +
+                "in table foo, column id, " :
+
+                "foreign key violation: attempt in table bar, column foo_id " +
+                "to reference non-present value 6 in table foo, column id");
         
         execute("delete from bar where foo_id = 6");
         execute(add);
         
         expectExecuteFailure("insert into bar values(6)", 
-            "foreign key violation: foo has no id 6");
+            "foreign key violation: attempt in table bar, column foo_id " +
+            "to reference non-present value 6 in table foo, column id");
     }
     
     public void testConstraintNames() throws Exception {

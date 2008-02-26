@@ -14,9 +14,11 @@ public class ForeignKeyTest extends SqlTestCase {
         execute("insert into cities values ('Perth', 1)");
 
         expectExecuteFailure("insert into cities values ('Dhaka', 3)",
-            "foreign key violation: countries has no id 3");
+            "foreign key violation: attempt in table cities, column country " +
+            "to reference non-present value 3 in table countries, column id");
         expectExecuteFailure("insert into cities(name, country) values ('Dhaka', 3)", 
-            "foreign key violation: countries has no id 3");
+            "foreign key violation: attempt in table cities, column country " +
+            "to reference non-present value 3 in table countries, column id");
 
         expectExecuteFailure("delete from countries",
             "foreign key violation: table cities refers to id 1 in countries");
@@ -54,7 +56,10 @@ public class ForeignKeyTest extends SqlTestCase {
         execute("create table foo (id integer primary key)");
         execute("insert into foo(id) values(569)");
         expectExecuteFailure("insert into jupiter.bar(name, foo_id) values ('x', 569)",
-            "foreign key violation: foo has no id 569");
+            "foreign key violation: attempt in table " +
+            (dialect.wishThisWereTrue() ? "jupiter.bar" : "bar") +
+            ", column foo_id " +
+            "to reference non-present value 569 in table foo, column id");
         execute("insert into jupiter.bar(name, foo_id) values ('x', 1899)");
         
         String createBaz = "create table baz (name varchar(255), foo_id integer," +
@@ -63,7 +68,8 @@ public class ForeignKeyTest extends SqlTestCase {
         if (dialect.foreignKeyCanReferToAnotherSchema()) {
             execute(createBaz);
             expectExecuteFailure("insert into baz(name, foo_id) values ('x', 569)",
-                "foreign key violation: jupiter.foo has no id 569");
+                "foreign key violation: attempt in table baz, column foo_id " +
+                "to reference non-present value 569 in table jupiter.foo, column id");
             execute("insert into baz(name, foo_id) values ('x', 1899)");
         }
         else {
@@ -84,10 +90,9 @@ public class ForeignKeyTest extends SqlTestCase {
 
         execute("update cities set country = 2");
 
-        /* Most databases mention "cities" in this message.  But is it always clear
-           from the sql?  If so, putting it in the message is clutter.  */
         expectExecuteFailure("update cities set country = 4", 
-            "foreign key violation: countries has no id 4");
+            "foreign key violation: attempt in table cities, column country " +
+            "to reference non-present value 4 in table countries, column id");
         assertResultSet(new String[] { " 'Berlin', 'West Germany' " },
             query("select cities.name, countries.name from cities " +
                 "inner join countries on cities.country = countries.id")
@@ -373,7 +378,8 @@ public class ForeignKeyTest extends SqlTestCase {
         execute("insert into person (id) values(1)");
         execute("insert into person (id, mother) values(2, 1)");
         expectExecuteFailure("insert into person (id, mother) values(3, 7)",
-            "foreign key violation: person has no id 7");
+            "foreign key violation: attempt in table person, column mother " +
+            "to reference non-present value 7 in table person, column id");
         
         execute("insert into person(id, mother) values(10, 10)");
         /* Are there extra self-reference cases?  Does the

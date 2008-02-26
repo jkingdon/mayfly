@@ -88,8 +88,7 @@ public class Constraints implements Iterable<Constraint> {
     }
 
     public void checkDropTable(DataStore store, String schema, String table) {
-        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
-            Constraint constraint = (Constraint) iter.next();
+        for (Constraint constraint : constraints) {
             constraint.checkDropTable(store, schema, table);
         }
     }
@@ -103,8 +102,7 @@ public class Constraints implements Iterable<Constraint> {
     private ImmutableList filterConstraintsForDropColumn(
         TableReference table, String column) {
         List newConstraints = new ArrayList();
-        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
-            Constraint constraint = (Constraint) iter.next();
+        for (Constraint constraint : constraints) {
             if (constraint.checkDropColumn(table, column)) {
                 newConstraints.add(constraint);
             }

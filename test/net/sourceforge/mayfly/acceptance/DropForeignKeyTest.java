@@ -18,7 +18,9 @@ public class DropForeignKeyTest extends SqlTestCase {
 
         String countrylessCity = "insert into cities values ('Monaco', 99)";
         expectExecuteFailure(countrylessCity,
-            "foreign key violation: countries has no id 99");
+            "foreign key violation: attempt in " +
+            "table cities, column country to reference " +
+            "non-present value 99 in table countries, column id");
         
         String dropForeignKey = 
             "alter table cities drop foreign key city_country";
@@ -44,7 +46,9 @@ public class DropForeignKeyTest extends SqlTestCase {
 
         String countrylessCity = "insert into cities values ('Monaco', 99)";
         expectExecuteFailure(countrylessCity,
-            "foreign key violation: countries has no id 99");
+            "foreign key violation: attempt in " +
+            "table cities, column country to reference " +
+            "non-present value 99 in table countries, column id");
         
         String dropConstraint = 
             "alter table cities drop constraint city_country";
@@ -122,16 +126,19 @@ public class DropForeignKeyTest extends SqlTestCase {
         String insertCityWithoutColonialPower = 
             "insert into cities values('Delhi', 2, 99)";
         expectExecuteFailure(insertCityWithoutColonialPower, 
-            "foreign key violation: countries has no id 99");
+            "foreign key violation: attempt in table cities, column colonial_power " +
+            "to reference non-present value 99 in table countries, column id");
         String insertCityWithoutCountry = 
             "insert into cities values('Monaco', 7, 1)";
         expectExecuteFailure(insertCityWithoutCountry, 
-            "foreign key violation: countries has no id 7");
+            "foreign key violation: attempt in table cities, column country " +
+            "to reference non-present value 7 in table countries, column id");
         
         execute("alter table cities drop foreign key colonial_constraint");
         execute(insertCityWithoutColonialPower);
         expectExecuteFailure(insertCityWithoutCountry, 
-            "foreign key violation: countries has no id 7");
+            "foreign key violation: attempt in table cities, column country " +
+            "to reference non-present value 7 in table countries, column id");
     }
     
     public void testDropUnnamedForeignKey() throws Exception {
@@ -217,12 +224,8 @@ public class DropForeignKeyTest extends SqlTestCase {
         execute("insert into refd(id) values(5)");
         execute("insert into refr(a,b,c) values(5,7,9)");
         expectExecuteFailure("insert into refr(a,b,c) values(7,5,9)",
-            dialect.wishThisWereTrue() ?
-                /* The wording here is awkward, but it is useful to know
-                   which column, right? */
-                "foreign key violation: attempt in table refr, column a " +
-                    "to reference non-present value 7 in table refd, column id" :
-                "foreign key violation: refd has no id 7");
+            "foreign key violation: attempt in table refr, column a " +
+            "to reference non-present value 7 in table refd, column id");
     }
     
 }
