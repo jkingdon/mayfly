@@ -299,6 +299,10 @@ public abstract class Dialect {
     public boolean canHaveHavingWithoutGroupBy() {
         return false;
     }
+    
+    public boolean havingCanReferToEnclosingRow() {
+        return true;
+    }
 
     public boolean nullSortsLower() {
         // I don't know whether there are arguments pro or con on this.

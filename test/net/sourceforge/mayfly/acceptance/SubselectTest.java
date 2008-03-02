@@ -155,7 +155,14 @@ public class SubselectTest extends SqlTestCase {
                     "(select c from carrots where c = ac))")
         );
     }
-    
+
+    /**
+     * @internal
+     * This is where the HAVING contains a subselect.
+     * Another case is where a HAVINGS refers to an enclosing row, in a
+     * correleated subselect situation, as in
+     * {@link GroupByTest#testHavingAndCorrelatedSubselect()}.
+     */
     public void testHaving() throws Exception {
         // TODO: subselect in HAVING condition
     }

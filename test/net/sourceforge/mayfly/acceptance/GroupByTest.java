@@ -509,6 +509,40 @@ public class GroupByTest extends SqlTestCase {
             "no column b",
             1, 37, 1, 38);
     }
+    
+    public void testHavingAndCorrelatedSubselect() throws Exception {
+        /* Sorry I didn't think up a better motivated example, but
+           the point here is that a HAVING condition can refer to
+           the row of an exclosing select, in a correlated subselect
+           situation. */
+        execute("create table foo(a integer, b integer)");
+        execute("create table bar(alpha varchar(255), beta integer)");
+        execute("insert into foo(a, b) values(4, 6)");
+        execute("insert into foo(a, b) values(3, 6)");
+        execute("insert into foo(a, b) values(2, 6)");
+        execute("insert into bar(alpha, beta) values('tiger', 6)");
+        execute("insert into bar(alpha, beta) values('lion', 6)");
+        execute("insert into foo(a, b) values(4, 7)");
+        execute("insert into foo(a, b) values(3, 7)");
+        execute("insert into foo(a, b) values(2, 7)");
+        execute("insert into bar(alpha, beta) values('petunia', 7)");
+        execute("insert into bar(alpha, beta) values('tomato', 7)");
+        execute("insert into bar(alpha, beta) values('tobacco', 7)");
+        
+        String sql = "select a, b from foo where a > " +
+            "(select count(*) from bar group by beta having beta = b)";
+        if (dialect.havingCanReferToEnclosingRow()) {
+            assertResultSet(new String[] {
+                " 3, 6 ",
+                " 4, 6 ",
+                " 4, 7 "},
+                query(sql)
+            );
+        }
+        else {
+            expectExecuteFailure(sql, "no column b");
+        }
+    }
 
     public void testAliasesAndExpression() throws Exception {
         if (!dialect.canGroupByExpression()) {

@@ -29,7 +29,7 @@ public class GroupBy implements Aggregator {
 
     public ResultRows group(ResultRows rows, Evaluator evaluator, Selected selected) {
         ResultRows resultOfGrouping = makeGroupedRows(rows, evaluator).ungroup(selected);
-        return resultOfGrouping.select(having);
+        return resultOfGrouping.select(having, evaluator);
     }
     
     public ResultRow check(ResultRow afterJoins, Evaluator evaluator, Selected selected) {
@@ -39,13 +39,14 @@ public class GroupBy implements Aggregator {
         ResultRows resultOfGrouping = grouped.ungroup(selected);
 
         ResultRow afterGroupBy = resultOfGrouping.singleRow();
-        checkHaving(afterJoins, afterGroupBy);
+        checkHaving(afterJoins, afterGroupBy, evaluator);
         return afterGroupBy;
     }
 
-    private void checkHaving(ResultRow afterJoins, ResultRow afterGroupBy) {
+    private void checkHaving(ResultRow afterJoins, ResultRow afterGroupBy,
+        Evaluator evaluator) {
         try {
-            having.evaluate(afterGroupBy);
+            having.evaluate(afterGroupBy, evaluator);
         }
         catch (NoColumn doesNotSurviveGroupBy) {
             if (having.isAggregate()) {
@@ -53,7 +54,7 @@ public class GroupBy implements Aggregator {
                     "aggregates in HAVING not yet fully implemented");
             }
 
-            having.evaluate(afterJoins);
+            having.evaluate(afterJoins, evaluator);
             throw new MayflyException(doesNotSurviveGroupBy.displayName() + 
                 " is not aggregate or mentioned in GROUP BY",
                 having.location());

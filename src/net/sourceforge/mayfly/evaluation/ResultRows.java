@@ -58,8 +58,7 @@ public class ResultRows implements Iterable<ResultRow> {
 
     public ResultRows select(Condition condition, Evaluator evaluator) {
         ResultRows selected = new ResultRows();
-        for (Iterator iter = rows.iterator(); iter.hasNext();) {
-            ResultRow row = (ResultRow) iter.next();
+        for (ResultRow row : rows) {
             if (condition.evaluate(row, evaluator)) {
                 selected = selected.with(row);
             }

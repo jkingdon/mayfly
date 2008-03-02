@@ -145,6 +145,11 @@ public class HypersonicDialect extends Dialect {
     }
     
     @Override
+    public boolean havingCanReferToEnclosingRow() {
+        return false;
+    }
+    
+    @Override
     public boolean notRequiresBoolean() {
         return false;
     }
