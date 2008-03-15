@@ -74,6 +74,7 @@ public class TableData {
         Row newRow = tuple.asRow();
         
         constraints.check(rows, newRow, table, values.location);
+        indexes.check(rows, newRow, table, values.location);
         checker.checkInsert(constraints, newRow);
 
         return new TableData(

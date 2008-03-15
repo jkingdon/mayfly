@@ -1,6 +1,7 @@
 package net.sourceforge.mayfly.datastore;
 
 import net.sourceforge.mayfly.MayflyException;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
 
@@ -10,7 +11,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-public class Indexes {
+public class Indexes implements Iterable<Index> {
 
     private final ImmutableList<Index> indexes;
     
@@ -57,14 +58,13 @@ public class Indexes {
         return result;
     }
 
-    public Iterator iterator() {
+    public Iterator<Index> iterator() {
         return indexes.iterator();
     }
 
     public Indexes renameColumn(String oldName, String newName) {
         List result = new ArrayList();
-        for (Iterator iter = indexes.iterator(); iter.hasNext();) {
-            Index index = (Index) iter.next();
+        for (Index index : indexes) {
             result.add(index.renameColumn(oldName, newName));
         }
         return new Indexes(new ImmutableList(result));
@@ -72,6 +72,12 @@ public class Indexes {
 
     public int indexCount() {
         return indexes.size();
+    }
+
+    public void check(Rows rows, Row newRow, TableReference table, Location location) {
+        for (Index index : indexes) {
+            index.check(rows, newRow, table, location);
+        }
     }
 
 }

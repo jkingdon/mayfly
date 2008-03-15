@@ -19,23 +19,23 @@ import java.util.List;
  * So far there hasn't been a big need for that, but maybe it would
  * make things cleaner (in terms of where to do various checks).
  */
-public class ColumnNames {
+public class ColumnNames implements Iterable<String> {
     
     public static ColumnNames fromColumns(Columns columns) {
         List names = new ArrayList();
         for (Column column : columns) {
             names.add(column.columnName());
         }
-        return new ColumnNames(new ImmutableList<Column>(names));
+        return new ColumnNames(new ImmutableList<String>(names));
     }
 
     public static ColumnNames singleton(String column) {
         return new ColumnNames(ImmutableList.singleton(column));
     }
 
-    private final ImmutableList names;
+    private final ImmutableList<String> names;
 
-    public ColumnNames(ImmutableList names) {
+    public ColumnNames(ImmutableList<String> names) {
         this.names = names;
     }
 
@@ -43,17 +43,16 @@ public class ColumnNames {
         return names.size();
     }
 
-    public Iterator iterator() {
+    public Iterator<String> iterator() {
         return names.iterator();
     }
     
     public String name(int index) {
-        return (String) names.get(index);
+        return names.get(index);
     }
 
     public boolean hasColumn(String target) {
-        for (int i = 0; i < names.size(); ++i) {
-            String candidate = (String) names.get(i);
+        for (String candidate : names) {
             if (candidate.equalsIgnoreCase(target)) {
                 return true;
             }
@@ -63,8 +62,7 @@ public class ColumnNames {
 
     public Columns resolve(Columns tableColumns) {
         List resolvedColumns = new ArrayList();
-        for (Iterator iter = iterator(); iter.hasNext();) {
-            String columnName = (String) iter.next();
+        for (String columnName : names) {
             Column column = tableColumns.columnFromName(columnName);
             resolvedColumns.add(column);
         }
@@ -72,9 +70,9 @@ public class ColumnNames {
     }
 
     public void dump(Writer out) throws IOException {
-        Iterator iter = iterator();
+        Iterator<String> iter = iterator();
         while (iter.hasNext()) {
-            String column = (String) iter.next();
+            String column = iter.next();
             out.write(column);
             if (iter.hasNext()) {
                 out.write(", ");
@@ -84,8 +82,7 @@ public class ColumnNames {
 
     public ColumnNames renameColumn(String oldName, String newName) {
         List result = new ArrayList();
-        for (Iterator iter = iterator(); iter.hasNext();) {
-            String columnName = (String) iter.next();
+        for (String columnName : names) {
             if (columnName.equalsIgnoreCase(oldName)) {
                 result.add(newName);
             }

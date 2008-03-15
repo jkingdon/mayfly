@@ -62,16 +62,14 @@ public class Constraints implements Iterable<Constraint> {
      * {@link Column#coerce(net.sourceforge.mayfly.datastore.Cell, Location)}
      */
     public void check(Rows rows, Row newRow, TableReference table, Location location) {
-        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
-            Constraint constraint = (Constraint) iter.next();
+        for (Constraint constraint : constraints) {
             constraint.check(rows, newRow, table, location);
         }
     }
 
     public void checkInsert(
         DataStore store, String schema, String table, Row proposedRow, Location location) {
-        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
-            Constraint constraint = (Constraint) iter.next();
+        for (Constraint constraint : constraints) {
             constraint.checkInsert(store, schema, table, proposedRow, location);
         }
     }
@@ -79,8 +77,7 @@ public class Constraints implements Iterable<Constraint> {
     public DataStore checkDelete(
         DataStore store, String schema, String table, 
         Row rowToDelete, Row replacementRow) {
-        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
-            Constraint constraint = (Constraint) iter.next();
+        for (Constraint constraint : constraints) {
             store = constraint.checkDelete(store, schema, table, 
                 rowToDelete, replacementRow);
         }

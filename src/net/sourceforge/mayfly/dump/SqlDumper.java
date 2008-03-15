@@ -293,10 +293,13 @@ public class SqlDumper {
 
     private void indexes(String tableName, Indexes indexes, Writer out) 
     throws IOException {
-        Iterator iterator = indexes.iterator();
-        while (iterator.hasNext()) {
-            Index index = (Index) iterator.next();
-            out.write("CREATE INDEX ");
+        for (Index index : indexes) {
+            out.write("CREATE ");
+            if (index.unique) {
+                out.write("UNIQUE ");
+            }
+            out.write("INDEX ");
+
             if (index.hasName()) {
                 identifier(index.name(), out);
             }

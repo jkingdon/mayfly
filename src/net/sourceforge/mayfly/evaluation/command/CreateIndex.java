@@ -22,29 +22,15 @@ public class CreateIndex extends Command {
 
     @Override
     public UpdateStore update(DataStore store, String currentSchema) {
-        DataStore withConstraint = addUniqueConstraint(store, currentSchema);
-        DataStore newStore = addIndex(withConstraint, currentSchema);
+        DataStore newStore = addIndex(store, currentSchema);
         return new UpdateStore(newStore, 0);
     }
 
     private DataStore addIndex(DataStore store, String currentSchema) {
-        Index index = new Index(indexName, columns);
+        Index index = new Index(indexName, columns, unique);
         TableReference reference = table.resolve(store, currentSchema, null);
+        index.checkExistingRows(store, reference);
         return store.addIndex(reference, index);
-    }
-
-    private DataStore addUniqueConstraint(
-        DataStore store, String currentSchema) {
-        if (unique) {
-            UnresolvedUniqueConstraint constraint = 
-                new UnresolvedUniqueConstraint(columns, null);
-            return new AddConstraint(table, constraint)
-                .update(store, currentSchema)
-                .store();
-        }
-        else {
-            return store;
-        }
     }
 
 }

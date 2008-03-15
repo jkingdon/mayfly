@@ -230,12 +230,16 @@ public class SqlDumperTest extends TestCase {
         database.execute("create table foo(a integer, b integer, c integer)");
         database.execute("create unique index x on foo(b, c)");
 
-        /* We consistently apply the rule that indexes are one thing 
-           and constraints another.  That is, dump them separately. */
+        /* Need to distinguish a unique index from an index and a constraint
+           so that DROP INDEX can drop the constraint for the former but not
+           for the latter. */
         assertEquals(
-            "CREATE TABLE foo(\n  a INTEGER,\n  b INTEGER,\n  c INTEGER,\n" +
-                "  UNIQUE(b, c)\n);\n" +
-                "CREATE INDEX x ON foo(b, c);\n\n",
+            "CREATE TABLE foo(\n" +
+            "  a INTEGER,\n" +
+            "  b INTEGER,\n" +
+            "  c INTEGER\n" +
+            ");\n" +
+            "CREATE UNIQUE INDEX x ON foo(b, c);\n\n",
             dump());
         
         checkRoundTrip(database.dataStore());
