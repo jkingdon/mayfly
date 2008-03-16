@@ -10,14 +10,16 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.util.ImmutableList;
-import net.sourceforge.mayfly.util.Iterable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 /**
-   Selected is a list of expressions.  In the case of
+   @internal
+   Selected is a list of expressions.
+   
+   In the case of
    SELECT a, b, foo.* FROM . . .
    it is what we get after we expand the *'s, unlike
    {@link What} which is before that expansion.
@@ -25,7 +27,7 @@ import java.util.List;
    It also has been resolved in the sense of
    {@link Expression#resolve(ResultRow, Evaluator)}.
  */
-public class Selected implements Iterable {
+public class Selected implements Iterable<Expression> {
 
     private final ImmutableList<Expression> expressions;
 
@@ -41,7 +43,7 @@ public class Selected implements Iterable {
         this.expressions = expressions;
     }
 
-    public Iterator iterator() {
+    public Iterator<Expression> iterator() {
         return expressions.iterator();
     }
 

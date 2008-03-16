@@ -108,9 +108,9 @@ public class JdbcDriver implements Driver {
     }
 
     /**
-     * Destroy databases managed by {@link JdbcDriver}.
+     * Destroy databases.
      * 
-     * That is, destroy
+     * Destroy databases managed by {@link JdbcDriver}. That is, destroy
      * all databases which have been created with {@link #create(DataStore)},
      * plus the default database (the one with url <tt>jdbc:mayfly:</tt>).</p>
      * 

@@ -4,6 +4,8 @@ import junit.framework.TestCase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 public class LTest extends TestCase {
@@ -45,6 +47,18 @@ public class LTest extends TestCase {
                                                 .append("b")
                                                 .append("c")))
         );
+    }
+
+    class IterableCollection implements Iterable {
+        private Collection c;
+
+        public IterableCollection(Collection c) {
+            this.c = c;
+        }
+
+        public Iterator iterator() {
+            return c.iterator();
+        }
     }
 
     public void testIndexToElementMap() throws Exception {
