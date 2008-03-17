@@ -67,7 +67,7 @@ public class ImmutableMap<K, V> implements Map<K, V> {
         return delegate.containsValue(value);
     }
 
-    public Set entrySet() {
+    public Set<Map.Entry<K, V>> entrySet() {
         return delegate.entrySet();
     }
 
@@ -89,7 +89,7 @@ public class ImmutableMap<K, V> implements Map<K, V> {
         return delegate.isEmpty();
     }
 
-    public Set keySet() {
+    public Set<K> keySet() {
         return delegate.keySet();
     }
 
@@ -109,7 +109,7 @@ public class ImmutableMap<K, V> implements Map<K, V> {
         return delegate.size();
     }
 
-    public Collection values() {
+    public Collection<V> values() {
         return delegate.values();
     }
 

@@ -331,4 +331,9 @@ public class PostgresDialect extends Dialect {
         return false;
     }
 
+    @Override
+    public boolean haveDropIndexOn() {
+        return false;
+    }
+
 }

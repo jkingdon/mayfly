@@ -313,5 +313,10 @@ public class DerbyDialect extends Dialect {
     public boolean callJavaMethodAsStoredProcedure() {
         return false;
     }
+    
+    @Override
+    public boolean haveDropIndexOn() {
+        return false;
+    }
 
 }

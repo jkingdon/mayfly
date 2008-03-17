@@ -273,4 +273,12 @@ public class DataStore {
         );
     }
 
+    public DataStore dropIndex(String schema, String indexName) {
+        Schema existing = schema(schema);
+        return replace(
+            schema, 
+            existing.dropIndex(indexName)
+        );
+    }
+
 }

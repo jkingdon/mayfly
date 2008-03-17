@@ -21,7 +21,7 @@ public class DataDefinitionTest extends SqlTestCase {
     }
 
     // In our book, "data definition" includes "data undefinition".
-    // So DROP TABLE tests belong in this class.
+    // So that's what DROP TABLE tests are doing here.
 
     // Maybe there's a motto here:
     // Mayfly, the most powerful data undefinition language around,
@@ -57,6 +57,12 @@ public class DataDefinitionTest extends SqlTestCase {
             // Now check that it is gone:
             execute("create table foo (x integer)");
         }
+    }
+    
+    public void testDroppingTableDropsIndexes() throws Exception {
+        execute("create table foo(x integer not null)");
+        execute("create index x_index on foo(x)");
+        execute("drop table foo");
     }
     
 }

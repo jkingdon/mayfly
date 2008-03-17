@@ -184,12 +184,7 @@ public class MayflyDialect extends Dialect {
            rather than just having them show up with
            the production database (say, Postgres).
            We might end up reversing this decision,
-           or introducing the concept of options
-           (say, Database#options() and JdbcDriver#options(String url)
-           methods which return an Options object in which
-           one can set options.  Or perhaps we only allow
-           the options to be passed in when the Database is
-           created).
+           or mking it something to set in Options.
          */
         return true;
     }
@@ -248,15 +243,6 @@ public class MayflyDialect extends Dialect {
     public boolean canIndexPartOfColumn() {
         // MySQL compatibility.
         return true;
-    }
-    
-    @Override
-    public boolean indexNamesArePerTable() {
-        /* Actually, we want this to be false but also accept the
-         * syntax DROP INDEX index_name ON table_name
-         * (which is just like DROP INDEX index_name but it complains
-         * if that index is from a different table). */
-        return !wishThisWereTrue();
     }
     
     @Override

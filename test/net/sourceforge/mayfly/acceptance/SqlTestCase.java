@@ -235,4 +235,17 @@ public abstract class SqlTestCase extends TestCase {
         assertEquals(0, execute("set schema " + name));
     }
 
+    protected void dropIndex(String name, String table) throws SQLException {
+        execute(dropIndexCommand(name, table));
+    }
+
+    protected String dropIndexCommand(String name, String table) {
+        if (dialect.indexNamesArePerTable()) {
+            return "drop index " + name + " on " + table;
+        }
+        else {
+            return "drop index " + name;
+        }
+    }
+
 }

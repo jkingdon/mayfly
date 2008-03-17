@@ -1,5 +1,8 @@
 Changes since 0.3:
 
+Now have the standard SQL DROP INDEX syntax:
+  DROP INDEX index-name
+
 For MySQL compatibility, accept engine and character set in CREATE TABLE
 and ALTER TABLE (the CREATE TABLE form had existed in Mayfly for a while
 but had not been documented; the ALTER TABLE form is new).

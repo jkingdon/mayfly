@@ -80,4 +80,13 @@ public class Indexes implements Iterable<Index> {
         }
     }
 
+    public boolean hasIndex(String indexName) {
+        for (Index index : indexes) {
+            if (indexName.equalsIgnoreCase(index.name())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

@@ -1,11 +1,12 @@
 package net.sourceforge.mayfly.parser;
 
-import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_values;
 import static net.sourceforge.mayfly.parser.TokenType.EQUAL;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_column;
 import static net.sourceforge.mayfly.parser.TokenType.IDENTIFIER;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_character;
+import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_on;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_set;
+import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_values;
 import static net.sourceforge.mayfly.parser.TokenType.CLOSE_PAREN;
 
 import net.sourceforge.mayfly.MayflyException;
@@ -487,9 +488,13 @@ public class Parser {
     
     private Command parseDropIndex() {
         String indexName = consumeIdentifier();
-        expectAndConsume(TokenType.KEYWORD_on);
-        UnresolvedTableReference table = parseTableReference();
-        return new DropIndex(table, indexName);
+        if (consumeIfMatches(KEYWORD_on)) {
+            UnresolvedTableReference table = parseTableReference();
+            return new DropIndex(table, indexName);
+        }
+        else {
+            return new DropIndex(null, indexName);
+        }
     }
 
     private CreateSchema parseCreateSchema() {

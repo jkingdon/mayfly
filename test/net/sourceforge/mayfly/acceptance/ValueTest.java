@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 /**
  * @internal
- * See {@link ValueTest} for insert cases involving subselects
+ * See {@link InsertSubselectTest} for insert cases involving subselects
  */
 public class ValueTest extends SqlTestCase {
 

@@ -801,6 +801,14 @@ public abstract class Dialect {
         return false;
     }
     
+    public boolean haveDropIndexOn() {
+        return true;
+    }
+
+    public boolean canDropIndexGivingWrongTable() {
+        return false;
+    }
+
     public boolean canIndexPartOfColumn() {
         return false;
     }

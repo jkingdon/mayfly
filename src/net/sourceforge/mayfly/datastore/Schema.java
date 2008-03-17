@@ -15,17 +15,18 @@ import net.sourceforge.mayfly.util.ImmutableMap;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Schema {
 
-    private final ImmutableMap tables;
+    private final ImmutableMap<String, TableData> tables;
     
     public Schema() {
         this(new ImmutableMap());
     }
 
-    private Schema(ImmutableMap tables) {
+    private Schema(ImmutableMap<String, TableData> tables) {
         this.tables = tables;
     }
 
@@ -99,7 +100,7 @@ public class Schema {
     public TableData table(String table) {
         String canonicalTableName = lookUpTable(table);
         
-        return (TableData) tables.get(canonicalTableName);
+        return tables.get(canonicalTableName);
     }
 
     public String lookUpTable(String target) {
@@ -111,8 +112,7 @@ public class Schema {
     }
 
     public String lookUpTable(String target, Location location, Options options) {
-        for (Iterator iter = tables.keySet().iterator(); iter.hasNext(); ) {
-            String canonicalTable = (String) iter.next();
+        for (String canonicalTable : tables.keySet()) {
             if (canonicalTable.equalsIgnoreCase(target)) {
                 if (options.tableNamesCaseSensitive()
                     && !canonicalTable.equals(target)) {
@@ -135,8 +135,7 @@ public class Schema {
     }
 
     private String lookUpTableOrNull(String target, Options options) {
-        for (Iterator iter = tables.keySet().iterator(); iter.hasNext(); ) {
-            String canonicalTable = (String) iter.next();
+        for (String canonicalTable : tables.keySet()) {
             if (options.tableNamesEqual(canonicalTable, target)) {
                 return canonicalTable;
             }
@@ -215,8 +214,7 @@ public class Schema {
     }
 
     public void checkDropTable(DataStore store, String schema, String table) {
-        for (Iterator iter = tables.values().iterator(); iter.hasNext();) {
-            TableData potentialReferencer = (TableData) iter.next();
+        for (TableData potentialReferencer : tables.values()) {
             potentialReferencer.checkDropTable(store, schema, table);
         }
     }
@@ -234,11 +232,46 @@ public class Schema {
     }
 
     public Schema addIndex(String table, Index index) {
+        String foundTable = findTableForIndex(index.name());
+        if (foundTable != null) {
+            throw new MayflyException(
+                "table " + foundTable + 
+                " already has an index " + index.name());
+        }
         return replaceTable(table, table(table).addIndex(index));
     }
 
     public Schema dropIndex(String table, String indexName) {
+        if (table == null) {
+            throw new NullPointerException("table expected");
+        }
+
+        String foundTable = findTableForIndex(indexName);
+        if (table.equalsIgnoreCase(foundTable)) {
+            return replaceTable(table, table(table).dropIndex(indexName));
+        }
+        else {
+            throw new MayflyException(
+                "attempt to drop index " + indexName + " from table " + 
+                table + " although the index is on table " + foundTable);
+        }
+    }
+    
+    public Schema dropIndex(String indexName) {
+        String table = findTableForIndex(indexName);
+        if (table == null) {
+            throw new MayflyException("no index " + indexName);
+        }
         return replaceTable(table, table(table).dropIndex(indexName));
+    }
+
+    public String findTableForIndex(String indexName) {
+        for (Map.Entry<String, TableData> entry : tables.entrySet()) {
+            if (entry.getValue().indexes.hasIndex(indexName)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
 }

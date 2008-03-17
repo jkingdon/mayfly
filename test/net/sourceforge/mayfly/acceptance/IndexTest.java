@@ -1,6 +1,5 @@
 package net.sourceforge.mayfly.acceptance;
 
-import java.sql.SQLException;
 
 public class IndexTest extends SqlTestCase {
     
@@ -80,7 +79,20 @@ public class IndexTest extends SqlTestCase {
         }
         else {
             expectExecuteFailure(duplicate, 
-                "index an_index_name already exists");
+                "table foo already has an index an_index_name");
+        }
+    }
+    
+    public void testIndexNamesAreCaseInsensitive() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        execute("create index an_index_name on foo(a)");
+        String duplicate = "create index an_iNdEx_name on foo(b)";
+        if (false) {
+            execute(duplicate);
+        }
+        else {
+            expectExecuteFailure(duplicate, 
+                "table foo already has an index an_iNdEx_name");
         }
     }
     
@@ -100,7 +112,7 @@ public class IndexTest extends SqlTestCase {
         execute("create index an_index on foo(a)");
         String tryToCreateIndexWithSameName = "create index an_index on foo(b)";
         expectExecuteFailure(tryToCreateIndexWithSameName, 
-            "duplicate index an_index");
+            "table foo already has an index an_index");
 
         String dropWithoutGivingTable = "drop index an_index";
         if (dialect.indexNamesArePerTable()) {
@@ -115,10 +127,55 @@ public class IndexTest extends SqlTestCase {
         execute(tryToCreateIndexWithSameName);
     }
     
+    public void testDropIndexBadName() throws Exception {
+        execute("create table foo(a integer)");
+        expectExecuteFailure(
+            dropIndexCommand("no_such", "foo"),
+            "no index no_such"
+        );
+    }
+    
+    public void testDropIndexWithWrongTable() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        execute("create table bar(a integer)");
+        execute("create index an_index on foo(a)");
+        String dropIndexOn = "drop index an_index on bar";
+        if (dialect.canDropIndexGivingWrongTable()) {
+            execute(dropIndexOn);
+            
+            // check it is really gone
+            execute("create index an_index on foo(b)");
+        }
+        else {
+            /* Could be syntax error, or something like "no index an_index",
+               or the Mayfly expectation of telling exactly what is happening.
+             */
+            expectExecuteFailure(dropIndexOn, 
+                "attempt to drop index an_index from table bar " +
+                "although the index is on table foo");
+        }
+    }
+    
+    public void testDropIndexWithCorrectTable() throws Exception {
+        execute("create table foo(a integer, b integer)");
+        execute("create table bar(a integer)");
+        execute("create index an_index on foo(a)");
+        String dropIndexOn = "drop index an_index on foo";
+        if (dialect.haveDropIndexOn()) {
+            execute(dropIndexOn);
+            
+            // Check that it is really gone
+            execute("create index an_index on foo(b)");
+        }
+        else {
+            expectExecuteFailure(dropIndexOn, "expected end of file but got ON");
+        }
+    }
+
     public void testDroppingUniqueIndexDropsConstraint() throws Exception {
         execute("create table foo(a integer, b varchar(20))");
         execute("create unique index an_index on foo(a)");
-        dropIndex("an_index");
+        dropIndex("an_index", "foo");
         dialect.checkDump(
             "CREATE TABLE foo(\n" +
             "  a INTEGER,\n" +
@@ -142,7 +199,7 @@ public class IndexTest extends SqlTestCase {
         }
 
         execute("create index an_index on foo(a)");
-        dropIndex("an_index");
+        dropIndex("an_index", "foo");
         dialect.checkDump(
             "CREATE TABLE foo(\n" +
             "  a INTEGER,\n" +
@@ -154,15 +211,6 @@ public class IndexTest extends SqlTestCase {
             "unique constraint in table foo, column a: duplicate value 6");
     }
 
-    private void dropIndex(String name) throws SQLException {
-        if (dialect.indexNamesArePerTable()) {
-            execute("drop index " + name + " on foo");
-        }
-        else {
-            execute("drop index " + name);
-        }
-    }
-    
     public void mysql_only_testAlterTableDropIndex() throws Exception {
         // another syntax, as an alternative to the DROP INDEX one
 

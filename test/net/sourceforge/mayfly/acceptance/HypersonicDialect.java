@@ -332,5 +332,10 @@ public class HypersonicDialect extends Dialect {
     public String productName() {
         return "HSQL Database Engine";
     }
+    
+    @Override
+    public boolean canDropIndexGivingWrongTable() {
+        return true;
+    }
 
 }

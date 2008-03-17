@@ -137,6 +137,21 @@ public class TableNamesCaseSensitiveTest extends TestCase {
         database.execute("create table foo (x integer)");
     }
     
+    public void testCreateIndex() throws Exception {
+        database.execute("create table foo(a integer)");
+        expectExecuteFailure("create index an_index on FOO(a)", 
+            "attempt to refer to table foo as FOO " +
+            "(with case sensitive table names enabled)");
+    }
+    
+    public void testDropIndex() throws Exception {
+        database.execute("create table foo(a integer)");
+        database.execute("create index an_index on foo(a)");
+        expectExecuteFailure("drop index an_index on FOO", 
+            "attempt to refer to table foo as FOO " +
+            "(with case sensitive table names enabled)");
+    }
+    
     private void expectQueryFailure(String sql, String message) {
         try {
             database.query(sql);

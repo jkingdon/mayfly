@@ -103,7 +103,7 @@ CREATE [UNIQUE] INDEX <var>index-name</var>
   ON <var>table</var>(<var>column</var> [(<var>width</var>)], ...)
 </pre>
 
-This is mostly no-op except:
+This is mostly a no-op except:
 
 * if the word UNIQUE is specified in which case it
 is the same as defining a unique constraint (for example, in a
@@ -111,19 +111,26 @@ CREATE TABLE statement).  The latter syntax is generally preferred,
 as it separates constraints (defining correct behavior) from indexes
 (performance optimization),
 
-* the index-name must be unique within a table (in the future, this
-is expected to change to require a unique name across tables), and
+* the index-name must be unique across tables, and
 
 * the index appears in dumps.
+
+The rationale behind not having real indexes is that we expect
+they would slow down Mayfly for the anticipated use cases (small
+data sets and as many writes as reads).
 
 @subsection dropindex DROP INDEX
 
 <pre>
+DROP INDEX <var>index-name</var>
 DROP INDEX <var>index-name</var> ON <var>table</var>
 </pre>
 
-A future version of Mayfly may omit the requirement of "ON table"
-(see the discussion of index name uniquess under CREATE INDEX).
+Mayfly supports the version without a table for compatibility
+with most databases (and the SQL standard), and the version with
+a table for compatibility with MySQL.  If the table name is
+specified it must match the table where the index is defined,
+though.
 
 @subsection create CREATE TABLE
 

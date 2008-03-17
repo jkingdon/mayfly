@@ -15,9 +15,15 @@ public class DropIndex extends Command {
 
     @Override
     public UpdateStore update(DataStore store, String currentSchema) {
-        TableReference reference = table.resolve(store, currentSchema, null);
-        DataStore newStore = store.dropIndex(reference, this.indexName);
-        return new UpdateStore(newStore, 0);
+        if (table == null) {
+            DataStore newStore = store.dropIndex(currentSchema, this.indexName);
+            return new UpdateStore(newStore, 0);
+        }
+        else {
+            TableReference reference = table.resolve(store, currentSchema, null);
+            DataStore newStore = store.dropIndex(reference, this.indexName);
+            return new UpdateStore(newStore, 0);
+        }
     }
 
 }
