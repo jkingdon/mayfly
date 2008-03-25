@@ -25,11 +25,11 @@ public class JdbcMetaData implements DatabaseMetaData {
     }
 
     public boolean dataDefinitionCausesTransactionCommit() throws SQLException {
-        throw new UnimplementedException();
+        return false;
     }
 
     public boolean dataDefinitionIgnoredInTransactions() throws SQLException {
-        throw new UnimplementedException();
+        return false;
     }
 
     public boolean deletesAreDetected(int arg0) throws SQLException {
@@ -80,11 +80,11 @@ public class JdbcMetaData implements DatabaseMetaData {
     }
 
     public int getDatabaseMajorVersion() throws SQLException {
-        throw new UnimplementedException();
+        return 0;
     }
 
     public int getDatabaseMinorVersion() throws SQLException {
-        throw new UnimplementedException();
+        return 0;
     }
 
     public String getDatabaseProductName() throws SQLException {
@@ -92,7 +92,7 @@ public class JdbcMetaData implements DatabaseMetaData {
     }
 
     public String getDatabaseProductVersion() throws SQLException {
-        throw new UnimplementedException();
+        return "";
     }
 
     public int getDefaultTransactionIsolation() throws SQLException {
@@ -100,19 +100,19 @@ public class JdbcMetaData implements DatabaseMetaData {
     }
 
     public int getDriverMajorVersion() {
-        throw new UnimplementedException();
+        return 0;
     }
 
     public int getDriverMinorVersion() {
-        throw new UnimplementedException();
+        return 0;
     }
 
     public String getDriverName() throws SQLException {
-        throw new UnimplementedException();
+        return "Mayfly JDBC Driver";
     }
 
     public String getDriverVersion() throws SQLException {
-        throw new UnimplementedException();
+        return "";
     }
 
     public ResultSet getExportedKeys(String arg0, String arg1, String arg2) throws SQLException {
