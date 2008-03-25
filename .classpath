@@ -6,14 +6,14 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="lib" path="src/lib/commons-collections-3.1.jar" sourcepath="src/lib-src/commons-collections-3.1-src.zip"/>
 	<classpathentry kind="lib" path="src/lib/commons-lang-2.1.jar" sourcepath="src/lib-src/commons-lang-2.1-src.zip"/>
-	<classpathentry kind="lib" path="test/lib/junit.jar"/>
 	<classpathentry kind="lib" path="test/lib/mysql-connector-java-3.1.12-bin.jar"/>
-	<classpathentry kind="lib" path="test/lib/junit-addons-1.4.jar" sourcepath="test/lib-src/junit-addons-1.4-src.jar"/>
 	<classpathentry kind="lib" path="test/lib/postgresql-8.1-404.jdbc3.jar"/>
 	<classpathentry kind="lib" path="test/lib/derby-10.1.2.1.jar" sourcepath="test/lib-src/db-derby-10.1.2.1-src.zip"/>
 	<classpathentry kind="lib" path="test/lib/commons-io-1.1.jar" sourcepath="test/lib-src/commons-io-1.1-src.zip"/>
 	<classpathentry kind="lib" path="src/lib/joda-time-1.3.jar" sourcepath="src/lib-src/joda-time-1.3-src-ide.zip"/>
 	<classpathentry kind="lib" path="test/lib/smallsql-0.15.jar"/>
 	<classpathentry kind="lib" path="test/lib/hsqldb-1.8.0.7.jar" sourcepath="test/lib-src/hsqldb_1_8_0_7.zip"/>
+	<classpathentry kind="lib" path="test/lib/junit-4.4.jar"/>
+	<classpathentry kind="lib" path="test/lib/junit-addons-1.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
