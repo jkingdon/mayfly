@@ -47,12 +47,35 @@ public class OrderByTest extends SqlTestCase {
         execute("insert into foo (a) values ('one')");
         execute("insert into foo (a) values (null)");
         execute("insert into foo (a) values ('')");
-        assertResultList(
-            dialect.nullSortsLower() ?
-                new String[] { " null ", " '' ", " 'one' " } :
+        if (dialect.nullSortsLower()) {
+            assertTrue(connection.getMetaData().nullsAreSortedLow());
+            assertFalse(connection.getMetaData().nullsAreSortedHigh());
+            assertFalse(connection.getMetaData().nullsAreSortedAtStart());
+            assertFalse(connection.getMetaData().nullsAreSortedAtEnd());
+            assertResultList(
+                new String[] { " null ", " '' ", " 'one' " },
+                query("select a from foo order by a")
+            );
+            assertResultList(
+                new String[] { " 'one' ", " '' ", " null " },
+                query("select a from foo order by a desc")
+            );
+        }
+        else {
+            assertFalse(connection.getMetaData().nullsAreSortedLow());
+            assertTrue(connection.getMetaData().nullsAreSortedHigh());
+            assertFalse(connection.getMetaData().nullsAreSortedAtStart());
+            assertFalse(connection.getMetaData().nullsAreSortedAtEnd());
+            assertResultList(
                 new String[] { " '' ", " 'one' ", " null " },
-            query("select a from foo order by a")
-        );
+                query("select a from foo order by a")
+            );
+            assertResultList(
+                new String[] { " null ", " 'one' ", " '' " },
+                query("select a from foo order by a desc")
+            );
+            
+        }
     }
     
     public void testOrderByExpression() throws Exception {

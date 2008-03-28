@@ -340,19 +340,19 @@ public class JdbcMetaData implements DatabaseMetaData {
     }
 
     public boolean nullsAreSortedAtEnd() throws SQLException {
-        throw new UnimplementedException();
+        return false;
     }
 
     public boolean nullsAreSortedAtStart() throws SQLException {
-        throw new UnimplementedException();
+        return false;
     }
 
     public boolean nullsAreSortedHigh() throws SQLException {
-        throw new UnimplementedException();
+        return false;
     }
 
     public boolean nullsAreSortedLow() throws SQLException {
-        throw new UnimplementedException();
+        return true;
     }
 
     public boolean othersDeletesAreVisible(int arg0) throws SQLException {
