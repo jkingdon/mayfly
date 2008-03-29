@@ -14,7 +14,7 @@ tasks) and does not allow one to freely create in-memory databases in
 the same way that one can create Java objects.
 
 Mayfly is written in Java (currently works with gcj/libgcj and
-Sun Java from 1.4, although exact versions may change), and
+Sun Java from 1.5, although exact versions may change), and
 should run on any OS which provides a Java platform.  It relies on the
 JDBC interfaces from the Java platform (although one has the choice
 of instantiating a Database object directly if one wishes to avoid
@@ -44,8 +44,6 @@ the like, which reverses the usual situation with SQL databases).
 
 A short list of SQL features which we believe are high priority are:
 
-* subselects
-
 * More SQL operators such as LIKE and BETWEEN.
 
 We do not envisage providing network protocols, at least not initially.
@@ -58,9 +56,9 @@ is useful for debugging, comparing two databases in a test,
 and the like.
 There is a database dumper in the SqlDumper class which dumps
 to SQL.  SQL is a good choice for preserving things like data
-types and interchange with other SQL databases.  An XML format
-might also be interesting for interchange with non-SQL tools
-(see class Dumper for an extremely preliminary start at one).
+types and interchange with other SQL databases.  Other formats,
+like XML, YAML (compatible with Rails fixtures), or JSON
+might also be interesting for interchange with non-SQL tools.
 We don't regard Java serialization, XStream, or the like as
 particularly interesting, as these are closely tied to
 Mayfly's internal data structures.
