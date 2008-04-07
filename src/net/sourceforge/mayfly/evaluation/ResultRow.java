@@ -91,6 +91,16 @@ public class ResultRow {
 
     public SingleColumn findColumn(String tableOrAlias, String columnName,
         Location location) {
+        SingleColumn found = findColumnOrNull(tableOrAlias, columnName, location);
+        if (found == null) {
+            throw new NoColumn(tableOrAlias, columnName, location);
+        } else {
+            return found;
+        }
+    }
+
+    public SingleColumn findColumnOrNull(
+        String tableOrAlias, String columnName, Location location) {
         SingleColumn found = null;
         for (Element element : elements) {
             if (element.expression instanceof SingleColumn) {
@@ -107,11 +117,7 @@ public class ResultRow {
                 }
             }
         }
-        if (found == null) {
-            throw new NoColumn(tableOrAlias, columnName, location);
-        } else {
-            return found;
-        }
+        return found;
     }
     
     public Cell findValue(Expression target) {

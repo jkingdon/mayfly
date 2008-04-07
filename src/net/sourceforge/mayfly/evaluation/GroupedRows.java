@@ -15,7 +15,7 @@ import java.util.Map;
 public class GroupedRows {
     
     private Map groups = new LinkedHashMap();
-    private List/*<Expression>*/ keyColumns = null;
+    private List<Expression> keyColumns = null;
     private GroupByKeys keys;
 
     public int groupCount() {
@@ -119,7 +119,7 @@ public class GroupedRows {
         }
         for (int i = 0; i < cells.size(); ++i) {
             Cell cell = cells.get(i);
-            Expression expression = (Expression) keyColumns.get(i);
+            Expression expression = keyColumns.get(i);
             accumulator = accumulator.with(expression, cell);
         }
         return accumulator;

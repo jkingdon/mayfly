@@ -5,6 +5,7 @@ import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.util.ImmutableList;
+import net.sourceforge.mayfly.util.L;
 
 public class In extends Condition {
 
@@ -27,6 +28,31 @@ public class In extends Condition {
             }
         }
         return false;
+    }
+    
+    @Override
+    public Condition resolve(ResultRow row, Evaluator evaluator) {
+        boolean resolvedSomething = false;
+        Expression newLeftSide = leftSide.resolve(row, evaluator);
+        if (newLeftSide != leftSide) {
+            resolvedSomething = true;
+        }
+        
+        L<Expression> newRightSide = new L<Expression>();
+        for (Expression aRightSide : expressions) {
+            Expression resolved = aRightSide.resolve(row, evaluator);
+            if (resolved != aRightSide) {
+                resolvedSomething = true;
+            }
+            newRightSide.add(resolved);
+        }
+        
+        if (resolvedSomething) {
+            return new In(newLeftSide, newRightSide.asImmutable());
+        }
+        else {
+            return this;
+        }
     }
 
     @Override

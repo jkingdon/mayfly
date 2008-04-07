@@ -12,8 +12,8 @@ import net.sourceforge.mayfly.util.MayflyAssert;
 public class GroupByKeysTest extends TestCase {
     
     public void testResolveColumns() throws Exception {
-        GroupByKeys keys = new GroupByKeys();
-        keys.add(new GroupItem(new Concatenate(new SingleColumn("a"), new QuotedString("'abc'"))));
+        GroupByKeys keys = new GroupByKeys(
+            new GroupItem(new Concatenate(new SingleColumn("a"), new QuotedString("'abc'"))));
         ResultRow row = new ResultRow().withColumn("foo", "a", NullCell.INSTANCE);
         keys.resolve(row, Evaluator.NO_SUBSELECT_NEEDED);
         

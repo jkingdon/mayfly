@@ -120,16 +120,16 @@ public class GroupedRowsTest extends TestCase {
     }
 
     private GroupByKeys keysForColumn(String columnName) {
-        GroupByKeys keys = new GroupByKeys();
-        keys.add(new GroupItem(new SingleColumn(columnName)));
-        return keys;
+        return new GroupByKeys(
+            new GroupItem(new SingleColumn(columnName))
+        );
     }
 
     private GroupByKeys keysForColumns(String columnName1, String columnName2) {
-        GroupByKeys keys = new GroupByKeys();
-        keys.add(new GroupItem(new SingleColumn(columnName1)));
-        keys.add(new GroupItem(new SingleColumn(columnName2)));
-        return keys;
+        return new GroupByKeys(
+            new GroupItem(new SingleColumn(columnName1)),
+            new GroupItem(new SingleColumn(columnName2))
+        );
     }
 
 }

@@ -20,6 +20,18 @@ public class Or extends Condition {
     }
 
     @Override
+    public Condition resolve(ResultRow row, Evaluator evaluator) {
+        Condition newLeftSide = leftSide.resolve(row, evaluator);
+        Condition newRightSide = rightSide.resolve(row, evaluator);
+        if (newLeftSide != leftSide || newRightSide != rightSide) {
+            return new Or(newLeftSide, newRightSide);
+        }
+        else {
+            return this;
+        }
+    }
+
+    @Override
     public String firstAggregate() {
         return firstAggregate(leftSide, rightSide);
     }

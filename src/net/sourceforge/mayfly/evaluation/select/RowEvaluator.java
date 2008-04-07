@@ -40,6 +40,13 @@ public class RowEvaluator extends Evaluator {
         }
     }
     
+//    @Override
+//    public Expression lookupName(String columnName) {
+//        Expression found = row.findColumnOrNull(null, columnName, Location.UNKNOWN);
+//        return found;
+////        return nestedEvaluator.lookupName(columnName);
+//    }
+    
     @Override
     public Options options() {
         return nestedEvaluator.options();

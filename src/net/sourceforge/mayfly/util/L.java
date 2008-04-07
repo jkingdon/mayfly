@@ -1,8 +1,5 @@
 package net.sourceforge.mayfly.util;
 
-import org.apache.commons.collections.IteratorUtils;
-import org.apache.commons.lang.ArrayUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -11,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-public class L implements List {
-    private List delegate;
+public class L<T> implements List<T> {
+    private List<T> delegate;
 
     public L() {
         this(new ArrayList());
@@ -23,10 +20,11 @@ public class L implements List {
     }
 
     public L(Iterable items) {
-        delegate = IteratorUtils.toList(items.iterator());
+        this();
+        addAll(items);
     }
 
-    public L append(Object o) {
+    public L append(T o) {
         add(o);
         return this;
     }
@@ -36,7 +34,7 @@ public class L implements List {
     }
 
 
-    public ImmutableList asImmutable() {
+    public ImmutableList<T> asImmutable() {
         return new ImmutableList(this);
     }
 
@@ -72,15 +70,15 @@ public class L implements List {
         return delegate.toArray();
     }
 
-    public Object get(int index) {
+    public T get(int index) {
         return delegate.get(index);
     }
 
-    public Object remove(int index) {
+    public T remove(int index) {
         return delegate.remove(index);
     }
 
-    public void add(int index, Object element) {
+    public void add(int index, T element) {
         delegate.add(index, element);
     }
 
@@ -92,7 +90,7 @@ public class L implements List {
         return delegate.lastIndexOf(o);
     }
 
-    public boolean add(Object o) {
+    public boolean add(T o) {
         return delegate.add(o);
     }
 
@@ -122,8 +120,8 @@ public class L implements List {
     }
 
     /** Iterate through iterable, slurping each element into this list. */
-    public L addAll(Iterable iterable) {
-        Iterator iter = iterable.iterator();
+    public L addAll(Iterable<T> iterable) {
+        Iterator<T> iter = iterable.iterator();
         while (iter.hasNext()) {
             append(iter.next());
         }
@@ -163,7 +161,7 @@ public class L implements List {
         return delegate.listIterator(index);
     }
 
-    public Object set(int index, Object element) {
+    public T set(int index, T element) {
         return delegate.set(index, element);
     }
 
@@ -174,10 +172,6 @@ public class L implements List {
 
     public static L fromArray(Object[] objects) {
         return new L(Arrays.asList(objects));
-    }
-
-    public static L fromArray(int[] objects) {
-        return new L(Arrays.asList(ArrayUtils.toObject(objects)));
     }
 
     @Override

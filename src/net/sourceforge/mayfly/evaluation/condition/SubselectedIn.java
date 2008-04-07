@@ -11,8 +11,8 @@ import net.sourceforge.mayfly.evaluation.select.Select;
 
 public class SubselectedIn extends Condition {
 
-    private final Select subselect;
     private final Expression leftSide;
+    private final Select subselect;
 
     public SubselectedIn(Expression leftSide, Select subselect) {
         this.leftSide = leftSide;
@@ -31,6 +31,18 @@ public class SubselectedIn extends Condition {
             }
         }
         return false;
+    }
+
+    @Override
+    public Condition resolve(ResultRow row, Evaluator evaluator) {
+        Expression newLeftSide = leftSide.resolve(row, evaluator);
+        // Probably should be resolving the subselect too.
+        if (newLeftSide != leftSide) {
+            return new SubselectedIn(leftSide, subselect);
+        }
+        else {
+            return this;
+        }
     }
 
     @Override

@@ -9,6 +9,11 @@ public class True extends Condition {
     public boolean evaluate(ResultRow candidate, Evaluator evaluator) {
         return true;
     }
+    
+    @Override
+    public Condition resolve(ResultRow row, Evaluator evaluator) {
+        return this;
+    }
 
     @Override
     public String firstAggregate() {

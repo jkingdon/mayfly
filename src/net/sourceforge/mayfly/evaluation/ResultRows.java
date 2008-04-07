@@ -65,7 +65,7 @@ public class ResultRows implements Iterable<ResultRow> {
         }
         return selected;
     }
-
+    
     public ResultRows join(ResultRows right) {
         List result = new ArrayList();
         for (Iterator leftIterator = iterator(); leftIterator.hasNext();) {

@@ -1,14 +1,13 @@
 package net.sourceforge.mayfly.parser;
 
+import static net.sourceforge.mayfly.parser.TokenType.CLOSE_PAREN;
 import static net.sourceforge.mayfly.parser.TokenType.EQUAL;
-import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_column;
 import static net.sourceforge.mayfly.parser.TokenType.IDENTIFIER;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_character;
+import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_column;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_on;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_set;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_values;
-import static net.sourceforge.mayfly.parser.TokenType.CLOSE_PAREN;
-
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.Options;
@@ -55,6 +54,7 @@ import net.sourceforge.mayfly.evaluation.command.DropTable;
 import net.sourceforge.mayfly.evaluation.command.Insert;
 import net.sourceforge.mayfly.evaluation.command.LastIdentity;
 import net.sourceforge.mayfly.evaluation.command.ModifyColumn;
+import net.sourceforge.mayfly.evaluation.command.NoopCommand;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
 import net.sourceforge.mayfly.evaluation.command.SubselectedInsert;
@@ -65,7 +65,6 @@ import net.sourceforge.mayfly.evaluation.command.UnresolvedPrimaryKey;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedTableReference;
 import net.sourceforge.mayfly.evaluation.command.UnresolvedUniqueConstraint;
 import net.sourceforge.mayfly.evaluation.command.Update;
-import net.sourceforge.mayfly.evaluation.command.NoopCommand;
 import net.sourceforge.mayfly.evaluation.condition.And;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.condition.Equal;
@@ -1681,16 +1680,20 @@ public class Parser {
     private Aggregator parseGroupBy() {
         if (consumeIfMatches(TokenType.KEYWORD_group)) {
             expectAndConsume(TokenType.KEYWORD_by);
-            
-            GroupBy groupBy = new GroupBy();
+
+            List<GroupItem> items = new ArrayList<GroupItem>();
             do {
-                groupBy.add(parseGroupItem());
+                items.add(parseGroupItem());
             } while (consumeIfMatches(TokenType.COMMA));
 
+            Condition having;
             if (consumeIfMatches(TokenType.KEYWORD_having)) {
-                groupBy.setHaving(parseCondition().asBoolean());
+                having = parseCondition().asBoolean();
             }
-            return groupBy;
+            else {
+                having = Condition.TRUE;
+            }
+            return new GroupBy(new ImmutableList<GroupItem>(items), having);
         }
         else {
             if (currentToken.type == TokenType.KEYWORD_having) {

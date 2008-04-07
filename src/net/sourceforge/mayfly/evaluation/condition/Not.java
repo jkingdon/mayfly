@@ -18,6 +18,17 @@ public class Not extends Condition {
     }
 
     @Override
+    public Condition resolve(ResultRow row, Evaluator evaluator) {
+        Condition newOperand = operand.resolve(row, evaluator);
+        if (newOperand != operand) {
+            return new Not(operand);
+        }
+        else {
+            return this;
+        }
+    }
+
+    @Override
     public String firstAggregate() {
         return operand.firstAggregate();
     }

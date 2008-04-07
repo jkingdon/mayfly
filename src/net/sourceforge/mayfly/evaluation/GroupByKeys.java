@@ -2,17 +2,26 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
+import net.sourceforge.mayfly.util.ImmutableList;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @internal
+ * Not yet immutable, because of {@link GroupItem}
+ */
 public class GroupByKeys {
 
-    private List<GroupItem> items = new ArrayList<GroupItem>();
+    private final ImmutableList<GroupItem> items;
 
-    public void add(GroupItem key) {
-        items.add(key);
+    public GroupByKeys(GroupItem... items) {
+        this(ImmutableList.fromArray(items));
+    }
+
+    public GroupByKeys(ImmutableList<GroupItem> items) {
+        this.items = items;
     }
 
     List expressions() {

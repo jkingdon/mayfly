@@ -4,8 +4,6 @@ import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 
-import java.util.Iterator;
-
 public class NoGroupBy implements Aggregator {
 
     public ResultRows group(ResultRows rows, Evaluator evaluator, Selected selected) {
@@ -19,8 +17,7 @@ public class NoGroupBy implements Aggregator {
         String firstColumn = null;
         String firstAggregate = null;
 
-        for (Iterator iter = selected.iterator(); iter.hasNext();) {
-            Expression element = (Expression) iter.next();
+        for (Expression element : selected) {
             if (firstColumn == null) {
                 firstColumn = element.firstColumn();
             }

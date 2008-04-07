@@ -19,6 +19,17 @@ public class IsNull extends Condition {
         Cell cell = expression.evaluate(row, evaluator);
         return cell instanceof NullCell;
     }
+    
+    @Override
+    public Condition resolve(ResultRow row, Evaluator evaluator) {
+        Expression resolved = expression.resolve(row, evaluator);
+        if (resolved != expression) {
+            return new IsNull(resolved);
+        }
+        else {
+            return this;
+        }
+    }
 
     @Override
     public String firstAggregate() {

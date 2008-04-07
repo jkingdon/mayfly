@@ -27,6 +27,8 @@ public abstract class Condition {
     }
 
     abstract public boolean evaluate(ResultRow row, Evaluator evaluator);
+    
+    abstract public Condition resolve(ResultRow row, Evaluator evaluator);
 
     abstract public String firstAggregate();
 

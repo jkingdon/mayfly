@@ -29,6 +29,18 @@ public class And extends Condition {
         return leftSide.evaluate(row, evaluator) && 
             rightSide.evaluate(row, evaluator);
     }
+    
+    @Override
+    public Condition resolve(ResultRow row, Evaluator evaluator) {
+        Condition newLeftSide = leftSide.resolve(row, evaluator);
+        Condition newRightSide = rightSide.resolve(row, evaluator);
+        if (newLeftSide != leftSide || newRightSide != rightSide) {
+            return new And(newLeftSide, newRightSide);
+        }
+        else {
+            return this;
+        }
+    }
 
     @Override
     public String firstAggregate() {

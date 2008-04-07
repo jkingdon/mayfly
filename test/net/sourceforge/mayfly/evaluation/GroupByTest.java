@@ -14,8 +14,7 @@ import java.util.Iterator;
 public class GroupByTest extends TestCase {
     
     public void testGroup() throws Exception {
-        GroupBy groupBy = new GroupBy();
-        groupBy.add(new GroupItem(new SingleColumn("a")));
+        GroupBy groupBy = new GroupBy(new GroupItem(new SingleColumn("a")));
         ResultRows rows = new ResultRows(
             new ImmutableList()
                 .with(new ResultRow()
@@ -59,9 +58,10 @@ public class GroupByTest extends TestCase {
     }
 
     public void testMutiple() throws Exception {
-        GroupBy groupBy = new GroupBy();
-        groupBy.add(new GroupItem(new SingleColumn("a")));
-        groupBy.add(new GroupItem(new SingleColumn("b")));
+        GroupBy groupBy = new GroupBy(
+            new GroupItem(new SingleColumn("a")),
+            new GroupItem(new SingleColumn("b"))
+        );
         ResultRows rows = new ResultRows(
             new ImmutableList()
                 .with(new ResultRow()
