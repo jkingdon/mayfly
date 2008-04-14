@@ -14,8 +14,8 @@ import net.sourceforge.mayfly.evaluation.select.Evaluator;
  */
 public class AliasedExpression extends Expression {
 
-    private final String alias;
-    private final Expression expression;
+    public final String alias;
+    public final Expression expression;
 
     public AliasedExpression(String aliasedColumn, Expression expression) {
         this.alias = aliasedColumn;

@@ -1,7 +1,11 @@
 package net.sourceforge.mayfly.evaluation.select;
 
+import static net.sourceforge.mayfly.util.MayflyAssert.assertColumn;
+import static net.sourceforge.mayfly.util.MayflyAssert.assertAliasedColumn;
+
 import junit.framework.TestCase;
 
+import net.sourceforge.mayfly.Database;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.NoColumn;
@@ -24,7 +28,6 @@ public class AliasEvaluatorTest extends TestCase {
 
         check(6, "a", evaluator, row);
         check(7, "b", evaluator, row);
-        check(7, "john_smith", evaluator, row);
         check(7, "john_smith", evaluator, row);
         
         try {
@@ -68,6 +71,23 @@ public class AliasEvaluatorTest extends TestCase {
         Evaluator evaluator, ResultRow row) {
         LongCell value = (LongCell) evaluator.lookup(row, table, column, null);
         assertEquals(expected, value.asLong());
+    }
+    
+    public void testLookupName() throws Exception {
+        What what = new What(
+            new AliasedExpression("john_smith", new SingleColumn("b"))
+        );
+        Database database = new Database();
+        database.execute("create table foo(a integer, b integer)");
+        database.execute("create table bar(john_smith integer)");
+        Evaluator evaluator = 
+            new AliasEvaluator(what, new StoreEvaluator(database.dataStore()));
+
+        // Not yet implemented (see StoreEvaluatorTest):
+//        assertColumn("foo", "a", evaluator.lookupName("a"));
+//        assertColumn("foo", "b", evaluator.lookupName("b"));
+        assertAliasedColumn("john_smith", null, "b", evaluator.lookupName("john_smith"));
+        assertNull(evaluator.lookupName("nonexist"));
     }
 
 }

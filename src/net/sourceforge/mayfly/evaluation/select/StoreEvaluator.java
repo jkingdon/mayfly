@@ -13,6 +13,10 @@ public class StoreEvaluator extends Evaluator {
     private final DataStore store;
     private final String currentSchema;
     private Options options;
+    
+    public StoreEvaluator(DataStore store) {
+        this(store, DataStore.ANONYMOUS_SCHEMA_NAME);
+    }
 
     public StoreEvaluator(DataStore store, String currentSchema) {
         this(store, currentSchema, new Options());

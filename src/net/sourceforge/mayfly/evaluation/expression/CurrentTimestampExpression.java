@@ -30,7 +30,7 @@ public class CurrentTimestampExpression extends Expression {
     }
 
     private Cell valueAsCell() {
-        /* Note that the timezone here is the one of the current machine. */
+        /* The timezone here is the one of the current machine. */
         return new TimestampCell(new LocalDateTime(timeSource.current()));
     }
 

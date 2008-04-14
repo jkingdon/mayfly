@@ -2,6 +2,8 @@ package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.Row;
+import net.sourceforge.mayfly.evaluation.expression.CurrentTimestampExpression;
+import net.sourceforge.mayfly.evaluation.expression.literal.Literal;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
@@ -79,6 +81,13 @@ abstract public class Expression extends WhatElement {
         return false;
     }
 
+    /**
+     * @internal
+     * Return a representation of this expression suitable for including in
+     * a database dump.  Currently only needed, or implemented, for expressions
+     * which can be default values (or on-update values), like {@link Literal} or 
+     * {@link CurrentTimestampExpression}.
+     */
     public String asSql() {
         return evaluate((ResultRow) null).asSql();
     }

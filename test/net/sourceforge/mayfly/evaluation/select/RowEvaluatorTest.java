@@ -49,7 +49,7 @@ public class RowEvaluatorTest {
         ResultRow correlatedRow = new ResultRow().withColumn("aaa", "a", new LongCell(7));
         RowEvaluator evaluator = new RowEvaluator(correlatedRow, nested);
 
-//        assertColumn("aaa", "a", evaluator.lookupName("a"));
+        assertColumn("aaa", "a", evaluator.lookupName("a"));
         assertNull(evaluator.lookupName("c"));
     }
 

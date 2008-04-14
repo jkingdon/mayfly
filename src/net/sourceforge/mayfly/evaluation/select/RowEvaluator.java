@@ -4,6 +4,7 @@ import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableData;
+import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
@@ -40,12 +41,12 @@ public class RowEvaluator extends Evaluator {
         }
     }
     
-//    @Override
-//    public Expression lookupName(String columnName) {
-//        Expression found = row.findColumnOrNull(null, columnName, Location.UNKNOWN);
-//        return found;
-////        return nestedEvaluator.lookupName(columnName);
-//    }
+    @Override
+    public Expression lookupName(String columnName) {
+        Expression found = row.findColumnOrNull(null, columnName, Location.UNKNOWN);
+        return found;
+//        return nestedEvaluator.lookupName(columnName);
+    }
     
     @Override
     public Options options() {
