@@ -127,7 +127,7 @@ public class SingleColumn extends Expression {
     @Override
     public Expression resolve(ResultRow row, Evaluator evaluator) {
         if (tableOrAlias == null) {
-            Expression lookedUp = evaluator.lookupName(columnName);
+            Expression lookedUp = evaluator.lookupName(row, columnName, location);
             if (lookedUp != null) {
                 return lookedUp;
             }
@@ -141,6 +141,22 @@ public class SingleColumn extends Expression {
         else {
             return this;
         }
+    }
+    
+    /**
+     * @internal
+     * Low-level helper for {@link #resolve(ResultRow, Evaluator)} and
+     * related machinery.
+     */
+    public SingleColumn asResultOfResolution(String spellingOfColumnName,
+        Location location2) {
+        if (!spellingOfColumnName.equalsIgnoreCase(columnName)) {
+            throw new MayflyInternalException(
+                "expected " + spellingOfColumnName + " and " + columnName + 
+                " to differ only in case");
+        }
+        return new SingleColumn(tableOrAlias, null, 
+            spellingOfColumnName, location2, options);
     }
     
     @Override

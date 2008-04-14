@@ -42,10 +42,13 @@ public class RowEvaluator extends Evaluator {
     }
     
     @Override
-    public Expression lookupName(String columnName) {
+    public Expression lookupName(
+        ResultRow nonCorrelatedRow, String columnName, Location location) {
         Expression found = row.findColumnOrNull(null, columnName, Location.UNKNOWN);
-        return found;
-//        return nestedEvaluator.lookupName(columnName);
+        if (found != null) {
+            return found;
+        }
+        return nestedEvaluator.lookupName(nonCorrelatedRow, columnName);
     }
     
     @Override

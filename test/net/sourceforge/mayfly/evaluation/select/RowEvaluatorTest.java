@@ -46,11 +46,13 @@ public class RowEvaluatorTest {
     @Test
     public void lookupName() {
         Evaluator nested = Evaluator.NO_SUBSELECT_NEEDED;
+        ResultRow nonCorrelatedRow = new ResultRow().withColumn("bbb", "b", new LongCell(8));
         ResultRow correlatedRow = new ResultRow().withColumn("aaa", "a", new LongCell(7));
         RowEvaluator evaluator = new RowEvaluator(correlatedRow, nested);
 
-        assertColumn("aaa", "a", evaluator.lookupName("a"));
-        assertNull(evaluator.lookupName("c"));
+        assertColumn("aaa", "a", evaluator.lookupName(nonCorrelatedRow, "a"));
+        assertColumn("bbb", "b", evaluator.lookupName(nonCorrelatedRow, "b"));
+        assertNull(evaluator.lookupName(nonCorrelatedRow, "c"));
     }
 
 }

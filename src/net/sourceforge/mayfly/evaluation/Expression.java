@@ -57,7 +57,7 @@ abstract public class Expression extends WhatElement {
 
     abstract public boolean sameExpression(Expression other);
 
-    public Expression resolve(ResultRow row) {
+    public final Expression resolve(ResultRow row) {
         return resolve(row, Evaluator.NO_SUBSELECT_NEEDED);
     }
     

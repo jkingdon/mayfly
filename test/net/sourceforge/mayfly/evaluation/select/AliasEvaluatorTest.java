@@ -1,13 +1,13 @@
 package net.sourceforge.mayfly.evaluation.select;
 
-import static net.sourceforge.mayfly.util.MayflyAssert.assertColumn;
 import static net.sourceforge.mayfly.util.MayflyAssert.assertAliasedColumn;
+import static net.sourceforge.mayfly.util.MayflyAssert.assertColumn;
 
 import junit.framework.TestCase;
 
-import net.sourceforge.mayfly.Database;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.LongCell;
+import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
@@ -77,17 +77,20 @@ public class AliasEvaluatorTest extends TestCase {
         What what = new What(
             new AliasedExpression("john_smith", new SingleColumn("b"))
         );
-        Database database = new Database();
-        database.execute("create table foo(a integer, b integer)");
-        database.execute("create table bar(john_smith integer)");
+        ResultRow dummyRow = new ResultRow()
+            .withColumn("foo", "a", NullCell.INSTANCE)
+            .withColumn("foo", "b", NullCell.INSTANCE)
+            .withColumn("bar", "john_smith", NullCell.INSTANCE)
+        ;
         Evaluator evaluator = 
-            new AliasEvaluator(what, new StoreEvaluator(database.dataStore()));
+            new AliasEvaluator(what, Evaluator.NO_SUBSELECT_NEEDED);
 
         // Not yet implemented (see StoreEvaluatorTest):
-//        assertColumn("foo", "a", evaluator.lookupName("a"));
-//        assertColumn("foo", "b", evaluator.lookupName("b"));
-        assertAliasedColumn("john_smith", null, "b", evaluator.lookupName("john_smith"));
-        assertNull(evaluator.lookupName("nonexist"));
+        assertColumn("foo", "a", evaluator.lookupName(dummyRow, "a"));
+        assertColumn("foo", "b", evaluator.lookupName(dummyRow, "b"));
+        assertAliasedColumn("john_smith", null, "b", 
+            evaluator.lookupName(dummyRow, "john_smith"));
+        assertNull(evaluator.lookupName(dummyRow, "nonexist"));
     }
 
 }

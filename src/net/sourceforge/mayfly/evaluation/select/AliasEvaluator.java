@@ -50,12 +50,13 @@ public class AliasEvaluator extends Evaluator {
     }
     
     @Override
-    public Expression lookupName(String columnName) {
+    public Expression lookupName(
+        ResultRow row, String columnName, Location location) {
         Expression foundinWhat = what.lookupName(columnName);
         if (foundinWhat != null) {
             return foundinWhat;
         }
-        return delegate.lookupName(columnName);
+        return delegate.lookupName(row, columnName);
     }
     
     @Override

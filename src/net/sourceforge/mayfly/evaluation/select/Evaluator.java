@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableData;
 import net.sourceforge.mayfly.evaluation.Expression;
 import net.sourceforge.mayfly.evaluation.ResultRow;
+import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.parser.Location;
 
@@ -52,8 +53,24 @@ public abstract class Evaluator {
         return new Options();
     }
 
-    public Expression lookupName(String columnName) {
+    /**
+     * @internal
+     * row is usually (always?) a dummy row.  The concept we are
+     * heading towards, as with
+     * {@link Expression#resolve(ResultRow, Evaluator)}, is that resolving
+     * names is part of an optimization/planning phase which happens
+     * once, not once for every row.
+     */
+    public Expression lookupName(ResultRow row, String name, Location location) {
+        SingleColumn found = row.findColumnOrNull(null, name, location);
+        if (found != null) {
+            return found.asResultOfResolution(name, location);
+        }
         return null;
+    }
+    
+    public final Expression lookupName(ResultRow row, String name) {
+        return lookupName(row, name, Location.UNKNOWN);
     }
     
 }
