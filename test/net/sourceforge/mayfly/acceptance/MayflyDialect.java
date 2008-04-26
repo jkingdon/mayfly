@@ -256,7 +256,17 @@ public class MayflyDialect extends Dialect {
            is a better syntax, seems like... */
         return true;
     }
-    
+
+    @Override
+    public Class typeOfTinyint() {
+        return Long.class;
+    }
+
+    @Override
+    public Class typeOfSmallint() {
+        return Long.class;
+    }
+
     @Override
     public Class typeOfInteger() {
         /* Is it important to be compatible with other databases (which
@@ -280,6 +290,21 @@ public class MayflyDialect extends Dialect {
     @Override
     public boolean haveConcatBuiltIn() {
         // No real downside
+        return true;
+    }
+    
+    @Override
+    public boolean haveConcatBuiltInWithOneArgument() {
+        /* Might make it easier to generate SQL automatically? 
+           Not sure whether this is a real use case or an imaginary one. */
+        return true;
+    }
+    
+    @Override
+    public boolean groupByExpressionSimpleComparator() {
+        /* Not sure whether this is worth worrying about or not, but maybe
+           in a different design catching the column which can't be evaluated
+           would just happen? Based on the H2 error message, it seems so. */
         return true;
     }
     

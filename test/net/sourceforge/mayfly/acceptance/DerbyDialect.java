@@ -70,6 +70,11 @@ public class DerbyDialect extends Dialect {
     }
     
     @Override
+    public boolean canTurnNullableColumnIntoPrimaryKey() {
+        return false;
+    }
+    
+    @Override
     public boolean canSetObjectNull() {
         return false;
     }

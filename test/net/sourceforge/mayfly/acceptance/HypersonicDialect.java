@@ -29,6 +29,11 @@ public class HypersonicDialect extends Dialect {
     }
     
     @Override
+    public boolean detectsAmbiguousColumnsInOrderBy() {
+        return false;
+    }
+    
+    @Override
     public boolean crossJoinRequiresOn() {
         // In hypersonic, CROSS JOIN seems to be a synonym for INNER JOIN
         return true;
@@ -46,6 +51,11 @@ public class HypersonicDialect extends Dialect {
     
     @Override
     public boolean allowDuplicateTableInQuery() {
+        return true;
+    }
+    
+    @Override
+    public boolean allowDuplicateTableWithDifferingColumnNames() {
         return true;
     }
     
@@ -115,7 +125,7 @@ public class HypersonicDialect extends Dialect {
     }
     
     @Override
-    public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression() {
+    public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression(boolean rowsPresent) {
         return false;
     }
     
@@ -338,4 +348,23 @@ public class HypersonicDialect extends Dialect {
         return true;
     }
 
+    @Override
+    public boolean complainAboutStoredProcedureOverloadingOnArgumentType() {
+        return false;
+    }
+    
+    @Override
+    public boolean haveConcatBuiltInWithOneArgument() {
+        /* What is really going on here?  Does an unrecognized function 
+           have a defined behavior or something? */
+        return true;
+    }
+    
+    @Override
+    public boolean haveConcatBuiltInWithZeroArguments() {
+        /* What is really going on here?  Does an unrecognized function 
+        have a defined behavior or something? */
+        return true;
+    }
+    
 }

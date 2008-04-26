@@ -240,7 +240,7 @@ public class OrderByTest extends SqlTestCase {
         execute("CREATE TABLE foo (A INTEGER)");
         execute("CREATE TABLE bar (A INTEGER)");
         String sql = "select foo.a, bar.a from foo, bar order by a";
-        if (dialect.detectsAmbiguousColumns()) {
+        if (dialect.detectsAmbiguousColumnsInOrderBy()) {
             expectQueryFailure(sql, "ambiguous column a");
         } else {
             assertResultSet(new String[] { }, query(sql));
@@ -257,7 +257,7 @@ public class OrderByTest extends SqlTestCase {
         execute("insert into foo(a) values(53)");
         
         String orderByWhenSelectingAggregate = "select count(a) from foo order by a";
-        if (dialect.errorIfNotAggregateOrGrouped()) {
+        if (dialect.errorIfNotAggregateOrGrouped(true)) {
             expectQueryFailure(orderByWhenSelectingAggregate,
                 "a is not aggregate or mentioned in GROUP BY");
         }

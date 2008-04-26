@@ -91,18 +91,15 @@ public class DataTypeTest extends SqlTestCase {
         assertTrue(results.next());
         assertTypesOfRow(results);
         assertTrue(results.next());
-        /* The interesting part about this is that all tested databases,
-           so far, base the returned type on the types in the expressions,
-           not the particular values from this execution. */
         assertTypesOfRow(results);
         assertFalse(results.next());
     }
 
     private void assertTypesOfRow(ResultSet results) throws SQLException {
         ObjectAssert.assertInstanceOf(
-            dialect.typeOfInteger(), results.getObject("x"));
+            dialect.typeOfTinyint(), results.getObject("x"));
         ObjectAssert.assertInstanceOf(
-            dialect.typeOfInteger(), results.getObject("y"));
+            dialect.typeOfSmallint(), results.getObject("y"));
         ObjectAssert.assertInstanceOf(
             dialect.typeOfInteger(), results.getObject("z"));
         ObjectAssert.assertInstanceOf(Long.class, results.getObject("w"));

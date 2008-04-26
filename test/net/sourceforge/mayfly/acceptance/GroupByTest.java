@@ -37,7 +37,7 @@ public class GroupByTest extends SqlTestCase {
 
         String needsSmartExpressionComparator = 
             "select birthdate + age + 0 from people group by birthdate + age";
-        if (dialect.expectMayflyBehavior()) {
+        if (dialect.groupByExpressionSimpleComparator()) {
             expectQueryFailure(needsSmartExpressionComparator, 
                 "expression is not aggregate or mentioned in GROUP BY");
         }
@@ -71,7 +71,7 @@ public class GroupByTest extends SqlTestCase {
         String expressionWhichMakesNoSense = 
             "select birthdate - age from people group by birthdate + age";
 
-        if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression()) {
+        if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression(false)) {
             expectQueryFailure(
                 selectColumnNotGrouped, 
                 "age is not aggregate or mentioned in GROUP BY"
@@ -165,7 +165,7 @@ public class GroupByTest extends SqlTestCase {
         String notAggegateOrGrouped = 
             "select author, title, count(*) from books group by author order by author";
 
-        if (dialect.errorIfNotAggregateOrGrouped()) {
+        if (dialect.errorIfNotAggregateOrGrouped(true)) {
             expectQueryFailure(notAggegateOrGrouped, 
                 "title is not aggregate or mentioned in GROUP BY");
         } else {
@@ -187,7 +187,7 @@ public class GroupByTest extends SqlTestCase {
         String notAggregateOrGrouped = 
             "select author, title, count(*) from books group by author";
 
-        if (dialect.errorIfNotAggregateOrGrouped()) {
+        if (dialect.errorIfNotAggregateOrGrouped(false)) {
             expectQueryFailure(notAggregateOrGrouped, 
                 "title is not aggregate or mentioned in GROUP BY");
         } else {
@@ -334,8 +334,14 @@ public class GroupByTest extends SqlTestCase {
     
     public void testHavingIsDisallowedOnUnaggregated() throws Exception {
         execute("create table foo (x integer, y integer)");
-        expectQueryFailure("select avg(x) from foo group by y having x < 5", 
-            "x is not aggregate or mentioned in GROUP BY");
+        String sql = "select avg(x) from foo group by y having x < 5";
+        if (dialect.disallowHavingOnUnaggregated()) {
+            expectQueryFailure(sql, 
+                "x is not aggregate or mentioned in GROUP BY");
+        }
+        else {
+            assertResultSet(new String[] { }, query(sql));
+        }
     }
 
     public void testHavingWithoutGroupBy() throws Exception {
@@ -378,7 +384,7 @@ public class GroupByTest extends SqlTestCase {
 
         String notAggregateOrGrouped = "select type, avg(price) from item " +
             "group by type order by price";
-        if (dialect.errorIfNotAggregateOrGrouped()) {
+        if (dialect.errorIfNotAggregateOrGrouped(true)) {
             expectQueryFailure(
                 notAggregateOrGrouped,
                 "price is not aggregate or mentioned in GROUP BY");
@@ -396,7 +402,7 @@ public class GroupByTest extends SqlTestCase {
 
         String notAggregateOrGrouped = "select type, avg(price) from item " +
             "group by type order by price";
-        if (dialect.errorIfNotAggregateOrGrouped()) {
+        if (dialect.errorIfNotAggregateOrGrouped(false)) {
             expectQueryFailure(
                 notAggregateOrGrouped,
                 "price is not aggregate or mentioned in GROUP BY");
@@ -437,7 +443,7 @@ public class GroupByTest extends SqlTestCase {
         
         String selectAll = "select * from books group by author";
         String selectAllFromTable = "select books.* from books group by author";
-        if (dialect.errorIfNotAggregateOrGrouped()) {
+        if (dialect.errorIfNotAggregateOrGrouped(true)) {
             expectQueryFailure(selectAll, 
                 "books.title is not aggregate or mentioned in GROUP BY");
             expectQueryFailure(selectAllFromTable, 
@@ -475,7 +481,7 @@ public class GroupByTest extends SqlTestCase {
 
         String notAggregateOrGrouped = 
             "select g.* from foo f, foo g group by f.a order by f.a";
-        if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression()) {
+        if (dialect.errorIfNotAggregateOrGroupedWhenGroupByExpression(true)) {
             expectQueryFailure(notAggregateOrGrouped, 
                 "g.a is not aggregate or mentioned in GROUP BY");
         }

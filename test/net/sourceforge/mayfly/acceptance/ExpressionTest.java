@@ -72,14 +72,35 @@ public class ExpressionTest extends SqlTestCase {
         String query = "select concat(first_name, ' ', last_name) from names";
         if (dialect.haveConcatBuiltIn()) {
             assertResultSet(new String[] { " 'John Jones' " }, query(query));
-            
-            // Corner cases: one argument, or zero.
-            assertResultSet(new String[] { " 'John' " }, 
-                query("select concat(first_name) from names"));
-            expectQueryFailure("select concat() from names", 
-                "expected expression but got ')'");
         } else {
             expectQueryFailure(query, "no function concat");
+        }
+    }
+    
+    public void testConcatBuiltInWithOneArgument() throws Exception {
+        execute("create table names (first_name varchar(255), last_name varchar(255))");
+        execute("insert into names(first_name, last_name) values ('John', 'Jones')");
+        String concatOneArgument = "select concat(first_name) from names";
+        if (dialect.haveConcatBuiltInWithOneArgument()) {
+            assertResultSet(new String[] { " 'John' " }, 
+                query(concatOneArgument));
+        } else {
+            expectQueryFailure(concatOneArgument, 
+                "concat requires 2 or more arguments" /* or no function concat */);
+        }
+    }
+    
+    public void testConcatBuiltInWithZeroArguments() throws Exception {
+        execute("create table names (first_name varchar(255), last_name varchar(255))");
+        execute("insert into names(first_name, last_name) values ('John', 'Jones')");
+        String concatZeroArguments = "select concat() from names";
+        if (dialect.haveConcatBuiltInWithZeroArguments()) {
+            assertResultSet(new String[] { " null " }, 
+                query(concatZeroArguments));
+        }
+        else {
+            expectQueryFailure(concatZeroArguments, 
+                "expected expression but got ')'");
         }
     }
     

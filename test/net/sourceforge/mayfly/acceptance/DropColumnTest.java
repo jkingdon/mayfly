@@ -64,12 +64,15 @@ public class DropColumnTest extends SqlTestCase {
     }
     
     public void testSingleColumnPrimaryKey() throws Exception {
-        if (!dialect.haveDropColumn()) {
-            return;
-        }
-
         execute("create table foo(a integer, b integer, primary key(a) )");
-        execute("alter table foo drop column a");
+        String dropPrimaryKey = "alter table foo drop column a";
+        if (dialect.haveDropColumn() && dialect.canDropPrimaryKeyColumn()) {
+            execute(dropPrimaryKey);
+        }
+        else {
+            expectExecuteFailure(dropPrimaryKey, 
+                "cannot drop column a because it is referenced by a primary key");
+        }
     }
     
     public void testForeignKeyFromDroppedColumn() throws Exception {

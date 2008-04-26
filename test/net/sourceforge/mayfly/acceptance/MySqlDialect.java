@@ -86,6 +86,11 @@ public class MySqlDialect extends Dialect {
     }
     
     @Override
+    public boolean haveConcatBuiltInWithOneArgument() {
+        return true;
+    }
+    
+    @Override
     public boolean tableNamesMightBeCaseSensitive() {
         // Whether table names are case sensitive in MySQL depends on whether
         // file names are.
@@ -192,7 +197,7 @@ public class MySqlDialect extends Dialect {
     }
     
     @Override
-    public boolean errorIfNotAggregateOrGrouped() {
+    public boolean errorIfNotAggregateOrGrouped(boolean rowsPresent) {
         /* This is documented behavior.
            See the ONLY_FULL_GROUP_BY SQL mode to change it. */
         return false;

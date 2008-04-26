@@ -15,5 +15,6 @@
 	<classpathentry kind="lib" path="test/lib/hsqldb-1.8.0.7.jar" sourcepath="test/lib-src/hsqldb_1_8_0_7.zip"/>
 	<classpathentry kind="lib" path="test/lib/junit-4.4.jar"/>
 	<classpathentry kind="lib" path="test/lib/junit-addons-1.4.jar"/>
+	<classpathentry kind="lib" path="test/lib/h2-1.0.71.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

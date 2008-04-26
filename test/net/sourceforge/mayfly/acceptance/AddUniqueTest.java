@@ -86,7 +86,7 @@ public class AddUniqueTest extends SqlTestCase {
             expectExecuteFailure(add, "primary key id cannot be null");
     
             execute("update foo set id = 7 where x = 20");
-            if (dialect.uniqueColumnMayBeNullable()) {
+            if (dialect.canTurnNullableColumnIntoPrimaryKey()) {
                 execute(add);
                 
                 expectExecuteFailure("insert into foo values(5, 30)", 

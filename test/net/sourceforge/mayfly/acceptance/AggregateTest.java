@@ -204,7 +204,7 @@ public class AggregateTest extends SqlTestCase {
         execute("insert into foo (x, y) values (7, 90)");
         
         assertResultSet(new String[] { " 3 " }, 
-            query("select count(all x) from foo"));
+            query("select count(x) from foo"));
         assertResultSet(new String[] { " 2 " }, 
             query("select count(distinct x) from foo"));
 
@@ -223,14 +223,25 @@ public class AggregateTest extends SqlTestCase {
         execute("insert into foo (x, y) values (5, 90)");
         execute("insert into foo (x, y) values (7, 90)");
         
-        assertResultSet(new String[] { " 80 " }, 
-            query("select avg(all y) from foo"));
-        assertResultSet(new String[] { " 17 " }, 
-            query("select sum(all x) from foo"));
-        assertResultSet(new String[] { " 5 " }, 
-            query("select min(all x) from foo"));
-        assertResultSet(new String[] { " 7 " }, 
-            query("select max(all x) from foo"));
+        if (dialect.allowExplicitAllInAggregate()) {
+            assertResultSet(new String[] { " 3 " }, 
+                query("select count(all x) from foo"));
+            assertResultSet(new String[] { " 80 " }, 
+                query("select avg(all y) from foo"));
+            assertResultSet(new String[] { " 17 " }, 
+                query("select sum(all x) from foo"));
+            assertResultSet(new String[] { " 5 " }, 
+                query("select min(all x) from foo"));
+            assertResultSet(new String[] { " 7 " }, 
+                query("select max(all x) from foo"));
+        }
+        else {
+            expectExecuteFailure("select count(all x) from foo", "bad token all");
+            expectExecuteFailure("select avg(all y) from foo", "bad token all");
+            expectExecuteFailure("select sum(all x) from foo", "bad token all");
+            expectExecuteFailure("select min(all x) from foo", "bad token all");
+            expectExecuteFailure("select max(all x) from foo", "bad token all");
+        }
     }
 
     public void testDistinct() throws Exception {

@@ -26,7 +26,7 @@ public class StoredProcedureTest extends SqlTestCase {
             "\"" +
             getClass().getName() +
             ".sampleProcedure\"";
-        if (dialect.callJavaMethodAsStoredProcedure()) {
+        if (dialect.haveCreateAlias()) {
             execute(createAlias);
             execute("create table foo(a integer, b integer)");
             execute("insert into foo(a, b) values(2, 3)");
@@ -46,7 +46,7 @@ public class StoredProcedureTest extends SqlTestCase {
     }
     
     public void testOverloadedOnArgumentCount() throws Exception {
-        if (!dialect.callJavaMethodAsStoredProcedure()) {
+        if (!dialect.haveCreateAlias()) {
             return;
         }
 
@@ -77,7 +77,7 @@ public class StoredProcedureTest extends SqlTestCase {
     }
     
     public void testOverloadedOnArgumentType() throws Exception {
-        if (!dialect.callJavaMethodAsStoredProcedure()) {
+        if (!dialect.haveCreateAlias()) {
             return;
         }
 
@@ -85,7 +85,7 @@ public class StoredProcedureTest extends SqlTestCase {
         execute("insert into foo(a) values(5)");
         createAlias("onType");
         String query = "select onType(a) from foo";
-        if (dialect.complainAboutDubiousStoredProcedure()) {
+        if (dialect.complainAboutStoredProcedureOverloadingOnArgumentType()) {
             expectQueryFailure(query, 
                 "multiple methods found for stored procedure.\n" +
                 "class: " + getClass().getName() + "\n" +
@@ -108,7 +108,7 @@ public class StoredProcedureTest extends SqlTestCase {
     }
 
     public void testWrongNumberOfArguments() throws Exception {
-        if (!dialect.callJavaMethodAsStoredProcedure()) {
+        if (!dialect.haveCreateAlias()) {
             return;
         }
 
@@ -135,18 +135,24 @@ public class StoredProcedureTest extends SqlTestCase {
     }
     
     public void testMethodNotStatic() throws Exception {
-        if (!dialect.callJavaMethodAsStoredProcedure()) {
+        if (!dialect.haveCreateAlias()) {
             return;
         }
 
         execute("create table foo(a integer)");
         execute("insert into foo(a) values(5)");
-        createAlias("notStatic");
+
         String query = "select notStatic(a) from foo";
-        expectQueryFailure(query, 
-            "stored procedure method must be static.\n" +
+        String expectedMessage = "stored procedure method must be static.\n" +
             "class: " + getClass().getName() + "\n" +
-            "method: notStatic");
+            "method: notStatic";
+        try {
+            createAlias("notStatic");
+            query(query);
+            failForMissingException(query, expectedMessage);
+        } catch (SQLException e) {
+            assertMessage(expectedMessage, e);
+        }
     }
     
     public int notStatic(int a) {
@@ -154,22 +160,28 @@ public class StoredProcedureTest extends SqlTestCase {
     }
     
     public void testMethodNotPublic() throws Exception {
-        if (!dialect.callJavaMethodAsStoredProcedure()) {
+        if (!dialect.haveCreateAlias()) {
             return;
         }
 
         execute("create table foo(a integer)");
         execute("insert into foo(a) values(5)");
-        createAlias("notPublic");
+
         String query = "select notPublic(a) from foo";
-        // Might be too much trouble to give a message other than "not found (maybe not public?)"
-        expectQueryFailure(query, 
-            "stored procedure method must be public.\n" +
+        String expectedMessage = "stored procedure method must be public.\n" +
             "class: " + getClass().getName() + "\n" +
-            "method: notPublic");
+            "method: notPublic";
+        // Might be too much trouble to give a message other than "not found (maybe not public?)"
+        try {
+            createAlias("notPublic");
+            query(query);
+            failForMissingException(query, expectedMessage);
+        } catch (SQLException e) {
+            assertMessage(expectedMessage, e);
+        }
     }
     
-    int notPublic(int a) {
+    static int notPublic(int a) {
         return a;
     }
     

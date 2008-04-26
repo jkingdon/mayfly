@@ -189,8 +189,11 @@ public class JoinTest extends SqlTestCase {
         execute("insert into bar(b) values(9)");
 
         String sql = "select * from foo t, bar t";
-        if (dialect.allowDuplicateTableInQuery()) {
-            assertResultSet(new String[] { " 5, 9 " }, query(sql));
+        if (dialect.allowDuplicateTableWithDifferingColumnNames()) {
+            /* I guess it doesn't really matter whether the database
+               returns 5,5 or 5,9.  Either way, accepting this seems
+               dubious. */
+            query(sql);
         }
         else {
             expectQueryFailure(sql, "duplicate table name or alias t");

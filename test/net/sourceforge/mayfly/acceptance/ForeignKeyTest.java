@@ -117,11 +117,17 @@ public class ForeignKeyTest extends SqlTestCase {
             ")" +
             dialect.tableTypeForForeignKeys());
         
-        expectExecuteFailure("drop table countries",
-            "cannot drop countries because " +
-            "a foreign key in table cities refers to it");
-        execute("drop table cities");
-        execute("drop table countries");
+        if (dialect.canDropTargetOfForeignKey()) {
+            execute("drop table countries");
+            execute("insert into cities(name, country) values('India', 5)");
+        }
+        else {
+            expectExecuteFailure("drop table countries",
+                "cannot drop countries because " +
+                "a foreign key in table cities refers to it");
+            execute("drop table cities");
+            execute("drop table countries");
+        }
     }
     
     public void testDropTableWithSchemas() throws Exception {
@@ -142,9 +148,15 @@ public class ForeignKeyTest extends SqlTestCase {
             dialect.tableTypeForForeignKeys());
         
         execute("set schema landoj");
-        expectExecuteFailure("drop table countries",
-            "cannot drop countries because " +
-            "a foreign key in table urboj.cities refers to it");
+        if (dialect.canDropTargetOfForeignKey()) {
+            execute("drop table countries");
+            return;
+        }
+        else {
+            expectExecuteFailure("drop table countries",
+                "cannot drop countries because " +
+                "a foreign key in table urboj.cities refers to it");
+        }
 
         execute("set schema urboj");
         expectExecuteFailure("drop table landoj.countries",
@@ -416,10 +428,16 @@ public class ForeignKeyTest extends SqlTestCase {
     public void testNoPrimaryKeyOrUnique() throws Exception {
         execute("create table foo(id integer)" 
             + dialect.tableTypeForForeignKeys());
-        expectExecuteFailure("create table bar(" +
-            "foo_id integer, foreign key (foo_id) references foo(id))" 
-            + dialect.tableTypeForForeignKeys(),
-            "foreign key refers to foo(id) which is not unique or a primary key");
+        String referToNonUniqueOrPrimaryKey = "create table bar(" +
+                    "foo_id integer, foreign key (foo_id) references foo(id))" 
+                    + dialect.tableTypeForForeignKeys();
+        if (dialect.foreignKeyMustReferToPrimaryKeyOrUnique()) {
+            expectExecuteFailure(referToNonUniqueOrPrimaryKey,
+                "foreign key refers to foo(id) which is not unique or a primary key");
+        }
+        else {
+            execute(referToNonUniqueOrPrimaryKey);
+        }
     }
     
     public void testReferencedColumnHasAnotherForeignKey() throws Exception {

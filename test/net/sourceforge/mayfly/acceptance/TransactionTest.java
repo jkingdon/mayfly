@@ -71,6 +71,9 @@ public class TransactionTest extends SqlTestCase {
                 assertMessage("auto-commit must be off to call rollback", e);
             }
         }
+        else {
+            connection.rollback();
+        }
 
         connection.setAutoCommit(false);
         connection.rollback();
@@ -139,6 +142,9 @@ public class TransactionTest extends SqlTestCase {
     }
     
     public void testTwoInsertsGetMerged() throws Exception {
+        if (dialect.willWaitForWriterToCommitOnTwoRowInserts()) {
+            return;
+        }
         execute("create table foo (x integer)");
         
         Connection connection2 = dialect.openAdditionalConnection();

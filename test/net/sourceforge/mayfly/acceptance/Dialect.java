@@ -91,6 +91,10 @@ public abstract class Dialect {
         return true;
     }
 
+    public boolean detectsAmbiguousColumnsInOrderBy() {
+        return true;
+    }
+
     /** 
      * @internal
      * Should a test look for behavior in which Mayfly intentionally diverges
@@ -144,6 +148,10 @@ public abstract class Dialect {
         return false;
     }
     
+    public boolean allowDuplicateTableWithDifferingColumnNames() {
+        return false;
+    }
+    
     public boolean detectsSyntaxErrorsInPrepareStatement() {
         return true;
     }
@@ -173,10 +181,19 @@ public abstract class Dialect {
     }
     
     public boolean callJavaMethodAsStoredProcedure() {
+        // Not even H2 supports this syntax.  So maybe there is a better way.
         return true;
     }
     
+    public boolean haveCreateAlias() {
+        return callJavaMethodAsStoredProcedure();
+    }
+    
     public boolean complainAboutDubiousStoredProcedure() {
+        return true;
+    }
+    
+    public boolean complainAboutStoredProcedureOverloadingOnArgumentType() {
         return true;
     }
 
@@ -203,6 +220,14 @@ public abstract class Dialect {
     }
     
     public boolean haveConcatBuiltIn() {
+        return false;
+    }
+    
+    public boolean haveConcatBuiltInWithOneArgument() {
+        return false;
+    }
+    
+    public boolean haveConcatBuiltInWithZeroArguments() {
         return false;
     }
     
@@ -264,16 +289,24 @@ public abstract class Dialect {
         return false;
     }
 
-    public boolean errorIfNotAggregateOrGrouped() {
+    public boolean errorIfNotAggregateOrGrouped(boolean rowsPresent) {
+        return true;
+    }
+    
+    public boolean disallowHavingOnUnaggregated() {
         return true;
     }
 
-    public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression() {
-        return errorIfNotAggregateOrGrouped();
+    public boolean errorIfNotAggregateOrGroupedWhenGroupByExpression(boolean rowsPresent) {
+        return errorIfNotAggregateOrGrouped(rowsPresent);
     }
 
     public boolean canGroupByExpression() {
         return true;
+    }
+    
+    public boolean groupByExpressionSimpleComparator() {
+        return false;
     }
 
     public boolean canOrderByExpression(boolean isAggregate) {
@@ -286,6 +319,10 @@ public abstract class Dialect {
 
     public boolean allowCountDistinctStar() {
         return false;
+    }
+    
+    public boolean allowExplicitAllInAggregate() {
+        return true;
     }
 
     public boolean canQuoteIdentifiers() {
@@ -388,6 +425,10 @@ public abstract class Dialect {
         return true;
     }
     
+    public boolean canTurnNullableColumnIntoPrimaryKey() {
+        return true;
+    }
+    
     public boolean allowMultipleNullsInUniqueColumn() {
         /* Most databases which allow nulls in unique columns allow
            more than one null (which is what this setting means
@@ -472,6 +513,10 @@ public abstract class Dialect {
     public boolean willWaitForWriterToCommit() {
         return false;
     }
+    
+    public boolean willWaitForWriterToCommitOnTwoRowInserts() {
+        return false;
+    }
 
     public boolean haveForUpdate() {
         return true;
@@ -511,6 +556,14 @@ public abstract class Dialect {
         return false;
     }
     
+    public boolean canDropTargetOfForeignKey() {
+        return false;
+    }
+
+    public boolean foreignKeyMustReferToPrimaryKeyOrUnique() {
+        return true;
+    }
+
     public boolean haveCheckConstraints() {
         return true;
     }
@@ -530,6 +583,14 @@ public abstract class Dialect {
     public Class typeFromAddingLongs() {
         // Obvious question here is what about overflow?
         return Long.class;
+    }
+
+    public Class typeOfTinyint() {
+        return Integer.class;
+    }
+    
+    public Class typeOfSmallint() {
+        return Integer.class;
     }
     
     public Class typeOfInteger() {
@@ -588,6 +649,10 @@ public abstract class Dialect {
     }
 
     public boolean haveDropColumn() {
+        return true;
+    }
+    
+    public boolean canDropPrimaryKeyColumn() {
         return true;
     }
     
