@@ -165,6 +165,12 @@ public class HypersonicDialect extends Dialect {
     }
     
     @Override
+    public boolean notRequiresBooleanForLike() {
+        // reports "Not a condition", a perfectly good error.
+        return true;
+    }
+    
+    @Override
     public boolean canInsertNoValues() {
         return false;
     }

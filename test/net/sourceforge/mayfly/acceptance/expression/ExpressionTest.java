@@ -1,4 +1,6 @@
-package net.sourceforge.mayfly.acceptance;
+package net.sourceforge.mayfly.acceptance.expression;
+
+import net.sourceforge.mayfly.acceptance.SqlTestCase;
 
 import java.sql.ResultSet;
 

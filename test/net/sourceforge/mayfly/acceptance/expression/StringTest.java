@@ -1,6 +1,7 @@
-package net.sourceforge.mayfly.acceptance;
+package net.sourceforge.mayfly.acceptance.expression;
 
 import net.sourceforge.mayfly.EndToEndTests;
+import net.sourceforge.mayfly.acceptance.SqlTestCase;
 
 import org.apache.commons.io.IOUtils;
 

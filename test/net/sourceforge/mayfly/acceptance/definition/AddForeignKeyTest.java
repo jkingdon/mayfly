@@ -1,4 +1,6 @@
-package net.sourceforge.mayfly.acceptance;
+package net.sourceforge.mayfly.acceptance.definition;
+
+import net.sourceforge.mayfly.acceptance.SqlTestCase;
 
 public class AddForeignKeyTest extends SqlTestCase {
     

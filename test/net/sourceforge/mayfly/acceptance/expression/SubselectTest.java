@@ -1,4 +1,8 @@
-package net.sourceforge.mayfly.acceptance;
+package net.sourceforge.mayfly.acceptance.expression;
+
+import net.sourceforge.mayfly.acceptance.GroupByTest;
+import net.sourceforge.mayfly.acceptance.ResultTest;
+import net.sourceforge.mayfly.acceptance.SqlTestCase;
 
 public class SubselectTest extends SqlTestCase {
     

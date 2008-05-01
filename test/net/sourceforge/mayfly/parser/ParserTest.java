@@ -231,7 +231,7 @@ public class ParserTest extends TestCase {
             new Parser("a NOT INTERESTING").parseWhere();
             fail();
         } catch (ParserException e) {
-            assertEquals("expected IN but got INTERESTING", e.getMessage());
+            assertEquals("expected IN or LIKE but got INTERESTING", e.getMessage());
         }
     }
 

@@ -60,7 +60,7 @@ public class EndToEndTests extends SqlTestCase {
     
     /**
      * @internal
-     * In {@link net.sourceforge.mayfly.acceptance.StringTest#testCharacterStream()} we test
+     * In {@link net.sourceforge.mayfly.acceptance.expression.StringTest#testCharacterStream()} we test
      * setting parameters with a length, and results via
      * an index.  So here we test setting parameters without
      * a length (which should work, as described there),

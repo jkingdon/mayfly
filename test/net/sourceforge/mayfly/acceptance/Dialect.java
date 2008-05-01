@@ -356,6 +356,12 @@ public abstract class Dialect {
         return true;
     }
 
+    /* I'm not really sure whether IN versus LIKE is really what
+       makes this different from notRequiresBoolean. */
+    public boolean notRequiresBooleanForLike() {
+        return notRequiresBoolean();
+    }
+
     public boolean numberOfValuesMustMatchNumberOfColumns() {
         return true;
     }

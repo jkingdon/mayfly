@@ -1,4 +1,6 @@
-package net.sourceforge.mayfly.acceptance;
+package net.sourceforge.mayfly.acceptance.expression;
+
+import net.sourceforge.mayfly.acceptance.SqlTestCase;
 
 import java.sql.ResultSet;
 
@@ -280,6 +282,30 @@ public class WhereTest extends SqlTestCase {
 //          expectQueryFailure(booleanAsLeftSideOfIn, "operand of NOT must be a boolean expression");
         } else {
             assertResultSet(new String[] { }, query(booleanAsLeftSideOfIn));
+        }
+    }
+    
+    public void testLikePrecedence() throws Exception {
+        /* Another case involving NOT and an infix.  Inspired by a blog
+           post by David Pashley. */
+        execute("create table foo(a varchar(40))");
+        execute("insert into foo(a) values(null)");
+        execute("insert into foo(a) values('aa')");
+        execute("insert into foo(a) values('a-a')");
+        execute("insert into foo(a) values('0')");
+        execute("insert into foo(a) values('1')");
+        assertResultSet(new String[] { " null ", " 'aa' ", " '0' ", " '1' " },
+            query("select a from foo where a is null or not a like '%-%'"));
+        assertResultSet(new String[] { " null ", " 'aa' ", " '0' ", " '1' " },
+            query("select a from foo where a is null or a not like '%-%'"));
+        String notOnAString = "select a from foo where a is null or (not a) like '%-%'";
+        if (dialect.notRequiresBooleanForLike()) {
+            expectQueryFailure(notOnAString, 
+                "expected boolean expression but got non-boolean expression");
+        }
+        else {
+            assertResultSet(new String[] { " null " },
+                query(notOnAString));
         }
     }
 

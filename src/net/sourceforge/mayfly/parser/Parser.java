@@ -5,6 +5,7 @@ import static net.sourceforge.mayfly.parser.TokenType.EQUAL;
 import static net.sourceforge.mayfly.parser.TokenType.IDENTIFIER;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_character;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_column;
+import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_like;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_on;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_set;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_values;
@@ -1193,9 +1194,8 @@ public class Parser {
             Expression right = parsePrimary().asNonBoolean();
             return new BooleanParserExpression(new Equal(left.asNonBoolean(), right));
         }
-        if (consumeIfMatches(TokenType.KEYWORD_like)) {
-            Expression right = parsePrimary().asNonBoolean();
-            return new BooleanParserExpression(new Like(left.asNonBoolean(), right));
+        if (currentToken.type == TokenType.KEYWORD_like) {
+            return new BooleanParserExpression(parseLike(left));
         }
         else if (consumeIfMatches(TokenType.LESS_GREATER)) {
             Expression right = parsePrimary().asNonBoolean();
@@ -1224,7 +1224,7 @@ public class Parser {
                 new LessEqual(right, left.asNonBoolean()));
         }
         else if (consumeIfMatches(TokenType.KEYWORD_not)) {
-            return new BooleanParserExpression(new Not(parseIn(left.asNonBoolean())));
+            return parseNotOperator(left);
         }
         else if (currentToken.type == TokenType.KEYWORD_in) {
             return new BooleanParserExpression(parseIn(left.asNonBoolean()));
@@ -1237,6 +1237,27 @@ public class Parser {
         }
         else {
             return left;
+        }
+    }
+
+    private Like parseLike(ParserExpression left) {
+        expectAndConsume(KEYWORD_like);
+        Expression right = parsePrimary().asNonBoolean();
+        return new Like(left.asNonBoolean(), right);
+    }
+
+    /*
+     * x NOT IN y, x NOT LIKE y, etc.
+     */
+    private BooleanParserExpression parseNotOperator(ParserExpression left) {
+        if (currentToken.type == TokenType.KEYWORD_in) {
+            return new BooleanParserExpression(new Not(parseIn(left.asNonBoolean())));
+        }
+        else if (currentToken.type == KEYWORD_like) {
+            return new BooleanParserExpression(new Not(parseLike(left)));
+        }
+        else {
+            throw new ParserException("IN or LIKE", currentToken);
         }
     }
 

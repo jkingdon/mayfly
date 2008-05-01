@@ -1,9 +1,12 @@
-package net.sourceforge.mayfly.acceptance;
+package net.sourceforge.mayfly.acceptance.definition;
+
+import net.sourceforge.mayfly.acceptance.ForeignKeyTest;
+import net.sourceforge.mayfly.acceptance.SqlTestCase;
 
 /**
  * Tests of creating and dropping tables.
- * Also see {@link net.sourceforge.mayfly.acceptance.AddColumnTest}
- * and {@link net.sourceforge.mayfly.acceptance.DropColumnTest}.
+ * Also see {@link net.sourceforge.mayfly.acceptance.definition.AddColumnTest}
+ * and {@link net.sourceforge.mayfly.acceptance.definition.DropColumnTest}.
  */
 public class DataDefinitionTest extends SqlTestCase {
 
