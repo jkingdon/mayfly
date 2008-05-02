@@ -355,7 +355,7 @@ public class HypersonicDialect extends Dialect {
     }
 
     @Override
-    public boolean complainAboutStoredProcedureOverloadingOnArgumentType() {
+    public boolean complainAboutStoredProcedureOverloadingOnArgumentTypeOrCount() {
         return false;
     }
     

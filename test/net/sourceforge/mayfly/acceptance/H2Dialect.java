@@ -73,7 +73,7 @@ public class H2Dialect extends Dialect {
     }
     
     @Override
-    public boolean complainAboutStoredProcedureOverloadingOnArgumentType() {
+    public boolean complainAboutStoredProcedureOverloadingOnArgumentTypeOrCount() {
         return false;
     }
     

@@ -181,7 +181,8 @@ public abstract class Dialect {
     }
     
     public boolean callJavaMethodAsStoredProcedure() {
-        // Not even H2 supports this syntax.  So maybe there is a better way.
+        /* Not even H2 supports this syntax.  So maybe CREATE ALIAS is
+           considered to be a better way. */
         return true;
     }
     
@@ -193,7 +194,7 @@ public abstract class Dialect {
         return true;
     }
     
-    public boolean complainAboutStoredProcedureOverloadingOnArgumentType() {
+    public boolean complainAboutStoredProcedureOverloadingOnArgumentTypeOrCount() {
         return true;
     }
 

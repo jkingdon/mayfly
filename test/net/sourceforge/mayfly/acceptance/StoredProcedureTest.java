@@ -54,7 +54,7 @@ public class StoredProcedureTest extends SqlTestCase {
         execute("insert into foo(a) values(5)");
         createAlias("overloaded");
         String query = "select overloaded(a) from foo";
-        if (dialect.complainAboutDubiousStoredProcedure()) {
+        if (dialect.complainAboutStoredProcedureOverloadingOnArgumentTypeOrCount()) {
             expectQueryFailure(query, 
                 "multiple methods found for stored procedure.\n" +
                 "class: " + getClass().getName() + "\n" +
@@ -85,7 +85,7 @@ public class StoredProcedureTest extends SqlTestCase {
         execute("insert into foo(a) values(5)");
         createAlias("onType");
         String query = "select onType(a) from foo";
-        if (dialect.complainAboutStoredProcedureOverloadingOnArgumentType()) {
+        if (dialect.complainAboutStoredProcedureOverloadingOnArgumentTypeOrCount()) {
             expectQueryFailure(query, 
                 "multiple methods found for stored procedure.\n" +
                 "class: " + getClass().getName() + "\n" +
