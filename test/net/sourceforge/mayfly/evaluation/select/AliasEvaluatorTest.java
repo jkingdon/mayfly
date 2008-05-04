@@ -69,7 +69,7 @@ public class AliasEvaluatorTest extends TestCase {
 
     private void check(long expected, String table, String column, 
         Evaluator evaluator, ResultRow row) {
-        LongCell value = (LongCell) evaluator.lookup(row, table, column, null);
+        LongCell value = (LongCell) evaluator.lookup(row, table, table, column, null);
         assertEquals(expected, value.asLong());
     }
     

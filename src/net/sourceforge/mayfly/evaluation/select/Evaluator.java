@@ -40,8 +40,9 @@ public abstract class Evaluator {
     abstract public String currentSchema();
 
     public Cell lookup(ResultRow row, 
-        String tableOrAlias, String columnName, Location location) {
-        Expression found = row.findColumn(tableOrAlias, columnName, location);
+        String tableOrAlias, String originalTableOrAlias, String columnName, Location location) {
+        Expression found = row.findColumn(
+            tableOrAlias, originalTableOrAlias, columnName, location);
         return row.findValue(found);
     }
 

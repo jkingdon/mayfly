@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation.condition;
 import junit.framework.TestCase;
 
 import net.sourceforge.mayfly.datastore.DateCell;
+import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.datastore.NullCell;
 import net.sourceforge.mayfly.datastore.Row;
 import net.sourceforge.mayfly.datastore.TupleBuilder;
@@ -13,6 +14,7 @@ import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.ScalarSubselect;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.evaluation.select.Select;
 import net.sourceforge.mayfly.parser.Parser;
 import net.sourceforge.mayfly.util.ImmutableList;
@@ -135,14 +137,32 @@ public class ConditionTest extends TestCase {
     }
 
     private void check(String expressionString, ResultRow row) {
+        Condition condition = parse(expressionString);
+        condition.check(row);
+    }
+
+    private Condition parse(String expressionString) {
         Parser parser = new Parser(expressionString);
         Condition condition = parser.parseCondition().asBoolean();
         assertEquals("", parser.remainingTokens());
-        condition.check(row);
+        return condition;
     }
     
     public void testResolve() throws Exception {
+        Condition condition = parse("a >= 5");
+        ResultRow row = new ResultRow().withColumn("foo", "a", new LongCell(8));
+        Condition resolved = condition.resolve(row, Evaluator.NO_SUBSELECT_NEEDED);
+        assertTrue(resolved.evaluate(row));
         
+        /* This is similar to what happens after a GROUP BY (in which the
+           ResultRow just has some aggregates */
+        try {
+            resolved.evaluate(new ResultRow());
+            fail();
+        }
+        catch (NoColumn expected) {
+            assertEquals("no column a", expected.getMessage());
+        }
     }
     
     public void testCompareDates() throws Exception {

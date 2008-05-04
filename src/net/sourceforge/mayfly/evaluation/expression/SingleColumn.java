@@ -12,8 +12,8 @@ import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.parser.Location;
 
 public class SingleColumn extends Expression {
-    private final String originalTableOrAlias;
     private final String tableOrAlias;
+    public final String originalTableOrAlias;
     private final String columnName;
     public final Options options;
 
@@ -49,17 +49,18 @@ public class SingleColumn extends Expression {
 
     @Override
     public Cell evaluate(ResultRow row, Evaluator evaluator) {
-        return evaluator.lookup(row, tableOrAlias, columnName, location);
+        return evaluator.lookup(row, tableOrAlias, originalTableOrAlias, columnName, location);
     }
 
     @Override
     public Cell evaluate(ResultRow row) {
-        Expression found = row.findColumn(tableOrAlias, columnName, location);
+        Expression found = lookup(row);
         return row.findValue(found);
     }
 
     public SingleColumn lookup(ResultRow row) {
-        return row.findColumn(tableOrAlias, columnName, location);
+        return row.findColumn(
+            tableOrAlias, originalTableOrAlias, columnName, location);
     }
 
     @Override

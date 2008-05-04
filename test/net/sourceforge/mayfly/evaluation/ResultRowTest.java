@@ -13,6 +13,7 @@ import net.sourceforge.mayfly.evaluation.expression.CountAll;
 import net.sourceforge.mayfly.evaluation.expression.Plus;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
+import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.MayflyAssert;
 
 public class ResultRowTest extends TestCase {
@@ -80,12 +81,20 @@ public class ResultRowTest extends TestCase {
                 .withColumn("bar", "x", new LongCell(5))
                 .with(new CountAll("count"), new LongCell(15))
                 ;
-        SingleColumn column = row.findColumn("bar", "x");
+        SingleColumn column = row.findColumn("bar", null, "x", Location.UNKNOWN);
         assertEquals("bar", column.tableOrAlias());
         assertEquals("x", column.columnName());
         
         try {
-            row.findColumn("bar", "y");
+            row.findColumn("bar", null, "y", Location.UNKNOWN);
+            fail();
+        }
+        catch (NoColumn e) {
+            assertEquals("no column y", e.getMessage());
+        }
+
+        try {
+            row.findColumn("bar", "bar", "y", Location.UNKNOWN);
             fail();
         }
         catch (NoColumn e) {

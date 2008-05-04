@@ -82,19 +82,17 @@ public class ResultRow {
     }
 
     public Expression findColumn(String columnName) {
-        return findColumn(null, columnName);
+        return findColumn(null, null, columnName, Location.UNKNOWN);
     }
 
-    public SingleColumn findColumn(String tableOrAlias, String columnName) {
-        return findColumn(tableOrAlias, columnName, Location.UNKNOWN);
-    }
-
-    public SingleColumn findColumn(String tableOrAlias, String columnName,
+    public SingleColumn findColumn(
+        String tableOrAlias, String originalTableOrAlias, String columnName,
         Location location) {
         SingleColumn found = findColumnOrNull(tableOrAlias, columnName, location);
         if (found == null) {
-            throw new NoColumn(tableOrAlias, columnName, location);
-        } else {
+            throw new NoColumn(originalTableOrAlias, columnName, location);
+        }
+        else {
             return found;
         }
     }

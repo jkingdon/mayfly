@@ -141,11 +141,12 @@ public class Parser {
         new ResultRow() {
             @Override
             public SingleColumn findColumn(
-                String tableOrAlias, String columnName,
+                String tableOrAlias, String originalTableOrAlias,
+                String columnName,
                 Location location) {
                 throw new MayflyException(
                     "values clause may not refer to column: " 
-                    + Column.displayName(tableOrAlias, columnName),
+                    + Column.displayName(originalTableOrAlias, columnName),
                     location
                 );
             }

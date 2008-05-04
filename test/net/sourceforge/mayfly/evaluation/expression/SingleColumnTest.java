@@ -5,6 +5,7 @@ import junit.framework.TestCase;
 import net.sourceforge.mayfly.Options;
 import net.sourceforge.mayfly.datastore.LongCell;
 import net.sourceforge.mayfly.evaluation.Expression;
+import net.sourceforge.mayfly.evaluation.NoColumn;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.select.AliasEvaluator;
@@ -55,9 +56,25 @@ public class SingleColumnTest extends TestCase {
             "x", new Location(5, 20, 7, 24), new Options());
 
         SingleColumn resolved = (SingleColumn) unresolved.resolve(row);
+        assertEquals(null, resolved.originalTableOrAlias);
+        assertEquals("x", resolved.displayName());
         assertEquals("foo", resolved.tableOrAlias());
         assertEquals("x", resolved.columnName());
         assertEquals(20, resolved.location.startColumn);
+    }
+    
+    public void testEvaluatePassesOriginalTableToException() throws Exception {
+        SingleColumn unresolved = (SingleColumn) 
+            new Parser("x").parseExpression().asNonBoolean();
+        SingleColumn resolved = (SingleColumn) unresolved.resolve(
+            new ResultRow().withColumn("foo", "x", new LongCell(7)));
+        try {
+            resolved.evaluate(new ResultRow());
+            fail();
+        }
+        catch (NoColumn expected) {
+            assertEquals("no column x", expected.getMessage());
+        }
     }
     
     public void testResolveWithColumnAlias() throws Exception {

@@ -32,12 +32,12 @@ public class RowEvaluator extends Evaluator {
     
     @Override
     public Cell lookup(ResultRow row, 
-        String tableOrAlias, String columnName, Location location) {
+        String tableOrAlias, String originalTableOrAlias, String columnName, Location location) {
         try {
-            return super.lookup(row, tableOrAlias, columnName, location);
+            return super.lookup(row, tableOrAlias, originalTableOrAlias, columnName, location);
         }
         catch (NoColumn e) {
-            return nestedEvaluator.lookup(this.row, tableOrAlias, columnName, location);
+            return nestedEvaluator.lookup(this.row, tableOrAlias, originalTableOrAlias, columnName, location);
         }
     }
     

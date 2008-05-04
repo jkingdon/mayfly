@@ -1,7 +1,6 @@
 package net.sourceforge.mayfly.evaluation;
 
 import net.sourceforge.mayfly.MayflyException;
-import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.evaluation.select.Evaluator;
 import net.sourceforge.mayfly.evaluation.what.Selected;
@@ -35,7 +34,7 @@ public class GroupBy implements Aggregator {
     }
     
     public ResultRow check(ResultRow afterJoins, Evaluator evaluator, Selected selected) {
-//        having = having.resolve(afterJoins, evaluator);
+        having = having.resolve(afterJoins, evaluator);
         keys.resolve(afterJoins, evaluator);
 
         GroupedRows grouped = makeGroupedRows(new ResultRows(afterJoins), evaluator);
@@ -52,11 +51,6 @@ public class GroupBy implements Aggregator {
             having.evaluate(afterGroupBy, evaluator);
         }
         catch (NoColumn doesNotSurviveGroupBy) {
-            if (having.isAggregate()) {
-                throw new UnimplementedException(
-                    "aggregates in HAVING not yet fully implemented");
-            }
-
             having.evaluate(afterJoins, evaluator);
             throw new MayflyException(doesNotSurviveGroupBy.displayName() + 
                 " is not aggregate or mentioned in GROUP BY",

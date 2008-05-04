@@ -35,9 +35,9 @@ public class AliasEvaluator extends Evaluator {
     }
     
     @Override
-    public Cell lookup(ResultRow row, String tableOrAlias, String columnName, Location location) {
+    public Cell lookup(ResultRow row, String tableOrAlias, String originalTableOrAlias, String columnName, Location location) {
         if (tableOrAlias != null) {
-            return delegate.lookup(row, tableOrAlias, columnName, location);
+            return delegate.lookup(row, tableOrAlias, originalTableOrAlias, columnName, location);
         }
 
         Expression aliasedTo = what.lookupAlias(columnName);
@@ -45,7 +45,7 @@ public class AliasEvaluator extends Evaluator {
             return aliasedTo.evaluate(row);
         }
         else {
-            return delegate.lookup(row, tableOrAlias, columnName, location);
+            return delegate.lookup(row, tableOrAlias, originalTableOrAlias, columnName, location);
         }
     }
     

@@ -21,10 +21,10 @@ public class RowEvaluatorTest {
         RowEvaluator evaluator = new RowEvaluator(correlatedRow, nested);
 
         ResultRow rowFromInner = new ResultRow().withColumn("bbb", "b", new LongCell(8));
-        assertLong(7, evaluator.lookup(rowFromInner, "aaa", "a", Location.UNKNOWN));
-        assertLong(7, evaluator.lookup(rowFromInner, null, "a", Location.UNKNOWN));
-        assertLong(8, evaluator.lookup(rowFromInner, "bbb", "b", Location.UNKNOWN));
-        assertLong(8, evaluator.lookup(rowFromInner, null, "b", Location.UNKNOWN));
+        assertLong(7, evaluator.lookup(rowFromInner, "aaa", null, "a", Location.UNKNOWN));
+        assertLong(7, evaluator.lookup(rowFromInner, null, null, "a", Location.UNKNOWN));
+        assertLong(8, evaluator.lookup(rowFromInner, "bbb", null, "b", Location.UNKNOWN));
+        assertLong(8, evaluator.lookup(rowFromInner, null, null, "b", Location.UNKNOWN));
         checkLookupFails(rowFromInner, evaluator, null, "c", "c");
         checkLookupFails(rowFromInner, evaluator, "ccc", "c", "ccc.c");
         checkLookupFails(rowFromInner, evaluator, "aaa", "b", "aaa.b");
@@ -35,7 +35,7 @@ public class RowEvaluatorTest {
         ResultRow row, RowEvaluator evaluator, String table, String column,
         String expectedDisplayName) {
         try {
-            evaluator.lookup(row, table, column, Location.UNKNOWN);
+            evaluator.lookup(row, table, table, column, Location.UNKNOWN);
             fail();
         }
         catch (NoColumn expected) {

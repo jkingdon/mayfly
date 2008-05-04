@@ -306,14 +306,7 @@ public class GroupByTest extends SqlTestCase {
             query("select avg(x) from foo group by y having avg(foo.x) < 5"));
 
         String sql = "select avg(x) from foo group by y having avg(x) < 5";
-        if (dialect.wishThisWereTrue()) {
-            assertResultList(new String[] { " 2 " }, query(sql));
-        }
-        else {
-            expectQueryFailure(sql, 
-                "aggregates in HAVING not yet fully implemented");
-        }
-        
+        assertResultList(new String[] { " 2 " }, query(sql));
     }
     
     public void testHavingIsKeyExpression() throws Exception {
