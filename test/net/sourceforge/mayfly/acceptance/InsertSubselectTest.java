@@ -25,48 +25,27 @@ public class InsertSubselectTest extends SqlTestCase {
         execute("create table src(d integer, e integer, f integer)");
         execute("create table dest(a integer, b integer, c integer)");
 
-        String insert = "insert into dest(a, b) select d, e, f from src";
-        if (dialect.wishThisWereTrue()) {
-            expectExecuteFailure(insert,
-                "Too many values.\n" +
-                "Columns and values were:\n" +
-                "a d\n" +
-                "b e\n" +
-                "(none) f\n");
-        }
-        else {
-            execute(insert);
-            execute("insert into src(d, e, f) values(1, 2, 3)");
-            expectExecuteFailure(insert,
-                "Too many values.\n" +
-                "Columns and values were:\n" +
-                "a 1\n" +
-                "b 2\n" +
-                "(none) 3\n");
-        }
+        expectExecuteFailure(
+            "insert into dest(a, b) select d, e, f from src",
+
+            "Too many values.\n" +
+            "Columns and values from subselect were:\n" +
+            "a d\n" +
+            "b e\n" +
+            "(none) f\n");
     }
 
     public void testTooFewValues() throws Exception {
         execute("create table src(d integer, e integer, f integer)");
         execute("create table dest(a integer, b integer, c integer)");
 
-        String insert = "insert into dest(a, b) select d from src";
-        if (dialect.wishThisWereTrue()) {
-            expectExecuteFailure(insert,
-                "Too few values.\n" +
-                "Columns and values were:\n" +
-                "a d\n" +
-                "b (none)\n");
-        }
-        else {
-            execute(insert);
-            execute("insert into src(d, e, f) values(1, 2, 3)");
-            expectExecuteFailure(insert,
-                "Too few values.\n" +
-                "Columns and values were:\n" +
-                "a 1\n" +
-                "b (none)\n");
-        }
+        expectExecuteFailure(
+            "insert into dest(a, b) select d from src",
+            
+            "Too few values.\n" +
+            "Columns and values from subselect were:\n" +
+            "a d\n" +
+            "b (none)\n");
     }
 
     public void testImplicitDestinationColumns() throws Exception {
@@ -77,6 +56,18 @@ public class InsertSubselectTest extends SqlTestCase {
         execute("insert into dest select d, e, f from src");
         assertResultSet(new String[] { " 1, 2, 3 " }, 
             query("select a, b, c from dest"));
+    }
+    
+    public void testStillCheckCountWhenDestinationColumnsAreImplicit() throws Exception {
+        execute("create table src(d integer, e integer, f integer)");
+        execute("create table dest(a integer, b integer, c integer)");
+
+        expectExecuteFailure("insert into dest select d, e from src",
+            "Too few values.\n" +
+            "Columns and values from subselect were:\n" +
+            "a d\n" +
+            "b e\n" +
+            "c (none)\n");
     }
 
     public void testImplicitSourceColumns() throws Exception {

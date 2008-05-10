@@ -42,20 +42,13 @@ public class TableData {
     }
 
     public TableData addRow(Checker checker, TableReference table,
-        List columnNames, ValueList values) {
-        if (columnNames.size() != values.size()) {
-            Columns columnsToInsert = findColumns(columnNames);
-            if (values.size() > columnNames.size()) {
-                throw makeException("Too many values.\n", columnsToInsert, values);
-            } else {
-                throw makeException("Too few values.\n", columnsToInsert, values);
-            }
-        }
+        ImmutableList<String> columnNames, ValueList values) {
+        checkColumnCount(columnNames, values);
         
         TupleMapper tuple = new TupleMapper();
         Columns newColumns = columns;
         for (int i = 0; i < values.size(); ++i) {
-            String columnName = (String)columnNames.get(i);
+            String columnName = columnNames.get(i);
             Column column = columns.columnFromName(columnName);
             newColumns =
                 addColumn(newColumns, tuple, column, checker, values.value(i));
@@ -85,10 +78,52 @@ public class TableData {
         return addRow(checker, table, columns.asNames(), values);
     }
 
-    private MayflyException makeException(String message, Columns columnsToInsert, ValueList values) {
+    public void checkColumnCount(ImmutableList<String> columnNames,
+        ValueList values) {
+        if (columnNames.size() != values.size()) {
+            if (values.size() > columnNames.size()) {
+                throw makeException("Too many values.\n", columnNames, values);
+            } else {
+                throw makeException("Too few values.\n", columnNames, values);
+            }
+        }
+    }
+
+    private MayflyException makeException(String message, 
+        ImmutableList<String> columnNames, ValueList values) {
         return new MayflyException(
-            message + describeNamesAndValues(columnsToInsert, values.asCells()),
+            message + describeNamesAndValues(columnNames, values),
             values.location);
+    }
+
+    private String describeNamesAndValues(
+        ImmutableList<String> columns, ValueList values) {
+        StringBuilder result = new StringBuilder();
+        
+        result.append("Columns and values were:\n");
+
+        Iterator<String> nameIterator = columns.iterator();
+        Iterator<Cell> valueIterator = values.asCells().iterator();
+        while (nameIterator.hasNext() || valueIterator.hasNext()) {
+            if (nameIterator.hasNext()) {
+                String columnName = nameIterator.next();
+                result.append(columnName);
+            } else {
+                result.append("(none)");
+            }
+
+            result.append(' ');
+
+            if (valueIterator.hasNext()) {
+                Cell value = valueIterator.next();
+                result.append(value.toString());
+            } else {
+                result.append("(none)");
+            }
+            
+            result.append('\n');
+        }
+        return result.toString();
     }
 
     private Columns addColumn(Columns newColumns, TupleMapper tuple, Column column, Checker checker, Value value) {
@@ -178,35 +213,6 @@ public class TableData {
         return new UpdateTable(newTable, rowsAffected);
     }
 
-    private String describeNamesAndValues(Columns columns, List values) {
-        StringBuilder result = new StringBuilder();
-        
-        result.append("Columns and values were:\n");
-
-        Iterator nameIterator = columns.iterator();
-        Iterator valueIterator = values.iterator();
-        while (nameIterator.hasNext() || valueIterator.hasNext()) {
-            if (nameIterator.hasNext()) {
-                Column column = (Column) nameIterator.next();
-                result.append(column.columnName());
-            } else {
-                result.append("(none)");
-            }
-
-            result.append(' ');
-
-            if (valueIterator.hasNext()) {
-                Object value = valueIterator.next();
-                result.append(value.toString());
-            } else {
-                result.append("(none)");
-            }
-            
-            result.append('\n');
-        }
-        return result.toString();
-    }
-
     public Columns findColumns(List columnNames) {
         L columnList = new L();
         for (Iterator iter = columnNames.iterator(); iter.hasNext();) {
@@ -235,7 +241,7 @@ public class TableData {
         return columns.columnFromName(columnName);
     }
 
-    public List columnNames() {
+    public ImmutableList<String> columnNames() {
         return columns.asNames();
     }
     

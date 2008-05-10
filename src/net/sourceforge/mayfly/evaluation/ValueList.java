@@ -34,7 +34,7 @@ public class ValueList {
         return new ValueList(values, this.location.combine(end));
     }
 
-    public ImmutableList asCells() {
+    public ImmutableList<Cell> asCells() {
         List cells = new ArrayList();
         for (Iterator iter = values.iterator(); iter.hasNext();) {
             Value value = (Value) iter.next();

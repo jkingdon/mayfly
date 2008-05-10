@@ -148,12 +148,12 @@ public class Schema {
     }
 
     public Schema addRow(Checker checker, TableReference table, 
-        List columnNames, ValueList values) {
+        ImmutableList columnNames, ValueList values) {
         return new Schema(tables.with(lookUpTable(table.tableName()), 
             table(table.tableName()).addRow(checker, table, columnNames, values)));
     }
     
-    public Schema addRow(String table, List columnNames, ValueList values) {
+    public Schema addRow(String table, ImmutableList columnNames, ValueList values) {
         return addRow(new NullChecker(), 
             new TableReference(DataStore.ANONYMOUS_SCHEMA_NAME, table), 
             columnNames, values);

@@ -20,7 +20,6 @@ import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.expression.literal.IntegerLiteral;
 import net.sourceforge.mayfly.evaluation.from.FromTable;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
-import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.L;
 import net.sourceforge.mayfly.util.MayflyAssert;
@@ -28,8 +27,8 @@ import net.sourceforge.mayfly.util.MayflyAssert;
 public class SelectTest extends TestCase {
 
     public void testExecuteSimpleJoin() throws Exception {
-        L fooColumns = new L().append("colA").append("colB");
-        L barColumns = new L().append("colX").append("colY");
+        ImmutableList fooColumns = new L().append("colA").append("colB").asImmutable();
+        ImmutableList barColumns = new L().append("colX").append("colY").asImmutable();
         Evaluator evaluator =
             new StoreEvaluator(
                 new Schema()
@@ -81,8 +80,8 @@ public class SelectTest extends TestCase {
 
     private ResultRows query(Evaluator evaluator, String sql) {
         Select select = (Select) Command.fromSql(sql);
-        select.optimize();
-        return select.query(evaluator, new Selected());
+        OptimizedSelect optimized = select.makeOptimized(evaluator);
+        return optimized.query();
     }
 
     public void testSmallerJoin() throws Exception {
@@ -90,10 +89,10 @@ public class SelectTest extends TestCase {
             new StoreEvaluator(
                 new Schema()
                     .createTable("foo", new L().append("colA"))
-                    .addRow("foo", new L().append("colA"), ValueList.singleton(new StringCell("1a")))
+                    .addRow("foo", new ImmutableList().with("colA"), ValueList.singleton(new StringCell("1a")))
 
                     .createTable("bar", new L().append("colX"))
-                    .addRow("bar", new L().append("colX"), ValueList.singleton(new StringCell("barXValue")))
+                    .addRow("bar", new ImmutableList().with("colX"), ValueList.singleton(new StringCell("barXValue")))
                 );
 
 
@@ -102,7 +101,7 @@ public class SelectTest extends TestCase {
     }
 
     public void testSimpleWhere() throws Exception {
-        L columnNames = new L().append("colA").append("colB");
+        ImmutableList columnNames = new ImmutableList().with("colA").with("colB");
         Evaluator evaluator =
             new StoreEvaluator(
                 new Schema()

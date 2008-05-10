@@ -13,6 +13,7 @@ import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
 import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
+import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.ImmutableMap;
 
 import java.util.Iterator;
@@ -114,7 +115,7 @@ public class DataStore {
     }
 
     public DataStore addRow(TableReference table, 
-        List columnNames, ValueList values, Checker checker) {
+        ImmutableList columnNames, ValueList values, Checker checker) {
         return replace(table.schema(),
             schema(table.schema())
                 .addRow(checker, table, columnNames, values));

@@ -69,6 +69,10 @@ public class Select extends Command {
 
     @Override
     public MayflyResultSet select(Evaluator evaluator, Cell lastIdentity) {
+        return makeOptimized(evaluator).asResultSet();
+    }
+
+    public OptimizedSelect makeOptimized(Evaluator evaluator) {
         Evaluator aliasEvaluator = new AliasEvaluator(what, evaluator);
 
         optimize(aliasEvaluator);
@@ -76,8 +80,9 @@ public class Select extends Command {
         Selected selected = what.selected(dummyRow);
 
         check(aliasEvaluator, selected, dummyRow);
-        ResultRows rows = query(aliasEvaluator, selected);
-        return new MayflyResultSet(selected, rows);
+        return new OptimizedSelect(
+            aliasEvaluator, selected, dummyRow,
+            from, where, groupBy, distinct, orderBy, what, limit);
     }
 
     private void check(Evaluator evaluator, Selected selected, ResultRow dummyRow) {
@@ -91,7 +96,7 @@ public class Select extends Command {
         ResultRow groupedDummyRow = groupBy.check(dummyRow, evaluator, selected);
 
         ResultRows afterDistinct = 
-            distinct(selected, new ResultRows(groupedDummyRow));
+            distinct(selected, new ResultRows(groupedDummyRow), distinct);
 
         orderBy.check(afterDistinct.singleRow(), groupedDummyRow, 
             dummyRow, evaluator);
@@ -106,23 +111,8 @@ public class Select extends Command {
         return element.dummyRow(evaluator);
     }
 
-    ResultRows query(Evaluator evaluator, Selected selected) {
-        FromElement element = from.soleElement();
-        ResultRows joinedRows = element.tableContents(
-            evaluator);
-
-        ResultRows afterWhere = joinedRows.select(where, evaluator);
-        
-        ResultRows afterGrouping = groupBy.group(afterWhere, evaluator, selected);
-
-        ResultRows afterDistinct = distinct(selected, afterGrouping);
-
-        ResultRows sorted = orderBy.sort(afterDistinct, what, evaluator);
-        return limit.limit(sorted);
-    }
-
-    private ResultRows distinct(Selected selected, ResultRows rows) {
-        if (!distinct) {
+    public static ResultRows distinct(Selected selected, ResultRows rows, boolean isDistinct) {
+        if (!isDistinct) {
             return rows;
         }
 
@@ -131,7 +121,7 @@ public class Select extends Command {
         return distinctRowsToResultRows(selected, distinctRows);
     }
 
-    private ResultRows distinctRowsToResultRows(Selected selected, Set distinctRows) {
+    private static ResultRows distinctRowsToResultRows(Selected selected, Set distinctRows) {
         ResultRows result = new ResultRows();
         for (Iterator iter = distinctRows.iterator(); iter.hasNext();) {
             GroupByCells cells = (GroupByCells) iter.next();
@@ -140,7 +130,7 @@ public class Select extends Command {
         return result;
     }
 
-    private Set constructDistinctRows(Selected selected, ResultRows rows) {
+    private static Set constructDistinctRows(Selected selected, ResultRows rows) {
         Set distinctRows = new LinkedHashSet();
         for (Iterator iter = rows.iterator(); iter.hasNext();) {
             ResultRow row = (ResultRow) iter.next();
