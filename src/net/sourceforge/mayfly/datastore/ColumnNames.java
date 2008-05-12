@@ -32,11 +32,28 @@ public class ColumnNames implements Iterable<String> {
     public static ColumnNames singleton(String column) {
         return new ColumnNames(ImmutableList.singleton(column));
     }
+    
+    /**
+     * @internal
+     * @param names list of column names, or null to use all columns in
+     * the table, in the order specified by the table.
+     */
+    public static ColumnNames fromParser(
+        DataStore store, TableReference table, ImmutableList<String> names) {
+        return
+            names != null ? 
+                new ColumnNames(names) : 
+                new ColumnNames(store.table(table).columnNames());
+    }
 
     private final ImmutableList<String> names;
 
     public ColumnNames(ImmutableList<String> names) {
         this.names = names;
+    }
+    
+    public ImmutableList<String> asList() {
+        return names;
     }
 
     public int size() {

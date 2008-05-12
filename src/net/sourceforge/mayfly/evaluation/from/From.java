@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 public class From {
 
-    private final ImmutableList fromElements;
+    private final ImmutableList<FromElement> fromElements;
 
     public From(FromElement... elements) { 
         this.fromElements = ImmutableList.fromArray(elements);
@@ -36,7 +36,7 @@ public class From {
     public FromElement soleElement() {
         if (size() != 1) {
             throw new MayflyInternalException(
-                "optimizer left us " + size() + " elements");
+                "planner left us " + size() + " elements");
         }
     
         return element(0);
@@ -47,7 +47,7 @@ public class From {
     }
     
     public FromElement element(int index) {
-        return (FromElement) fromElements.get(index);
+        return fromElements.get(index);
     }
 
 }

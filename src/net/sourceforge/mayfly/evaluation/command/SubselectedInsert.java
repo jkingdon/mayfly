@@ -3,6 +3,7 @@ package net.sourceforge.mayfly.evaluation.command;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
 import net.sourceforge.mayfly.MayflyResultSet;
+import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.evaluation.Checker;
@@ -21,7 +22,7 @@ import java.util.Iterator;
 public class SubselectedInsert extends Command {
 
     private final UnresolvedTableReference unresolvedTable;
-    private final ImmutableList columnNames;
+    private final ImmutableList<String> columnNames;
 
     private final Location location;
     private final Select subselect;
@@ -57,16 +58,15 @@ public class SubselectedInsert extends Command {
         Checker checker) {
         DataStore store = evaluator.store();
 
-        OptimizedSelect optimized = subselect.makeOptimized(evaluator);
+        OptimizedSelect optimized = subselect.plan(evaluator);
 
-        ImmutableList<String> names = 
-            columnNames != null ? columnNames : store.table(table).columnNames();
-        checkColumnCount(names, optimized.selected);
+        ColumnNames names = ColumnNames.fromParser(store, table, columnNames);
+        checkColumnCount(names.asList(), optimized.selected);
 
         MayflyResultSet rows = optimized.asResultSet();
         while (rows.next()) {
             ValueList values = rows.asValues(subselect.location);
-            store = Insert.addOneRow(store, table, columnNames, values, checker);
+            store = store.addRow(table, names.asList(), values, checker);
         }
         return store;
     }

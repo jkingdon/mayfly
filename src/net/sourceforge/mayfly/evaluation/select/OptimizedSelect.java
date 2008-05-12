@@ -5,7 +5,6 @@ import net.sourceforge.mayfly.evaluation.Aggregator;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
-import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.What;
@@ -16,17 +15,17 @@ public class OptimizedSelect {
     public final Selected selected;
     private final ResultRow dummyRow;
 
-    private final From from;
-    private final Condition where;
+    public final FromElement from;
+    final Condition where;
     private final Aggregator groupBy;
-    private final boolean distinct;
+    private final Distinct distinct;
     private final OrderBy orderBy;
     private final What what;
     private final Limit limit;
 
     public OptimizedSelect(
         Evaluator evaluator, Selected selected, ResultRow dummyRow,
-        From from, Condition where, Aggregator groupBy, boolean distinct, 
+        FromElement from, Condition where, Aggregator groupBy, Distinct distinct, 
         OrderBy orderBy, What what, Limit limit) {
         this.evaluator = evaluator;
         this.selected = selected;
@@ -41,14 +40,13 @@ public class OptimizedSelect {
     }
 
     ResultRows query() {
-        FromElement element = from.soleElement();
-        ResultRows joinedRows = element.tableContents(evaluator);
+        ResultRows joinedRows = from.tableContents(evaluator);
 
         ResultRows afterWhere = joinedRows.select(where, evaluator);
         
         ResultRows afterGrouping = groupBy.group(afterWhere, evaluator, selected);
 
-        ResultRows afterDistinct = Select.distinct(selected, afterGrouping, distinct);
+        ResultRows afterDistinct = distinct.distinct(selected, afterGrouping);
 
         ResultRows sorted = orderBy.sort(afterDistinct, what, evaluator);
         return limit.limit(sorted);

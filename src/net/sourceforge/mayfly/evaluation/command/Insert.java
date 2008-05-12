@@ -1,5 +1,6 @@
 package net.sourceforge.mayfly.evaluation.command;
 
+import net.sourceforge.mayfly.datastore.ColumnNames;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.datastore.TableReference;
 import net.sourceforge.mayfly.evaluation.Checker;
@@ -11,7 +12,7 @@ import net.sourceforge.mayfly.util.ImmutableList;
 public class Insert extends Command {
 
     public final UnresolvedTableReference table;
-    public final ImmutableList columnNames;
+    public final ImmutableList<String> columnNames;
     public final ValueList values;
     public final Location location;
 
@@ -32,22 +33,13 @@ public class Insert extends Command {
     public UpdateStore update(DataStore store, String defaultSchema) {
         TableReference resolved = table.resolve(store, defaultSchema, null);
         Checker checker = new RealChecker(store, resolved, location, table.options);
+        ColumnNames columns = ColumnNames.fromParser(store, resolved, columnNames);
 
         return new UpdateStore(
-            addOneRow(store, resolved, columnNames, values, checker),
+            store.addRow(resolved, columns.asList(), values, checker),
             1,
             checker.newIdentityValue()
         );
-    }
-
-    public static DataStore addOneRow(DataStore store, TableReference table, 
-        ImmutableList columnNames, ValueList values, Checker checker) {
-        if (columnNames == null) {
-            return store.addRow(table, values, checker);
-        }
-        else {
-            return store.addRow(table, columnNames, values, checker);
-        }
     }
 
 }

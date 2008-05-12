@@ -116,15 +116,13 @@ public class DataStore {
 
     public DataStore addRow(TableReference table, 
         ImmutableList columnNames, ValueList values, Checker checker) {
+        if (columnNames == null) {
+            throw new NullPointerException("should have looked up column names by now");
+        }
+
         return replace(table.schema(),
             schema(table.schema())
                 .addRow(checker, table, columnNames, values));
-    }
-
-    public DataStore addRow(TableReference table, ValueList values, Checker checker) {
-        return replace(table.schema(), 
-            schema(table.schema())
-                .addRow(checker, table, values));
     }
 
     public Set schemas() {

@@ -80,7 +80,7 @@ public class SelectTest extends TestCase {
 
     private ResultRows query(Evaluator evaluator, String sql) {
         Select select = (Select) Command.fromSql(sql);
-        OptimizedSelect optimized = select.makeOptimized(evaluator);
+        OptimizedSelect optimized = select.plan(evaluator);
         return optimized.query();
     }
 
@@ -125,8 +125,8 @@ public class SelectTest extends TestCase {
     
     public void testMakeJoinsExplicit() throws Exception {
         Select select = (Select) Select.fromSql("select * from foo, bar");
-        select.optimize();
-        InnerJoin join = (InnerJoin) select.from().soleElement();
+        OptimizedSelect planned = select.planner().planForTests();
+        InnerJoin join = (InnerJoin) planned.from;
 
         assertEquals("foo", ((FromTable) join.left).tableName);
         assertEquals("bar", ((FromTable) join.right).tableName);
@@ -136,8 +136,8 @@ public class SelectTest extends TestCase {
         // At least for now, we don't try to pick the optimal order of
         // joins; we just take the listed order in a left-associative way.
         Select select = (Select) Select.fromSql("select * from foo, bar, baz");
-        select.optimize();
-        InnerJoin join = (InnerJoin) select.from().soleElement();
+        OptimizedSelect planned = select.planner().planForTests();
+        InnerJoin join = (InnerJoin) planned.from;
 
         InnerJoin firstJoin = (InnerJoin) join.left;
         assertEquals("foo", ((FromTable) firstJoin.left).tableName);
@@ -149,25 +149,25 @@ public class SelectTest extends TestCase {
     public void testTransformWhereToOn() throws Exception {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz where foo.id = bar.id");
-        select.optimize(
+        OptimizedSelect planned = select.plan(
             new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
             ));
 
-        InnerJoin join = (InnerJoin) select.from().soleElement();
+        InnerJoin join = (InnerJoin) planned.from;
         InnerJoin firstJoin = (InnerJoin) join.left;
 
         Equal on = (Equal) firstJoin.condition;
         MayflyAssert.assertColumn("foo", "id", on.leftSide);
         MayflyAssert.assertColumn("bar", "id", on.rightSide);
         
-        ObjectAssert.assertInstanceOf(True.class, select.where);
+        ObjectAssert.assertInstanceOf(True.class, planned.where);
     }
     
     public void testCanMove() throws Exception {
-        assertTrue(Select.canMove(
+        assertTrue(Planner.canMove(
             new Equal(
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("b")), 
@@ -179,7 +179,7 @@ public class SelectTest extends TestCase {
     }
     
     public void testCannotMoveNoColumn() throws Exception {
-        assertFalse(Select.canMove(
+        assertFalse(Planner.canMove(
             new Equal(
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("c")), 
@@ -191,7 +191,7 @@ public class SelectTest extends TestCase {
     }
     
     public void testCannotMoveNoTable() throws Exception {
-        assertFalse(Select.canMove(
+        assertFalse(Planner.canMove(
             new Equal(
                 new SingleColumn("foo", "a"), 
                 new SingleColumn("baz", "c")), 
@@ -203,7 +203,7 @@ public class SelectTest extends TestCase {
     }
     
     public void testCheckComplexExpressionUnmovable() throws Exception {
-        assertFalse(Select.canMove(
+        assertFalse(Planner.canMove(
             new Or(
                 new Equal(new IntegerLiteral(5), new IntegerLiteral(5)),
                 new Equal(
@@ -218,7 +218,7 @@ public class SelectTest extends TestCase {
     }
     
     public void testCheckComplexExpressionMovable() throws Exception {
-        assertTrue(Select.canMove(
+        assertTrue(Planner.canMove(
             new Or(
                 new Equal(new IntegerLiteral(5), new IntegerLiteral(5)),
                 new Equal(
@@ -236,7 +236,7 @@ public class SelectTest extends TestCase {
         // The problem is that we don't yet have fully functional
         // machinery for taking max(a) and knowing that "a" is
         // foo.a and not some other a.
-        assertFalse(Select.canMove(
+        assertFalse(Planner.canMove(
             new Equal(
                 new Maximum(new SingleColumn("a"), "max", false),
                 new IntegerLiteral(5)), 
@@ -250,7 +250,7 @@ public class SelectTest extends TestCase {
     public void testFullDummyRow() throws Exception {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz");
-        ResultRow dummyRow = select.dummyRow(
+        ResultRow dummyRow = select.planner().dummyRow(
             0,
             new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
@@ -265,14 +265,14 @@ public class SelectTest extends TestCase {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz " +
             "where foo.id = bar.id and (bar.id = 5 or baz.id = 7)");
-        select.optimize(
+        OptimizedSelect planned = select.plan(
             new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
             ));
 
-        InnerJoin join = (InnerJoin) select.from().soleElement();
+        InnerJoin join = (InnerJoin) planned.from;
         InnerJoin firstJoin = (InnerJoin) join.left;
 
         Equal on = (Equal) firstJoin.condition;
@@ -285,21 +285,21 @@ public class SelectTest extends TestCase {
         Equal bazEquals7 = (Equal) movedToLastJoin.rightSide;
         MayflyAssert.assertColumn("baz", "id", bazEquals7.leftSide);
         
-        ObjectAssert.assertInstanceOf(True.class, select.where);
+        ObjectAssert.assertInstanceOf(True.class, planned.where);
     }
     
     public void testMoveRightSideOfAnd() throws Exception {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz " +
             "where foo.id = baz.id and (bar.id = 5 or foo.id = 7)");
-        select.optimize(
+        OptimizedSelect planned = select.plan(
             new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
             ));
 
-        InnerJoin join = (InnerJoin) select.from().soleElement();
+        InnerJoin join = (InnerJoin) planned.from;
         InnerJoin firstJoin = (InnerJoin) join.left;
 
         Or on = (Or) firstJoin.condition;
@@ -310,21 +310,21 @@ public class SelectTest extends TestCase {
         MayflyAssert.assertColumn("foo", "id", movedToLastJoin.leftSide);
         MayflyAssert.assertColumn("baz", "id", movedToLastJoin.rightSide);
         
-        ObjectAssert.assertInstanceOf(True.class, select.where);
+        ObjectAssert.assertInstanceOf(True.class, planned.where);
     }
     
     public void testMoveAlmostEverything() throws Exception {
         Select select = (Select) Select.fromSql(
             "select * from foo, bar, baz " +
             "where foo.id = bar.id and bar.id > 5 and baz.id = 9 and foo.id > 7");
-        select.optimize(
+        OptimizedSelect planned = select.plan(
             new StoreEvaluator(new Schema()
                 .createTable("foo", ImmutableList.singleton("id"))
                 .createTable("bar", ImmutableList.singleton("id"))
                 .createTable("baz", ImmutableList.singleton("id"))
             ));
 
-        InnerJoin join = (InnerJoin) select.from().soleElement();
+        InnerJoin join = (InnerJoin) planned.from;
         InnerJoin firstJoin = (InnerJoin) join.left;
 
         And on = (And) firstJoin.condition;
@@ -336,7 +336,7 @@ public class SelectTest extends TestCase {
         Equal movedToLastJoin = (Equal) join.condition;
         MayflyAssert.assertColumn("baz", "id", movedToLastJoin.leftSide);
         
-        ObjectAssert.assertInstanceOf(True.class, select.where);
+        ObjectAssert.assertInstanceOf(True.class, planned.where);
     }
     
 }

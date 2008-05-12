@@ -159,13 +159,6 @@ public class Schema {
             columnNames, values);
     }
 
-    public Schema addRow(Checker checker, TableReference table, ValueList values) {
-        return new Schema(
-            tables.with(
-                lookUpTable(table.tableName()), 
-                table(table.tableName()).addRow(checker, table, values)));
-    }
-
     public UpdateSchema update(Checker checker, TableReference table, 
         List setClauses, Condition where) {
         UpdateTable result = 

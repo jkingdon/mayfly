@@ -74,10 +74,6 @@ public class TableData {
             newColumns, constraints, rows.with(newRow), indexes);
     }
 
-    public TableData addRow(Checker checker, TableReference table, ValueList values) {
-        return addRow(checker, table, columns.asNames(), values);
-    }
-
     public void checkColumnCount(ImmutableList<String> columnNames,
         ValueList values) {
         if (columnNames.size() != values.size()) {
