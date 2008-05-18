@@ -74,9 +74,7 @@ public class PrimaryKeyTest extends SqlTestCase {
         
         execute("insert into foo(x) values(5)");
         expectExecuteFailure("insert into foo(x) values(5)", 
-            dialect.wishThisWereTrue() ?
-                "primary key my_primary_key (table foo, column x): duplicate value 5" :
-                "primary key in table foo, column x: duplicate value 5");
+            "primary key my_primary_key (table foo, column x): duplicate value 5");
     }
     
     public void testNotNull() throws Exception {

@@ -102,7 +102,15 @@ public abstract class NotNullOrUnique extends Constraint {
     private String constraintName(TableReference table) {
         StringBuilder message = new StringBuilder();
         message.append(description());
-        message.append(" in table ");
+        if (constraintName != null) {
+            message.append(" ");
+            message.append(constraintName);
+            message.append(" (");
+        }
+        else {
+            message.append(" in ");
+        }
+        message.append("table ");
         message.append(table.tableName());
         message.append(", column");
         if (names.size() != 1) {
@@ -117,6 +125,10 @@ public abstract class NotNullOrUnique extends Constraint {
             String column = (String) iter.next();
             message.append(",");
             message.append(column);
+        }
+        
+        if (constraintName != null) {
+            message.append(")");
         }
         return message.toString();
     }

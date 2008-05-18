@@ -13,7 +13,7 @@ public class DropUniqueConstraintTest extends SqlTestCase {
         execute("insert into foo(x, y) values(5, 'first')");
         String insertSecond = "insert into foo(x, y) values(5, 'second')";
         expectExecuteFailure(insertSecond, 
-            "unique constraint in table foo, column x: duplicate value 5");
+            "unique constraint x_uniq (table foo, column x): duplicate value 5");
         
         String dropConstraint = "alter table foo drop constraint x_uniq";
         if (dialect.haveDropConstraint()) {
@@ -43,7 +43,7 @@ public class DropUniqueConstraintTest extends SqlTestCase {
         execute("insert into foo(x, y) values(5, 'first')");
         String insertSecond = "insert into foo(x, y) values(5, 'second')";
         expectExecuteFailure(insertSecond, 
-            "unique constraint in table foo, column x: duplicate value 5");
+            "unique constraint x_uniq (table foo, column x): duplicate value 5");
 
         String sql = dropIndexCommand("x_uniq", "foo");
         if (dialect.haveDropConstraint()) {
