@@ -9,14 +9,13 @@ import net.sourceforge.mayfly.datastore.Schema;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.expression.SingleColumn;
 import net.sourceforge.mayfly.evaluation.select.StoreEvaluator;
-import net.sourceforge.mayfly.util.ImmutableList;
 
 public class FromTableTest extends TestCase {
     
     public void testCaseSensitiveTableName() throws Exception {
         Options options = new Options(true);
         DataStore store = new DataStore(
-            new Schema().createTable("foo", ImmutableList.singleton("x")));
+            new Schema().createTable("foo", "x"));
         try {
             new FromTable("Foo", "f")
                 .dummyRow(
@@ -35,7 +34,7 @@ public class FromTableTest extends TestCase {
     public void testOptionsPassedToRows() throws Exception {
         Options options = new Options(true);
         DataStore store = new DataStore(
-            new Schema().createTable("foo", ImmutableList.singleton("x")));
+            new Schema().createTable("foo", "x"));
         ResultRow dummyRow = new FromTable("foo", "f")
             .dummyRow(
                 new StoreEvaluator(store, 

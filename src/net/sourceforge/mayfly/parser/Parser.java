@@ -1627,30 +1627,29 @@ public class Parser {
     }
 
     private FromElement parseFromItem() {
+        FromElement left;
         if (consumeIfMatches(TokenType.OPEN_PAREN)) {
-            FromElement fromElement = parseFromItem();
+            left = parseFromItem();
             expectAndConsume(CLOSE_PAREN);
-            return fromElement;
+        }
+        else {
+            left = parseFromTable();
         }
 
-        FromElement left = parseFromTable();
         while (true) {
-            if (currentToken.type == TokenType.KEYWORD_cross) {
-                expectAndConsume(TokenType.KEYWORD_cross);
+            if (consumeIfMatches(TokenType.KEYWORD_cross)) {
                 expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
                 left = new InnerJoin(left, right, Condition.TRUE);
             }
-            else if (currentToken.type == TokenType.KEYWORD_inner) {
-                expectAndConsume(TokenType.KEYWORD_inner);
+            else if (consumeIfMatches(TokenType.KEYWORD_inner)) {
                 expectAndConsume(TokenType.KEYWORD_join);
                 FromElement right = parseFromItem();
                 expectAndConsume(TokenType.KEYWORD_on);
                 Condition condition = parseWhere();
                 left = new InnerJoin(left, right, condition);
             }
-            else if (currentToken.type == TokenType.KEYWORD_left) {
-                expectAndConsume(TokenType.KEYWORD_left);
+            else if (consumeIfMatches(TokenType.KEYWORD_left)) {
                 if (currentToken.type == TokenType.KEYWORD_outer) {
                     expectAndConsume(TokenType.KEYWORD_outer);
                 }

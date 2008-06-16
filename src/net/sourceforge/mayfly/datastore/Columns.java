@@ -6,7 +6,6 @@ import net.sourceforge.mayfly.parser.Location;
 import net.sourceforge.mayfly.util.CaseInsensitiveString;
 import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.ImmutableMap;
-import net.sourceforge.mayfly.util.L;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,14 +14,22 @@ import java.util.List;
 import java.util.Map;
 
 public class Columns implements Iterable<Column> {
-    public static Columns fromColumnNames(List columnNameStrings) {
-        L columnList = new L();
-        for (Iterator iter = columnNameStrings.iterator(); iter.hasNext();) {
-            String name = (String) iter.next();
+    public static Columns fromColumnNames(Iterable<String> names) {
+        List<Column> columnList = new ArrayList<Column>();
+        for (String name : names) {
             columnList.add(new Column(name));
         }
 
-        return new Columns(columnList.asImmutable());
+        return new Columns(new ImmutableList(columnList));
+    }
+    
+    public static Columns fromColumnNames(String... names) {
+        List<Column> columnList = new ArrayList<Column>();
+        for (String name : names) {
+            columnList.add(new Column(name));
+        }
+
+        return new Columns(new ImmutableList(columnList));
     }
 
     public static Columns singleton(Column column) {
@@ -31,14 +38,13 @@ public class Columns implements Iterable<Column> {
     }
 
 
-    final ImmutableList columnNames;
+    final ImmutableList<CaseInsensitiveString> columnNames;
     final ImmutableMap nameToColumn;
 
-    public Columns(ImmutableList columns) {
+    public Columns(ImmutableList<Column> columns) {
         List names = new ArrayList();
         Map map = new HashMap();
-        for (Iterator iter = columns.iterator(); iter.hasNext();) {
-            Column column = (Column) iter.next();
+        for (Column column : columns) {
             CaseInsensitiveString name = column.columnName;
             names.add(name);
             Object oldColumn = map.put(name, column);
@@ -46,11 +52,11 @@ public class Columns implements Iterable<Column> {
                 throw new MayflyException("duplicate column " + name);
             }
         }
-        this.columnNames = new ImmutableList(names);
+        this.columnNames = new ImmutableList<CaseInsensitiveString>(names);
         this.nameToColumn = new ImmutableMap(map);
     }
     
-    private Columns(ImmutableList names, ImmutableMap map) {
+    private Columns(ImmutableList<CaseInsensitiveString> names, ImmutableMap map) {
         this.columnNames = names;
         this.nameToColumn = map;
     }
@@ -78,17 +84,15 @@ public class Columns implements Iterable<Column> {
         };
     }
 
-    public ImmutableList asNames() {
-        List names = new ArrayList();
-        for (int i = 0; i < columnNames.size(); ++i) {
-            CaseInsensitiveString column = (CaseInsensitiveString) 
-                columnNames.get(i);
+    public ImmutableList<String> asNames() {
+        List<String> names = new ArrayList<String>();
+        for (CaseInsensitiveString column : columnNames) {
             names.add(column.getString());
         }
-        return new ImmutableList(names);
+        return new ImmutableList<String>(names);
     }
     
-    public ImmutableList asCaseNames() {
+    public ImmutableList<CaseInsensitiveString> asCaseNames() {
         return columnNames;
     }
 

@@ -5,7 +5,7 @@ import net.sourceforge.mayfly.evaluation.what.Selected;
 
 /**
  * @internal
- * Not yet immutable, because of {@link GroupByKeys}
+ * Implementations of this interface should be immutable.
  */
 public interface Aggregator {
 
@@ -14,5 +14,7 @@ public interface Aggregator {
 
     public abstract ResultRow check(
         ResultRow dummyRow, Evaluator evaluator, Selected selected);
+    
+    public abstract Aggregator resolve(ResultRow dummyRow, Evaluator evaluator);
 
 }

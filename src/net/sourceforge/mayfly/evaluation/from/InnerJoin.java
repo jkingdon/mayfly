@@ -17,5 +17,10 @@ public class InnerJoin extends Join {
                 .join(right.tableContents(evaluator));
         return unfiltered.select(condition, evaluator);
     }
+    
+    @Override
+    public FromElement addToCondition(Condition conditionToAndIn) {
+        return new InnerJoin(left, right, condition.makeAnd(conditionToAndIn));
+    }
 
 }

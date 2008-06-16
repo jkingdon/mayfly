@@ -6,10 +6,7 @@ import net.sourceforge.mayfly.evaluation.select.Evaluator;
 
 public class GroupItem {
 
-    /**
-     * Not yet immutable, because of {@link #resolve(ResultRow, Evaluator)}.
-     */
-    private Expression expression;
+    private final Expression expression;
 
     public GroupItem(Expression expression) {
         this.expression = expression;
@@ -29,8 +26,14 @@ public class GroupItem {
         return expression;
     }
 
-    public void resolve(ResultRow row, Evaluator evaluator) {
-        expression = expression.resolve(row, evaluator);
+    public GroupItem resolve(ResultRow row, Evaluator evaluator) {
+        Expression resolved = expression.resolve(row, evaluator);
+        if (resolved == expression) {
+            return this;
+        }
+        else {
+            return new GroupItem(resolved);
+        }
     }
 
 }

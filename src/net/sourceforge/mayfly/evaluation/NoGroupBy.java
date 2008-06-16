@@ -42,4 +42,8 @@ public class NoGroupBy implements Aggregator {
         }
     }
     
+    public Aggregator resolve(ResultRow dummyRow, Evaluator evaluator) {
+        return this;
+    }
+    
 }

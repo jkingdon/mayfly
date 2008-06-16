@@ -1,7 +1,5 @@
 package net.sourceforge.mayfly.evaluation.select;
 
-import java.util.Iterator;
-
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.Aggregator;
@@ -11,7 +9,6 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.ResultRows;
 import net.sourceforge.mayfly.evaluation.condition.And;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
-import net.sourceforge.mayfly.evaluation.condition.True;
 import net.sourceforge.mayfly.evaluation.from.From;
 import net.sourceforge.mayfly.evaluation.from.FromElement;
 import net.sourceforge.mayfly.evaluation.from.InnerJoin;
@@ -30,7 +27,9 @@ public class Planner {
     // mutated as we move conditions from WHERE to ON
     private Condition where;
 
-    private final Aggregator groupBy;
+    // mutated when we resolve
+    private Aggregator groupBy;
+
     private final Distinct distinct;
     private final OrderBy orderBy;
     private final Limit limit;
@@ -44,13 +43,6 @@ public class Planner {
         this.distinct = distinct;
         this.orderBy = orderBy;
         this.limit = limit;
-    }
-
-    public OptimizedSelect planForTests() {
-        optimize();
-        return new OptimizedSelect(
-            null, null, null,
-            from.soleElement(), where, groupBy, distinct, orderBy, what, limit);
     }
 
     public OptimizedSelect plan(Evaluator evaluator) {
@@ -67,13 +59,13 @@ public class Planner {
     }
 
     private void check(Evaluator evaluator, Selected selected, ResultRow dummyRow) {
-        for (Iterator iter = selected.iterator(); iter.hasNext();) {
-            Expression element = (Expression) iter.next();
+        for (Expression element : selected) {
             element.evaluate(dummyRow, evaluator);
         }
         
         where.evaluate(dummyRow, evaluator);
         where.rejectAggregates("WHERE");
+        groupBy = groupBy.resolve(dummyRow, evaluator);
         ResultRow groupedDummyRow = groupBy.check(dummyRow, evaluator, selected);
 
         ResultRows afterDistinct = 
@@ -92,24 +84,20 @@ public class Planner {
         return element.dummyRow(evaluator);
     }
 
-    public void optimize() {
-        optimize(null);
-    }
-
     /**
      * Currently this method makes joins explicit and also moves
      * conditions from WHERE to ON.  The whole thing would probably
-     * be cleaner if those were separated.  The second step
-     * would be optional (for those tests currently passing in
-     * null for store) and the {@link #dummyRow(int, DataStore, String)}
+     * be cleaner if those were separated.  The 
+     * {@link #dummyRow(int, DataStore, String)}
      * method could make use of the joins which were built up
      * in the first step.
      */
-    public void optimize(Evaluator evaluator) {
-        if (evaluator != null) {
-            ResultRow fullDummyRow = dummyRow(0, evaluator);
-            where.evaluate(fullDummyRow, evaluator);
+    private void optimize(Evaluator evaluator) {
+        if (evaluator == null) {
+            throw new NullPointerException("evaluator is required");
         }
+        ResultRow fullDummyRow = dummyRow(0, evaluator);
+        where.evaluate(fullDummyRow, evaluator);
 
         while (from.size() > 1) {
             // x y z -> join(x, y) z
@@ -122,6 +110,12 @@ public class Planner {
 
             from = from.without(0).without(0).with(0, explicitJoin);
         }
+        
+        moveAllWhereToOn(evaluator);
+    }
+
+    private void moveAllWhereToOn(Evaluator evaluator) {
+        // Currently handled in optimize method
     }
 
     ResultRow dummyRow(int index, Evaluator evaluator) {
@@ -138,11 +132,6 @@ public class Planner {
     private Condition moveWhereToOn(
         FromElement first, FromElement second,
         Evaluator evaluator) {
-        if (evaluator == null) {
-            // For convenience in tests.
-            return Condition.TRUE;
-        }
-
         MoveResult result = new MoveResult();
         moveToResult(first, second, evaluator, result, where);
         where = result.nonMovable;
@@ -153,7 +142,7 @@ public class Planner {
         Evaluator evaluator, 
         final MoveResult moveResult, Condition toAnalyze) {
         if (canMove(toAnalyze, first, second, evaluator)) {
-            moveResult.toBeMoved = makeAnd(toAnalyze, moveResult.toBeMoved);
+            moveResult.toBeMoved = toAnalyze.makeAnd(moveResult.toBeMoved);
         }
         else if (toAnalyze instanceof And) {
             And and = (And) toAnalyze;
@@ -165,19 +154,6 @@ public class Planner {
         }
     }
     
-    private Condition makeAnd(Condition left, Condition right) {
-        // Turn "foo and true" into "foo" (mainly to make unit tests easier).
-        if (left instanceof True) {
-            return right;
-        }
-        else if (right instanceof True) {
-            return left;
-        }
-        else {
-            return new And(left, right);
-        }
-    }
-
     static class MoveResult {
         Condition toBeMoved = Condition.TRUE;
         Condition nonMovable = Condition.TRUE;

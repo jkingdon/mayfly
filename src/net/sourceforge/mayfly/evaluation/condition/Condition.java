@@ -8,11 +8,8 @@ import net.sourceforge.mayfly.parser.Location;
 
 /**
  * @internal
- * The intention is that a condition should be immutable. Right now
- * the condition subclasses themselves don't always enforce this but
- * mutating the condition, after its initial construction, is not
- * allowed as it is in the data store. (The subclass in question is
- * {@link SubselectedIn}).
+ * I believe that conditions are now immutable.  Certainly that
+ * is the intention (since they can be kept in the data store).
  */
 public abstract class Condition {
 
@@ -59,6 +56,23 @@ public abstract class Condition {
     
     public Location location() {
         return Location.UNKNOWN;
+    }
+
+    /**
+     * @internal
+     * Construct a condition which behaves like this AND right
+     */
+    public Condition makeAnd(Condition right) {
+        // Turn "foo and true" into "foo" (mainly to make unit tests easier).
+        if (this instanceof True) {
+            return right;
+        }
+        else if (right instanceof True) {
+            return this;
+        }
+        else {
+            return new And(this, right);
+        }
     }
 
 }

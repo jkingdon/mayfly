@@ -8,10 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @internal
- * Not yet immutable, because of {@link GroupItem}
- */
 public class GroupByKeys {
 
     private final ImmutableList<GroupItem> items;
@@ -53,9 +49,21 @@ public class GroupByKeys {
         return false;
     }
 
-    public void resolve(ResultRow row, Evaluator evaluator) {
+    public GroupByKeys resolve(ResultRow row, Evaluator evaluator) {
+        List<GroupItem> resolvedItems = new ArrayList<GroupItem>();
+        boolean changed = false;
         for (GroupItem item : items) {
-            item.resolve(row, evaluator);
+            GroupItem resolved = item.resolve(row, evaluator);
+            if (resolved != item) {
+                changed = true;
+            }
+            resolvedItems.add(resolved);
+        }
+        if (changed) {
+            return new GroupByKeys(new ImmutableList(resolvedItems));
+        }
+        else {
+            return this;
         }
     }
 

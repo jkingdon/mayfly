@@ -47,4 +47,9 @@ public class LeftJoin extends Join {
         return new ResultRows(joinResult.asImmutable());
     }
 
+    @Override
+    public FromElement addToCondition(Condition conditionToAndIn) {
+        return new LeftJoin(left, right, condition.makeAnd(conditionToAndIn));
+    }
+
 }

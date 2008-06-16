@@ -15,7 +15,7 @@ public class GroupByKeysTest extends TestCase {
         GroupByKeys keys = new GroupByKeys(
             new GroupItem(new Concatenate(new SingleColumn("a"), new QuotedString("'abc'"))));
         ResultRow row = new ResultRow().withColumn("foo", "a", NullCell.INSTANCE);
-        keys.resolve(row, Evaluator.NO_SUBSELECT_NEEDED);
+        keys = keys.resolve(row, Evaluator.NO_SUBSELECT_NEEDED);
         
         assertEquals(1, keys.size());
         Expression expression = keys.get(0).expression();

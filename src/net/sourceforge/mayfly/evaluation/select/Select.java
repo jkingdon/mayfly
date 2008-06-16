@@ -5,7 +5,6 @@ import net.sourceforge.mayfly.MayflyResultSet;
 import net.sourceforge.mayfly.datastore.Cell;
 import net.sourceforge.mayfly.datastore.DataStore;
 import net.sourceforge.mayfly.evaluation.Aggregator;
-import net.sourceforge.mayfly.evaluation.GroupByKeys;
 import net.sourceforge.mayfly.evaluation.command.Command;
 import net.sourceforge.mayfly.evaluation.command.UpdateStore;
 import net.sourceforge.mayfly.evaluation.condition.Condition;
@@ -21,9 +20,6 @@ public class Select extends Command {
 
     private final Condition where;
 
-    /**
-     * Not immutable, because of {@link GroupByKeys}
-     */
     private final Aggregator groupBy;
 
     private final Distinct distinct;

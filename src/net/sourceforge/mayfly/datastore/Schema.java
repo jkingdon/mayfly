@@ -30,7 +30,15 @@ public class Schema {
         this.tables = tables;
     }
 
-    public Schema createTable(String table, List columnNames) {
+    public Schema createTable(String table, Iterable<String> columnNames) {
+        return createTable(
+            table, 
+            Columns.fromColumnNames(columnNames), 
+            new Constraints(),
+            new ImmutableList());
+    }
+    
+    public Schema createTable(String table, String... columnNames) {
         return createTable(
             table, 
             Columns.fromColumnNames(columnNames), 

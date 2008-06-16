@@ -424,6 +424,38 @@ public class JoinTest extends SqlTestCase {
         );
     }
     
+    public void testParenthesesAndJoins() throws Exception {
+        execute("create table apple(a varchar(255))");
+        execute("create table banana(b varchar(255))");
+        execute("create table carrot(c varchar(255))");
+        execute("insert into apple(a) values('aa')");
+        execute("insert into banana(b) values('bb')");
+        execute("insert into carrot(c) values('cc')");
+        
+        assertResultSet(new String[] { " 'aa', 'bb', 'cc' " },
+            query("select a, b, c from apple, banana, carrot"));
+
+        String simpleCrossJoin = "select a, b, c from apple cross join banana cross join carrot";
+        if (dialect.crossJoinRequiresOn()) {
+            expectExecuteFailure(simpleCrossJoin, "expected ON but got CROSS");
+            return;
+        }
+        assertResultSet(new String[] { " 'aa', 'bb', 'cc' " },
+            query(simpleCrossJoin));
+
+        assertResultSet(new String[] { " 'aa', 'bb', 'cc' " },
+            query("select a, b, c from apple cross join banana, carrot"));
+        assertResultSet(new String[] { " 'aa', 'bb', 'cc' " },
+            query("select a, b, c from apple, banana cross join carrot"));
+        // Those were warmups.  Here we start in on parens
+        assertResultSet(new String[] { " 'aa', 'bb', 'cc' " },
+            query("select a, b, c from (apple cross join banana) cross join carrot"));
+        assertResultSet(new String[] { " 'aa', 'bb', 'cc' " },
+            query("select a, b, c from apple cross join (banana cross join carrot)"));
+        assertResultSet(new String[] { " 'aa', 'bb', 'cc' " },
+            query("select a, b, c from apple inner join (banana cross join carrot) on a = 'aa' "));
+    }
+    
     public void testJoinOnNull() throws Exception {
         // This case is mentioned in the documentation for
         // hypersonic 1.8.x.

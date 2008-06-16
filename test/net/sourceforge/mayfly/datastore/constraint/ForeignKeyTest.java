@@ -19,9 +19,9 @@ public class ForeignKeyTest extends TestCase {
         DataStore store =
             new DataStore(
                 new Schema()
-                    .createTable("foo", ImmutableList.singleton("bar_id"))
+                    .createTable("foo", "bar_id")
 
-                    .createTable("bar", ImmutableList.singleton("id"))
+                    .createTable("bar", "id")
                     .addRow("bar", ImmutableList.singleton("id"), ValueList.singleton(new LongCell(5)))
             );
         key.checkInsert(store, DataStore.ANONYMOUS_SCHEMA_NAME, "foo",
@@ -53,10 +53,10 @@ public class ForeignKeyTest extends TestCase {
         DataStore store =
             new DataStore(
                 new Schema()
-                    .createTable("foo", ImmutableList.singleton("bar_id"))
+                    .createTable("foo", "bar_id")
                     .addRow("foo", ImmutableList.singleton("bar_id"), ValueList.singleton(new LongCell(5)))
 
-                    .createTable("bar", ImmutableList.singleton("id"))
+                    .createTable("bar", "id")
                     .addRow("bar", ImmutableList.singleton("id"), ValueList.singleton(new LongCell(5)))
                     .addRow("bar", ImmutableList.singleton("id"), ValueList.singleton(new LongCell(6)))
             );

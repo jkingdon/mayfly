@@ -9,15 +9,19 @@ import net.sourceforge.mayfly.util.ImmutableList;
 public class GroupBy implements Aggregator {
     
     private final GroupByKeys keys;
-    private Condition having;
+    private final Condition having;
 
     public GroupBy(ImmutableList<GroupItem> items, Condition having) {
-        keys = new GroupByKeys(items);
-        this.having = having;
+        this(new GroupByKeys(items), having);
     }
 
     public GroupBy(GroupItem... item) {
         this(ImmutableList.fromArray(item), Condition.TRUE);
+    }
+    
+    public GroupBy(GroupByKeys keys, Condition having) {
+        this.keys = keys;
+        this.having = having;
     }
 
     public GroupedRows makeGroupedRows(ResultRows resultRows, Evaluator evaluator) {
@@ -33,10 +37,18 @@ public class GroupBy implements Aggregator {
         return resultOfGrouping.select(having, evaluator);
     }
     
+    public Aggregator resolve(ResultRow afterJoins, Evaluator evaluator) {
+        Condition newHaving = having.resolve(afterJoins, evaluator);
+        GroupByKeys newKeys = keys.resolve(afterJoins, evaluator);
+        if (newHaving != having || newKeys != keys) {
+            return new GroupBy(newKeys, newHaving);
+        }
+        else {
+            return this;
+        }
+    }
+    
     public ResultRow check(ResultRow afterJoins, Evaluator evaluator, Selected selected) {
-        having = having.resolve(afterJoins, evaluator);
-        keys.resolve(afterJoins, evaluator);
-
         GroupedRows grouped = makeGroupedRows(new ResultRows(afterJoins), evaluator);
         ResultRows resultOfGrouping = grouped.ungroup(selected);
 

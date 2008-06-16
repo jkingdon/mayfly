@@ -62,9 +62,7 @@ public class FromTable extends FromElement {
     private ResultRow applyAlias(Row row, Columns tableColumns,
         Options options) {
         ResultRow result = new ResultRow();
-        for (Iterator iter = tableColumns.asCaseNames().iterator(); 
-            iter.hasNext(); ) {
-            CaseInsensitiveString column = (CaseInsensitiveString) iter.next();
+        for (CaseInsensitiveString column : tableColumns.asCaseNames()) {
             result = result.with(
                 new SingleColumn(alias, column.getString(), options), 
                 row.cell(column));
