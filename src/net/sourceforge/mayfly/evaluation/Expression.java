@@ -9,6 +9,11 @@ import net.sourceforge.mayfly.evaluation.what.Selected;
 import net.sourceforge.mayfly.evaluation.what.WhatElement;
 import net.sourceforge.mayfly.parser.Location;
 
+/**
+ * @internal
+ * Expressions should be immutable.  I think that is probably true now
+ * (certainly it is the intention, as they go in the store).
+ */
 abstract public class Expression extends WhatElement {
     
     /* Storing a location here is dubious because an expression can

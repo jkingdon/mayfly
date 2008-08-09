@@ -85,6 +85,7 @@ public class Planner {
     }
 
     /**
+     * @internal
      * Currently this method makes joins explicit and also moves
      * conditions from WHERE to ON.  The whole thing would probably
      * be cleaner if those were separated.  The 

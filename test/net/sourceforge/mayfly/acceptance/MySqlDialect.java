@@ -436,5 +436,10 @@ public class MySqlDialect extends Dialect {
     public boolean callJavaMethodAsStoredProcedure() {
         return false;
     }
+    
+    @Override
+    public boolean likeIsCaseSensitive() {
+        return false;
+    }
 
 }

@@ -3,6 +3,10 @@ package net.sourceforge.mayfly.evaluation.select;
 import net.sourceforge.mayfly.evaluation.ResultRow;
 import net.sourceforge.mayfly.evaluation.what.What;
 
+/**
+ * @internal
+ * Implementations of this class should be immutable.
+ */
 abstract public class OrderItem {
 
     private final boolean ascending;

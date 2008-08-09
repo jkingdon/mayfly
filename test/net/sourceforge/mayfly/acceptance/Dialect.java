@@ -486,6 +486,10 @@ public abstract class Dialect {
         // messages case-preserving in general.
         return false;
     }
+    
+    public boolean likeIsCaseSensitive() {
+        return true;
+    }
 
     public boolean haveSlashStarComments() {
         return true;

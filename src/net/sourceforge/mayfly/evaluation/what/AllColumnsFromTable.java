@@ -4,7 +4,7 @@ import net.sourceforge.mayfly.evaluation.ResultRow;
 
 public class AllColumnsFromTable extends WhatElement {
 
-    private String aliasOrTable;
+    private final String aliasOrTable;
 
     public AllColumnsFromTable(String aliasOrTable) {
         this.aliasOrTable = aliasOrTable;
