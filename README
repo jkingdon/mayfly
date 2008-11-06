@@ -1,0 +1,10 @@
+Mayfly is an in-memory SQL database designed for unit testing.  It is
+designed to make creating and destroying databases or tables as easy 
+as creating and destroying objects, and to make it easy to do things
+like compare two databases.
+
+The documentation, including installation instructions,
+is in the doc directory (online at http://mayfly.sourceforge.net/doc ).
+
+The mayfly home page is at http://mayfly.sourceforge.net/
+
