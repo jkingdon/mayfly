@@ -1,0 +1,17 @@
+Instructions for people maintaining these web pages:
+
+* Check in all changes to git.
+
+* Push individual files to sourceforge (where we currently host the web site) using sftp as described at http://alexandria.wiki.sourceforge.net/Project+Web,+Shell,+VHOST+and+Database+Services
+Quick summary is:
+$ sftp SOURCEFORGE_USER,mayfly@web.sourceforge.net
+Connecting to web.sourceforge.net...
+sftp> cd htdocs
+sftp> put index.html
+Uploading index.html to /home/groups/m/ma/mayfly/htdocs/index.html
+index.html                                    100% 4288     4.2KB/s   00:00    
+sftp> quit
+$ 
+
+* Probably it will be easier to rsync it to sourceforge, as soon as I figure that out.
+
