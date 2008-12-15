@@ -216,6 +216,14 @@ public class DataStore {
         return new UpdateStore(replace(table.schema(), updatedSchema), 0);
     }
 
+    public UpdateStore renameTable(TableReference existing, String newName) {
+        return new UpdateStore(
+            replace(existing.schema(),
+                schema(existing.schema()).renameTable(existing, newName)
+            ),
+            0);
+    }
+
     public DataStore renameColumn(TableReference table, 
         String oldName, String newName) {
         checkForReferencesToColumn(table, oldName);

@@ -8,6 +8,7 @@ import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_column;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_like;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_on;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_set;
+import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_to;
 import static net.sourceforge.mayfly.parser.TokenType.KEYWORD_values;
 import net.sourceforge.mayfly.MayflyException;
 import net.sourceforge.mayfly.MayflyInternalException;
@@ -56,6 +57,7 @@ import net.sourceforge.mayfly.evaluation.command.Insert;
 import net.sourceforge.mayfly.evaluation.command.LastIdentity;
 import net.sourceforge.mayfly.evaluation.command.ModifyColumn;
 import net.sourceforge.mayfly.evaluation.command.NoopCommand;
+import net.sourceforge.mayfly.evaluation.command.RenameTable;
 import net.sourceforge.mayfly.evaluation.command.SetClause;
 import net.sourceforge.mayfly.evaluation.command.SetSchema;
 import net.sourceforge.mayfly.evaluation.command.SubselectedInsert;
@@ -614,6 +616,11 @@ public class Parser {
         else if (matchesNonReservedWord("engine")) {
             parseTableTypeIfPresent();
             return new NoopCommand();
+        }
+        else if (consumeNonReservedWordIfMatches("rename")) {
+            expectAndConsume(KEYWORD_to);
+            String newName = consumeIdentifier();
+            return new RenameTable(table, newName);
         }
         else if (currentToken.type == KEYWORD_character) {
             parseCharacterSetIfPresent();

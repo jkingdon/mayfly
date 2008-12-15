@@ -275,4 +275,18 @@ public class Schema {
         return null;
     }
 
+    public Schema renameTable(TableReference existing, String newName) {
+        if (hasTable(newName)) {
+            throw new MayflyException(
+                "table " + newName + " already exists; " +
+                "cannot rename " + existing.tableName() + " to " + newName);
+        }
+            
+        return new Schema(
+            tables
+                .without(existing.tableName())
+                .with(newName, table(existing.tableName()))
+        );
+    }
+
 }

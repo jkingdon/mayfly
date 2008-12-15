@@ -102,6 +102,7 @@ public class TokenType {
     public static final TokenType KEYWORD_smallint = registerKeyword("smallint");
     public static final TokenType KEYWORD_sum = registerKeyword("sum");
     public static final TokenType KEYWORD_table = registerKeyword("table");
+    public static final TokenType KEYWORD_to = registerKeyword("to");
     public static final TokenType KEYWORD_then = registerKeyword("then");
     public static final TokenType KEYWORD_unique = registerKeyword("unique");
     public static final TokenType KEYWORD_update = registerKeyword("update");

@@ -10,7 +10,7 @@ public class RenameTableTest extends SqlTestCase {
         if (dialect.haveAlterTableRenameTo()) {
             execute(rename);
             assertResultSet(new String[] { }, query("select x from bar"));
-            expectExecuteFailure("select x from foo", "no table foo");
+            expectQueryFailure("select x from foo", "no table foo");
         }
         else {
             expectExecuteFailure(rename, 
@@ -40,5 +40,9 @@ public class RenameTableTest extends SqlTestCase {
     
     // TODO: constraints pointing to renamed table
     // TODO: constraints pointing from renamed table
+    // TODO: error handling if the from table doesn't exist.
+    // TODO: rename across schemas.  MySQL sometimes supports this, I think.
+    //   It somehow feels wrong.
+    // TODO: worry about rowsAffected?  Always 0, I would think.
 
 }
