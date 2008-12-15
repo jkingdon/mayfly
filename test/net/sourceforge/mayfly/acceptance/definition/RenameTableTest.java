@@ -27,6 +27,14 @@ public class RenameTableTest extends SqlTestCase {
         expectExecuteFailure("alter table foo rename to bar", 
             "table bar already exists; cannot rename foo to bar");
     }
+    
+    public void testSourceTableDoesNotExist() throws Exception {
+        if (!dialect.haveAlterTableRenameTo()) {
+            return;
+        }
+        expectExecuteFailure("alter table foo rename to bar", 
+            "no table foo");
+    }
 
     public void testDataIsPreserved() throws Exception {
         if (!dialect.haveAlterTableRenameTo()) {
