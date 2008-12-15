@@ -64,10 +64,11 @@ public class DerbyDialect extends Dialect {
         return false;
     }
     
-    @Override
-    public boolean uniqueColumnMayBeNullable() {
-        return false;
-    }
+    /* False for Derby 10.1.2.1, true for 10.4.2.0 */
+//    @Override
+//    public boolean uniqueColumnMayBeNullable() {
+//        return false;
+//    }
     
     @Override
     public boolean canTurnNullableColumnIntoPrimaryKey() {
@@ -84,10 +85,11 @@ public class DerbyDialect extends Dialect {
         return false;
     }
     
-    @Override
-    public boolean authorizationAllowedInCreateSchema() {
-        return false;
-    }
+    /* False for Derby 10.1.2.1, true for 10.4.2.0 */
+//    @Override
+//    public boolean authorizationAllowedInCreateSchema() {
+//        return false;
+//    }
     
     @Override
     public boolean isReservedWord(String word) {
@@ -102,10 +104,11 @@ public class DerbyDialect extends Dialect {
         return true;
     }
 
-    @Override
-    public boolean haveSlashStarComments() {
-        return false;
-    }
+    /* False for Derby 10.1.2.1, true for 10.4.2.0 */
+//    @Override
+//    public boolean haveSlashStarComments() {
+//        return false;
+//    }
 
     @Override
     public boolean canConcatenateStringAndInteger() {
@@ -120,11 +123,12 @@ public class DerbyDialect extends Dialect {
         return true;
     }
     
-    @Override
-    public boolean canGroupByExpression() {
-        // Seems to be allowed as of Derby 10.2.1.6
-        return false;
-    }
+    /* False for Derby 10.1.2.1, true for 10.4.2.0 */
+    // Seems to be allowed as of Derby 10.2.1.6
+//    @Override
+//    public boolean canGroupByExpression() {
+//        return false;
+//    }
     
     @Override
     public boolean canGroupByColumnAlias() {
@@ -304,10 +308,11 @@ public class DerbyDialect extends Dialect {
         return true;
     }
     
-    @Override
-    public boolean errorIfOrderByNotInSelectDistinct() {
-        return false;
-    }
+    /* False for Derby 10.1.2.1, true for 10.4.2.0 */
+//    @Override
+//    public boolean errorIfOrderByNotInSelectDistinct() {
+//        return false;
+//    }
 
     @Override
     public boolean metaDataExpectsUppercase() {

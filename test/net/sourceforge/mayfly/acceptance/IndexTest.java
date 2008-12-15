@@ -193,8 +193,12 @@ public class IndexTest extends SqlTestCase {
         else {
             expectExecuteFailure(createTable, 
                 "cannot combine nullable column and unique constraint: table foo, column a");
-            // If it were just the NOT NULL thing, we could work around it.
-            // But I couldn't get the rest of this test to work in Derby.
+        }
+        
+        if (dialect instanceof DerbyDialect) {
+            // I couldn't get the rest of this test to work in Derby.
+            // Dropping the index is failing, saying no such index, and
+            // I'm not sure sure why.
             return;
         }
 

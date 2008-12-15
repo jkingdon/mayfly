@@ -302,6 +302,8 @@ public abstract class Dialect {
         return errorIfNotAggregateOrGrouped(rowsPresent);
     }
 
+    // Keeping this function for the moment for old version of derby, but
+    // current ones don't need the setting.
     public boolean canGroupByExpression() {
         return true;
     }
@@ -428,6 +430,8 @@ public abstract class Dialect {
         return false;
     }
 
+    // Keeping this function for the moment for old version of derby, but
+    // current ones don't need the setting.
     public boolean uniqueColumnMayBeNullable() {
         return true;
     }
@@ -491,6 +495,8 @@ public abstract class Dialect {
         return true;
     }
 
+    // Keeping this function for the moment for old version of derby, but
+    // current ones don't need the setting.
     public boolean haveSlashStarComments() {
         return true;
     }
