@@ -308,4 +308,8 @@ public class MayflyDialect extends Dialect {
         return true;
     }
     
+    @Override
+    public boolean haveAlterTableRenameTo() {
+        return false;
+    }
 }

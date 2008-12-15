@@ -253,6 +253,11 @@ public class DerbyDialect extends Dialect {
         ALTER TABLE foo ALTER [COLUMN] a [NOT] NULL */
         return false;
     }
+    
+    @Override
+    public boolean haveAlterTableRenameTo() {
+        return false;
+    }
 
     @Override
     public boolean haveSql2003AutoIncrement() {

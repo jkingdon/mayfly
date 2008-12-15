@@ -52,5 +52,6 @@ public class RenameColumnTest extends SqlTestCase {
     
     // TODO: are other constraints (besides foreign keys) a different case?
     // TODO: indexes refer to old name
+    // TODO: what if the column aleady exists
 
 }

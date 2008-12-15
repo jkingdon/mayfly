@@ -690,6 +690,10 @@ public abstract class Dialect {
     public boolean canDropLastColumn() {
         return false;
     }
+    
+    public boolean haveAlterTableRenameTo() {
+        return true;
+    }
 
     public boolean defaultValueCanBeExpression() {
         // Who does this besides postgres?
