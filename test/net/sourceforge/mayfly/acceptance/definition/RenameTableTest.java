@@ -46,8 +46,9 @@ public class RenameTableTest extends SqlTestCase {
         assertResultSet(new String[] { " 77 " }, query("select x from bar"));
     }
     
-    // TODO: constraints pointing to renamed table
-    // TODO: constraints pointing from renamed table
+    // TODO: foreign keys pointing to renamed table
+    // TODO: foreign keys pointing from renamed table
+    // TODO: CheckConstraint has a table name in it.
     // TODO: error handling if the from table doesn't exist.
     // TODO: rename across schemas.  MySQL sometimes supports this, I think.
     //   It somehow feels wrong.

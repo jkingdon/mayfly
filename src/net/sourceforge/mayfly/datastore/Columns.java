@@ -39,7 +39,7 @@ public class Columns implements Iterable<Column> {
 
 
     final ImmutableList<CaseInsensitiveString> columnNames;
-    final ImmutableMap nameToColumn;
+    final ImmutableMap<CaseInsensitiveString, Column> nameToColumn;
 
     public Columns(ImmutableList<Column> columns) {
         List names = new ArrayList();
@@ -98,7 +98,7 @@ public class Columns implements Iterable<Column> {
 
 
     public Column column(int index) {
-        return (Column) nameToColumn.get(columnNames.get(index));
+        return nameToColumn.get(columnNames.get(index));
     }
 
     public Column columnFromName(String columnName) {
@@ -106,8 +106,7 @@ public class Columns implements Iterable<Column> {
     }
 
     public Column columnFromName(String columnName, Location location) {
-        Column found = (Column) 
-            nameToColumn.get(new CaseInsensitiveString(columnName));
+        Column found = nameToColumn.get(new CaseInsensitiveString(columnName));
         if (found == null) {
             throw new NoColumn(columnName, location);
         } else {
@@ -155,9 +154,7 @@ public class Columns implements Iterable<Column> {
             result.add(newName);
             found = true;
         }
-        for (Iterator iter = columnNames.iterator(); iter.hasNext();) {
-            CaseInsensitiveString existing = (CaseInsensitiveString) 
-                iter.next();
+        for (CaseInsensitiveString existing: columnNames) {
             result.add(existing);
             if (position.isAfter(existing.getString())) {
                 result.add(newName);

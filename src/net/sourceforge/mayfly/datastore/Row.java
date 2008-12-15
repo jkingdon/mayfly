@@ -15,7 +15,7 @@ import java.util.Iterator;
  */
 public class Row {
 
-    final ImmutableMap cells;
+    final ImmutableMap<CaseInsensitiveString, Cell> cells;
     
     public Row() {
         this(new ImmutableMap());
@@ -31,7 +31,7 @@ public class Row {
 
 
     public Cell cell(CaseInsensitiveString column) {
-        Cell cell = (Cell) cells.get(column);
+        Cell cell = cells.get(column);
         if (cell == null) {
             throw new NoColumn(column);
         }
