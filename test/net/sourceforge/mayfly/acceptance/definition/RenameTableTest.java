@@ -46,6 +46,28 @@ public class RenameTableTest extends SqlTestCase {
         assertResultSet(new String[] { " 77 " }, query("select x from bar"));
     }
     
+    public void testForeignKeyFromRenamedTable() throws Exception {
+        if (!dialect.haveAlterTableRenameTo()) {
+            return;
+        }
+        execute("create table authors(id integer primary key)" + 
+            dialect.tableTypeForForeignKeys());
+        execute("create table cookbooks(name varchar(255), " +
+        		"author_id integer," +
+        		"foreign key(author_id) references authors(id))" + 
+                dialect.tableTypeForForeignKeys());
+        execute("alter table cookbooks rename to books");
+
+        execute("insert into authors(id) values(5)");
+        expectExecuteFailure(
+            "insert into books(name, author_id) values ('dal makhani', 77)",
+            "foreign key violation: " +
+            "attempt in table books, column author_id " +
+            "to reference non-present value 77 in " +
+            "table authors, column id");
+        execute("insert into books(name, author_id) values ('aloo gobi', 5)");
+    }
+    
     // TODO: foreign keys pointing to renamed table
     // TODO: foreign keys pointing from renamed table
     // TODO: CheckConstraint has a table name in it.

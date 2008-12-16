@@ -88,6 +88,21 @@ public class Schema {
             tables.with(table, oldTable.renameColumn(oldName, newName)));
     }
 
+    public Schema renameTable(TableReference existing, String newName) {
+        String oldName = existing.tableName();
+        if (hasTable(newName)) {
+            throw new MayflyException(
+                "table " + newName + " already exists; " +
+                "cannot rename " + oldName + " to " + newName);
+        }
+            
+        return new Schema(
+            tables
+                .without(oldName)
+                .with(newName, table(oldName).renameTable(oldName, newName))
+        );
+    }
+
     private void assertNoTable(String table) {
         String existingTable = lookUpTableOrNull(table);
         if (existingTable != null) {
@@ -273,20 +288,6 @@ public class Schema {
             }
         }
         return null;
-    }
-
-    public Schema renameTable(TableReference existing, String newName) {
-        if (hasTable(newName)) {
-            throw new MayflyException(
-                "table " + newName + " already exists; " +
-                "cannot rename " + existing.tableName() + " to " + newName);
-        }
-            
-        return new Schema(
-            tables
-                .without(existing.tableName())
-                .with(newName, table(existing.tableName()))
-        );
     }
 
 }

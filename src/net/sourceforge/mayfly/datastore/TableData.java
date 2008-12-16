@@ -358,6 +358,15 @@ public class TableData {
             indexes.renameColumn(oldName, newName)
         );
     }
+    
+    public TableData renameTable(String oldName, String newName) {
+        return new TableData(
+            columns,
+            constraints.renameTable(oldName, newName),
+            rows,
+            indexes
+        );
+    }
 
     Cell highest(String column) {
         Iterator iter = rows.iterator(); 

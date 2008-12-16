@@ -76,7 +76,7 @@ public class ForeignKey extends Constraint {
     @Override
     public void checkExistingRows(DataStore store, TableReference table) {
         checkWeAreInTheRightPlace(table.schema(), table.tableName());
-        TableData tableData = store.schema(referencerSchema).table(referencerTable);
+        TableData tableData = store.schema(table.schema()).table(table.tableName());
         for (int i = 0; i < tableData.rowCount(); ++i) {
             Row row = tableData.row(i);
             checkInsert(store, row, Location.UNKNOWN);
@@ -257,7 +257,20 @@ public class ForeignKey extends Constraint {
             return this;
         }
     }
-
+    
+    @Override
+    public Constraint renameTable(String oldName, String newName) {
+        if (oldName.equalsIgnoreCase(referencerTable)) {
+            return new ForeignKey(
+                referencerSchema, newName, referencerColumn, 
+                targetTable, targetColumn, 
+                onDelete, onUpdate, constraintName);
+        }
+        else {
+            return this;
+        }
+    }
+    
     /**
      * @internal
      * Doesn't apply for foreign key; instead we check in

@@ -107,5 +107,10 @@ public abstract class Constraint {
     }
 
     abstract public Constraint renameColumn(String oldName, String newName);
+    
+    public Constraint renameTable(String oldName, String newName) {
+        // Most subclasses don't need to do anything.
+        return this;
+    }
 
 }

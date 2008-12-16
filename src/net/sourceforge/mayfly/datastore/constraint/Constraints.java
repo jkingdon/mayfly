@@ -116,9 +116,7 @@ public class Constraints implements Iterable<Constraint> {
 
     public Constraints renameColumn(String oldName, String newName) {
         List newConstraints = new ArrayList();
-        for (Iterator iter = constraints.iterator(); iter.hasNext();) {
-            Constraint constraint = (Constraint) iter.next();
-            
+        for (Constraint constraint : constraints) {
             if (constraint.refersTo(oldName)) {
                 throw new MayflyException("cannot rename column " + oldName + 
                     " because a constraint refers to it");
@@ -126,6 +124,16 @@ public class Constraints implements Iterable<Constraint> {
 
             Constraint newConstraint = 
                 constraint.renameColumn(oldName, newName);
+            newConstraints.add(newConstraint);
+        }
+        return new Constraints(new ImmutableList(newConstraints));
+    }
+
+    public Constraints renameTable(String oldName, String newName) {
+        List newConstraints = new ArrayList();
+        for (Constraint constraint : constraints) {
+            Constraint newConstraint = 
+                constraint.renameTable(oldName, newName);
             newConstraints.add(newConstraint);
         }
         return new Constraints(new ImmutableList(newConstraints));
