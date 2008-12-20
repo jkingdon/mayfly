@@ -1,11 +1,13 @@
 package net.sourceforge.mayfly.acceptance;
 
-import org.apache.commons.io.FileUtils;
-
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class DerbyDialect extends Dialect {
 
@@ -15,19 +17,74 @@ public class DerbyDialect extends Dialect {
         Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
 
         File testDirectory = new File("derby", "test");
-
-        // This works, but Derby is extremely slow on create=true
-        // So we'd like a better way...
-        FileUtils.deleteDirectory(testDirectory);
-
+        
         if (!testDirectory.exists()) {
             // If you need to clean out all state for sure, just delete the derby/test
             // directory and all its contents
             return DriverManager.getConnection("jdbc:derby:test;create=true");
         }
         else {
-            return openAdditionalConnection();
+            Connection connection = openAdditionalConnection();
+            dropAllTables(connection);
+            return connection;
         }
+    }
+
+    private void dropAllTables(Connection connection) throws Exception {
+        // This is much faster than rm -rf derby/test and re-creating
+        List<String> tables = listTables(connection);
+        while (tables.size() > 0) {
+            int startingSize = tables.size();
+            Iterator<String> i = tables.iterator();
+            while (i.hasNext()) {
+                String table = i.next();
+                boolean success = true;
+                try {
+                    SqlTestCase.execute("drop table \"" + table + "\"", connection);
+                }
+                catch (SQLException e) {
+                    if (e.getSQLState().equals("X0Y25")) {
+                        // There is a foreign key pointing to this table.
+                        success = false;
+                    }
+                    else {
+                        throw e;
+                    }
+                }
+                if (success) {
+                    i.remove();
+                }
+            }
+            if (startingSize == tables.size()) {
+                throw new Exception("Cannot delete tables " + join(tables, ", "));
+            }
+        }
+    }
+
+    private String join(List<String> tables, String separator) {
+        StringBuilder result = new StringBuilder();
+        Iterator<String> i = tables.iterator();
+        if (i.hasNext()) {
+            String first = i.next();
+            result.append(first);
+        }
+        while (i.hasNext()) {
+            String nonFirst = i.next();
+            result.append(separator);
+            result.append(nonFirst);
+        }
+        return result.toString();
+    }
+
+    private List<String> listTables(Connection connection) throws Exception {
+        List<String> result = new ArrayList<String>();
+        ResultSet tables =
+            connection.getMetaData().getTables(null, "APP", "%", null);
+        while (tables.next()) {
+            result.add(tables.getString("TABLE_NAME"));
+        }
+        tables.close();
+        return result;
     }
 
     @Override
@@ -40,7 +97,13 @@ public class DerbyDialect extends Dialect {
         connection.close();
         try {
             DriverManager.getConnection("jdbc:derby:test;shutdown=true");
-        } catch (SQLException derbyThrowsThisToMeanItShutDown) {
+        } catch (SQLException shutdownException) {
+            // These two indicate success, others failure (see Derby docs).
+            if (!(shutdownException.getSQLState().equals("XJ015")
+                || shutdownException.getSQLState().equals("08006")
+                )) {
+                throw shutdownException;
+            }
         }
     }
     
@@ -80,6 +143,13 @@ public class DerbyDialect extends Dialect {
         return false;
     }
     
+    @Override
+    public boolean schemasMissing() {
+        /** Interacts poorly with the table deletion code in 
+            {@link #openConnection()}. So disabled for now. */
+        return true;
+    }
+
     @Override
     public boolean canCreateSchemaAndTablesInSameStatement() {
         return false;
