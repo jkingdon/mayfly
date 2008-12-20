@@ -42,7 +42,7 @@ public class RenameTableTest extends SqlTestCase {
         }
         execute("create table foo(x integer)");
         execute("insert into foo(x) values(77)");
-        execute("alter table foo rename to bar");
+        assertEquals(0, execute("alter table foo rename to bar"));
         assertResultSet(new String[] { " 77 " }, query("select x from bar"));
     }
     
@@ -90,11 +90,8 @@ public class RenameTableTest extends SqlTestCase {
         execute("insert into cookbooks(name, author_id) values ('aloo gobi', 5)");
     }
     
-    // TODO: foreign keys pointing to renamed table
     // TODO: CheckConstraint has a table name in it.
-    // TODO: error handling if the from table doesn't exist.
     // TODO: rename across schemas.  MySQL sometimes supports this, I think.
     //   It somehow feels wrong.
-    // TODO: worry about rowsAffected?  Always 0, I would think.
 
 }
