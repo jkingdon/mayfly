@@ -265,6 +265,13 @@ public class ForeignKey extends Constraint {
                 referencerSchema, newName, referencerColumn, 
                 targetTable, targetColumn, 
                 onDelete, onUpdate, constraintName);
+        } else if (oldName.equalsIgnoreCase(targetTable.tableName())) {
+            TableReference newTable = new TableReference(
+                targetTable.schema(), newName);
+            return new ForeignKey(
+                referencerSchema, referencerTable, referencerColumn, 
+                newTable, targetColumn, 
+                onDelete, onUpdate, constraintName);
         }
         else {
             return this;

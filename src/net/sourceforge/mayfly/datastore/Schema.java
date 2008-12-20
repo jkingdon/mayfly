@@ -14,6 +14,7 @@ import net.sourceforge.mayfly.util.ImmutableList;
 import net.sourceforge.mayfly.util.ImmutableMap;
 
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -95,12 +96,17 @@ public class Schema {
                 "table " + newName + " already exists; " +
                 "cannot rename " + oldName + " to " + newName);
         }
-            
-        return new Schema(
-            tables
-                .without(oldName)
-                .with(newName, table(oldName).renameTable(oldName, newName))
-        );
+        
+        Map<String, TableData> result = new LinkedHashMap<String, TableData>();
+        for (String table : tables.keySet()) {
+            if (table.equalsIgnoreCase(oldName)) {
+                result.put(newName, table(oldName).renameTable(oldName, newName));
+            }
+            else {
+                result.put(table, table(table).renameTable(oldName, newName));
+            }
+        }
+        return new Schema(new ImmutableMap(result));
     }
 
     private void assertNoTable(String table) {

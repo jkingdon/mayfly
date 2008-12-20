@@ -68,8 +68,29 @@ public class RenameTableTest extends SqlTestCase {
         execute("insert into books(name, author_id) values ('aloo gobi', 5)");
     }
     
+    public void testForeignKeyToRenamedTable() throws Exception {
+        if (!dialect.haveAlterTableRenameTo()) {
+            return;
+        }
+        execute("create table authors(id integer primary key)" + 
+            dialect.tableTypeForForeignKeys());
+        execute("create table cookbooks(name varchar(255), " +
+                "author_id integer," +
+                "foreign key(author_id) references authors(id))" + 
+                dialect.tableTypeForForeignKeys());
+        execute("alter table authors rename to people");
+        
+        execute("insert into people(id) values(5)");
+        expectExecuteFailure(
+            "insert into cookbooks(name, author_id) values ('dal makhani', 77)",
+            "foreign key violation: " +
+            "attempt in table cookbooks, column author_id " +
+            "to reference non-present value 77 in " +
+            "table people, column id");
+        execute("insert into cookbooks(name, author_id) values ('aloo gobi', 5)");
+    }
+    
     // TODO: foreign keys pointing to renamed table
-    // TODO: foreign keys pointing from renamed table
     // TODO: CheckConstraint has a table name in it.
     // TODO: error handling if the from table doesn't exist.
     // TODO: rename across schemas.  MySQL sometimes supports this, I think.
