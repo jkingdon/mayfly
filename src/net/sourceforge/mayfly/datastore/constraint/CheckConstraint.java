@@ -48,6 +48,16 @@ public class CheckConstraint extends Constraint {
     public Constraint renameColumn(String oldName, String newName) {
         throw new UnimplementedException();
     }
+    
+    @Override
+    public Constraint renameTable(String oldName, String newName) {
+        if (tableName.equalsIgnoreCase(oldName)) {
+            return new CheckConstraint(condition, newName, constraintName);
+        }
+        else {
+            return this;
+        }
+    }
 
     @Override
     public void checkExistingRows(DataStore store, TableReference table) {

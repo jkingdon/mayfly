@@ -130,13 +130,23 @@ public class Constraints implements Iterable<Constraint> {
     }
 
     public Constraints renameTable(String oldName, String newName) {
+        boolean somethingChanged = false;
+
         List newConstraints = new ArrayList();
         for (Constraint constraint : constraints) {
             Constraint newConstraint = 
                 constraint.renameTable(oldName, newName);
+            if (newConstraint != constraint) {
+                somethingChanged = true;
+            }
             newConstraints.add(newConstraint);
         }
-        return new Constraints(new ImmutableList(newConstraints));
+        if (somethingChanged) {
+            return new Constraints(new ImmutableList(newConstraints));
+        }
+        else {
+            return this;
+        }
     }
 
     public Constraints dropForeignKey(String constraintName) {

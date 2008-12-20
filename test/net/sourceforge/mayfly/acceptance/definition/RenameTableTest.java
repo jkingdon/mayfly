@@ -90,7 +90,17 @@ public class RenameTableTest extends SqlTestCase {
         execute("insert into cookbooks(name, author_id) values ('aloo gobi', 5)");
     }
     
-    // TODO: CheckConstraint has a table name in it.
+    public void testCheckConstraintStillWorks() throws Exception {
+        if (!dialect.haveCheckConstraints() || !dialect.haveAlterTableRenameTo()) {
+            return;
+        }
+
+        execute("create table coronations(year integer, check(year >= 1784))");
+        execute("alter table coronations rename to inaugurations");
+        expectExecuteFailure("insert into inaugurations(year) values(1776)", 
+            "cannot insert into inaugurations; check constraint failed");
+    }
+
     // TODO: rename across schemas.  MySQL sometimes supports this, I think.
     //   It somehow feels wrong.
 
