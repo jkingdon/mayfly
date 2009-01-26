@@ -160,12 +160,8 @@ public class Schema {
     }
 
     private String lookUpTableOrNull(String target) {
-        return lookUpTableOrNull(target, new Options());
-    }
-
-    private String lookUpTableOrNull(String target, Options options) {
         for (String canonicalTable : tables.keySet()) {
-            if (options.tableNamesEqual(canonicalTable, target)) {
+            if (canonicalTable.equalsIgnoreCase(target)) {
                 return canonicalTable;
             }
         }
