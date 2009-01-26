@@ -91,16 +91,16 @@ public class Schema {
 
     public Schema renameTable(TableReference existing, String newName) {
         String oldName = existing.tableName();
-        if (hasTable(newName)) {
-            throw new MayflyException(
-                "table " + newName + " already exists; " +
-                "cannot rename " + oldName + " to " + newName);
-        }
         
         Map<String, TableData> result = new LinkedHashMap<String, TableData>();
         for (String table : tables.keySet()) {
             if (table.equalsIgnoreCase(oldName)) {
                 result.put(newName, table(oldName).renameTable(oldName, newName));
+            }
+            else if (table.equalsIgnoreCase(newName)) {
+                throw new MayflyException(
+                    "table " + newName + " already exists; " +
+                    "cannot rename " + oldName + " to " + newName);
             }
             else {
                 result.put(table, table(table).renameTable(oldName, newName));

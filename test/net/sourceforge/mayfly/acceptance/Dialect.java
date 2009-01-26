@@ -100,7 +100,7 @@ public abstract class Dialect {
      * Should a test look for behavior in which Mayfly intentionally diverges
      * from what other databases do.
      * 
-     * (In most case it makes more sense to have an individual test for a specific questions
+     * (In most cases it makes more sense to have an individual test for a specific questions
      * like detectsAmbiguousColumns or whatever).  */
     public boolean expectMayflyBehavior() {
         return false;
