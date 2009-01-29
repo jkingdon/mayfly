@@ -8,12 +8,6 @@
         <delete dir="build"/>
     </target>
 
-    <path id="classpath.lib">
-        <fileset dir="src/lib">
-            <include name="**/*.jar"/>
-        </fileset>
-    </path>
-
     <path id="classpath">
         <fileset dir="src/lib">
             <include name="**/*.jar"/>
