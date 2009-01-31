@@ -76,28 +76,6 @@ and have automated tests which can be run against Mayfly):
 
 Things to document somewhere:
 
-* Why is Mayfly written to work with GCJ when GCJ is missing Java 1.5 features?
-Reasons include ease of installation
-(on Fedora Core 4 and later, at least), insurance in case Sun licensing becomes more
-difficult, and the possibility that diversity will lead to more progress (although it
-is not clear this has been true to date, as gcj plays catch-up at least as much as
-it innovates).  Having said all that, we miss 1.5 features so this decision is
-subject to change.
-
-For info on gcj, best site I've found so far is:
-
-http://fedoraproject.org/wiki/JavaFAQ
-
-with one of the most annoying bugs being the lack of line numbers in java stack traces:
-
-http://fedoraproject.org/wiki/JavaStackTraces
-
-Eclipse seems to be pretty solid as of 3.1.1-1jpp_1fc.FC4.4 (which hit updates-released in October, 2005).  There are still annoyances (don't know if they are gcj or Fedora specific),
-but I haven't seen it crashing.
-
-There are some java-related items in:
-http://www.fedoraproject.org/wiki/FC5Future
-
 * Associating types with values rather than columns.  This is what SQLite does.
   For better compatibility we may want to implement what SQLite calls "type
   affinity" (in which the column type gives a preferred type for the value).
