@@ -167,7 +167,8 @@ public class JdbcStatement implements Statement {
         throw new UnimplementedException();
     }
 
-    public boolean execute(String sql, int[] columnIndexes) throws SQLException {
+    public boolean execute(String sql, int[] columnIndexes)
+            throws SQLException {
         throw new UnimplementedException();
     }
 
@@ -177,6 +178,26 @@ public class JdbcStatement implements Statement {
     }
 
     public int getResultSetHoldability() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public boolean isClosed() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public boolean isPoolable() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setPoolable(boolean poolable) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new UnimplementedException();
     }
 

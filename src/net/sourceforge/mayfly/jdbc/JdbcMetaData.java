@@ -6,6 +6,7 @@ import net.sourceforge.mayfly.UnimplementedException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.RowIdLifetime;
 import java.sql.SQLException;
 
 public class JdbcMetaData implements DatabaseMetaData {
@@ -680,6 +681,44 @@ public class JdbcMetaData implements DatabaseMetaData {
 
     public boolean usesLocalFiles() throws SQLException {
         return false;
+    }
+
+    public boolean autoCommitFailureClosesAllResultSets() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public ResultSet getClientInfoProperties() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public ResultSet getFunctionColumns(String arg0, String arg1, String arg2,
+        String arg3) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public ResultSet getFunctions(String arg0, String arg1, String arg2)
+        throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public RowIdLifetime getRowIdLifetime() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public ResultSet getSchemas(String arg0, String arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public boolean supportsStoredFunctionsUsingCallSyntax() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
+        throw new UnimplementedException();
     }
 
 }

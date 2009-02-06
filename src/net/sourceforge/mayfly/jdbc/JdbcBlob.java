@@ -53,4 +53,13 @@ public class JdbcBlob implements Blob {
         throw new UnimplementedException();
     }
 
+    public void free() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public InputStream getBinaryStream(long arg0, long arg1)
+        throws SQLException {
+        throw new UnimplementedException();
+    }
+
 }

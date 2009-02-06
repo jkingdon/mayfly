@@ -6,15 +6,23 @@ import net.sourceforge.mayfly.MayflyConnection;
 import net.sourceforge.mayfly.UnimplementedException;
 import net.sourceforge.mayfly.datastore.DataStore;
 
+import java.sql.Array;
+import java.sql.Blob;
 import java.sql.CallableStatement;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.NClob;
 import java.sql.PreparedStatement;
+import java.sql.SQLClientInfoException;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Savepoint;
 import java.sql.Statement;
+import java.sql.Struct;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * This is Mayfly's implementation of a JDBC connection.
@@ -254,6 +262,59 @@ public class JdbcConnection implements Connection {
      */
     public DataStore snapshot() {
         return mayflyConnection.snapshot();
+    }
+
+    public Array createArrayOf(String arg0, Object[] arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public Blob createBlob() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public Clob createClob() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public NClob createNClob() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public SQLXML createSQLXML() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public Struct createStruct(String arg0, Object[] arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public Properties getClientInfo() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public String getClientInfo(String arg0) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public boolean isValid(int arg0) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setClientInfo(Properties arg0) throws SQLClientInfoException {
+        throw new UnimplementedException();
+    }
+
+    public void setClientInfo(String arg0, String arg1)
+        throws SQLClientInfoException {
+        throw new UnimplementedException();
+    }
+
+    public boolean isWrapperFor(Class<?> arg0) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public <T> T unwrap(Class<T> arg0) throws SQLException {
+        throw new UnimplementedException();
     }
 
 }

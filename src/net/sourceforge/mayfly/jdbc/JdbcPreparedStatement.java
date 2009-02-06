@@ -22,13 +22,16 @@ import java.sql.Array;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.Connection;
+import java.sql.NClob;
 import java.sql.ParameterMetaData;
 import java.sql.PreparedStatement;
 import java.sql.Ref;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLWarning;
+import java.sql.SQLXML;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.BitSet;
@@ -457,6 +460,103 @@ public class JdbcPreparedStatement implements PreparedStatement {
     }
 
     public int getResultSetHoldability() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setAsciiStream(int arg0, InputStream arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setAsciiStream(int arg0, InputStream arg1, long arg2)
+        throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setBinaryStream(int arg0, InputStream arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setBinaryStream(int arg0, InputStream arg1, long arg2)
+        throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setBlob(int arg0, InputStream arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setBlob(int arg0, InputStream arg1, long arg2)
+        throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setCharacterStream(int arg0, Reader arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setCharacterStream(int arg0, Reader arg1, long arg2)
+        throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setClob(int arg0, Reader arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setClob(int arg0, Reader arg1, long arg2) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setNCharacterStream(int arg0, Reader arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setNCharacterStream(int arg0, Reader arg1, long arg2)
+        throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setNClob(int arg0, NClob arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setNClob(int arg0, Reader arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setNClob(int arg0, Reader arg1, long arg2) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setNString(int arg0, String arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setRowId(int arg0, RowId arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setSQLXML(int arg0, SQLXML arg1) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public boolean isClosed() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public boolean isPoolable() throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public void setPoolable(boolean arg0) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public boolean isWrapperFor(Class<?> iface) throws SQLException {
+        throw new UnimplementedException();
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
         throw new UnimplementedException();
     }
 
