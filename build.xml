@@ -56,7 +56,7 @@
     </target>
 
     <target name="test" depends="compile-tests" description="run unit tests">
-        <junit fork="yes" haltonfailure="true" haltonerror="true">
+        <junit haltonfailure="true" haltonerror="true">
             <classpath refid="runtest.classpath"/>
             <formatter usefile="false" type="brief"/>
             <batchtest>
