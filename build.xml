@@ -71,7 +71,7 @@
     <!-- Profile a test with JIP ( http://jiprof.sourceforge.net/ ). -->
     <target name="profile-test" depends="compile-tests" 
         description="Profile tests - may require manual editing of PerformanceTest.java">
-        <junit fork="yes" haltonfailure="true" haltonerror="true">
+        <junit haltonfailure="true" haltonerror="true">
             <classpath refid="runtest.classpath"/>
             <jvmarg value="-javaagent:test/lib/jiprof-1.0.7.jar"/> 
             <jvmarg value="-Dprofile.properties=profile.properties"/>
