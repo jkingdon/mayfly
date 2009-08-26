@@ -106,6 +106,11 @@ public class MayflyConnection {
         TableData tableData = database.dataStore().table(currentSchema, tableName);
         return tableData.rowCount();
     }
+    
+    public List<String> indexes(String tableName) {
+        TableData tableData = database.dataStore().table(currentSchema, tableName);
+        return tableData.indexes.names();
+    }
 
     public void setAutoCommit(boolean autoCommit) throws SQLException {
         this.autoCommit  = autoCommit;

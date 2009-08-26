@@ -175,6 +175,21 @@ public class Database {
     }
 
     /**
+     * Return the index names for indexes in the given table.
+     * 
+     * <p>If you have more than one
+     * schema, only tables in the current
+     * schema (as set by SET SCHEMA) are consulted.</p>
+     * 
+     * <p>If a future version of Mayfly implements this functionality in
+     * java.sql.DatabaseMetaData, this method is likely to remain, as
+     * being more convenient than DatabaseMetaData.</p>
+     */
+    public List<String> indexes(String tableName) {
+        return defaultConnection.indexes(tableName);
+    }
+
+    /**
      * Number of rows in given table.
      * 
      * This is a convenience method.  Your production code will almost

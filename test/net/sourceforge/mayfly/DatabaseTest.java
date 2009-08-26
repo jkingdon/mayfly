@@ -10,6 +10,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -84,6 +85,29 @@ public class DatabaseTest extends TestCase {
         catch (MayflyException e) {
             assertEquals("no table nosuch", e.getMessage());
         }
+    }
+    
+    public void testIndexesOnNonexistentTable() throws Exception {
+        try {
+            database.indexes("nosuch");
+            fail();
+        }
+        catch (MayflyException e) {
+            assertEquals("no table nosuch", e.getMessage());
+        }
+    }
+    
+    public void testNoIndexes() throws Exception {
+        database.execute("create table foo(x integer)");
+        assertEquals(0, database.indexes("foo").size());
+    }
+    
+    public void testReturnIndexes() throws Exception {
+        database.execute("create table foo(x integer)");
+        database.execute("create index an_index_name on foo(x)");
+        List<String> indexes = database.indexes("foo");
+        assertEquals(1, indexes.size());
+        assertEquals("an_index_name", indexes.get(0));
     }
     
     public void testQueryAndSchema() throws Exception {

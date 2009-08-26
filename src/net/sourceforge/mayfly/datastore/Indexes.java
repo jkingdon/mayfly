@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class Indexes implements Iterable<Index> {
 
-    private final ImmutableList<Index> indexes;
+    public final ImmutableList<Index> indexes;
     
     public Indexes() {
         this(new ImmutableList<Index>());
@@ -87,6 +87,14 @@ public class Indexes implements Iterable<Index> {
             }
         }
         return false;
+    }
+    
+    public List<String> names() {
+        List<String> result = new ArrayList<String>();
+        for (Index index : indexes) {
+            result.add(index.name());
+        }
+        return result;
     }
 
 }
