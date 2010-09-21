@@ -2,7 +2,8 @@ Instructions for people maintaining these web pages:
 
 * Check in all changes to git.
 
-* Push individual files to sourceforge (where we currently host the web site) using sftp as described at http://alexandria.wiki.sourceforge.net/Project+Web,+Shell,+VHOST+and+Database+Services
+* Push individual files to sourceforge (where we currently host the web site) using sftp as described at https://sourceforge.net/apps/trac/sourceforge/wiki/Project%20web
+
 Quick summary is:
 $ sftp SOURCEFORGE_USER,mayfly@web.sourceforge.net
 Connecting to web.sourceforge.net...
